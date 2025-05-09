@@ -3,12 +3,11 @@ import Counter from "~/components/Counter";
 import { Avatar } from "~/components/Avatar";
 import { Controlled } from "~/components/switch/Controlled";
 import { Dynamic } from "solid-js/web";
-import { createSignal, For } from "solid-js";
+import { createSignal, ErrorBoundary, For } from "solid-js";
 import ForList from "~/components/list/For";
 import IndexList from "~/components/list/Index";
 import PortalExample from "~/components/Portal";
-import BasicErrorBoundary from "~/components/errorBoudary/BasicErrorBoundary";
-import SimpleBuggy from "~/components/errorBoudary/SimpleBuggy";
+import Login from "~/components/errorBoudary/Login";
 
 const RedDiv = () => <div style="color: red">Red</div>;
 const GreenDiv = () => <div style="color: green">Green</div>;
@@ -23,18 +22,6 @@ type ColorOption = keyof typeof options;
 
 export default function Home() {
   const [selected, setSelected] = createSignal<ColorOption>("red");
-  const [makeItThrow, setMakeItThrow] = createSignal(false);
-  const [componentKey, setComponentKey] = createSignal(0);
-
-  const toggleErrorState = () => {
-    setMakeItThrow(!makeItThrow());
-  };
-
-  const handleResetFromBoundary = () => {
-    console.log("App: Resetting error state and component key.");
-    setMakeItThrow(false);
-    setComponentKey((prevKey) => prevKey + 1);
-  };
 
   return (
     <main class="text-center mx-auto text-gray-700 p-4">
@@ -65,7 +52,7 @@ export default function Home() {
       </div>
 
       <div class="flex w-full justify-center mt-5">
-        <Controlled></Controlled>
+        <Controlled />
       </div>
       <div>
         <select
@@ -80,45 +67,28 @@ export default function Home() {
         <Dynamic component={options[selected()]} />
       </div>
       <div>
-        <ForList></ForList>
-        <IndexList></IndexList>
+        <ForList />
+        <IndexList />
       </div>
       <div>
-        <PortalExample></PortalExample>
+        <PortalExample />
       </div>
-
-      <div class="min-h-screen bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-50 p-6 flex flex-col items-center">
-        <header class="mb-8 text-center">
-          <h1 class="text-3xl font-bold text-sky-700 dark:text-sky-400">
-            Simple SolidJS Error Boundary
-          </h1>
-        </header>
-
-        <div class="w-full max-w-lg p-6 bg-white dark:bg-slate-800 shadow-xl rounded-lg">
-          <button
-            onClick={toggleErrorState}
-            class="mb-6 w-full px-4 py-2 font-semibold text-white rounded-md shadow-sm transition-colors
-                 focus:outline-none focus:ring-2 focus:ring-opacity-50
-                 "
-            classList={{
-              "bg-red-500 hover:bg-red-600 focus:ring-red-500": !makeItThrow(),
-              "bg-green-500 hover:bg-green-600 focus:ring-green-500":
-                makeItThrow(),
-            }}
+      <div class="container mx-auto p-4">
+        <div class="bg-slate-100 dark:bg-slate-800 shadow-md rounded-lg p-6 space-y-4">
+          <ErrorBoundary
+            fallback={(e) => (
+              <>
+                <h2 class="text-4xl font-bold text-sky-700 dark:text-sky-400">
+                  Error Boundary Test
+                </h2>
+                <div class="border-2 border-dashed border-sky-400 dark:border-sky-600 p-6 rounded-lg bg-white dark:bg-slate-700 shadow">
+                  <p class="text-slate-700 dark:text-slate-300">{e.message}</p>
+                </div>
+              </>
+            )}
           >
-            {makeItThrow()
-              ? "Make it Work (Reset Error Condition)"
-              : "Make it Throw Error"}
-          </button>
-
-          <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">
-            The component below is wrapped in an Error Boundary. Current state:{" "}
-            {makeItThrow() ? "Will throw error on render" : "Should work"}
-          </p>
-
-          <BasicErrorBoundary onReset={handleResetFromBoundary}>
-            <SimpleBuggy id={componentKey()} shouldThrow={makeItThrow()} />
-          </BasicErrorBoundary>
+            <Login />
+          </ErrorBoundary>
         </div>
       </div>
     </main>

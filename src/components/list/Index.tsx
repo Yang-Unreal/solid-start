@@ -20,7 +20,7 @@ function IndexList() {
     <form class="container mx-auto p-4">
       <div class="bg-slate-100 dark:bg-slate-800 shadow-md rounded-lg p-6 space-y-4">
         <h2 class="text-4xl font-bold text-sky-700 dark:text-sky-400">
-          Editable List Items
+          Index list
         </h2>
         <ul class="divide-y divide-gray-200">
           <Index each={inputs()}>

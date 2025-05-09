@@ -18,7 +18,7 @@ export default function PortalExample() {
       <div class="p-6 bg-slate-100 dark:bg-slate-800 rounded-lg">
         <header class="mb-8 text-center">
           <h1 class="text-4xl font-bold text-sky-700 dark:text-sky-400">
-            SolidJS Portal with Tailwind CSS v4
+            Portal
           </h1>
         </header>
 

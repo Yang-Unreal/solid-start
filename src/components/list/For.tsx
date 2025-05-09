@@ -24,7 +24,7 @@ export default function ForList() {
         {/* Use Ark UI Field component for the input */}
         <Field.Root class="mb-4">
           <Field.Label class="text-4xl font-bold text-sky-700 dark:text-sky-400">
-            Add New Item
+            For List
           </Field.Label>
 
           <Field.Input
