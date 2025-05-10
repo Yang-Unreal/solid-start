@@ -2,28 +2,15 @@ import { A } from "@solidjs/router";
 import Counter from "~/components/Counter";
 import { Avatar } from "~/components/Avatar";
 import { Controlled } from "~/components/switch/Controlled";
-import { Dynamic } from "solid-js/web";
-import { createSignal, ErrorBoundary, For } from "solid-js";
+import { ErrorBoundary } from "solid-js";
 import ForList from "~/components/list/For";
 import IndexList from "~/components/list/Index";
 import PortalExample from "~/components/Portal";
 import Login from "~/components/errorBoudary/Login";
 import AnimeTimer from "~/components/AnimeTimer";
-
-const RedDiv = () => <div style="color: red">Red</div>;
-const GreenDiv = () => <div style="color: green">Green</div>;
-const BlueDiv = () => <div style="color: blue">Blue</div>;
-
-const options = {
-  red: RedDiv,
-  green: GreenDiv,
-  blue: BlueDiv,
-};
-type ColorOption = keyof typeof options;
+import DynamicRender from "~/components/DynamicRender";
 
 export default function Home() {
-  const [selected, setSelected] = createSignal<ColorOption>("red");
-
   return (
     <main class="text-center mx-auto text-gray-700 p-4">
       <Counter />
@@ -55,17 +42,8 @@ export default function Home() {
       <div class="flex w-full justify-center mt-5">
         <Controlled />
       </div>
-      <div>
-        <select
-          value={selected()}
-          onInput={(e) => setSelected(e.currentTarget.value as ColorOption)}
-          name="colorSelect"
-        >
-          <For each={Object.keys(options)}>
-            {(color) => <option value={color}>{color}</option>}
-          </For>
-        </select>
-        <Dynamic component={options[selected()]} />
+      <div class="container mx-auto p-4">
+        <DynamicRender />
       </div>
       <div>
         <ForList />
@@ -92,7 +70,7 @@ export default function Home() {
           </ErrorBoundary>
         </div>
       </div>
-      <div class=" container mx-auto flex relative flex-row w-full ">
+      <div class=" container mx-auto flex relative flex-row p-4 gap-4">
         <AnimeTimer />
         <AnimeTimer />
       </div>

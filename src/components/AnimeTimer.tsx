@@ -52,7 +52,7 @@ function AnimeTimer() {
   };
 
   return (
-    <div class="bg-zinc-900 p-4 sm:p-5 rounded-xl shadow-xl text-yellow-500 max-w-xs mx-auto">
+    <div class="bg-zinc-900 p-4 sm:p-5 rounded-xl shadow-xl text-yellow-500 w-full mx-auto">
       {" "}
       {/* Adjusted max-w, padding, rounded */}
       <div class="flex justify-between items-center mb-3 sm:mb-4">
