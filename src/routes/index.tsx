@@ -8,6 +8,7 @@ import ForList from "~/components/list/For";
 import IndexList from "~/components/list/Index";
 import PortalExample from "~/components/Portal";
 import Login from "~/components/errorBoudary/Login";
+import AnimeTimer from "~/components/AnimeTimer";
 
 const RedDiv = () => <div style="color: red">Red</div>;
 const GreenDiv = () => <div style="color: green">Green</div>;
@@ -47,7 +48,7 @@ export default function Home() {
       <div class="flex w-full justify-center">
         <Avatar
           name="Yang Yang"
-          src="https://avatars.githubusercontent.com/u/1846056?v=4"
+          src="https://minio.limingcn.com/bun/cloud.jpg"
         />
       </div>
 
@@ -90,6 +91,10 @@ export default function Home() {
             <Login />
           </ErrorBoundary>
         </div>
+      </div>
+      <div class=" container mx-auto flex relative flex-row w-full ">
+        <AnimeTimer />
+        <AnimeTimer />
       </div>
     </main>
   );
