@@ -1,22 +1,79 @@
 @import "tailwindcss";
 
+/*
+  This custom variant allows you to use utilities like `dark:bg-whatever`
+  and they will apply if the element itself or any of its parents has the .dark class.
+  This is a common setup for Tailwind dark mode with JIT/PostCSS.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background-rgb: 214, 219, 220;
-  --foreground-rgb: 0, 0, 0;
+  /* --- Light Theme (Default when .dark class is not present) --- */
+  --background-rgb: 255, 255, 255; /* White */
+  --foreground-rgb: 17, 24, 39; /* Tailwind gray-900 (Near Black for text) */
+  --accent-hex: #c2fe0c; /* Lime Green */
+  --accent-rgb: 194, 254, 12; /* Lime Green as RGB */
+
+  /* Font stack - prioritize modern system sans-serif fonts */
+  /* You can prepend a specific font like "Neue Haas Grotesk" if you have it */
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+:root.dark {
+  /* --- Dark Theme (Marathon Style - when .dark class is present) --- */
+  --background-rgb: 0, 0, 0; /* Black */
+  --foreground-rgb: 229, 231, 235; /* Tailwind gray-200 (Off-White for text) */
+  --accent-hex: #c2fe0c; /* Lime Green */
+  --accent-rgb: 194, 254, 12; /* Lime Green as RGB */
+}
+
+/*
+  This media query ensures that if the user's OS preference is dark,
+  the dark theme variables are applied by default. This is especially relevant
+  if the "system" theme is selected in your application.
+  The specificity of :root.dark (when .dark class is explicitly added by JS)
+  will take precedence over this if needed.
+*/
 @media (prefers-color-scheme: dark) {
   :root {
+    /* Apply to the root if no overriding .light class is present, for instance */
     --background-rgb: 0, 0, 0;
-    --foreground-rgb: 255, 255, 255;
+    --foreground-rgb: 229, 231, 235; /* Tailwind gray-200 */
+    --accent-hex: #c2fe0c;
+    --accent-rgb: 194, 254, 12;
   }
 }
 
 body {
-  background: rgb(var(--background-rgb));
+  background-color: rgb(var(--background-rgb));
   color: rgb(var(--foreground-rgb));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased; /* For smoother fonts on WebKit browsers */
+  -moz-osx-font-smoothing: grayscale; /* For smoother fonts on Firefox */
 }
 
+/*
+  Optional: You can add global styles for elements like links if you want
+  the accent color to be used more broadly by default in the Marathon style.
+  Example:
+  a {
+    color: var(--accent-hex);
+    text-decoration: none;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  :root.dark a {
+     color: var(--accent-hex); // Ensure accent is used for links in dark mode
+  }
+  :root:not(.dark) a {
+     color: #8ab40a; // A darker shade of lime for better contrast on light bg
+  }
+*/
+
+/* Animations - these are well-defined and generally useful */
 @layer utilities {
   @keyframes modal-appear {
     from {
@@ -35,7 +92,7 @@ body {
   @keyframes fade-in {
     from {
       opacity: 0;
-      transform: translateY(-10px);
+      transform: translateY(-10px); /* Start slightly above */
     }
     to {
       opacity: 1;
@@ -43,6 +100,7 @@ body {
     }
   }
   .animate-fade-in {
+    /* Duration matches what was used in Nav component for consistency */
     animation: fade-in 0.3s ease-out forwards;
   }
 }

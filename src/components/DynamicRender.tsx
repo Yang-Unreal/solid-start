@@ -1,39 +1,43 @@
 import { createSignal, For } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-// Styled Dynamic Components using Tailwind classes
+// --- Theme-Aware Dynamic Components with Rounded Corners ---
+const dynamicBoxBaseClass =
+  "p-6 mt-4 rounded-md border-2 bg-neutral-50 dark:bg-neutral-900";
+
 const RedDiv = () => (
-  <div class="p-6 mt-4 rounded-lg bg-red-100 dark:bg-red-900 border border-red-300 dark:border-red-700">
-    <p class="text-2xl font-semibold text-red-700 dark:text-red-300">
-      Red Component
+  <div class={`${dynamicBoxBaseClass} border-red-500 dark:border-red-600`}>
+    <p class="text-2xl font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
+      Red Variant
     </p>
-    <p class="mt-2 text-red-600 dark:text-red-400">
-      This content is dynamically rendered and styled red.
+    <p class="mt-2 text-neutral-700 dark:text-neutral-300">
+      This content is dynamically rendered with a red accent.
     </p>
   </div>
 );
 
 const GreenDiv = () => (
-  <div class="p-6 mt-4 rounded-lg bg-green-100 dark:bg-green-900 border border-green-300 dark:border-green-700">
-    <p class="text-2xl font-semibold text-green-700 dark:text-green-300">
-      Green Component
+  <div class={`${dynamicBoxBaseClass} border-green-500 dark:border-green-600`}>
+    <p class="text-2xl font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider">
+      Green Variant
     </p>
-    <p class="mt-2 text-green-600 dark:text-green-400">
-      This content is dynamically rendered and styled green.
+    <p class="mt-2 text-neutral-700 dark:text-neutral-300">
+      This content is dynamically rendered with a green accent.
     </p>
   </div>
 );
 
 const BlueDiv = () => (
-  <div class="p-6 mt-4 rounded-lg bg-blue-100 dark:bg-blue-900 border border-blue-300 dark:border-blue-700">
-    <p class="text-2xl font-semibold text-blue-700 dark:text-blue-300">
-      Blue Component
+  <div class={`${dynamicBoxBaseClass} border-blue-500 dark:border-blue-600`}>
+    <p class="text-2xl font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+      Blue Variant
     </p>
-    <p class="mt-2 text-blue-600 dark:text-blue-400">
-      This content is dynamically rendered and styled blue.
+    <p class="mt-2 text-neutral-700 dark:text-neutral-300">
+      This content is dynamically rendered with a blue accent.
     </p>
   </div>
 );
+// --- End Theme-Aware Dynamic Components ---
 
 const options = {
   red: RedDiv,
@@ -46,45 +50,50 @@ export default function DynamicRender() {
   const [selected, setSelected] = createSignal<ColorOption>("red");
 
   return (
-    <div class="mx-auto mt-10 p-6 bg-white dark:bg-zinc-900 rounded-xl shadow-2xl space-y-6">
-      <h1 class="text-4xl font-bold text-sky-700 dark:text-sky-400">
-        Dynamic Component Renderer
+    // Removed mx-auto from here, assuming parent layout handles centering if needed
+    <div class="p-6 sm:p-8 bg-white dark:bg-black text-neutral-800 dark:text-neutral-300 rounded-lg shadow-lg dark:shadow-2xl dark:shadow-neutral-800/50 space-y-6 sm:space-y-8">
+      <h1 class="text-center text-3xl sm:text-4xl font-bold text-sky-600 dark:text-[#c2fe0c] uppercase tracking-wider">
+        Dynamic Renderer
       </h1>
 
       <div>
         <label
-          for="colorSelect"
-          class="block mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300"
+          for="colorSelectDR" // Changed id to be unique if both components are on same page
+          class="block mb-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 uppercase tracking-wide"
         >
-          Select a color theme:
+          Select Accent Variant:
         </label>
         <select
-          id="colorSelect" // Added id for label association
+          id="colorSelectDR" // Changed id
           value={selected()}
           onInput={(e) => setSelected(e.currentTarget.value as ColorOption)}
-          class="block w-full py-3 px-4 border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800
-                 text-zinc-900 dark:text-zinc-100 rounded-lg shadow-sm
-                 focus:outline-none focus:ring-2 focus:ring-sky-500 dark:focus:ring-sky-400
-                 focus:border-sky-500 dark:focus:border-sky-400 transition duration-150 ease-in-out"
+          class={`
+            block w-full
+            py-2.5 px-3.5
+            rounded-md
+            shadow-sm
+            transition duration-150 ease-in-out
+            appearance-none
+            bg-white text-neutral-900 border-2 border-neutral-300
+            focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500
+            dark:bg-neutral-900 dark:text-neutral-200 dark:border-neutral-700
+            dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]
+          `}
         >
           <For each={Object.keys(options) as ColorOption[]}>
             {(color) => (
               <option
                 value={color}
-                class="text-zinc-800 dark:text-zinc-200 bg-white dark:bg-zinc-700" // Basic styling for options
+                class="text-neutral-800 bg-white dark:text-neutral-200 dark:bg-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-700"
               >
-                {color.charAt(0).toUpperCase() + color.slice(1)}{" "}
-                {/* Capitalize */}
+                {color.charAt(0).toUpperCase() + color.slice(1)}
               </option>
             )}
           </For>
         </select>
       </div>
 
-      {/* Container for the dynamic component for consistent spacing */}
-      <div class="min-h-[150px]">
-        {" "}
-        {/* Ensures space even if component changes height */}
+      <div class="min-h-[180px] pt-2">
         <Dynamic component={options[selected()]} />
       </div>
     </div>
