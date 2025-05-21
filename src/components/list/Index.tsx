@@ -58,13 +58,13 @@ function IndexList() {
                         id={inputId}
                         name={`item-${index}`}
                         class={`
-                          w-full px-3 py-1.5 {/* Adjusted padding slightly for input height */}
+                          w-full px-3 py-1.5
                           rounded-md shadow-sm
                           transition duration-150 ease-in-out
-                          /* Light Theme Input */
+                     
                           bg-white text-neutral-900 border-2 border-neutral-300
                           focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500
-                          /* Dark Theme Input */
+                 
                           dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600
                           dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]
                         `}
@@ -74,8 +74,6 @@ function IndexList() {
                     <Editable.Context>
                       {(editable) => (
                         <Editable.Control class="flex items-center gap-2 flex-shrink-0">
-                          {" "}
-                          {/* Prevent controls from shrinking too much */}
                           <Show
                             when={editable().editing}
                             fallback={

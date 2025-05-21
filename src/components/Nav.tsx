@@ -128,6 +128,16 @@ export default function Nav() {
             Counter
           </a>
         </li>
+        <li class="mx-1.5 sm:mx-4">
+          <a
+            href="/todo"
+            class={`${activeLinkClasses(
+              "/todo"
+            )} transition-colors duration-150 text-xs sm:text-sm uppercase tracking-wider font-semibold`}
+          >
+            ToDo
+          </a>
+        </li>
 
         <li class="ml-auto relative" ref={dropdownRef}>
           <button
