@@ -1,19 +1,8 @@
-import { createSignal, onMount } from "solid-js";
-
 export default function Login() {
-  const [shouldError, setShouldError] = createSignal(false);
-
-  // Example: Trigger error after a short delay or based on a prop
-  onMount(() => {
-    // Simulate a condition that leads to an error
-    setTimeout(() => {
-      setShouldError(true);
-    }, 100); // Or trigger based on a prop, context, etc.
-  });
-
-  if (shouldError()) {
-    throw new Error("Login has broken due to a condition!");
+  if (true) {
+    console.log("Login component: Intentionally throwing error.");
+    throw new Error("Login has broke (intentional test error)");
   }
 
-  return <div>This is the Login component.</div>;
+  return <div>This content should not be rendered.</div>;
 }

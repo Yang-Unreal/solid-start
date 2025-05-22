@@ -7,7 +7,7 @@ export default function PortalExample() {
   const toggleModal = () => setShowModal(!showModal());
 
   return (
-    <div class="p-6 sm:p-8 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-300 rounded-lg shadow-lg dark:shadow-xl dark:shadow-black/25 space-y-6 sm:space-y-8">
+    <div class="p-6 sm:p-8 bg-white dark:bg-black text-neutral-800 dark:text-neutral-300 rounded-lg space-y-6 sm:space-y-8">
       <h1 class="text-center text-2xl font-medium text-neutral-800 dark:text-neutral-200 mb-6">
         Portal
       </h1>
@@ -27,11 +27,6 @@ export default function PortalExample() {
         >
           <p class="text-center text-sm text-neutral-500 dark:text-neutral-400">
             I am a designated portal outlet.
-            <Show when={!showModal()}>
-              <span class="block mt-1">
-                Click button to render content here.
-              </span>
-            </Show>
           </p>
         </div>
       </div>
