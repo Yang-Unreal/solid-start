@@ -1,4 +1,19 @@
+import { createSignal, onMount } from "solid-js";
+
 export default function Login() {
-  throw new Error("Login has broke");
-  return <div>Login</div>;
+  const [shouldError, setShouldError] = createSignal(false);
+
+  // Example: Trigger error after a short delay or based on a prop
+  onMount(() => {
+    // Simulate a condition that leads to an error
+    setTimeout(() => {
+      setShouldError(true);
+    }, 100); // Or trigger based on a prop, context, etc.
+  });
+
+  if (shouldError()) {
+    throw new Error("Login has broken due to a condition!");
+  }
+
+  return <div>This is the Login component.</div>;
 }

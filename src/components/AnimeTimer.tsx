@@ -47,72 +47,57 @@ function AnimeTimer() {
   return (
     <div
       class={`
-        p-4 sm:p-5 rounded-xl shadow-xl w-full mx-auto
-        /* Light Theme */
-        bg-white text-sky-700
-        /* Dark Theme */
-        dark:bg-zinc-900 dark:text-yellow-500
+        p-5 rounded-lg w-full mx-auto
+        bg-white dark:bg-neutral-800/50
+        text-neutral-700 dark:text-neutral-300
+        shadow-sm border border-neutral-200 dark:border-neutral-700/80
       `}
     >
-      <div class="flex justify-between items-center mb-3 sm:mb-4">
+      <div class="flex justify-between items-center mb-4">
         <h2
           class={`
-            text-lg sm:text-xl font-semibold
-            /* Light Theme Title */
-            text-sky-700
-            /* Dark Theme Title */
-            dark:text-yellow-500
+            text-lg font-medium
+            text-neutral-800 dark:text-neutral-200
           `}
         >
-          Timer
+          Animation Timer
         </h2>
         <button
           type="button"
           onClick={handleReset}
           class={`
-            p-1.5 rounded-full transition-colors
-            /* Light Theme Reset Button */
-            text-sky-600 hover:bg-sky-100 
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 
+            p-2 rounded-full transition-colors
+            text-neutral-600 hover:bg-neutral-200/70
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500
             focus-visible:ring-offset-2 focus-visible:ring-offset-white
-            /* Dark Theme Reset Button */
-            dark:text-yellow-500 dark:hover:bg-zinc-700/70 
-            dark:focus-visible:ring-yellow-500 dark:focus-visible:ring-offset-zinc-900
+            dark:text-neutral-400 dark:hover:bg-neutral-700/60
+            dark:focus-visible:ring-[#c2fe0c] dark:focus-visible:ring-offset-neutral-800
           `}
           aria-label="Reset Timer"
         >
-          <RefreshCw class="w-4 h-4 sm:w-5 sm:h-5" stroke-width="2" />
+          <RefreshCw class="w-5 h-5" stroke-width="2.25" />
         </button>
       </div>
-      <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
+      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
         <div
           class={`
-            p-3 sm:p-4 rounded-lg flex-1 flex flex-col items-center
-            /* Light Theme Display Box */
-            bg-sky-50
-            /* Dark Theme Display Box */
-            dark:bg-zinc-800
+            p-4 rounded-md flex-1 flex flex-col items-center
+            bg-neutral-100 dark:bg-neutral-700/50
           `}
         >
           <span
             class={`
-              block text-xs font-medium uppercase tracking-wider mb-1 whitespace-nowrap
-              /* Light Theme Label */
-              text-sky-600/80
-              /* Dark Theme Label */
-              dark:text-yellow-500/80
+              block text-xs font-medium text-neutral-500 dark:text-neutral-400
+              mb-1.5 tracking-normal
             `}
           >
-            CURRENT TIME
+            Current Time
           </span>
           <span
             class={`
-              text-3xl sm:text-4xl font-mono h-[40px] sm:h-[48px] 
-              flex items-end justify-center leading-none w-full
-              /* Light Theme Value */
-              text-sky-700
-              /* Dark Theme Value */
-              dark:text-yellow-500
+              text-3xl font-mono font-medium
+              text-sky-600 dark:text-[#c2fe0c]
+              h-10 flex items-center justify-center
             `}
           >
             {currentTime()}
@@ -120,32 +105,23 @@ function AnimeTimer() {
         </div>
         <div
           class={`
-            p-3 sm:p-4 rounded-lg flex-1 flex flex-col items-center
-            /* Light Theme Display Box */
-            bg-sky-50
-            /* Dark Theme Display Box */
-            dark:bg-zinc-800
+            p-4 rounded-md flex-1 flex flex-col items-center
+            bg-neutral-100 dark:bg-neutral-700/50
           `}
         >
           <span
             class={`
-              block text-xs font-medium uppercase tracking-wider mb-1 whitespace-nowrap
-              /* Light Theme Label */
-              text-sky-600/80
-              /* Dark Theme Label */
-              dark:text-yellow-500/80
+              block text-xs font-medium text-neutral-500 dark:text-neutral-400
+              mb-1.5 tracking-normal
             `}
           >
-            CALLBACK FIRED
+            Loops Completed
           </span>
           <span
             class={`
-              text-3xl sm:text-4xl font-mono h-[40px] sm:h-[48px] 
-              flex items-end justify-center leading-none w-full
-              /* Light Theme Value */
-              text-sky-700
-              /* Dark Theme Value */
-              dark:text-yellow-500
+              text-3xl font-mono font-medium
+              text-sky-600 dark:text-[#c2fe0c]
+              h-10 flex items-center justify-center
             `}
           >
             {loopCount()}

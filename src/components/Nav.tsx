@@ -1,67 +1,74 @@
-import { createSignal, onMount, onCleanup, Show } from "solid-js";
+// Nav.tsx
+import { createSignal, onMount, onCleanup, Show, Component } from "solid-js";
 import { useLocation } from "@solidjs/router";
 import { Sun, Moon, Monitor } from "lucide-solid";
+// Import from your new ThemeManager module
+import {
+  currentTheme,
+  setCurrentTheme as setCurrentThemeSignal,
+  applyTheme,
+} from "./ThemeManager"; // Adjust path
 
+// ... (type Theme can also be moved to ThemeManager.tsx and exported)
 type Theme = "light" | "dark" | "system";
-
 const THEME_STORAGE_KEY = "theme";
 
-// --- Global Theme State and Logic (remains the same) ---
-const [currentTheme, setCurrentTheme] = createSignal<Theme>("system");
-const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
+const [isDropdownOpen, setIsDropdownOpen] = createSignal(false); // Keep local to Nav
 
-function applyTheme(theme: Theme) {
-  if (typeof window === "undefined") return;
-  const root = document.documentElement;
-  const isDarkPreferred = window.matchMedia(
-    "(prefers-color-scheme: dark)"
-  ).matches;
-  if (theme === "dark" || (theme === "system" && isDarkPreferred)) {
-    root.classList.add("dark");
-  } else {
-    root.classList.remove("dark");
-  }
-}
-
+// This setTheme function now updates the shared signal and applies the theme
 function setTheme(newTheme: Theme) {
-  setCurrentTheme(newTheme);
+  setCurrentThemeSignal(newTheme); // Update the shared signal
   if (typeof window !== "undefined") {
     localStorage.setItem(THEME_STORAGE_KEY, newTheme);
   }
-  applyTheme(newTheme);
+  applyTheme(newTheme); // Use the applyTheme function
   setIsDropdownOpen(false);
 }
 
-if (typeof window !== "undefined") {
-  onMount(() => {
-    const storedTheme = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-    let themeToApply: Theme = "system";
-    if (storedTheme && ["light", "dark", "system"].includes(storedTheme)) {
-      themeToApply = storedTheme;
-    }
-    setCurrentTheme(themeToApply);
-    applyTheme(themeToApply);
-
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      if (currentTheme() === "system") {
-        applyTheme("system");
+const ThemeIconDisplay: Component<{ size: number; class?: string }> = (
+  props
+) => {
+  // Uses the imported currentTheme signal
+  return (
+    <Show
+      when={currentTheme() === "light"}
+      fallback={
+        <Show
+          when={currentTheme() === "dark"}
+          fallback={<Monitor size={props.size} class={props.class} />}
+        >
+          <Moon size={props.size} class={props.class} />
+        </Show>
       }
-    };
-    mediaQuery.addEventListener("change", handleChange);
-    onCleanup(() => mediaQuery.removeEventListener("change", handleChange));
-  });
-}
+    >
+      <Sun size={props.size} class={props.class} />
+    </Show>
+  );
+};
 
-// --- Nav Component ---
 export default function Nav() {
   const location = useLocation();
+  const [isClientRendered, setIsClientRendered] = createSignal(false);
+  let dropdownRef: HTMLLIElement | undefined;
 
-  // Updated activeLinkClasses to be theme-aware
+  onMount(() => {
+    setIsClientRendered(true);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("click", handleClickOutside);
+    onCleanup(() => {
+      document.removeEventListener("click", handleClickOutside);
+    });
+  });
+
   const activeLinkClasses = (path: string) => {
-    const baseActive = "text-[#c2fe0c]"; // Lime green for active link (good contrast on both light/dark)
+    const baseActive = "text-sky-600 dark:text-[#c2fe0c] font-medium";
     const baseInactive =
-      "text-neutral-700 dark:text-white hover:text-[#c2fe0c] dark:hover:text-[#c2fe0c]";
+      "text-neutral-600 dark:text-neutral-300 hover:text-sky-600 dark:hover:text-[#c2fe0c] font-medium";
     return path === location.pathname ? baseActive : baseInactive;
   };
 
@@ -70,70 +77,50 @@ export default function Nav() {
     setIsDropdownOpen(!isDropdownOpen());
   };
 
-  let dropdownRef: HTMLLIElement | undefined;
-
-  if (typeof window !== "undefined") {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    onMount(() => {
-      document.addEventListener("click", handleClickOutside);
-      onCleanup(() => {
-        document.removeEventListener("click", handleClickOutside);
-      });
-    });
-  }
-
-  const [isClientRendered, setIsClientRendered] = createSignal(false);
-  onMount(() => {
-    setIsClientRendered(true);
-  });
-
   const iconSize = 20;
   const dropdownIconSize = 16;
+  const iconBaseClass = "text-neutral-600 dark:text-neutral-300";
 
   return (
-    // Nav theming: light gray background for light mode, black for dark mode
-    <nav class="bg-neutral-100 dark:bg-black shadow-md">
-      <ul class="container flex items-center p-3 text-neutral-800 dark:text-white font-sans">
-        <li class="mx-1.5 sm:mx-4">
+    <nav class="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
+      <ul class="container flex items-center p-3 font-sans">
+        {/* Navigation links remain the same */}
+        <li class="mx-1.5 sm:mx-3">
           <a
             href="/"
             class={`${activeLinkClasses(
               "/"
-            )} transition-colors duration-150 text-xs sm:text-sm uppercase tracking-wider font-semibold`}
+            )} transition-colors duration-150 text-sm`}
           >
             Home
           </a>
         </li>
-        <li class="mx-1.5 sm:mx-4">
+        <li class="mx-1.5 sm:mx-3">
           <a
             href="/about"
             class={`${activeLinkClasses(
               "/about"
-            )} transition-colors duration-150 text-xs sm:text-sm uppercase tracking-wider font-semibold`}
+            )} transition-colors duration-150 text-sm`}
           >
             About
           </a>
         </li>
-        <li class="mx-1.5 sm:mx-4">
+        <li class="mx-1.5 sm:mx-3">
           <a
             href="/counter"
             class={`${activeLinkClasses(
               "/counter"
-            )} transition-colors duration-150 text-xs sm:text-sm uppercase tracking-wider font-semibold`}
+            )} transition-colors duration-150 text-sm`}
           >
             Counter
           </a>
         </li>
-        <li class="mx-1.5 sm:mx-4">
+        <li class="mx-1.5 sm:mx-3">
           <a
             href="/todo"
             class={`${activeLinkClasses(
               "/todo"
-            )} transition-colors duration-150 text-xs sm:text-sm uppercase tracking-wider font-semibold`}
+            )} transition-colors duration-150 text-sm`}
           >
             ToDo
           </a>
@@ -142,96 +129,69 @@ export default function Nav() {
         <li class="ml-auto relative" ref={dropdownRef}>
           <button
             onClick={toggleDropdown}
-            class={`p-1.5 sm:p-2 flex items-center justify-center transition-colors duration-150
-                     text-neutral-700 dark:text-white rounded-sm
+            class={`p-2 flex items-center justify-center transition-colors duration-150 rounded-full
                      ${
                        isDropdownOpen()
-                         ? "text-[#c2fe0c] bg-neutral-200 dark:bg-neutral-800"
-                         : "hover:text-[#c2fe0c] hover:bg-neutral-200 dark:hover:bg-neutral-800"
+                         ? "bg-neutral-200 dark:bg-neutral-700"
+                         : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
                      }
                      focus:outline-none focus:ring-2 focus:ring-offset-2 
-                     focus:ring-offset-neutral-100 dark:focus:ring-offset-black 
-                     focus:ring-[#c2fe0c]`}
+                     focus:ring-offset-white dark:focus:ring-offset-neutral-900 
+                     focus:ring-sky-500 dark:focus:ring-[#c2fe0c]`}
             aria-label="Select theme"
             aria-haspopup="true"
             aria-expanded={isDropdownOpen()}
           >
             <Show
               when={isClientRendered()}
-              // Fallback icon color needs to adapt if Nav's default text color changes
-              fallback={
-                <Monitor
-                  size={iconSize}
-                  class="text-neutral-700 dark:text-white"
-                />
-              }
+              fallback={<Monitor size={iconSize} class={iconBaseClass} />}
             >
-              <Show
-                when={currentTheme() === "light"}
-                fallback={
-                  <Show
-                    when={currentTheme() === "dark"}
-                    fallback={
-                      <Monitor
-                        size={iconSize}
-                        class="text-neutral-700 dark:text-white"
-                      />
-                    }
-                  >
-                    <Moon
-                      size={iconSize}
-                      class="text-neutral-700 dark:text-white"
-                    />
-                  </Show>
-                }
-              >
-                <Sun size={iconSize} class="text-neutral-700 dark:text-white" />
-              </Show>
+              <ThemeIconDisplay size={iconSize} class={iconBaseClass} />
             </Show>
           </button>
           <Show when={isDropdownOpen()}>
             <div
-              class="animate-fade-in absolute right-0 mt-2 w-48
-                     bg-white dark:bg-black rounded-sm shadow-lg 
-                     border border-neutral-300 dark:border-neutral-700 
+              class="animate-fade-in absolute right-0 mt-2 w-44
+                     bg-white dark:bg-neutral-800 rounded-md shadow-lg 
+                     border border-neutral-200 dark:border-neutral-700 
                      py-1 z-50"
             >
               <button
                 onClick={() => setTheme("light")}
-                class="w-full text-left px-3 py-2 text-xs sm:text-sm 
-                         text-neutral-700 dark:text-neutral-300 
-                         hover:bg-[#c2fe0c] hover:text-black 
+                class="w-full text-left px-3 py-1.5 text-sm 
+                         text-neutral-700 dark:text-neutral-200 
+                         hover:bg-neutral-100 dark:hover:bg-neutral-700 
                          flex items-center group transition-colors duration-150"
               >
                 <Sun
                   size={dropdownIconSize}
-                  class="mr-2.5 text-neutral-500 group-hover:text-black transition-colors duration-150"
+                  class="mr-2 text-neutral-500 dark:text-neutral-400"
                 />
                 Light
               </button>
               <button
                 onClick={() => setTheme("dark")}
-                class="w-full text-left px-3 py-2 text-xs sm:text-sm 
-                         text-neutral-700 dark:text-neutral-300 
-                         hover:bg-[#c2fe0c] hover:text-black 
+                class="w-full text-left px-3 py-1.5 text-sm 
+                         text-neutral-700 dark:text-neutral-200 
+                         hover:bg-neutral-100 dark:hover:bg-neutral-700 
                          flex items-center group transition-colors duration-150"
               >
                 <Moon
                   size={dropdownIconSize}
-                  class="mr-2.5 text-neutral-500 group-hover:text-black transition-colors duration-150"
+                  class="mr-2 text-neutral-500 dark:text-neutral-400"
                 />
                 Dark
               </button>
               <button
                 onClick={() => setTheme("system")}
-                class="w-full text-left px-3 py-2 text-xs sm:text-sm 
-                         text-neutral-700 dark:text-neutral-300 
-                         hover:bg-[#c2fe0c] hover:text-black 
+                class="w-full text-left px-3 py-1.5 text-sm 
+                         text-neutral-700 dark:text-neutral-200 
+                         hover:bg-neutral-100 dark:hover:bg-neutral-700 
                          flex items-center group transition-colors duration-150"
               >
                 <Monitor
                   size={dropdownIconSize}
-                  class="mr-2.5 text-neutral-500 group-hover:text-black transition-colors duration-150"
+                  class="mr-2 text-neutral-500 dark:text-neutral-400"
                 />
                 System
               </button>
