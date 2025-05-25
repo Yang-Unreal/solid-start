@@ -1,11 +1,14 @@
 import { Avatar as ArkAvatar } from "@ark-ui/solid/avatar";
 import { UserIcon } from "lucide-solid";
-import { Show, splitProps, Component } from "solid-js";
+import { Show, splitProps } from "solid-js";
+import type { Component } from "solid-js";
 
 export interface AvatarProps extends ArkAvatar.RootProps {
   name?: string;
   src?: string;
   size?: "sm" | "md" | "lg";
+  // If this component were to accept children, you'd add:
+  // children?: JSX.Element;
 }
 
 const sizeClasses = {
@@ -15,7 +18,7 @@ const sizeClasses = {
 };
 
 const iconSizeClasses = {
-  sm: "w-5 h-5",
+  sm: "w-5 h-5", // For UserIcon inside fallback
   md: "w-7 h-7",
   lg: "w-10 h-10",
 };
@@ -53,7 +56,7 @@ export const Avatar: Component<AvatarProps> = (props) => {
       >
         <Show
           when={localProps.name}
-          fallback={<UserIcon class={`${iconSizeClasses[currentSize]}`} />}
+          fallback={<UserIcon class={`${iconSizeClasses[currentSize]}`} />} // Pass the correct icon size
         >
           {getInitials(localProps.name)}
         </Show>

@@ -1,4 +1,4 @@
-import { Component, For, createSignal, Show } from "solid-js";
+import { For, createSignal, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import {
   Checkbox as ArkCheckbox,
@@ -17,7 +17,7 @@ interface ToDoState {
   nextItemId: number;
 }
 
-const ToDo: Component = () => {
+const ToDo = () => {
   const [state, setState] = createStore<ToDoState>({
     items: [
       { id: 1, text: "Review Ark UI Checkbox", completed: false },

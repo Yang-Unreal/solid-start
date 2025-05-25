@@ -1,14 +1,7 @@
 import { Switch as ArkSwitch } from "@ark-ui/solid/switch";
-import {
-  createSignal,
-  Switch as SolidSwitch,
-  Match,
-  Component,
-} from "solid-js";
+import { createSignal, Switch as SolidSwitch, Match } from "solid-js";
 
-interface ControlledSwitchProps {}
-
-export const Controlled: Component<ControlledSwitchProps> = () => {
+export const Controlled = () => {
   const [checked, setChecked] = createSignal(false);
 
   return (

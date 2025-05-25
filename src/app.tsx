@@ -4,6 +4,7 @@ import { Suspense } from "solid-js";
 import Nav from "~/components/Nav";
 import "./app.css";
 import ThemeManager from "./components/ThemeManager";
+import { MetaProvider } from "@solidjs/meta";
 
 export default function App() {
   return (
@@ -12,7 +13,11 @@ export default function App() {
         <>
           <ThemeManager />
           <Nav />
-          <Suspense>{props.children}</Suspense>
+          <div class="flex-grow pt-16">
+            <MetaProvider>
+              <Suspense>{props.children}</Suspense>
+            </MetaProvider>
+          </div>
         </>
       )}
     >

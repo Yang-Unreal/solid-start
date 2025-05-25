@@ -1,4 +1,6 @@
-import { createSignal, createMemo, ParentComponent, Component } from "solid-js";
+import { createSignal, createMemo } from "solid-js";
+import type { ParentComponent, Component } from "solid-js"; // Import as types
+import type { JSX } from "solid-js"; // Good practice to include if JSX elements are in props/return types
 import CounterContext, { useCounter } from "~/context/CounterContext";
 
 const CounterProvider: ParentComponent = (props) => {

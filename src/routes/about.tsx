@@ -8,7 +8,7 @@ export default function About() {
     "bg-[#c2fe0c] text-black hover:bg-[#a8e00a] focus:ring-[#c2fe0c]";
 
   return (
-    <main class="bg-neutral-100 dark:bg-neutral-900 min-h-screen p-4 sm:p-6 lg:p-8">
+    <main class=" bg-neutral-100 dark:bg-neutral-900  p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-4rem)]">
       <div class="card-content-host p-6 sm:p-8 space-y-8">
         <h1 class="text-center text-2xl font-medium text-neutral-800 dark:text-neutral-200">
           About This Application

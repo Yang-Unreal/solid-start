@@ -1,5 +1,5 @@
 // Nav.tsx
-import { createSignal, onMount, onCleanup, Show, Component } from "solid-js";
+import { createSignal, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, A, useNavigate } from "@solidjs/router"; // Added A and useNavigate
 import {
   Sun,
@@ -15,7 +15,7 @@ import {
   setCurrentTheme as setCurrentThemeSignal,
   applyTheme,
 } from "./ThemeManager"; // Adjust path if needed
-
+import type { Component } from "solid-js";
 import { authClient } from "~/lib/auth-client"; // Import your auth client
 
 type Theme = "light" | "dark" | "system";
@@ -97,8 +97,11 @@ export default function Nav() {
     "transition-colors duration-150 text-sm flex items-center";
 
   return (
-    <nav class="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
-      <ul class="container flex items-center p-3 font-sans">
+    // Changed to fixed, added w-full, top-0, left-0, right-0 and a z-index
+    <nav class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
+      <ul class="container flex items-center h-full p-3 font-sans">
+        {" "}
+        {/* Ensured h-full for ul */}
         {/* Standard Navigation links */}
         <li class="mx-1.5 sm:mx-3">
           <A href="/" class={`${activeLinkClasses("/")} ${linkBaseClass}`}>
@@ -114,9 +117,9 @@ export default function Nav() {
           </A>
         </li>
         {/* Add other common links here if needed */}
-
         {/* Auth Links & Theme Toggle move to the right */}
         <div class="ml-auto flex items-center space-x-3 sm:space-x-4">
+          {/* ... Show components for auth links and theme toggle remain the same ... */}
           <Show when={!session().isPending && session().data?.user}>
             {/* Authenticated User Links */}
             <li class="mx-1.5 sm:mx-3">
@@ -191,8 +194,9 @@ export default function Nav() {
                 class="animate-fade-in absolute right-0 mt-2 w-44
                        bg-white dark:bg-neutral-800 rounded-md shadow-lg 
                        border border-neutral-200 dark:border-neutral-700 
-                       py-1 z-50"
+                       py-1 z-50" // Ensure dropdown z-index is also high
               >
+                {/* Theme buttons remain the same */}
                 <button
                   onClick={() => setTheme("light")}
                   class="w-full text-left px-3 py-1.5 text-sm 

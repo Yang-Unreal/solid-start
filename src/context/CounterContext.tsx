@@ -1,13 +1,11 @@
-import { createContext, useContext, Accessor, Setter } from "solid-js";
+import { createContext, useContext } from "solid-js";
+import type { Accessor, Setter } from "solid-js";
 
-// The data we want to share
 interface CounterContextValue {
   count: Accessor<number>;
   setCount: Setter<number>;
 }
 
-// Create the context. We can provide a default for type inference,
-// but we'll throw an error if used outside a provider.
 const CounterContext = createContext<CounterContextValue | undefined>(
   undefined
 );

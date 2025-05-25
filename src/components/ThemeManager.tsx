@@ -1,5 +1,5 @@
 // src/components/ThemeManager.tsx (or a suitable path)
-import { createSignal, onMount, onCleanup, Component } from "solid-js";
+import { createSignal, onMount, onCleanup } from "solid-js";
 
 type Theme = "light" | "dark" | "system";
 const THEME_STORAGE_KEY = "theme";
@@ -30,7 +30,7 @@ export function getStoredThemePreference(): Theme {
   return "system";
 }
 
-const ThemeManager: Component = () => {
+const ThemeManager = () => {
   onMount(() => {
     // Initial theme application based on stored preference or system
     // This part might be redundant if your inline script in entry-server.tsx already handles it.
