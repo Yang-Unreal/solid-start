@@ -8,6 +8,7 @@ import PortalExample from "~/components/Portal";
 import Login from "~/components/errorBoudary/Login";
 import AnimeTimer from "~/components/AnimeTimer";
 import DynamicRender from "~/components/DynamicRender";
+import { RefsExample } from "~/components/RefsExample";
 
 export default function Home() {
   return (
@@ -57,7 +58,9 @@ export default function Home() {
             <Login />
           </ErrorBoundary>
         </div> */}
-
+        <div class="card-content-host">
+          <RefsExample />
+        </div>
         <div class="card-wrapper">
           <AnimeTimer />
         </div>

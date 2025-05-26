@@ -19,9 +19,8 @@ export default function DashboardPage() {
   };
 
   return (
-    // Changed background to match Home.tsx
     <div class=" flex-grow bg-neutral-100 dark:bg-neutral-900 text-slate-800 dark:text-neutral-200 transition-colors duration-300 min-h-[calc(100vh-4rem)]">
-      <main class="container mx-auto px-4 sm:px-6 lg:px-8  flex flex-col grow overflow-hidden">
+      <main class="container mx-auto p-4 sm:p-6 lg:p-8  flex flex-col grow overflow-hidden ">
         <Show when={session().isPending}>
           <div class="flex-grow flex justify-center items-center">
             <svg
@@ -68,9 +67,6 @@ export default function DashboardPage() {
                 Welcome back,{" "}
                 {session().data?.user?.name || session().data?.user?.email}!
               </h1>
-              <p class="mt-1 text-md text-neutral-600 dark:text-neutral-400">
-                Here's what's happening with your account today.
-              </p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 grow overflow-y-auto custom-scrollbar pb-4">
