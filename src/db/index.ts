@@ -1,23 +1,7 @@
-// import "dotenv/config";
-// import { drizzle } from "drizzle-orm/node-postgres";
-// import { Pool } from "pg";
-// import * as schema from "./schema";
-
-// if (!process.env.DATABASE_URL) {
-//   throw new Error("DATABASE_URL environment variable is not set.");
-// }
-
-// const pool = new Pool({
-//   connectionString: process.env.DATABASE_URL,
-// });
-
-// const db = drizzle(pool, { schema });
-
-// export default db;
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool, type PoolConfig } from "pg";
-import * as schema from "./schema"; // Ensure this path is correct
+import * as schema from "./schema";
 import fs from "fs";
 import { URL } from "url";
 import net from "net";
@@ -40,7 +24,7 @@ const poolConfig: PoolConfig = {
   password: dbUrl.password,
   host: currentHostForConnection,
   port: parseInt(dbUrl.port, 10),
-  database: dbUrl.pathname.slice(1), // Remove leading '/' from pathname
+  database: dbUrl.pathname.slice(1),
 };
 
 if (sslMode === "disable") {
@@ -65,6 +49,7 @@ if (sslMode === "disable") {
 
   if (sslMode === "verify-full") {
     const sslRootCertPath = dbUrl.searchParams.get("sslrootcert");
+
     if (!sslRootCertPath) {
       throw new Error(
         "sslmode=verify-full requires an sslrootcert parameter in DATABASE_URL for custom CA verification."
