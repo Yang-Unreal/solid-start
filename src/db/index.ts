@@ -17,11 +17,14 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool, type PoolConfig } from "pg";
-import * as schema from "./schema";
+import * as schema from "./schema"; // Ensure this path is correct
 import fs from "fs";
 import { URL } from "url";
 import net from "net";
-import tls, { type PeerCertificate } from "tls";
+import tls, {
+  type PeerCertificate,
+  type ConnectionOptions as TlsConnectionOptions,
+} from "tls";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set.");
@@ -30,53 +33,56 @@ if (!process.env.DATABASE_URL) {
 const databaseUrlString = process.env.DATABASE_URL;
 const dbUrl = new URL(databaseUrlString);
 const currentHostForConnection = dbUrl.hostname;
+const sslMode = dbUrl.searchParams.get("sslmode");
 
 const poolConfig: PoolConfig = {
   user: dbUrl.username,
   password: dbUrl.password,
   host: currentHostForConnection,
   port: parseInt(dbUrl.port, 10),
-  database: dbUrl.pathname.slice(1),
-  ssl: {
+  database: dbUrl.pathname.slice(1), // Remove leading '/' from pathname
+};
+
+if (sslMode === "disable") {
+  poolConfig.ssl = false;
+} else {
+  const sslOptions: TlsConnectionOptions = {
     rejectUnauthorized: true,
     checkServerIdentity: (
       hostnameBeingChecked: string,
       cert: PeerCertificate
     ): Error | undefined => {
       if (hostnameBeingChecked.toLowerCase().startsWith("localhost")) {
-        const errorForActualHost = tls.checkServerIdentity(
-          currentHostForConnection,
-          cert
-        );
-        return errorForActualHost;
+        return tls.checkServerIdentity(currentHostForConnection, cert);
       }
       return tls.checkServerIdentity(hostnameBeingChecked, cert);
     },
-  },
-};
+  };
 
-if (!net.isIP(currentHostForConnection)) {
-  if (typeof poolConfig.ssl === "object" && poolConfig.ssl !== null) {
-    poolConfig.ssl.servername = currentHostForConnection;
+  if (!net.isIP(currentHostForConnection)) {
+    sslOptions.servername = currentHostForConnection;
   }
-}
 
-const sslRootCertPath = dbUrl.searchParams.get("sslrootcert");
-const sslMode = dbUrl.searchParams.get("sslmode");
-
-if (sslMode === "verify-full" && sslRootCertPath) {
-  try {
-    if (typeof poolConfig.ssl === "object" && poolConfig.ssl !== null) {
-      poolConfig.ssl.ca = fs.readFileSync(sslRootCertPath).toString();
+  if (sslMode === "verify-full") {
+    const sslRootCertPath = dbUrl.searchParams.get("sslrootcert");
+    if (!sslRootCertPath) {
+      throw new Error(
+        "sslmode=verify-full requires an sslrootcert parameter in DATABASE_URL for custom CA verification."
+      );
     }
-  } catch (error) {
-    console.error(
-      `Failed to load CA certificate from ${sslRootCertPath}: ${error}`
-    );
-    throw new Error(`Could not load CA certificate: ${sslRootCertPath}.`);
+    try {
+      sslOptions.ca = fs.readFileSync(sslRootCertPath).toString();
+    } catch (error) {
+      console.error(
+        `Critical: Failed to load CA certificate from ${sslRootCertPath}:`,
+        error
+      );
+      throw new Error(
+        `Could not load CA certificate: ${sslRootCertPath}. Application startup aborted.`
+      );
+    }
   }
-} else if (sslMode === "disable") {
-  poolConfig.ssl = false;
+  poolConfig.ssl = sslOptions;
 }
 
 const pool = new Pool(poolConfig);
