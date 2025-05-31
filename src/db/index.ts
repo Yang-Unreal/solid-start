@@ -14,13 +14,12 @@
 // const db = drizzle(pool, { schema });
 
 // export default db;
-
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import * as schema from "./schema"; // Assuming schema.ts is in the same directory
-import fs from "fs"; // Import the Node.js file system module
-import { URL } from "url"; // Import the Node.js URL module
+import { Pool, type PoolConfig } from "pg"; // Import PoolConfig
+import * as schema from "./schema";
+import fs from "fs";
+import { URL } from "url";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is not set.");
@@ -29,49 +28,95 @@ if (!process.env.DATABASE_URL) {
 const databaseUrlString = process.env.DATABASE_URL;
 const dbUrl = new URL(databaseUrlString);
 
-// Prepare SSL configuration
-const sslConfig: import("pg").PoolConfig["ssl"] = {
-  rejectUnauthorized: true, // Important for security: verify the CA
+// Explicitly extract all parts from the URL to build PoolConfig
+// This gives us more control than relying solely on connectionString for these parts
+const poolConfig: PoolConfig = {
+  user: dbUrl.username,
+  password: dbUrl.password,
+  host: dbUrl.hostname, // Explicitly set the host for the connection
+  port: parseInt(dbUrl.port, 10),
+  database: dbUrl.pathname.slice(1), // Remove leading '/' from pathname
+  ssl: {
+    // Initialize SSL object
+    rejectUnauthorized: true, // Default to true for security
+    // Critical: Set servername to the hostname from the URL
+    // This is what the TLS layer will use to verify the certificate against
+    servername: dbUrl.hostname,
+  },
 };
 
 const sslRootCertPath = dbUrl.searchParams.get("sslrootcert");
+const sslMode = dbUrl.searchParams.get("sslmode");
 
-if (dbUrl.searchParams.get("sslmode") === "verify-full" && sslRootCertPath) {
+// Only proceed to load CA if sslmode indicates verification and path is provided
+if (sslMode === "verify-full" && sslRootCertPath) {
   try {
-    // Read the CA certificate content from the file specified in the URL
-    sslConfig.ca = fs.readFileSync(sslRootCertPath).toString();
-    // Explicitly tell Node's TLS layer what hostname to use for verification.
-    // This should match one of the names in the certificate's Subject Alternative Name (SAN).
-    // dbUrl.hostname will be '5.78.127.238' from your DATABASE_URL
-    sslConfig.servername = dbUrl.hostname;
+    // Ensure poolConfig.ssl is an object before assigning 'ca'
+    if (typeof poolConfig.ssl !== "object" || poolConfig.ssl === null) {
+      poolConfig.ssl = { rejectUnauthorized: true, servername: dbUrl.hostname };
+    }
+    (poolConfig.ssl as any).ca = fs.readFileSync(sslRootCertPath).toString();
   } catch (error) {
     console.error(
-      `Failed to read SSL root certificate from ${sslRootCertPath}:`,
+      `[DB_SSL_ERROR] Failed to read SSL root certificate from ${sslRootCertPath}:`,
       error
     );
     throw new Error(
-      `Could not load CA certificate specified by sslrootcert: ${sslRootCertPath}. Ensure the file exists and is accessible.`
+      `Could not load CA certificate: ${sslRootCertPath}. Ensure file exists and is accessible.`
     );
   }
-} else if (
-  dbUrl.searchParams.get("sslmode") === "require" ||
-  dbUrl.searchParams.get("sslmode") === "prefer"
-) {
-  // For 'require' or 'prefer' without verify-full, you might not need servername or custom CA
-  // but if you are using Coolify's CA, you likely still want to provide it if the connection fails.
-  // For now, we only explicitly add CA and servername for verify-full.
-  // If you encounter issues with 'require', you might need to adjust.
+} else if (sslMode === "disable") {
+  poolConfig.ssl = false; // Explicitly disable SSL
+} else if (sslMode && ["require", "prefer", "allow"].includes(sslMode)) {
+  // For modes like 'require', 'prefer', 'allow', ensure SSL is enabled.
+  // servername is already set. If a custom CA is needed but not verify-full,
+  // this might need more specific handling if connection issues arise.
+  if (typeof poolConfig.ssl !== "object" || poolConfig.ssl === null) {
+    poolConfig.ssl = {
+      rejectUnauthorized: sslMode === "require",
+      servername: dbUrl.hostname,
+    };
+  }
+}
+// If no sslMode is in URL, pg might try PGSSLMODE env var or default to no SSL.
+// Our explicit poolConfig.ssl setup should take precedence.
+
+// --- DETAILED LOGGING ---
+console.log("--- DATABASE CONNECTION ATTEMPT DEBUG ---");
+console.log("Raw DATABASE_URL from env:", databaseUrlString);
+console.log(
+  "Explicit Pool Config being passed to new Pool():",
+  JSON.stringify(
+    poolConfig,
+    (key, value) => {
+      // Avoid printing the full CA cert in logs, just an indicator
+      if (key === "ca" && typeof value === "string" && value.length > 100) {
+        return value.substring(0, 70) + "... (CA cert content truncated)";
+      }
+      return value;
+    },
+    2
+  )
+);
+if (poolConfig.ssl && (poolConfig.ssl as any).ca) {
+  console.log("[DB_SSL_INFO] CA certificate appears to be loaded into config.");
+} else if (poolConfig.ssl && sslMode === "verify-full") {
   console.warn(
-    `SSL mode is '${dbUrl.searchParams.get(
-      "sslmode"
-    )}'. Full certificate verification including hostname might not be performed unless servername is explicitly set.`
+    "[DB_SSL_WARN] SSL mode is verify-full but CA certificate was not loaded into config. Check path and permissions for: " +
+      sslRootCertPath
+  );
+} else if (poolConfig.ssl) {
+  console.log(
+    "[DB_SSL_INFO] SSL config is present, but CA content not shown (or not verify-full mode with CA path)."
+  );
+} else {
+  console.log(
+    "[DB_SSL_INFO] SSL does not appear to be configured in poolConfig."
   );
 }
+// --- END LOGGING ---
 
-const pool = new Pool({
-  connectionString: databaseUrlString, // pg driver uses this for base settings
-  ssl: sslConfig, // Override/provide specific SSL options
-});
+const pool = new Pool(poolConfig); // Use the fully deconstructed and logged config
 
 const db = drizzle(pool, { schema });
 
