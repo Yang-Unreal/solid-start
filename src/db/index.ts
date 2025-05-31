@@ -30,7 +30,6 @@ if (!process.env.DATABASE_URL) {
 const databaseUrlString = process.env.DATABASE_URL;
 const dbUrl = new URL(databaseUrlString);
 const currentHostForConnection = dbUrl.hostname; // This is the host we are connecting to (IP or DNS name)
-const knownDnsNameFromCert = "kscw80s84ko0484s0wogoo8o"; // The DNS name we know is in the cert
 
 const poolConfig: PoolConfig = {
   user: dbUrl.username,
@@ -54,10 +53,10 @@ const poolConfig: PoolConfig = {
       // If the TLS stack is trying to verify 'localhost'
       if (hostnameBeingChecked.toLowerCase().startsWith("localhost")) {
         console.warn(
-          `[DB_SSL_checkServerIdentity] Hostname being checked is '${hostnameBeingChecked}'. Overriding to check against actual connection host ('${currentHostForConnection}') and known DNS name ('${knownDnsNameFromCert}').`
+          `[DB_SSL_checkServerIdentity] Hostname being checked is '${hostnameBeingChecked}'. Overriding to check against actual connection host ('${currentHostForConnection}').`
         );
 
-        // Try to validate against the actual host we connected to (e.g., the IP address)
+        // Perform the check against the actual host we connected to
         const errorForActualHost = tls.checkServerIdentity(
           currentHostForConnection,
           cert
@@ -68,33 +67,11 @@ const poolConfig: PoolConfig = {
           );
           return undefined; // No error, identity is valid
         }
-        console.warn(
-          `[DB_SSL_checkServerIdentity] Override check failed for actual host '${currentHostForConnection}': ${errorForActualHost.message}`
+        // If the override check itself fails, return that specific error
+        console.error(
+          `[DB_SSL_checkServerIdentity] OVERRIDE FAILED: Certificate NOT valid for actual connection host '${currentHostForConnection}'. Error: ${errorForActualHost.message}`
         );
-
-        // As a fallback, if different, try validating against the known DNS name from the cert
-        if (currentHostForConnection !== knownDnsNameFromCert) {
-          const errorForKnownDns = tls.checkServerIdentity(
-            knownDnsNameFromCert,
-            cert
-          );
-          if (!errorForKnownDns) {
-            console.log(
-              `[DB_SSL_checkServerIdentity] SUCCESS (override): Certificate is valid for known DNS name '${knownDnsNameFromCert}'.`
-            );
-            return undefined; // No error, identity is valid
-          }
-          console.warn(
-            `[DB_SSL_checkServerIdentity] Override check failed for known DNS name '${knownDnsNameFromCert}': ${errorForKnownDns.message}`
-          );
-        }
-        // If both override checks fail, return the original error for 'localhost' or a new one.
-        return (
-          errorForActualHost ||
-          new Error(
-            `Certificate not valid for '${currentHostForConnection}' or '${knownDnsNameFromCert}' after 'localhost' check.`
-          )
-        );
+        return errorForActualHost;
       }
 
       // If not 'localhost', perform the default check provided by Node.js
