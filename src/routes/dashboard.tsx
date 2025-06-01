@@ -1,6 +1,6 @@
 import { createEffect, Show } from "solid-js";
 import { useNavigate } from "@solidjs/router";
-import { authClient } from "~/lib/auth-client";
+import { authClient } from "~/lib/auth-client"; // Assuming this path is correct
 import { UserCircle } from "lucide-solid";
 
 export default function DashboardPage() {
@@ -19,12 +19,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <div class=" flex-grow bg-neutral-100 dark:bg-neutral-900 text-slate-800 dark:text-neutral-200 transition-colors duration-300 min-h-[calc(100vh-4rem)]">
-      <main class="container mx-auto p-4 sm:p-6 lg:p-8  flex flex-col grow overflow-hidden ">
+    <div class="flex-grow bg-neutral-100 dark:bg-neutral-900 text-slate-800 dark:text-neutral-200 min-h-[calc(100vh-4rem)]">
+      <main class="w-full max-w-none px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col grow overflow-hidden">
         <Show when={session().isPending}>
           <div class="flex-grow flex justify-center items-center">
             <svg
-              class="animate-spin h-8 w-8 text-blue-600 dark:text-blue-400"
+              class="animate-spin h-8 w-8 text-sky-600 dark:text-sky-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -62,15 +62,16 @@ export default function DashboardPage() {
           }
         >
           <div class="flex flex-col h-full">
-            <div class="mb-8 shrink-0">
-              <h1 class="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
+            <div class="mb-6 sm:mb-8 shrink-0">
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
                 Welcome back,{" "}
                 {session().data?.user?.name || session().data?.user?.email}!
               </h1>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 grow overflow-y-auto custom-scrollbar pb-4">
-              <div class="md:col-span-1 bg-white dark:bg-black shadow-lg rounded-xl p-6 h-fit">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grow overflow-y-auto custom-scrollbar pb-4">
+              {/* Profile Card */}
+              <div class="md:col-span-1 lg:col-span-1 bg-white dark:bg-black shadow-lg rounded-xl p-6 h-fit">
                 <div class="flex flex-col items-center">
                   <Show
                     when={session().data?.user?.image}
@@ -95,34 +96,59 @@ export default function DashboardPage() {
                   </p>
                   <button
                     onClick={handleViewProfile}
-                    class="mt-4 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-black focus:ring-blue-500"
+                    class="mt-6 px-5 py-2.5 text-sm font-medium text-white rounded-lg
+                           bg-sky-600 hover:bg-sky-700 dark:bg-sky-500 dark:hover:bg-sky-600 
+                           focus:outline-none focus:ring-2 focus:ring-offset-2 
+                           focus:ring-offset-white dark:focus:ring-offset-black 
+                           focus:ring-sky-500"
                   >
                     View Profile
                   </button>
                 </div>
               </div>
 
-              <div class="md:col-span-2 bg-white dark:bg-black shadow-lg rounded-xl p-6 h-fit">
+              {/* Performance Overview Card (Replaced Session Details) */}
+              <div class="md:col-span-1 lg:col-span-2 bg-white dark:bg-black shadow-lg rounded-xl p-6 h-fit">
                 <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
-                  Active Session Details
+                  Performance Overview
                 </h3>
-                <pre class="bg-neutral-50 dark:bg-neutral-900/50 p-4 rounded-md text-xs text-neutral-700 dark:text-neutral-300 overflow-x-auto custom-scrollbar max-h-96">
-                  {JSON.stringify(
-                    {
-                      user: session().data?.user,
-                      /*session: session().data?.session,*/
-                    },
-                    null,
-                    2
-                  )}
-                </pre>
+                <div class="space-y-4">
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-md">
+                    <h4 class="font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+                      Monthly Active Users (MAU)
+                    </h4>
+                    <p class="text-2xl font-bold text-sky-600 dark:text-sky-400">
+                      1,234
+                    </p>
+                    <p class="text-xs text-green-500 dark:text-green-400">
+                      +5.2% vs last month
+                    </p>
+                  </div>
+                  <div class="p-4 bg-neutral-50 dark:bg-neutral-900/50 rounded-md">
+                    <h4 class="font-medium text-neutral-700 dark:text-neutral-300 mb-1">
+                      Conversion Rate
+                    </h4>
+                    <p class="text-2xl font-bold text-sky-600 dark:text-sky-400">
+                      12.5%
+                    </p>
+                    <p class="text-xs text-red-500 dark:text-red-400">
+                      -0.8% vs last month
+                    </p>
+                  </div>
+                  <div class="h-40 bg-neutral-100 dark:bg-neutral-800/70 rounded-md flex items-center justify-center">
+                    <p class="text-neutral-400 dark:text-neutral-500 italic">
+                      [Chart Placeholder - e.g., User Activity Trend]
+                    </p>
+                  </div>
+                </div>
               </div>
 
+              {/* Other cards */}
               <div class="bg-white dark:bg-black shadow-lg rounded-xl p-6 h-fit">
                 <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
                   Quick Stats
                 </h3>
-                <p class="text-neutral-600 dark:text-neutral-400">
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
                   Your important numbers here... <br /> More content to make it
                   taller. <br /> And more. <br /> And even more.
                 </p>
@@ -131,7 +157,7 @@ export default function DashboardPage() {
                 <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
                   Recent Activity
                 </h3>
-                <p class="text-neutral-600 dark:text-neutral-400">
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
                   List of recent actions... <br /> Activity 1 <br /> Activity 2
                   <br /> Activity 3
                 </p>
@@ -140,7 +166,7 @@ export default function DashboardPage() {
                 <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
                   Notifications
                 </h3>
-                <p class="text-neutral-600 dark:text-neutral-400">
+                <p class="text-sm text-neutral-600 dark:text-neutral-400">
                   No new notifications. But this card could be tall. <br /> Line
                   2 <br /> Line 3 <br /> Line 4
                 </p>
