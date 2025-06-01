@@ -1,6 +1,6 @@
 // Nav.tsx
 import { createSignal, onMount, onCleanup, Show } from "solid-js";
-import { useLocation, A, useNavigate } from "@solidjs/router"; // Added A and useNavigate
+import { useLocation, A, useNavigate } from "@solidjs/router";
 import {
   Sun,
   Moon,
@@ -9,7 +9,7 @@ import {
   LogIn,
   UserPlus,
   LayoutDashboard,
-} from "lucide-solid"; // Added new icons
+} from "lucide-solid";
 import {
   currentTheme,
   setCurrentTheme as setCurrentThemeSignal,
@@ -55,7 +55,7 @@ const ThemeIconDisplay: Component<{ size: number; class?: string }> = (
 export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
-  const session = authClient.useSession(); // Get session state
+  const session = authClient.useSession();
   const [isClientRendered, setIsClientRendered] = createSignal(false);
   let dropdownRef: HTMLLIElement | undefined;
 
@@ -86,7 +86,7 @@ export default function Nav() {
 
   const handleLogout = async () => {
     await authClient.signOut();
-    navigate("/login", { replace: true }); // Navigate to login after logout
+    navigate("/login", { replace: true });
   };
 
   const iconSize = 20;
@@ -97,12 +97,8 @@ export default function Nav() {
     "transition-colors duration-150 text-sm flex items-center";
 
   return (
-    // Changed to fixed, added w-full, top-0, left-0, right-0 and a z-index
     <nav class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
       <ul class="container flex items-center h-full p-3 font-sans">
-        {" "}
-        {/* Ensured h-full for ul */}
-        {/* Standard Navigation links */}
         <li class="mx-1.5 sm:mx-3">
           <A href="/" class={`${activeLinkClasses("/")} ${linkBaseClass}`}>
             Home
@@ -116,12 +112,19 @@ export default function Nav() {
             About
           </A>
         </li>
-        {/* Add other common links here if needed */}
+        {/* Dragonfly Page Link without icon */}
+        <li class="mx-1.5 sm:mx-3">
+          <A
+            href="/dragonfly"
+            class={`${activeLinkClasses("/dragonfly")} ${linkBaseClass}`}
+          >
+            Dragonfly
+          </A>
+        </li>
+
         {/* Auth Links & Theme Toggle move to the right */}
         <div class="ml-auto flex items-center space-x-3 sm:space-x-4">
-          {/* ... Show components for auth links and theme toggle remain the same ... */}
           <Show when={!session().isPending && session().data?.user}>
-            {/* Authenticated User Links */}
             <li class="mx-1.5 sm:mx-3">
               <A
                 href="/dashboard"
@@ -144,7 +147,6 @@ export default function Nav() {
           </Show>
 
           <Show when={!session().isPending && !session().data?.user}>
-            {/* Unauthenticated User Links */}
             <li class="mx-1.5 sm:mx-3">
               <A
                 href="/login"
@@ -194,9 +196,8 @@ export default function Nav() {
                 class="animate-fade-in absolute right-0 mt-2 w-44
                        bg-white dark:bg-neutral-800 rounded-md shadow-lg 
                        border border-neutral-200 dark:border-neutral-700 
-                       py-1 z-50" // Ensure dropdown z-index is also high
+                       py-1 z-50"
               >
-                {/* Theme buttons remain the same */}
                 <button
                   onClick={() => setTheme("light")}
                   class="w-full text-left px-3 py-1.5 text-sm 

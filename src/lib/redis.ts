@@ -1,11 +1,10 @@
-import "dotenv/config"; // Ensures .env variables are loaded early
+import "dotenv/config";
 import Redis, { type RedisOptions } from "ioredis";
 import fs from "fs";
 import { URL } from "url";
 import net from "net";
-import tls from "tls"; // Import Node.js tls module for ConnectionOptions type
+import tls, { type ConnectionOptions as TlsConnectionOptions } from "tls";
 
-// Define a global variable for the Redis client singleton
 declare global {
   // eslint-disable-next-line no-var
   var redisClient: Redis | undefined;
@@ -18,20 +17,17 @@ const getRedisClient = (): Redis => {
 
   const dragonflyUriFromEnv = process.env.DRAGONFLY_URI;
   if (!dragonflyUriFromEnv) {
-    const errorMessage =
-      "CRITICAL: DRAGONFLY_URI environment variable is not set.";
-    console.error(`[Redis Init] ${errorMessage}`);
-    throw new Error(errorMessage);
+    throw new Error("CRITICAL: DRAGONFLY_URI environment variable is not set.");
   }
-  console.log(`[Redis Init] Effective DRAGONFLY_URI: ${dragonflyUriFromEnv}`);
 
   const redisClientOptions: RedisOptions = {
-    maxRetriesPerRequest: 3,
+    maxRetriesPerRequest: 3, // Example: Retain a sensible default
+    // For production, you might want to configure connectTimeout,
+    // enableOfflineQueue based on your needs, or keep it minimal.
   };
 
   if (dragonflyUriFromEnv.startsWith("rediss://")) {
-    const tlsOptions: tls.ConnectionOptions = {
-      // Use Node.js tls.ConnectionOptions type
+    const tlsOptions: TlsConnectionOptions = {
       rejectUnauthorized: true,
     };
 
@@ -39,56 +35,41 @@ const getRedisClient = (): Redis => {
     const clientCertPath = process.env.DRAGONFLY_CLIENT_CERT_PATH;
     const clientKeyPath = process.env.DRAGONFLY_CLIENT_KEY_PATH;
 
-    let tlsSetupSuccessful = true;
+    let criticalCertLoadFailed = false;
 
     if (caCertPath) {
       try {
         tlsOptions.ca = [fs.readFileSync(caCertPath)];
-        console.log(`[Redis Init] CA certificate loaded from: ${caCertPath}`);
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e));
         console.error(
-          `[Redis Init] CRITICAL: Failed to load CA certificate from '${caCertPath}'. Error: ${error.message}`
+          `[Redis Init] CRITICAL_ERROR: Failed to load CA certificate from '${caCertPath}'. Details: ${error.message}`
         );
-        tlsSetupSuccessful = false;
+        criticalCertLoadFailed = true;
       }
-    } else {
-      // If no CA path is provided, TLS will try to use system CAs.
-      // For custom CAs like Coolify's, this usually means DRAGONFLY_CA_CERT_PATH is required.
-      console.warn(
-        "[Redis Init] DRAGONFLY_CA_CERT_PATH not set. Server certificate will be verified against system CAs (if rejectUnauthorized is true). This might fail with custom CAs."
-      );
     }
 
-    // Handle mTLS (client certificate and key) only if both paths are provided
     if (clientCertPath && clientKeyPath) {
       try {
         tlsOptions.cert = fs.readFileSync(clientCertPath);
         tlsOptions.key = fs.readFileSync(clientKeyPath);
-        console.log(
-          `[Redis Init] Client certificate and key loaded for mTLS from: Cert='${clientCertPath}', Key='${clientKeyPath}'`
-        );
       } catch (e) {
         const error = e instanceof Error ? e : new Error(String(e));
         console.error(
-          `[Redis Init] CRITICAL: Failed to load client certificate or key for mTLS. CertPath='${clientCertPath}', KeyPath='${clientKeyPath}'. Error: ${error.message}`
+          `[Redis Init] CRITICAL_ERROR: Failed to load client certificate or key for mTLS. CertPath='${clientCertPath}', KeyPath='${clientKeyPath}'. Details: ${error.message}`
         );
-        tlsSetupSuccessful = false;
+        criticalCertLoadFailed = true;
       }
     } else if (clientCertPath || clientKeyPath) {
-      // Only one of client cert/key path is provided, which is an invalid mTLS setup
+      // This is a configuration error, so a warning is still useful even in "clean" code.
       console.warn(
-        "[Redis Init] Either DRAGONFLY_CLIENT_CERT_PATH or DRAGONFLY_CLIENT_KEY_PATH is missing for mTLS. Both are required if one is set. Proceeding without mTLS client authentication."
-      );
-    } else {
-      console.log(
-        "[Redis Init] Client certificate and key paths not provided. Proceeding without mTLS client authentication."
+        "[Redis Init] CONFIG_WARNING: Either DRAGONFLY_CLIENT_CERT_PATH or DRAGONFLY_CLIENT_KEY_PATH is missing for mTLS. Proceeding without mTLS client authentication."
       );
     }
 
-    if (!tlsSetupSuccessful) {
+    if (criticalCertLoadFailed) {
       throw new Error(
-        "Failed to load one or more required TLS certificates for DragonflyDB. Check logs for details."
+        "Failed to load one or more required TLS certificates for DragonflyDB. Client startup aborted."
       );
     }
 
@@ -96,33 +77,16 @@ const getRedisClient = (): Redis => {
     if (!net.isIP(currentHostForConnection)) {
       tlsOptions.servername = currentHostForConnection;
     }
-
     redisClientOptions.tls = tlsOptions;
-    console.log("[Redis Init] TLS options prepared.");
-  } else {
-    console.log(
-      "[Redis Init] Connecting to DragonflyDB without SSL (URI does not start with rediss://)."
-    );
   }
 
   const client = new Redis(dragonflyUriFromEnv, redisClientOptions);
 
-  client.on("connect", () =>
-    console.log("[Redis] Successfully connected to DragonflyDB!")
-  );
-  client.on("ready", () =>
-    console.log("[Redis] Client is ready to process commands.")
-  );
-  client.on("error", (err) => console.error("[Redis] Connection Error:", err));
-  client.on("reconnecting", () =>
-    console.log("[Redis] Reconnecting to DragonflyDB...")
-  );
-  client.on("close", () =>
-    console.log("[Redis] Connection to DragonflyDB closed.")
-  );
-  client.on("end", () =>
-    console.log("[Redis] Connection to DragonflyDB ended.")
-  );
+  // Minimal error listener for production might be useful
+  client.on("error", (err) => {
+    // In production, you might send this to a proper logging service
+    console.error("[Redis] Runtime Connection Error:", err.message);
+  });
 
   global.redisClient = client;
   return client;
