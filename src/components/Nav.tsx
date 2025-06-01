@@ -10,29 +10,33 @@ import {
   LayoutDashboard,
 } from "lucide-solid";
 import {
-  currentTheme,
-  setCurrentTheme as setCurrentThemeSignal,
-  applyTheme,
-} from "./ThemeManager";
+  currentTheme, // Assuming this is reactive from ThemeManager
+  setCurrentTheme as setCurrentThemeSignal, // Assuming this updates the signal in ThemeManager
+  applyTheme, // Assuming this applies class to <html>
+} from "./ThemeManager"; // Adjust path if needed
 import type { Component } from "solid-js";
+import { authClient } from "~/lib/auth-client"; // Import your auth client
 
 type Theme = "light" | "dark" | "system";
-const THEME_STORAGE_KEY = "theme";
+const THEME_STORAGE_KEY = "theme"; // Ensure this is consistent with ThemeManager and inline script logic
 
+// Component-local state for dropdown, separate from global theme state
 const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
 
+// This function interacts with the global theme state via imported functions
 function setTheme(newTheme: Theme) {
-  setCurrentThemeSignal(newTheme);
+  setCurrentThemeSignal(newTheme); // Update the global theme signal
   if (typeof window !== "undefined") {
     localStorage.setItem(THEME_STORAGE_KEY, newTheme);
   }
-  applyTheme(newTheme);
-  setIsDropdownOpen(false);
+  applyTheme(newTheme); // Apply the class to <html>
+  setIsDropdownOpen(false); // Close local dropdown
 }
 
 const ThemeIconDisplay: Component<{ size: number; class?: string }> = (
   props
 ) => {
+  // Relies on the global currentTheme signal from ThemeManager
   return (
     <Show
       when={currentTheme() === "light"}
@@ -53,13 +57,9 @@ const ThemeIconDisplay: Component<{ size: number; class?: string }> = (
 export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const session = authClient.useSession();
   const [isClientRendered, setIsClientRendered] = createSignal(false);
   let dropdownRef: HTMLLIElement | undefined;
-
-  const session = () => ({
-    isPending: false,
-    data: { user: null },
-  });
 
   onMount(() => {
     setIsClientRendered(true);
@@ -87,7 +87,7 @@ export default function Nav() {
   };
 
   const handleLogout = async () => {
-    console.log("User logged out");
+    await authClient.signOut();
     navigate("/login", { replace: true });
   };
 
@@ -100,6 +100,7 @@ export default function Nav() {
 
   return (
     <nav class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
+      {/* MODIFICATION: Removed 'container', replaced 'p-3' with responsive 'px-* py-3' */}
       <ul class="flex items-center h-full px-4 sm:px-6 lg:px-8 py-3 font-sans">
         <li class="mx-1.5 sm:mx-3">
           <A href="/" class={`${activeLinkClasses("/")} ${linkBaseClass}`}>
