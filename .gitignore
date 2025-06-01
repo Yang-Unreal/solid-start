@@ -28,4 +28,4 @@ gitignore
 Thumbs.db
 
 # Ignore local CA certificates
-certs/coolify-ca.crt
+certs
