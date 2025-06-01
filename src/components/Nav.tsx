@@ -1,4 +1,3 @@
-// Nav.tsx
 import { createSignal, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, A, useNavigate } from "@solidjs/router";
 import {
@@ -14,9 +13,8 @@ import {
   currentTheme,
   setCurrentTheme as setCurrentThemeSignal,
   applyTheme,
-} from "./ThemeManager"; // Adjust path if needed
+} from "./ThemeManager";
 import type { Component } from "solid-js";
-import { authClient } from "~/lib/auth-client"; // Import your auth client
 
 type Theme = "light" | "dark" | "system";
 const THEME_STORAGE_KEY = "theme";
@@ -55,9 +53,13 @@ const ThemeIconDisplay: Component<{ size: number; class?: string }> = (
 export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
-  const session = authClient.useSession();
   const [isClientRendered, setIsClientRendered] = createSignal(false);
   let dropdownRef: HTMLLIElement | undefined;
+
+  const session = () => ({
+    isPending: false,
+    data: { user: null },
+  });
 
   onMount(() => {
     setIsClientRendered(true);
@@ -85,7 +87,7 @@ export default function Nav() {
   };
 
   const handleLogout = async () => {
-    await authClient.signOut();
+    console.log("User logged out");
     navigate("/login", { replace: true });
   };
 
@@ -98,7 +100,7 @@ export default function Nav() {
 
   return (
     <nav class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
-      <ul class="container flex items-center h-full p-3 font-sans">
+      <ul class="flex items-center h-full px-4 sm:px-6 lg:px-8 py-3 font-sans">
         <li class="mx-1.5 sm:mx-3">
           <A href="/" class={`${activeLinkClasses("/")} ${linkBaseClass}`}>
             Home
@@ -112,7 +114,6 @@ export default function Nav() {
             About
           </A>
         </li>
-        {/* Dragonfly Page Link without icon */}
         <li class="mx-1.5 sm:mx-3">
           <A
             href="/dragonfly"
@@ -122,7 +123,6 @@ export default function Nav() {
           </A>
         </li>
 
-        {/* Auth Links & Theme Toggle move to the right */}
         <div class="ml-auto flex items-center space-x-3 sm:space-x-4">
           <Show when={!session().isPending && session().data?.user}>
             <li class="mx-1.5 sm:mx-3">
@@ -167,7 +167,6 @@ export default function Nav() {
             </li>
           </Show>
 
-          {/* Theme Toggle Dropdown */}
           <li class="relative" ref={dropdownRef}>
             <button
               onClick={toggleDropdown}
