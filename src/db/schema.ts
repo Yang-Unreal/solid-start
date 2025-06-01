@@ -55,3 +55,16 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("created_at"),
   updatedAt: timestamp("updated_at"),
 });
+
+export const product = pgTable("product", {
+  id: text("id").primaryKey(), // Or serial("id").primaryKey();
+  name: text("name").notNull(),
+  description: text("description"),
+  // Store price in cents as an integer to avoid floating point issues
+  priceInCents: integer("price_in_cents").notNull(),
+  imageUrl: text("image_url"),
+  category: text("category"),
+  stockQuantity: integer("stock_quantity").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
