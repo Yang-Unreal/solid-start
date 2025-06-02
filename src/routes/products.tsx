@@ -1,7 +1,8 @@
 // src/routes/products.tsx
-import { createSignal, For, Show, createEffect } from "solid-js";
+import { For, Show } from "solid-js";
 import { useSearchParams } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
+import { useQuery } from "@tanstack/solid-query";
 
 interface Product {
   id: string;
@@ -30,12 +31,9 @@ interface ApiResponse {
   error?: string;
 }
 
-const ProductsPage = () => {
-  const [products, setProducts] = createSignal<Product[]>([]);
-  const [pagination, setPagination] = createSignal<PaginationInfo | null>(null);
-  const [isLoading, setIsLoading] = createSignal(true);
-  const [error, setError] = createSignal<string | null>(null);
+const PRODUCTS_QUERY_KEY_PREFIX = "products";
 
+const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const getSearchParamString = (
@@ -54,55 +52,88 @@ const ProductsPage = () => {
   };
 
   const pageSize = () => {
-    const pageSizeStr = getSearchParamString(searchParams.pageSize, "12"); // Default to 12
+    const pageSizeStr = getSearchParamString(searchParams.pageSize, "12");
     return parseInt(pageSizeStr, 10);
   };
 
-  const fetchProducts = async (page: number, size: number) => {
-    setIsLoading(true);
-    setError(null);
+  const fetchProductsQueryFn = async (context: {
+    queryKey: readonly [string, { page: number; size: number }];
+  }): Promise<ApiResponse> => {
+    const [_key, { page, size }] = context.queryKey;
+    console.warn(
+      `[TANSTACK USEQUERY FETCHER INVOKED] page: ${page}, size: ${size}`
+    );
+    let baseUrl = "";
+    if (import.meta.env.SSR && typeof window === "undefined") {
+      baseUrl =
+        import.meta.env.VITE_INTERNAL_API_ORIGIN ||
+        `http://localhost:${process.env.PORT || 3000}`;
+    }
+    const fetchUrl = `${baseUrl}/api/products?page=${page}&pageSize=${size}`;
+    console.log("TanStack useQuery - Constructed fetch URL:", fetchUrl);
+
+    let response: Response;
     try {
-      const response = await fetch(
-        `/api/products?page=${page}&pageSize=${size}`
+      response = await fetch(fetchUrl);
+    } catch (networkError: any) {
+      console.error("Network error during fetch:", networkError);
+      throw new Error(
+        `Network error: ${networkError.message || "Failed to connect"}`
       );
-      if (!response.ok) {
-        let errorMsg = `HTTP error! status: ${response.status}`;
-        try {
-          const contentType = response.headers.get("content-type");
-          if (contentType && contentType.includes("application/json")) {
-            const errData = await response.json();
-            errorMsg = errData.error || errData.message || errorMsg;
-          } else {
-            const textError = await response.text();
-            errorMsg = textError || errorMsg;
-          }
-        } catch (e) {
-          /* ignore parsing error */
+    }
+
+    if (!response.ok) {
+      let errorMsg = `HTTP error! status: ${response.status}`;
+      try {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+          const errData = await response.json();
+          errorMsg = errData.error || errData.message || errorMsg;
+        } else {
+          const textError = await response.text();
+          errorMsg = textError.substring(0, 200) || errorMsg;
         }
-        throw new Error(errorMsg);
+      } catch (parsingError) {
+        console.error("Error parsing error response:", parsingError);
       }
+      throw new Error(errorMsg);
+    }
+
+    try {
       const data: ApiResponse = await response.json();
       if (data.error) {
-        setError(data.error);
-        setProducts([]);
-        setPagination(null);
-      } else {
-        setProducts(data.data);
-        setPagination(data.pagination);
+        throw new Error(data.error);
       }
-    } catch (e: any) {
-      console.error("Failed to fetch products:", e);
-      setError(e.message || "An unknown error occurred.");
-      setProducts([]);
-      setPagination(null);
-    } finally {
-      setIsLoading(false);
+      return data;
+    } catch (jsonError: any) {
+      console.error("Error parsing successful JSON response:", jsonError);
+      throw new Error(`Invalid JSON response: ${jsonError.message}`);
     }
   };
 
-  createEffect(() => {
-    fetchProducts(currentPage(), pageSize());
-  });
+  const productsQuery = useQuery<
+    ApiResponse,
+    Error,
+    ApiResponse,
+    readonly [string, { page: number; size: number }]
+  >(() => ({
+    queryKey: [
+      PRODUCTS_QUERY_KEY_PREFIX,
+      { page: currentPage(), size: pageSize() },
+    ] as const,
+    queryFn: fetchProductsQueryFn,
+    staleTime: 5 * 60 * 1000,
+    keepPreviousData: true,
+    gcTime: 30 * 60 * 1000,
+  }));
+
+  const products = () => productsQuery.data?.data || [];
+  const pagination = () => productsQuery.data?.pagination || null;
+
+  const isLoadingInitial = () => productsQuery.isLoading && !productsQuery.data;
+
+  const isFetching = () => productsQuery.isFetching;
+  const error = () => productsQuery.error;
 
   const handlePageChange = (newPage: number) => {
     setSearchParams({
@@ -116,23 +147,11 @@ const ProductsPage = () => {
   };
 
   const paginationButtonClasses = `
-    min-w-[100px] text-center
-    rounded-lg
-    px-4 py-2
-    text-sm
-    font-medium
-    transition-colors duration-150 ease-in-out
-    bg-[#c2fe0c]
-    text-black
-    hover:bg-[#a8e00a]
-    active:bg-[#8ab40a]
-    focus:outline-none
-    focus:ring-2
-    focus:ring-[#c2fe0c]
-    focus:ring-offset-2
-    focus:ring-offset-neutral-100
-    dark:focus:ring-offset-black 
-    disabled:opacity-50 disabled:cursor-not-allowed
+    min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
+    transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black
+    hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2
+    focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100
+    dark:focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed
   `;
 
   return (
@@ -143,24 +162,30 @@ const ProductsPage = () => {
           Our Products
         </h1>
 
-        <Show when={isLoading()}>
+        <Show when={isLoadingInitial()}>
           <p class="text-center text-xl text-neutral-700 dark:text-neutral-300 py-10">
             Loading products...
           </p>
         </Show>
 
-        <Show when={error()}>
+        <Show when={error() && !isFetching()}>
           <div class="text-center py-10">
             <p class="text-xl text-red-600 dark:text-red-400">
-              Error: {error()}
+              Error: {error()?.message || "An unknown error occurred."}
             </p>
             <p class="text-neutral-600 dark:text-neutral-400 mt-2">
               Please try refreshing the page or check back later.
+              <button
+                onClick={() => productsQuery.refetch()}
+                class="ml-2 text-sky-600 dark:text-[#c2fe0c] underline"
+              >
+                Retry
+              </button>
             </p>
           </div>
         </Show>
 
-        <Show when={!isLoading() && !error() && products().length > 0}>
+        <Show when={productsQuery.data && !error()}>
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
             <For each={products()}>
               {(product) => (
@@ -208,7 +233,7 @@ const ProductsPage = () => {
             <div class="mt-10 flex justify-center items-center space-x-3">
               <button
                 onClick={() => handlePageChange(pagination()!.currentPage - 1)}
-                disabled={!pagination()!.hasPreviousPage}
+                disabled={!pagination()!.hasPreviousPage || isFetching()}
                 class={paginationButtonClasses}
               >
                 Previous
@@ -218,7 +243,7 @@ const ProductsPage = () => {
               </span>
               <button
                 onClick={() => handlePageChange(pagination()!.currentPage + 1)}
-                disabled={!pagination()!.hasNextPage}
+                disabled={!pagination()!.hasNextPage || isFetching()}
                 class={paginationButtonClasses}
               >
                 Next
@@ -227,7 +252,14 @@ const ProductsPage = () => {
           </Show>
         </Show>
 
-        <Show when={!isLoading() && !error() && products().length === 0}>
+        <Show
+          when={
+            productsQuery.isSuccess &&
+            !isLoadingInitial() &&
+            !error() &&
+            products().length === 0
+          }
+        >
           <p class="text-center text-xl text-neutral-700 dark:text-neutral-300 py-10">
             No products found.
           </p>

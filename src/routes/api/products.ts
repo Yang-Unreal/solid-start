@@ -2,9 +2,9 @@
 import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
 import { product as productTable } from "~/db/schema";
-import { sql, asc, desc, count, Column } from "drizzle-orm";
+import { asc, desc, count, Column } from "drizzle-orm";
 
-const DEFAULT_PAGE_SIZE = 12; // Changed to 12
+const DEFAULT_PAGE_SIZE = 12;
 
 export async function GET({ request }: APIEvent) {
   console.log("API Route: /api/products endpoint hit.");
@@ -40,16 +40,12 @@ export async function GET({ request }: APIEvent) {
       }
     );
   }
-  console.log(
-    "API Route: Column names found on productTable:",
-    Object.keys(columns).join(", ")
-  );
 
   const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const page = parseInt(url.searchParams.get("page") || "1", 10); // Added radix 10
   const pageSize = parseInt(
-    url.searchParams.get("pageSize") || `${DEFAULT_PAGE_SIZE}`, // Will use 12 if not specified
-    10
+    url.searchParams.get("pageSize") || `${DEFAULT_PAGE_SIZE}`,
+    10 // Added radix 10
   );
 
   let sortByInput = url.searchParams.get("sortBy") || "createdAt";
@@ -67,12 +63,11 @@ export async function GET({ request }: APIEvent) {
       }
     );
   }
-  // You might want to adjust max page size if default is 12, e.g. 12*5 = 60 for a cap.
+
   if (pageSize < 1 || pageSize > 60) {
     return new Response(
       JSON.stringify({ error: `Page size must be between 1 and 60.` }),
       {
-        // Adjusted max page size
         status: 400,
         headers: { "Content-Type": "application/json" },
       }
