@@ -57,10 +57,9 @@ export const verification = pgTable("verification", {
 });
 
 export const product = pgTable("product", {
-  id: text("id").primaryKey(), // Or serial("id").primaryKey();
+  id: text("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  // Store price in cents as an integer to avoid floating point issues
   priceInCents: integer("price_in_cents").notNull(),
   imageUrl: text("image_url"),
   category: text("category"),

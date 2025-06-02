@@ -1,3 +1,4 @@
+// Nav.tsx
 import { createSignal, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, A, useNavigate } from "@solidjs/router";
 import {
@@ -8,35 +9,33 @@ import {
   LogIn,
   UserPlus,
   LayoutDashboard,
+  ShoppingBag, // Added ShoppingBag icon for Products
 } from "lucide-solid";
 import {
-  currentTheme, // Assuming this is reactive from ThemeManager
-  setCurrentTheme as setCurrentThemeSignal, // Assuming this updates the signal in ThemeManager
-  applyTheme, // Assuming this applies class to <html>
+  currentTheme,
+  setCurrentTheme as setCurrentThemeSignal,
+  applyTheme,
 } from "./ThemeManager"; // Adjust path if needed
 import type { Component } from "solid-js";
-import { authClient } from "~/lib/auth-client"; // Import your auth client
+import { authClient } from "~/lib/auth-client";
 
 type Theme = "light" | "dark" | "system";
-const THEME_STORAGE_KEY = "theme"; // Ensure this is consistent with ThemeManager and inline script logic
+const THEME_STORAGE_KEY = "theme";
 
-// Component-local state for dropdown, separate from global theme state
 const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
 
-// This function interacts with the global theme state via imported functions
 function setTheme(newTheme: Theme) {
-  setCurrentThemeSignal(newTheme); // Update the global theme signal
+  setCurrentThemeSignal(newTheme);
   if (typeof window !== "undefined") {
     localStorage.setItem(THEME_STORAGE_KEY, newTheme);
   }
-  applyTheme(newTheme); // Apply the class to <html>
-  setIsDropdownOpen(false); // Close local dropdown
+  applyTheme(newTheme);
+  setIsDropdownOpen(false);
 }
 
 const ThemeIconDisplay: Component<{ size: number; class?: string }> = (
   props
 ) => {
-  // Relies on the global currentTheme signal from ThemeManager
   return (
     <Show
       when={currentTheme() === "light"}
@@ -91,16 +90,16 @@ export default function Nav() {
     navigate("/login", { replace: true });
   };
 
-  const iconSize = 20;
+  const iconSize = 20; // General icon size for theme toggle
+  const mainLinkIconSize = 18; // Icon size for main nav links if they have one
   const dropdownIconSize = 16;
   const authIconSize = 18;
-  const iconBaseClass = "text-neutral-600 dark:text-neutral-300";
+  const iconBaseClass = "text-neutral-600 dark:text-neutral-300"; // For theme icon only now
   const linkBaseClass =
     "transition-colors duration-150 text-sm flex items-center";
 
   return (
     <nav class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
-      {/* MODIFICATION: Removed 'container', replaced 'p-3' with responsive 'px-* py-3' */}
       <ul class="flex items-center h-full px-4 sm:px-6 lg:px-8 py-3 font-sans">
         <li class="mx-1.5 sm:mx-3">
           <A href="/" class={`${activeLinkClasses("/")} ${linkBaseClass}`}>
@@ -121,6 +120,17 @@ export default function Nav() {
             class={`${activeLinkClasses("/dragonfly")} ${linkBaseClass}`}
           >
             Dragonfly
+          </A>
+        </li>
+        {/* ADDED PRODUCTS LINK HERE */}
+        <li class="mx-1.5 sm:mx-3">
+          <A
+            href="/products"
+            class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
+          >
+            {/* Optional: Add an icon like ShoppingBag */}
+            {/* <ShoppingBag size={mainLinkIconSize} class="mr-1 sm:mr-1.5" /> */}
+            Products
           </A>
         </li>
 
@@ -186,9 +196,21 @@ export default function Nav() {
             >
               <Show
                 when={isClientRendered()}
-                fallback={<Monitor size={iconSize} class={iconBaseClass} />}
+                fallback={
+                  <Monitor
+                    size={iconSize}
+                    class={
+                      iconBaseClass /* This one uses specific iconBaseClass */
+                    }
+                  />
+                }
               >
-                <ThemeIconDisplay size={iconSize} class={iconBaseClass} />
+                <ThemeIconDisplay
+                  size={iconSize}
+                  class={
+                    iconBaseClass /* This one uses specific iconBaseClass */
+                  }
+                />
               </Show>
             </button>
             <Show when={isDropdownOpen()}>
