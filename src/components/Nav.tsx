@@ -9,13 +9,12 @@ import {
   LogIn,
   UserPlus,
   LayoutDashboard,
-  ShoppingBag, // Added ShoppingBag icon for Products
 } from "lucide-solid";
 import {
   currentTheme,
   setCurrentTheme as setCurrentThemeSignal,
   applyTheme,
-} from "./ThemeManager"; // Adjust path if needed
+} from "./ThemeManager";
 import type { Component } from "solid-js";
 import { authClient } from "~/lib/auth-client";
 
@@ -90,11 +89,11 @@ export default function Nav() {
     navigate("/login", { replace: true });
   };
 
-  const iconSize = 20; // General icon size for theme toggle
-  const mainLinkIconSize = 18; // Icon size for main nav links if they have one
+  const iconSize = 20;
+
   const dropdownIconSize = 16;
   const authIconSize = 18;
-  const iconBaseClass = "text-neutral-600 dark:text-neutral-300"; // For theme icon only now
+  const iconBaseClass = "text-neutral-600 dark:text-neutral-300";
   const linkBaseClass =
     "transition-colors duration-150 text-sm flex items-center";
 
@@ -122,14 +121,11 @@ export default function Nav() {
             Dragonfly
           </A>
         </li>
-        {/* ADDED PRODUCTS LINK HERE */}
         <li class="mx-1.5 sm:mx-3">
           <A
             href="/products"
             class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
           >
-            {/* Optional: Add an icon like ShoppingBag */}
-            {/* <ShoppingBag size={mainLinkIconSize} class="mr-1 sm:mr-1.5" /> */}
             Products
           </A>
         </li>
@@ -196,21 +192,9 @@ export default function Nav() {
             >
               <Show
                 when={isClientRendered()}
-                fallback={
-                  <Monitor
-                    size={iconSize}
-                    class={
-                      iconBaseClass /* This one uses specific iconBaseClass */
-                    }
-                  />
-                }
+                fallback={<Monitor size={iconSize} class={iconBaseClass} />}
               >
-                <ThemeIconDisplay
-                  size={iconSize}
-                  class={
-                    iconBaseClass /* This one uses specific iconBaseClass */
-                  }
-                />
+                <ThemeIconDisplay size={iconSize} class={iconBaseClass} />
               </Show>
             </button>
             <Show when={isDropdownOpen()}>
