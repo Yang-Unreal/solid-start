@@ -1,13 +1,11 @@
-// src/routes/products.tsx
+// src/routes/products/index.tsx (or products.tsx)
 import { For, Show } from "solid-js";
-import { useSearchParams, A } from "@solidjs/router"; // Added A
+import { useSearchParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
-import { PlusCircle } from "lucide-solid"; // For the "Add Product" button
+import { PlusCircle } from "lucide-solid";
 
-// Export the interface so it can be used by new.tsx
 export interface Product {
-  // Added export
   id: string;
   name: string;
   description: string | null;
@@ -158,7 +156,7 @@ const ProductsPage = () => {
             Our Products
           </h1>
           <A
-            href="/products/new" // Link to the new product page
+            href="/products/new"
             class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
                    transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black
                    hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2
@@ -194,50 +192,57 @@ const ProductsPage = () => {
         </Show>
 
         <Show when={productsQuery.data && !error()}>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-            <For each={products()}>
-              {(product) => (
-                <div class="card-content-host flex flex-col">
-                  <Show when={product.imageUrl}>
-                    <img
-                      src={product.imageUrl!}
-                      alt={product.name}
-                      class="w-full h-56 object-cover"
-                      loading="lazy"
-                      width="400"
-                      height="224"
-                      onError={(e) => (e.currentTarget.style.display = "none")}
-                    />
-                  </Show>
-                  <div class="p-5 flex flex-col flex-grow">
-                    <h2
-                      class="text-lg font-semibold mb-1 text-neutral-800 dark:text-neutral-200 truncate"
-                      title={product.name}
-                    >
-                      {product.name}
-                    </h2>
-                    <p class="text-xl mb-3 text-neutral-700 dark:text-neutral-300">
-                      {formatPrice(product.priceInCents)}
-                    </p>
-                    <Show when={product.description}>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 flex-grow min-h-[40px]">
-                        {product.description!.length > 100
-                          ? product.description!.substring(0, 97) + "..."
-                          : product.description}
-                      </p>
+          {/* MODIFIED: Grid container to use a custom class for auto-fit behavior */}
+          <div class="max-w-screen-2xl mx-auto">
+            {/* Removed grid-cols-*, using a custom class "product-grid" */}
+            <div class="product-grid gap-6 sm:gap-8">
+              <For each={products()}>
+                {(product) => (
+                  // The card will now respect the minmax width from the CSS rule
+                  <div class="card-content-host flex flex-col">
+                    <Show when={product.imageUrl}>
+                      <img
+                        src={product.imageUrl!}
+                        alt={product.name}
+                        class="w-full h-56 object-cover"
+                        loading="lazy"
+                        width="320"
+                        height="180"
+                        onError={(e) =>
+                          (e.currentTarget.style.display = "none")
+                        }
+                      />
                     </Show>
-                    <div class="mt-auto pt-2 border-t border-neutral-200 dark:border-neutral-700">
-                      <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                        Category: {product.category || "N/A"}
+                    <div class="p-5 flex flex-col flex-grow">
+                      <h2
+                        class="text-lg font-semibold mb-1 text-neutral-800 dark:text-neutral-200 truncate"
+                        title={product.name}
+                      >
+                        {product.name}
+                      </h2>
+                      <p class="text-xl mb-3 text-neutral-700 dark:text-neutral-300">
+                        {formatPrice(product.priceInCents)}
                       </p>
-                      <p class="text-xs text-neutral-500 dark:text-neutral-400">
-                        Stock: {product.stockQuantity}
-                      </p>
+                      <Show when={product.description}>
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 flex-grow min-h-[40px]">
+                          {product.description!.length > 100
+                            ? product.description!.substring(0, 97) + "..."
+                            : product.description}
+                        </p>
+                      </Show>
+                      <div class="mt-auto pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                          Category: {product.category || "N/A"}
+                        </p>
+                        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                          Stock: {product.stockQuantity}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </For>
+                )}
+              </For>
+            </div>
           </div>
 
           <Show when={pagination() && pagination()!.totalPages > 1}>
