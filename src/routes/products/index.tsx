@@ -1,10 +1,13 @@
 // src/routes/products.tsx
 import { For, Show } from "solid-js";
-import { useSearchParams } from "@solidjs/router";
+import { useSearchParams, A } from "@solidjs/router"; // Added A
 import { MetaProvider, Title } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
+import { PlusCircle } from "lucide-solid"; // For the "Add Product" button
 
-interface Product {
+// Export the interface so it can be used by new.tsx
+export interface Product {
+  // Added export
   id: string;
   name: string;
   description: string | null;
@@ -60,9 +63,6 @@ const ProductsPage = () => {
     queryKey: readonly [string, { page: number; size: number }];
   }): Promise<ApiResponse> => {
     const [_key, { page, size }] = context.queryKey;
-    console.warn(
-      `[TANSTACK USEQUERY FETCHER INVOKED] page: ${page}, size: ${size}`
-    );
     let baseUrl = "";
     if (import.meta.env.SSR && typeof window === "undefined") {
       baseUrl =
@@ -70,13 +70,11 @@ const ProductsPage = () => {
         `http://localhost:${process.env.PORT || 3000}`;
     }
     const fetchUrl = `${baseUrl}/api/products?page=${page}&pageSize=${size}`;
-    console.log("TanStack useQuery - Constructed fetch URL:", fetchUrl);
 
     let response: Response;
     try {
       response = await fetch(fetchUrl);
     } catch (networkError: any) {
-      console.error("Network error during fetch:", networkError);
       throw new Error(
         `Network error: ${networkError.message || "Failed to connect"}`
       );
@@ -94,7 +92,7 @@ const ProductsPage = () => {
           errorMsg = textError.substring(0, 200) || errorMsg;
         }
       } catch (parsingError) {
-        console.error("Error parsing error response:", parsingError);
+        /* ignore */
       }
       throw new Error(errorMsg);
     }
@@ -106,7 +104,6 @@ const ProductsPage = () => {
       }
       return data;
     } catch (jsonError: any) {
-      console.error("Error parsing successful JSON response:", jsonError);
       throw new Error(`Invalid JSON response: ${jsonError.message}`);
     }
   };
@@ -129,9 +126,7 @@ const ProductsPage = () => {
 
   const products = () => productsQuery.data?.data || [];
   const pagination = () => productsQuery.data?.pagination || null;
-
   const isLoadingInitial = () => productsQuery.isLoading && !productsQuery.data;
-
   const isFetching = () => productsQuery.isFetching;
   const error = () => productsQuery.error;
 
@@ -158,9 +153,22 @@ const ProductsPage = () => {
     <MetaProvider>
       <Title>Our Products</Title>
       <main class="bg-neutral-100 dark:bg-neutral-900 p-4 sm:p-6 lg:p-8">
-        <h1 class="text-3xl font-bold mb-8 text-center text-neutral-800 dark:text-neutral-200">
-          Our Products
-        </h1>
+        <div class="flex justify-between items-center mb-8">
+          <h1 class="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
+            Our Products
+          </h1>
+          <A
+            href="/products/new" // Link to the new product page
+            class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
+                   transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black
+                   hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2
+                   focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100
+                   dark:focus:ring-offset-black"
+          >
+            <PlusCircle size={18} class="mr-2" />
+            Add Product
+          </A>
+        </div>
 
         <Show when={isLoadingInitial()}>
           <p class="text-center text-xl text-neutral-700 dark:text-neutral-300 py-10">
@@ -195,6 +203,9 @@ const ProductsPage = () => {
                       src={product.imageUrl!}
                       alt={product.name}
                       class="w-full h-56 object-cover"
+                      loading="lazy"
+                      width="400"
+                      height="224"
                       onError={(e) => (e.currentTarget.style.display = "none")}
                     />
                   </Show>

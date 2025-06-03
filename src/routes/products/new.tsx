@@ -1,0 +1,375 @@
+// src/routes/products/new.tsx
+import { createSignal, Show } from "solid-js";
+import { useNavigate, A } from "@solidjs/router";
+import { MetaProvider, Title } from "@solidjs/meta";
+import {
+  useMutation,
+  useQueryClient,
+  type UseMutationResult,
+} from "@tanstack/solid-query";
+import type { Product } from "../products"; // Assuming Product interface is exported from there
+
+const PRODUCTS_QUERY_KEY_PREFIX = "products";
+
+// Type for data sent to create a product (ID, createdAt, updatedAt are backend-generated)
+type NewProductData = Omit<Product, "id" | "createdAt" | "updatedAt">;
+
+// This is the mutation function for creating the product in the database
+async function createProductInDB(newProduct: NewProductData): Promise<Product> {
+  let baseUrl = "";
+  if (import.meta.env.SSR && typeof window === "undefined") {
+    baseUrl =
+      import.meta.env.VITE_INTERNAL_API_ORIGIN ||
+      `http://localhost:${process.env.PORT || 3000}`;
+  }
+  const fetchUrl = `${baseUrl}/api/products`; // Your product creation API
+
+  const response = await fetch(fetchUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(newProduct),
+  });
+
+  if (!response.ok) {
+    const errorData = await response
+      .json()
+      .catch(() => ({ error: "Failed to parse error response from server" }));
+    throw new Error(
+      errorData.error ||
+        `Error creating product: ${response.status} ${response.statusText}`
+    );
+  }
+  const responseData = await response.json();
+  return responseData as Product;
+}
+
+const AddProductPage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const [name, setName] = createSignal("");
+  const [description, setDescription] = createSignal("");
+  const [priceInCents, setPriceInCents] = createSignal<number | undefined>(
+    undefined
+  );
+  // Removed imageUrl signal as it will come from file upload
+  const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
+  const [category, setCategory] = createSignal("");
+  const [stockQuantity, setStockQuantity] = createSignal<number | undefined>(
+    undefined
+  );
+
+  const [formError, setFormError] = createSignal<string | null>(null);
+  const [fileUploadError, setFileUploadError] = createSignal<string | null>(
+    null
+  );
+  const [isUploadingImage, setIsUploadingImage] = createSignal(false);
+
+  const productCreationMutation: UseMutationResult<
+    Product,
+    Error,
+    NewProductData
+  > = useMutation<Product, Error, NewProductData>(() => ({
+    mutationFn: createProductInDB,
+    onSuccess: (data: Product) => {
+      console.log("Product created successfully in DB:", data);
+      queryClient.invalidateQueries({ queryKey: [PRODUCTS_QUERY_KEY_PREFIX] });
+      navigate("/products");
+    },
+    onError: (error: Error) => {
+      setFormError(
+        error.message ||
+          "An unknown error occurred while creating the product entry."
+      );
+    },
+  }));
+
+  const handleFileChange = (e: Event) => {
+    const input = e.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    setSelectedFile(file || null);
+    setFileUploadError(null); // Clear previous file upload error on new file selection
+    setFormError(null); // Also clear general form error
+  };
+
+  const handleSubmit = async (e: Event) => {
+    e.preventDefault();
+    setFormError(null);
+    setFileUploadError(null);
+
+    // Basic form validations
+    if (!name().trim()) {
+      setFormError("Product name is required.");
+      return;
+    }
+    if (priceInCents() === undefined || priceInCents()! <= 0) {
+      setFormError("Price must be a positive number (in cents).");
+      return;
+    }
+    if (stockQuantity() === undefined || stockQuantity()! < 0) {
+      setFormError("Stock quantity cannot be negative.");
+      return;
+    }
+
+    let uploadedImageUrl: string | null = null;
+
+    // Step 1: Upload image if selected
+    if (selectedFile()) {
+      setIsUploadingImage(true);
+      const formData = new FormData();
+      formData.append("files", selectedFile()!); // "files" is the key your /api/upload expects
+
+      try {
+        const uploadResponse = await fetch("/api/upload", {
+          // Your existing upload API endpoint
+          method: "POST",
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          const errData = await uploadResponse
+            .json()
+            .catch(() => ({
+              error: "Failed to parse image upload error response",
+            }));
+          throw new Error(
+            errData.error || `Image upload failed: ${uploadResponse.status}`
+          );
+        }
+
+        const uploadResult = await uploadResponse.json();
+        if (
+          uploadResult.files &&
+          uploadResult.files.length > 0 &&
+          uploadResult.files[0].url
+        ) {
+          uploadedImageUrl = uploadResult.files[0].url;
+          console.log("Image uploaded successfully:", uploadedImageUrl);
+        } else {
+          throw new Error(
+            "Image was uploaded, but no URL was returned or the response format was unexpected."
+          );
+        }
+      } catch (uploadError: any) {
+        setFileUploadError(
+          uploadError.message ||
+            "An unexpected error occurred during image upload."
+        );
+        setIsUploadingImage(false);
+        return; // Stop submission if image upload fails
+      } finally {
+        setIsUploadingImage(false);
+      }
+    }
+    // If no file was selected, uploadedImageUrl remains null, which is fine if imageUrl is optional
+
+    // Step 2: Create product data and mutate
+    const newProductData: NewProductData = {
+      name: name().trim(),
+      description: description().trim() || null,
+      priceInCents: priceInCents()!,
+      imageUrl: uploadedImageUrl, // Use the URL from MinIO
+      category: category().trim() || null,
+      stockQuantity: stockQuantity()!,
+    };
+
+    productCreationMutation.mutate(newProductData);
+  };
+
+  const inputBaseClasses = `
+    block w-full mt-1 py-2 px-3 rounded-md border transition duration-150 ease-in-out
+    bg-white text-neutral-900 border-neutral-300
+    focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c]
+    dark:bg-neutral-700 dark:text-neutral-100 dark:border-neutral-600
+    dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]
+  `;
+  const labelBaseClasses =
+    "block text-sm font-medium text-neutral-700 dark:text-neutral-300";
+  const fileInputClasses = `
+    mt-1 block w-full text-sm text-neutral-500 dark:text-neutral-400
+    file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0
+    file:text-sm file:font-semibold file:bg-[#c2fe0c] file:text-black
+    hover:file:bg-[#a8e00a] dark:file:focus:ring-offset-neutral-800
+    disabled:opacity-50 disabled:cursor-not-allowed
+  `;
+
+  return (
+    <MetaProvider>
+      <Title>Add New Product</Title>
+      <main class="bg-neutral-100 dark:bg-neutral-900 p-4 sm:p-6 lg:p-8 flex justify-center items-start min-h-screen">
+        <div class="w-full max-w-2xl bg-white dark:bg-neutral-800 shadow-xl rounded-lg p-6 sm:p-8 my-8">
+          <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-neutral-800 dark:text-neutral-200">
+            Create New Product
+          </h1>
+          <form onSubmit={handleSubmit} class="space-y-5">
+            <div>
+              <label for="name" class={labelBaseClasses}>
+                Product Name <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="name"
+                type="text"
+                value={name()}
+                onInput={(e) => setName(e.currentTarget.value)}
+                class={inputBaseClasses}
+                required
+                disabled={
+                  isUploadingImage() || productCreationMutation.isPending
+                }
+              />
+            </div>
+            <div>
+              <label for="description" class={labelBaseClasses}>
+                Description
+              </label>
+              <textarea
+                id="description"
+                value={description()}
+                onInput={(e) => setDescription(e.currentTarget.value)}
+                class={`${inputBaseClasses} min-h-[100px]`}
+                disabled={
+                  isUploadingImage() || productCreationMutation.isPending
+                }
+              />
+            </div>
+            <div>
+              <label for="price" class={labelBaseClasses}>
+                Price (in Cents) <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="price"
+                type="number"
+                value={priceInCents() ?? ""}
+                onInput={(e) =>
+                  setPriceInCents(
+                    e.currentTarget.value === ""
+                      ? undefined
+                      : parseInt(e.currentTarget.value, 10)
+                  )
+                }
+                class={inputBaseClasses}
+                required
+                min="1"
+                disabled={
+                  isUploadingImage() || productCreationMutation.isPending
+                }
+              />
+            </div>
+
+            {/* File Input for Image Upload */}
+            <div>
+              <label for="productImage" class={labelBaseClasses}>
+                Product Image
+              </label>
+              <input
+                id="productImage"
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+                class={fileInputClasses}
+                onInput={handleFileChange}
+                disabled={
+                  isUploadingImage() || productCreationMutation.isPending
+                }
+              />
+              <Show when={selectedFile() && !fileUploadError()}>
+                <p class="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                  Selected: {selectedFile()!.name} (
+                  {(selectedFile()!.size / 1024).toFixed(2)} KB)
+                </p>
+              </Show>
+              <Show when={fileUploadError()}>
+                <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
+              </Show>
+            </div>
+
+            <div>
+              <label for="category" class={labelBaseClasses}>
+                Category
+              </label>
+              <input
+                id="category"
+                type="text"
+                value={category()}
+                onInput={(e) => setCategory(e.currentTarget.value)}
+                class={inputBaseClasses}
+                disabled={
+                  isUploadingImage() || productCreationMutation.isPending
+                }
+              />
+            </div>
+            <div>
+              <label for="stockQuantity" class={labelBaseClasses}>
+                Stock Quantity <span class="text-red-500">*</span>
+              </label>
+              <input
+                id="stockQuantity"
+                type="number"
+                value={stockQuantity() ?? ""}
+                onInput={(e) =>
+                  setStockQuantity(
+                    e.currentTarget.value === ""
+                      ? undefined
+                      : parseInt(e.currentTarget.value, 10)
+                  )
+                }
+                class={inputBaseClasses}
+                required
+                min="0"
+                disabled={
+                  isUploadingImage() || productCreationMutation.isPending
+                }
+              />
+            </div>
+
+            <Show when={formError()}>
+              <p class="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md text-center">
+                {formError()}
+              </p>
+            </Show>
+
+            <div class="flex items-center justify-end space-x-4 pt-3">
+              <A
+                href="/products"
+                class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
+                       transition-colors duration-150 ease-in-out
+                       bg-neutral-200 text-neutral-700 hover:bg-neutral-300
+                       dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-500
+                       ${
+                         isUploadingImage() || productCreationMutation.isPending
+                           ? "opacity-50 cursor-not-allowed"
+                           : ""
+                       }`}
+                onClick={(e) => {
+                  if (isUploadingImage() || productCreationMutation.isPending)
+                    e.preventDefault();
+                }}
+              >
+                Cancel
+              </A>
+              <button
+                type="submit"
+                disabled={
+                  isUploadingImage() || productCreationMutation.isPending
+                }
+                class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium
+                       transition-colors duration-150 ease-in-out
+                       bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a]
+                       focus:outline-none focus:ring-2 focus:ring-[#c2fe0c]
+                       focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800
+                       disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isUploadingImage()
+                  ? "Uploading Image..."
+                  : productCreationMutation.isPending
+                  ? "Adding Product..."
+                  : "Add Product"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </main>
+    </MetaProvider>
+  );
+};
+
+export default AddProductPage;
