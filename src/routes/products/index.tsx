@@ -192,26 +192,31 @@ const ProductsPage = () => {
         </Show>
 
         <Show when={productsQuery.data && !error()}>
-          {/* MODIFIED: Grid container to use a custom class for auto-fit behavior */}
           <div class="max-w-screen-2xl mx-auto">
-            {/* Removed grid-cols-*, using a custom class "product-grid" */}
             <div class="product-grid gap-6 sm:gap-8">
+              {" "}
+              {/* Using custom class .product-grid */}
               <For each={products()}>
                 {(product) => (
-                  // The card will now respect the minmax width from the CSS rule
                   <div class="card-content-host flex flex-col">
                     <Show when={product.imageUrl}>
-                      <img
-                        src={product.imageUrl!}
-                        alt={product.name}
-                        class="w-full h-56 object-cover"
-                        loading="lazy"
-                        width="320"
-                        height="180"
-                        onError={(e) =>
-                          (e.currentTarget.style.display = "none")
-                        }
-                      />
+                      {/* MODIFIED: Added a container with aspect-ratio */}
+                      <div class="w-full aspect-video bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
+                        {" "}
+                        {/* aspect-video for 16:9. Or aspect-square, aspect-[4/3] etc. */}
+                        <img
+                          src={product.imageUrl!}
+                          alt={product.name}
+                          class="w-full h-full object-cover"
+                          loading="lazy"
+                          // width/height attributes here are less critical for layout shape,
+                          // but still good for CLS if you know the original image's aspect ratio.
+                          // They won't override the aspect-ratio styling of the container.
+                          onError={(e) =>
+                            (e.currentTarget.style.display = "none")
+                          }
+                        />
+                      </div>
                     </Show>
                     <div class="p-5 flex flex-col flex-grow">
                       <h2
