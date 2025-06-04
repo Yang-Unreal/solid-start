@@ -127,11 +127,9 @@ const AddProductPage = () => {
         });
 
         if (!uploadResponse.ok) {
-          const errData = await uploadResponse
-            .json()
-            .catch(() => ({
-              error: "Failed to parse image upload error response",
-            }));
+          const errData = await uploadResponse.json().catch(() => ({
+            error: "Failed to parse image upload error response",
+          }));
           throw new Error(
             errData.error || `Image upload failed: ${uploadResponse.status}`
           );

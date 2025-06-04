@@ -5,17 +5,19 @@
     "dev": "vinxi dev",
     "build": "vinxi build",
     "start": "vinxi start",
-    "db:seed": "tsx ./src/scripts/seed.ts"
+    "db:seed": "tsx ./src/scripts/seed.ts",
+    "studio": "bunx drizzle-kit studio",
+    "db:push": "npx drizzle-kit push"
   },
   "dependencies": {
     "@ark-ui/solid": "^5.11.0",
-    "@aws-sdk/client-s3": "^3.821.0",
-    "@aws-sdk/s3-request-presigner": "^3.821.0",
+    "@aws-sdk/client-s3": "^3.823.0",
+    "@aws-sdk/s3-request-presigner": "^3.823.0",
     "@faker-js/faker": "^9.8.0",
     "@solidjs/meta": "^0.29.4",
     "@solidjs/router": "^0.15.3",
     "@solidjs/start": "^1.1.4",
-    "@tanstack/solid-query": "^5.79.2",
+    "@tanstack/solid-query": "^5.80.2",
     "animejs": "^4.0.2",
     "better-auth": "^1.2.8",
     "dotenv": "^16.5.0",

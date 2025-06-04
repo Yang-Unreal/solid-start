@@ -4,17 +4,30 @@ import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
 import Nav from "~/components/Nav";
 import "./app.css";
-import ThemeManager from "./components/ThemeManager"; // Assuming this is your theme setup component
-import { MetaProvider, Title } from "@solidjs/meta"; // Added Title for consistency
-import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"; // Import these
+import ThemeManager from "./components/ThemeManager";
+import { MetaProvider, Title } from "@solidjs/meta";
+import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 
-// Create a new QueryClient instance
+// Create a new QueryClient instance with proper configuration
+// Temporary workaround for the experimental_prefetchInRender issue
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Example: Default staleTime and gcTime for all queries
-      // staleTime: 5 * 60 * 1000, // 5 minutes until stale
-      // gcTime: 10 * 60 * 1000,    // 10 minutes until garbage collected
+      // Other recommended defaults for SolidJS
+      staleTime: 5 * 60 * 1000, // 5 minutes until stale
+      gcTime: 10 * 60 * 1000, // 10 minutes until garbage collected
+      retry: 3,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      // Prevent refetching on window focus in SSR environments
+      refetchOnWindowFocus: false,
+      // Prevent refetching on reconnect by default
+      refetchOnReconnect: false,
+      // Disable the experimental feature that's causing issues
+      experimental_prefetchInRender: true,
+    },
+    mutations: {
+      retry: 1,
+      retryDelay: 1000,
     },
   },
 });
@@ -23,22 +36,21 @@ export default function App() {
   return (
     <Router
       root={(props) => (
-        // Wrap the entire content with QueryClientProvider
         <QueryClientProvider client={queryClient}>
-          {/* ThemeManager can be inside or outside, depending on its needs.
-              If it doesn't rely on queryClient, outside is fine.
-              If it might, place it inside. For simplicity, keeping current structure. */}
           <ThemeManager />
           <MetaProvider>
-            {" "}
-            {/* MetaProvider should ideally wrap all content that might set meta tags */}
-            <Title>SolidStart App</Title> {/* Example default title */}
+            <Title>SolidStart App</Title>
             <Nav />
-            {/* 'flex-grow pt-16' is for layout if Nav is fixed height (h-16) */}
             <main class="flex-grow pt-16">
-              {" "}
-              {/* Changed div to main for semantics */}
-              <Suspense>{props.children}</Suspense>
+              <Suspense
+                fallback={
+                  <div class="flex justify-center items-center h-64">
+                    Loading...
+                  </div>
+                }
+              >
+                {props.children}
+              </Suspense>
             </main>
           </MetaProvider>
         </QueryClientProvider>
