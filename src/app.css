@@ -97,14 +97,8 @@ body {
   }
   .product-grid {
     display: grid;
-    /* 
-      Set your desired minimum card width here. 
-      - 300px is a good starting point for a comfortable medium size.
-      - Adjust up or down based on your preference.
-      - Examples: 280px, 320px.
-      - This roughly corresponds to Tailwind's max-w-xs to max-w-sm.
-    */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    /* gap is applied by Tailwind classes on the div itself in the JSX */
+
+    grid-template-columns: repeat(auto-fit, minmax(300px, 350px));
+    justify-content: center;
   }
 }

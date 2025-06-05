@@ -2,11 +2,13 @@
 import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
 import { product as productTable } from "~/db/schema";
-import { asc, desc, count, Column } from "drizzle-orm";
+import { asc, desc, count, eq, Column } from "drizzle-orm";
 import { z } from "zod/v4"; // Assuming this is the correct v4 import
 
-const DEFAULT_PAGE_SIZE = 12;
+const DEFAULT_PAGE_SIZE = 12; // This default is mostly for the API if no pageSize is provided
+const MAX_PAGE_SIZE = 100; // Define a reasonable maximum page size the API will allow
 
+// --- GET Handler ---
 export async function GET({ request }: APIEvent) {
   console.log("API Route: /api/products GET endpoint hit.");
 
@@ -34,10 +36,13 @@ export async function GET({ request }: APIEvent) {
 
   const url = new URL(request.url);
   const page = parseInt(url.searchParams.get("page") || "1", 10);
-  const pageSize = parseInt(
+  // Use the API's default if not specified, or cap it at MAX_PAGE_SIZE
+  let pageSize = parseInt(
     url.searchParams.get("pageSize") || `${DEFAULT_PAGE_SIZE}`,
     10
   );
+  pageSize = Math.min(pageSize, MAX_PAGE_SIZE); // Cap the page size
+
   let sortByInput = url.searchParams.get("sortBy") || "createdAt";
   const sortOrder =
     url.searchParams.get("sortOrder")?.toLowerCase() === "asc" ? "asc" : "desc";
@@ -49,9 +54,12 @@ export async function GET({ request }: APIEvent) {
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
-  if (pageSize < 1 || pageSize > 60) {
+  // Check against the (potentially capped) pageSize
+  if (pageSize < 1 || pageSize > MAX_PAGE_SIZE) {
     return new Response(
-      JSON.stringify({ error: `Page size must be between 1 and 60.` }),
+      JSON.stringify({
+        error: `Page size must be between 1 and ${MAX_PAGE_SIZE}.`,
+      }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
   }
@@ -113,7 +121,7 @@ export async function GET({ request }: APIEvent) {
   }
 }
 
-// Define a Zod schema for the product creation payload
+// --- POST Handler (Zod v4 adjusted schema) ---
 const NewProductPayloadSchema = z.object({
   name: z.string().trim().min(1, { message: "Product name is required." }),
   description: z.string().trim().nullable().optional(),
@@ -152,7 +160,6 @@ export async function POST({ request }: APIEvent) {
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-
     const {
       name,
       description,
@@ -161,7 +168,6 @@ export async function POST({ request }: APIEvent) {
       category,
       stockQuantity,
     } = validationResult.data;
-
     const newProductData = {
       name,
       description: description || null,
@@ -175,7 +181,6 @@ export async function POST({ request }: APIEvent) {
       .insert(productTable)
       .values(newProductData)
       .returning();
-
     if (!insertedProducts || insertedProducts.length === 0) {
       console.error(
         "API Route POST: Product insertion failed, no rows returned."
@@ -185,7 +190,6 @@ export async function POST({ request }: APIEvent) {
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
-
     console.log(
       "API Route POST: Product created successfully:",
       insertedProducts[0]
@@ -197,7 +201,6 @@ export async function POST({ request }: APIEvent) {
   } catch (error: any) {
     console.error("API Route POST Error:", error.message, error.stack);
     if (error instanceof SyntaxError) {
-      // Handle cases where request.json() fails
       return new Response(JSON.stringify({ error: "Invalid JSON payload." }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -206,6 +209,62 @@ export async function POST({ request }: APIEvent) {
     return new Response(
       JSON.stringify({
         error: "Failed to create product. " + (error?.message || ""),
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+}
+
+// --- DELETE Handler ---
+const ProductIdSchema = z
+  .string()
+  .uuid({ message: "Invalid product ID format." });
+
+export async function DELETE({ request }: APIEvent) {
+  console.log("API Route: /api/products DELETE endpoint hit.");
+  // TODO: Add server-side admin role check here
+  const url = new URL(request.url);
+  const productId = url.searchParams.get("id");
+
+  const idValidationResult = ProductIdSchema.safeParse(productId);
+  if (!idValidationResult.success) {
+    return new Response(
+      JSON.stringify({
+        error: "Invalid product ID.",
+        issues: idValidationResult.error.flatten().formErrors,
+      }),
+      { status: 400, headers: { "Content-Type": "application/json" } }
+    );
+  }
+  const validProductId = idValidationResult.data;
+
+  try {
+    const deletedProduct = await db
+      .delete(productTable)
+      .where(eq(productTable.id, validProductId))
+      .returning();
+    if (!deletedProduct || deletedProduct.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Product not found or already deleted." }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    console.log(
+      "API Route DELETE: Product deleted successfully:",
+      deletedProduct[0]
+    );
+    return new Response(
+      JSON.stringify({
+        message: "Product deleted successfully.",
+        product: deletedProduct[0],
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } }
+    );
+  } catch (error: any) {
+    console.error("API Route DELETE Error:", error.message, error.stack);
+    return new Response(
+      JSON.stringify({
+        error: "Failed to delete product. " + (error?.message || ""),
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
