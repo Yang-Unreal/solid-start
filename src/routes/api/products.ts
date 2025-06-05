@@ -3,6 +3,7 @@ import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
 import { product as productTable } from "~/db/schema";
 import { asc, desc, count, Column } from "drizzle-orm";
+import { z } from "zod/v4"; // Assuming this is the correct v4 import
 
 const DEFAULT_PAGE_SIZE = 12;
 
@@ -70,18 +71,13 @@ export async function GET({ request }: APIEvent) {
       );
     }
 
-    // Start with the base select
     const initialQuery = db.select().from(productTable);
-
-    // Apply sorting, assigning to a new variable
     let sortedQuery;
     if (sortOrder === "asc") {
       sortedQuery = initialQuery.orderBy(asc(sortColumn));
     } else {
       sortedQuery = initialQuery.orderBy(desc(sortColumn));
     }
-
-    // Apply limit and offset to the sorted query
     const finalQuery = sortedQuery.limit(pageSize).offset(offset);
 
     const [productsData, totalCountResult] = await Promise.all([
@@ -117,20 +113,46 @@ export async function GET({ request }: APIEvent) {
   }
 }
 
-// --- POST Handler (Code is okay, ensure it's correctly placed after GET) ---
-interface NewProductPayload {
-  name: string;
-  description?: string | null;
-  priceInCents: number;
-  imageUrl?: string | null;
-  category?: string | null;
-  stockQuantity: number;
-}
+// Define a Zod schema for the product creation payload
+const NewProductPayloadSchema = z.object({
+  name: z.string().trim().min(1, { message: "Product name is required." }),
+  description: z.string().trim().nullable().optional(),
+  priceInCents: z
+    .number({ message: "Price must be a valid number for cents." })
+    .int({ message: "Price in cents must be an integer." })
+    .positive({ message: "Price in cents must be a positive number." }),
+  imageUrl: z
+    .string()
+    .url({ message: "Invalid image URL format." })
+    .nullable()
+    .optional(),
+  category: z.string().trim().nullable().optional(),
+  stockQuantity: z
+    .number({ message: "Stock quantity must be a valid number." })
+    .int({ message: "Stock quantity must be an integer." })
+    .min(0, { message: "Stock quantity cannot be negative." }),
+});
 
 export async function POST({ request }: APIEvent) {
   console.log("API Route: /api/products POST endpoint hit.");
   try {
     const body = await request.json();
+    const validationResult = NewProductPayloadSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      console.error(
+        "API Route POST Validation Error:",
+        validationResult.error.flatten()
+      );
+      return new Response(
+        JSON.stringify({
+          error: "Invalid input.",
+          issues: validationResult.error.flatten().fieldErrors,
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const {
       name,
       description,
@@ -138,32 +160,10 @@ export async function POST({ request }: APIEvent) {
       imageUrl,
       category,
       stockQuantity,
-    } = body as NewProductPayload;
-
-    if (!name || typeof name !== "string" || name.trim() === "") {
-      return new Response(
-        JSON.stringify({ error: "Product name is required." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-    if (typeof priceInCents !== "number" || priceInCents <= 0) {
-      return new Response(
-        JSON.stringify({ error: "Price must be a positive number." }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
-    if (typeof stockQuantity !== "number" || stockQuantity < 0) {
-      return new Response(
-        JSON.stringify({
-          error: "Stock quantity must be a non-negative number.",
-        }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    } = validationResult.data;
 
     const newProductData = {
-      id: crypto.randomUUID(),
-      name: name.trim(),
+      name,
       description: description || null,
       priceInCents,
       imageUrl: imageUrl || null,
@@ -196,6 +196,13 @@ export async function POST({ request }: APIEvent) {
     });
   } catch (error: any) {
     console.error("API Route POST Error:", error.message, error.stack);
+    if (error instanceof SyntaxError) {
+      // Handle cases where request.json() fails
+      return new Response(JSON.stringify({ error: "Invalid JSON payload." }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
     return new Response(
       JSON.stringify({
         error: "Failed to create product. " + (error?.message || ""),
