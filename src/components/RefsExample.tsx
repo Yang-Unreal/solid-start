@@ -38,12 +38,21 @@ export const RefsExample: Component = () => {
         reference.
       </p>
 
+      {/* Ensure 'for' on label matches 'id' on input */}
+      <label for="refs-example-text-input" class="sr-only">
+        {" "}
+        {/* Ensure this class is defined in your CSS */}
+        Sample Input for Refs Example
+      </label>
       <input
         ref={myInputRef}
+        id="refs-example-text-input" // Ensure this ID is unique on the page
+        name="refs_example_value"
         type="text"
         value={inputValue()}
         onInput={(e) => setInputValue(e.currentTarget.value)}
         placeholder="Type something..."
+        autocomplete="off"
         class={`
           block w-full
           py-2 px-3

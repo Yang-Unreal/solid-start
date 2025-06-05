@@ -4,6 +4,7 @@ import { useSearchParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
 import { PlusCircle } from "lucide-solid";
+import { authClient } from "~/lib/auth-client"; // Import authClient
 
 export interface Product {
   id: string;
@@ -36,6 +37,7 @@ const PRODUCTS_QUERY_KEY_PREFIX = "products";
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const session = authClient.useSession(); // Get session data
 
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
@@ -147,6 +149,12 @@ const ProductsPage = () => {
     dark:focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed
   `;
 
+  // Typed accessor for user role
+  const userRole = () => {
+    const user = session()?.data?.user as { role?: string } | undefined;
+    return user?.role;
+  };
+
   return (
     <MetaProvider>
       <Title>Our Products</Title>
@@ -155,17 +163,19 @@ const ProductsPage = () => {
           <h1 class="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
             Our Products
           </h1>
-          <A
-            href="/products/new"
-            class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
-                   transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black
-                   hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2
-                   focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100
-                   dark:focus:ring-offset-black"
-          >
-            <PlusCircle size={18} class="mr-2" />
-            Add Product
-          </A>
+          <Show when={!session().isPending && userRole() === "admin"}>
+            <A
+              href="/products/new"
+              class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
+                     transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black
+                     hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2
+                     focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100
+                     dark:focus:ring-offset-black"
+            >
+              <PlusCircle size={18} class="mr-2" />
+              Add Product
+            </A>
+          </Show>
         </div>
 
         <Show when={isLoadingInitial()}>
@@ -209,9 +219,6 @@ const ProductsPage = () => {
                           alt={product.name}
                           class="w-full h-full object-cover"
                           loading="lazy"
-                          // width/height attributes here are less critical for layout shape,
-                          // but still good for CLS if you know the original image's aspect ratio.
-                          // They won't override the aspect-ratio styling of the container.
                           onError={(e) =>
                             (e.currentTarget.style.display = "none")
                           }

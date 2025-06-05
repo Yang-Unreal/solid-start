@@ -60,6 +60,7 @@ export default function DynamicRender() {
       </h1>
 
       <div>
+        {/* Correct: 'for' matches 'id' */}
         <label
           for="colorSelectDR"
           class="block mb-1.5 text-sm font-medium text-neutral-600 dark:text-neutral-400"
@@ -68,6 +69,7 @@ export default function DynamicRender() {
         </label>
         <select
           id="colorSelectDR"
+          name="color_variant_selector"
           value={selected()}
           onInput={(e) => setSelected(e.currentTarget.value as ColorOption)}
           class={`

@@ -19,12 +19,20 @@ export default function ForList() {
 
   return (
     <div class="p-6 sm:p-8 bg-white dark:bg-black text-neutral-800 dark:text-neutral-300 rounded-lg space-y-6 sm:space-y-8">
-      <Field.Root class="w-full">
-        <Field.Label class="text-center block text-2xl font-medium text-neutral-800 dark:text-neutral-200 mb-5">
-          For List
-        </Field.Label>
+      <h2 class="text-center block text-2xl font-medium text-neutral-800 dark:text-neutral-200 mb-5">
+        For List
+      </h2>
 
-        <Field.Input
+      {/* Field.Root helps associate Field.Label and Field.Input */}
+      <Field.Root class="w-full">
+        {/* The content of Field.Label is used as the accessible name.
+            It will be associated with the Field.Input by Ark UI. */}
+        <Field.Label class="sr-only">
+          {" "}
+          {/* Visually hidden, but provides accessible name */}
+          Add new item
+        </Field.Label>
+        <Field.Input // No explicit id needed here if Field.Label doesn't have 'for'
           type="text"
           onKeyDown={handleAddItem}
           placeholder="Type item and press Enter..."

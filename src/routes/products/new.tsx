@@ -1,5 +1,5 @@
 // src/routes/products/new.tsx
-import { createSignal, Show } from "solid-js";
+import { createSignal, Show, createEffect } from "solid-js";
 import { useNavigate, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -8,6 +8,7 @@ import {
   type UseMutationResult,
 } from "@tanstack/solid-query";
 import type { Product } from "../products"; // Assuming Product interface is exported from there
+import { authClient } from "~/lib/auth-client"; // Import authClient
 
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 
@@ -46,13 +47,29 @@ async function createProductInDB(newProduct: NewProductData): Promise<Product> {
 const AddProductPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const session = authClient.useSession();
+
+  const [isAuthorized, setIsAuthorized] = createSignal(false);
+
+  createEffect(() => {
+    const currentSession = session();
+    if (!currentSession.isPending) {
+      const user = currentSession.data?.user as { role?: string } | undefined;
+      if (!user) {
+        navigate("/login", { replace: true }); // Not logged in
+      } else if (user.role === "admin") {
+        setIsAuthorized(true); // Is admin
+      } else {
+        navigate("/dashboard", { replace: true }); // Logged in, but not admin
+      }
+    }
+  });
 
   const [name, setName] = createSignal("");
   const [description, setDescription] = createSignal("");
   const [priceInCents, setPriceInCents] = createSignal<number | undefined>(
     undefined
   );
-  // Removed imageUrl signal as it will come from file upload
   const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
   const [category, setCategory] = createSignal("");
   const [stockQuantity, setStockQuantity] = createSignal<number | undefined>(
@@ -88,8 +105,8 @@ const AddProductPage = () => {
     const input = e.currentTarget as HTMLInputElement;
     const file = input.files?.[0];
     setSelectedFile(file || null);
-    setFileUploadError(null); // Clear previous file upload error on new file selection
-    setFormError(null); // Also clear general form error
+    setFileUploadError(null);
+    setFormError(null);
   };
 
   const handleSubmit = async (e: Event) => {
@@ -97,7 +114,6 @@ const AddProductPage = () => {
     setFormError(null);
     setFileUploadError(null);
 
-    // Basic form validations
     if (!name().trim()) {
       setFormError("Product name is required.");
       return;
@@ -113,7 +129,6 @@ const AddProductPage = () => {
 
     let uploadedImageUrl: string | null = null;
 
-    // Step 1: Upload image if selected
     if (selectedFile()) {
       setIsUploadingImage(true);
       const formData = new FormData();
@@ -192,181 +207,200 @@ const AddProductPage = () => {
   `;
 
   return (
-    <MetaProvider>
-      <Title>Add New Product</Title>
-      <main class="bg-neutral-100 dark:bg-neutral-900 p-4 sm:p-6 lg:p-8 flex justify-center items-start min-h-screen">
-        <div class="w-full max-w-2xl bg-white dark:bg-neutral-800 shadow-xl rounded-lg p-6 sm:p-8 my-8">
-          <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-neutral-800 dark:text-neutral-200">
-            Create New Product
-          </h1>
-          <form onSubmit={handleSubmit} class="space-y-5">
-            <div>
-              <label for="name" class={labelBaseClasses}>
-                Product Name <span class="text-red-500">*</span>
-              </label>
-              <input
-                id="name"
-                type="text"
-                value={name()}
-                onInput={(e) => setName(e.currentTarget.value)}
-                class={inputBaseClasses}
-                required
-                disabled={
-                  isUploadingImage() || productCreationMutation.isPending
-                }
-              />
-            </div>
-            <div>
-              <label for="description" class={labelBaseClasses}>
-                Description
-              </label>
-              <textarea
-                id="description"
-                value={description()}
-                onInput={(e) => setDescription(e.currentTarget.value)}
-                class={`${inputBaseClasses} min-h-[100px]`}
-                disabled={
-                  isUploadingImage() || productCreationMutation.isPending
-                }
-              />
-            </div>
-            <div>
-              <label for="price" class={labelBaseClasses}>
-                Price (in Cents) <span class="text-red-500">*</span>
-              </label>
-              <input
-                id="price"
-                type="number"
-                value={priceInCents() ?? ""}
-                onInput={(e) =>
-                  setPriceInCents(
-                    e.currentTarget.value === ""
-                      ? undefined
-                      : parseInt(e.currentTarget.value, 10)
-                  )
-                }
-                class={inputBaseClasses}
-                required
-                min="1"
-                disabled={
-                  isUploadingImage() || productCreationMutation.isPending
-                }
-              />
-            </div>
-
-            {/* File Input for Image Upload */}
-            <div>
-              <label for="productImage" class={labelBaseClasses}>
-                Product Image
-              </label>
-              <input
-                id="productImage"
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-                class={fileInputClasses}
-                onInput={handleFileChange}
-                disabled={
-                  isUploadingImage() || productCreationMutation.isPending
-                }
-              />
-              <Show when={selectedFile() && !fileUploadError()}>
-                <p class="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
-                  Selected: {selectedFile()!.name} (
-                  {(selectedFile()!.size / 1024).toFixed(2)} KB)
-                </p>
-              </Show>
-              <Show when={fileUploadError()}>
-                <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
-              </Show>
-            </div>
-
-            <div>
-              <label for="category" class={labelBaseClasses}>
-                Category
-              </label>
-              <input
-                id="category"
-                type="text"
-                value={category()}
-                onInput={(e) => setCategory(e.currentTarget.value)}
-                class={inputBaseClasses}
-                disabled={
-                  isUploadingImage() || productCreationMutation.isPending
-                }
-              />
-            </div>
-            <div>
-              <label for="stockQuantity" class={labelBaseClasses}>
-                Stock Quantity <span class="text-red-500">*</span>
-              </label>
-              <input
-                id="stockQuantity"
-                type="number"
-                value={stockQuantity() ?? ""}
-                onInput={(e) =>
-                  setStockQuantity(
-                    e.currentTarget.value === ""
-                      ? undefined
-                      : parseInt(e.currentTarget.value, 10)
-                  )
-                }
-                class={inputBaseClasses}
-                required
-                min="0"
-                disabled={
-                  isUploadingImage() || productCreationMutation.isPending
-                }
-              />
-            </div>
-
-            <Show when={formError()}>
-              <p class="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md text-center">
-                {formError()}
-              </p>
-            </Show>
-
-            <div class="flex items-center justify-end space-x-4 pt-3">
-              <A
-                href="/products"
-                class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
-                       transition-colors duration-150 ease-in-out
-                       bg-neutral-200 text-neutral-700 hover:bg-neutral-300
-                       dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-500
-                       ${
-                         isUploadingImage() || productCreationMutation.isPending
-                           ? "opacity-50 cursor-not-allowed"
-                           : ""
-                       }`}
-                onClick={(e) => {
-                  if (isUploadingImage() || productCreationMutation.isPending)
-                    e.preventDefault();
-                }}
-              >
-                Cancel
-              </A>
-              <button
-                type="submit"
-                disabled={
-                  isUploadingImage() || productCreationMutation.isPending
-                }
-                class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium
-                       transition-colors duration-150 ease-in-out
-                       bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a]
-                       focus:outline-none focus:ring-2 focus:ring-[#c2fe0c]
-                       focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800
-                       disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {isUploadingImage()
-                  ? "Uploading Image..."
-                  : productCreationMutation.isPending
-                  ? "Adding Product..."
-                  : "Add Product"}
-              </button>
-            </div>
-          </form>
+    <>
+      <Show when={session().isPending && !isAuthorized()}>
+        {" "}
+        {/* Show loading only if not yet authorized */}
+        <div class="flex justify-center items-center min-h-screen">
+          <p class="text-xl">Loading session...</p>
         </div>
-      </main>
-    </MetaProvider>
+      </Show>
+
+      <Show when={!session().isPending && isAuthorized()}>
+        <MetaProvider>
+          <Title>Add New Product</Title>
+          <main class="bg-neutral-100 dark:bg-neutral-900 p-4 sm:p-6 lg:p-8 flex justify-center items-start min-h-screen">
+            <div class="w-full max-w-2xl bg-white dark:bg-neutral-800 shadow-xl rounded-lg p-6 sm:p-8 my-8">
+              <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-neutral-800 dark:text-neutral-200">
+                Create New Product
+              </h1>
+              <form onSubmit={handleSubmit} class="space-y-5">
+                <div>
+                  <label for="name" class={labelBaseClasses}>
+                    Product Name <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="name"
+                    type="text"
+                    value={name()}
+                    onInput={(e) => setName(e.currentTarget.value)}
+                    class={inputBaseClasses}
+                    required
+                    autocomplete="off" // Example: explicitly turning off autocomplete
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                </div>
+                <div>
+                  <label for="description" class={labelBaseClasses}>
+                    Description
+                  </label>
+                  <textarea
+                    id="description"
+                    value={description()}
+                    onInput={(e) => setDescription(e.currentTarget.value)}
+                    class={`${inputBaseClasses} min-h-[100px]`}
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                </div>
+                <div>
+                  <label for="price" class={labelBaseClasses}>
+                    Price (in Cents) <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="price"
+                    type="number"
+                    value={priceInCents() ?? ""}
+                    onInput={(e) =>
+                      setPriceInCents(
+                        e.currentTarget.value === ""
+                          ? undefined
+                          : parseInt(e.currentTarget.value, 10)
+                      )
+                    }
+                    class={inputBaseClasses}
+                    required
+                    min="1"
+                    autocomplete="off"
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label for="productImage" class={labelBaseClasses}>
+                    Product Image
+                  </label>
+                  <input
+                    id="productImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    class={fileInputClasses}
+                    onInput={handleFileChange}
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                  <Show when={selectedFile() && !fileUploadError()}>
+                    <p class="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                      Selected: {selectedFile()!.name} (
+                      {(selectedFile()!.size / 1024).toFixed(2)} KB)
+                    </p>
+                  </Show>
+                  <Show when={fileUploadError()}>
+                    <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
+                  </Show>
+                </div>
+
+                <div>
+                  <label for="category" class={labelBaseClasses}>
+                    Category
+                  </label>
+                  <input
+                    id="category"
+                    type="text"
+                    value={category()}
+                    onInput={(e) => setCategory(e.currentTarget.value)}
+                    class={inputBaseClasses}
+                    autocomplete="off"
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                </div>
+                <div>
+                  <label for="stockQuantity" class={labelBaseClasses}>
+                    Stock Quantity <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="stockQuantity"
+                    type="number"
+                    value={stockQuantity() ?? ""}
+                    onInput={(e) =>
+                      setStockQuantity(
+                        e.currentTarget.value === ""
+                          ? undefined
+                          : parseInt(e.currentTarget.value, 10)
+                      )
+                    }
+                    class={inputBaseClasses}
+                    required
+                    min="0"
+                    autocomplete="off"
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                </div>
+
+                <Show when={formError()}>
+                  <p class="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md text-center">
+                    {formError()}
+                  </p>
+                </Show>
+
+                <div class="flex items-center justify-end space-x-4 pt-3">
+                  <A
+                    href="/products"
+                    class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium
+                           transition-colors duration-150 ease-in-out
+                           bg-neutral-200 text-neutral-700 hover:bg-neutral-300
+                           dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-500
+                           ${
+                             isUploadingImage() ||
+                             productCreationMutation.isPending
+                               ? "opacity-50 cursor-not-allowed"
+                               : ""
+                           }`}
+                    onClick={(e) => {
+                      if (
+                        isUploadingImage() ||
+                        productCreationMutation.isPending
+                      )
+                        e.preventDefault();
+                    }}
+                  >
+                    Cancel
+                  </A>
+                  <button
+                    type="submit"
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                    class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium
+                           transition-colors duration-150 ease-in-out
+                           bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a]
+                           focus:outline-none focus:ring-2 focus:ring-[#c2fe0c]
+                           focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800
+                           disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {isUploadingImage()
+                      ? "Uploading Image..."
+                      : productCreationMutation.isPending
+                      ? "Adding Product..."
+                      : "Add Product"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </main>
+        </MetaProvider>
+      </Show>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
-// src/routes/api/auth/[...solidauth].ts
-import { auth } from "~/lib/auth"; // path to your server auth file
+// src/routes/api/auth/[...auth].ts
+import { auth } from "~/lib/auth";
 import { toSolidStartHandler } from "better-auth/solid-start";
 
 export const { GET, POST } = toSolidStartHandler(auth);

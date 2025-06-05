@@ -73,10 +73,7 @@ export const verification = pgTable("verification", {
 });
 
 export const product = pgTable("product", {
-  // If using pgTable, and you want auto-generated UUIDs:
-  id: uuid("id").defaultRandom().primaryKey(), // CORRECTED: Use uuid and defaultRandom
-  // If you are NOT using PostgreSQL, or want to use text IDs provided by client:
-  // id: text("id").primaryKey(), // (and ensure you provide it in the seed)
+  id: uuid("id").defaultRandom().primaryKey(),
 
   name: text("name").notNull(),
   description: text("description"),

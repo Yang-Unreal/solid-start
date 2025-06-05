@@ -28,7 +28,7 @@ function IndexList() {
         <ul class="border border-neutral-200 dark:border-neutral-700 rounded-md overflow-hidden">
           <Index each={inputs()}>
             {(input, index) => {
-              const inputId = `item-input-${index}`;
+              const inputId = `item-input-${index}`; // Dynamic ID
               return (
                 <li class="flex items-center justify-between px-3 py-2.5 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
                   <Editable.Root
@@ -38,6 +38,7 @@ function IndexList() {
                     }
                     class="flex items-center justify-between gap-2 sm:gap-4 w-full"
                   >
+                    {/* Correct: 'for' matches dynamic 'id' */}
                     <Editable.Label for={inputId} class="sr-only">
                       Item {index + 1}
                     </Editable.Label>
@@ -45,7 +46,7 @@ function IndexList() {
                     <Editable.Area class="flex-grow min-w-0">
                       <Editable.Preview class="w-full px-2 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800/50 truncate text-neutral-700 dark:text-neutral-300 cursor-text" />
                       <Editable.Input
-                        id={inputId}
+                        id={inputId} // Dynamic ID
                         name={`item-${index}`}
                         class={`
                           w-full px-2 py-1

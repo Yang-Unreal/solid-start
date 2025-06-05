@@ -6,7 +6,6 @@ import net from "net";
 import tls, { type ConnectionOptions as TlsConnectionOptions } from "tls";
 
 declare global {
-  // eslint-disable-next-line no-var
   var redisClient: Redis | undefined;
 }
 
@@ -21,9 +20,7 @@ const getRedisClient = (): Redis => {
   }
 
   const redisClientOptions: RedisOptions = {
-    maxRetriesPerRequest: 3, // Example: Retain a sensible default
-    // For production, you might want to configure connectTimeout,
-    // enableOfflineQueue based on your needs, or keep it minimal.
+    maxRetriesPerRequest: 3,
   };
 
   if (dragonflyUriFromEnv.startsWith("rediss://")) {
@@ -61,7 +58,6 @@ const getRedisClient = (): Redis => {
         criticalCertLoadFailed = true;
       }
     } else if (clientCertPath || clientKeyPath) {
-      // This is a configuration error, so a warning is still useful even in "clean" code.
       console.warn(
         "[Redis Init] CONFIG_WARNING: Either DRAGONFLY_CLIENT_CERT_PATH or DRAGONFLY_CLIENT_KEY_PATH is missing for mTLS. Proceeding without mTLS client authentication."
       );
@@ -82,9 +78,7 @@ const getRedisClient = (): Redis => {
 
   const client = new Redis(dragonflyUriFromEnv, redisClientOptions);
 
-  // Minimal error listener for production might be useful
   client.on("error", (err) => {
-    // In production, you might send this to a proper logging service
     console.error("[Redis] Runtime Connection Error:", err.message);
   });
 
