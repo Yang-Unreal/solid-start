@@ -41,6 +41,8 @@ interface ApiResponse {
 }
 
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
+const TARGET_ROWS_ON_PAGE = 3;
+const MAX_API_PAGE_SIZE = 100;
 
 async function deleteProductApi(
   productId: string
@@ -59,6 +61,40 @@ async function deleteProductApi(
   return response.json();
 }
 
+// THIS FUNCTION MUST ACCURATELY REFLECT THE TAILWIND CSS `grid-cols-*` BREAKPOINTS
+// USED IN THE JSX FOR THE PRODUCT GRID, INCLUDING CUSTOM BREAKPOINTS DEFINED VIA @theme in CSS.
+const getActiveColumnCount = () => {
+  if (typeof window === "undefined") return 4; // SSR fallback (e.g., for 'lg')
+
+  const screenWidth = window.innerWidth;
+
+  // Pixel values for breakpoints:
+  // Default Tailwind: sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px
+  // Custom via @theme (example): 3xl: 1920px (120rem * 16px/rem if base font is 16px)
+
+  // Order from largest to smallest is important.
+  if (screenWidth >= 1920) return 6; // Matches custom `3xl:grid-cols-6`
+  if (screenWidth >= 1536) return 5; // Matches `2xl:grid-cols-5`
+  if (screenWidth >= 1280) return 4; // Matches `xl:grid-cols-4`
+  if (screenWidth >= 1024) return 4; // Matches `lg:grid-cols-4`
+  if (screenWidth >= 768) return 3; // Matches `md:grid-cols-3`
+  if (screenWidth >= 640) return 2; // Matches `sm:grid-cols-2`
+  return 1; // Default `grid-cols-1`
+};
+
+const calculatePageSize = () => {
+  const columns = getActiveColumnCount();
+  let newPageSize = columns * TARGET_ROWS_ON_PAGE;
+
+  if (newPageSize === 0 && columns > 0) newPageSize = columns;
+  if (newPageSize < columns && columns > 0) newPageSize = columns;
+
+  const absoluteMinPageSize = Math.max(6, columns);
+  newPageSize = Math.max(newPageSize, absoluteMinPageSize);
+
+  return Math.min(newPageSize, MAX_API_PAGE_SIZE);
+};
+
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const session = authClient.useSession();
@@ -75,20 +111,9 @@ const ProductsPage = () => {
 
   const currentPage = () =>
     parseInt(getSearchParamString(searchParams.page, "1"), 10);
-
-  const [dynamicPageSize, setDynamicPageSize] = createSignal(12); // Default initial page size
-
-  const calculatePageSize = () => {
-    if (typeof window !== "undefined") {
-      const screenWidth = window.innerWidth;
-      if (screenWidth >= 2800) return 36;
-      if (screenWidth >= 1920) return 24;
-      if (screenWidth >= 1280) return 18;
-      if (screenWidth >= 768) return 12;
-      return 8;
-    }
-    return 12;
-  };
+  const [dynamicPageSize, setDynamicPageSize] = createSignal(
+    calculatePageSize()
+  );
 
   onMount(() => {
     const initialSize = calculatePageSize();
@@ -144,13 +169,12 @@ const ProductsPage = () => {
       if (
         !isNaN(numParamPageSize) &&
         numParamPageSize > 0 &&
-        numParamPageSize <= 100
+        numParamPageSize <= MAX_API_PAGE_SIZE
       ) {
-        // MAX_PAGE_SIZE from API
         return numParamPageSize;
       }
     }
-    return dynamicPageSize() || 12;
+    return dynamicPageSize();
   };
 
   const fetchProductsQueryFn = async (context: {
@@ -236,7 +260,6 @@ const ProductsPage = () => {
       setTimeout(() => setDeleteError(null), 5000);
     },
   }));
-
   const handleDeleteProduct = (productId: string, productName: string) => {
     if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
       setDeleteError(null);
@@ -244,7 +267,6 @@ const ProductsPage = () => {
       deleteProductMutation.mutate(productId);
     }
   };
-
   const handlePageChange = (newPage: number) => {
     setSearchParams({
       page: newPage.toString(),
@@ -252,7 +274,6 @@ const ProductsPage = () => {
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   const formatPrice = (priceInCents: number) =>
     `$${(priceInCents / 100).toFixed(2)}`;
   const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100 dark:focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed`;
@@ -311,7 +332,11 @@ const ProductsPage = () => {
 
         <Show when={productsQuery.data && !error()}>
           <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-            <div class="product-grid gap-6 sm:gap-8">
+            {/*
+              Tailwind classes define columns. `getActiveColumnCount` MUST match these.
+              Custom `3xl` breakpoint (e.g., 1920px) should be defined in `app.css` via @theme.
+            */}
+            <div class="justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6 sm:gap-8">
               <For each={products()}>
                 {(product) => (
                   <div class="card-content-host flex flex-col bg-white dark:bg-black shadow-lg rounded-xl overflow-hidden">

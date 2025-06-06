@@ -1,4 +1,9 @@
-@import "tailwindcss";
+/* src/app.css */
+@import "tailwindcss"; /* Or @tailwind base; @tailwind components; @tailwind utilities; */
+
+@theme {
+  --breakpoint-3xl: 120rem;
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -16,16 +21,14 @@
 :root.dark {
   --background-rgb: 0, 0, 0;
   --foreground-rgb: 229, 231, 235;
-  --accent-hex: #c2fe0c;
-  --accent-rgb: 194, 254, 12;
+  --accent-hex: #c2fe0c; /* Ensure this is intended if it doesn't change for dark mode */
+  --accent-rgb: 194, 254, 12; /* Ensure this is intended */
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background-rgb: 0, 0, 0;
     --foreground-rgb: 229, 231, 235;
-    --accent-hex: #c2fe0c;
-    --accent-rgb: 194, 254, 12;
   }
 }
 
@@ -39,29 +42,29 @@ body {
 
 @layer components {
   .card-wrapper {
-    @apply bg-white dark:bg-black 
-           rounded-lg 
-          shadow-lg dark:shadow-xl dark:shadow-neutral-950/50 
-           p-6 sm:p-8 
-           flex flex-col items-center justify-center 
-           space-y-6 sm:space-y-8 
-           text-center 
+    @apply bg-white dark:bg-black
+           rounded-lg
+           shadow-lg dark:shadow-xl dark:shadow-neutral-950/50
+           p-6 sm:p-8
+           flex flex-col items-center justify-center
+           space-y-6 sm:space-y-8
+           text-center
            min-h-[300px] h-full;
   }
 
   .card-content-host {
-    @apply bg-white dark:bg-black 
-           rounded-lg 
-           shadow-lg dark:shadow-xl dark:shadow-neutral-950/50 
-           h-full 
-           overflow-hidden;
+    @apply bg-white dark:bg-black
+           rounded-lg
+           shadow-lg dark:shadow-xl dark:shadow-neutral-950/50
+           h-full
+           overflow-hidden; /* This is for the individual card, not the grid */
   }
 
   .card-error-boundary-host {
-    @apply bg-white dark:bg-black 
-         rounded-lg 
-         shadow-lg dark:shadow-xl dark:shadow-neutral-950/50 
-         h-full 
+    @apply bg-white dark:bg-black
+         rounded-lg
+         shadow-lg dark:shadow-xl dark:shadow-neutral-950/50
+         h-full
          overflow-hidden
          p-6 sm:p-8;
   }
@@ -95,10 +98,32 @@ body {
   .animate-fade-in {
     animation: fade-in 0.3s ease-out forwards;
   }
-  .product-grid {
-    display: grid;
 
-    grid-template-columns: repeat(auto-fit, minmax(300px, 350px));
-    justify-content: center;
+  /* Utility class to visually hide elements but keep them accessible to screen readers */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Custom scrollbar styling (optional, adjust as needed) */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-neutral-200 dark:bg-neutral-800 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-neutral-400 dark:bg-neutral-600 rounded-full;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-500 dark:bg-neutral-500;
   }
 }
