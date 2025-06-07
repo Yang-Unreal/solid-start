@@ -20,9 +20,9 @@
 
 :root.dark {
   --background-rgb: 0, 0, 0;
-  --foreground-rgb: 229, 231, 235;
-  --accent-hex: #c2fe0c; /* Ensure this is intended if it doesn't change for dark mode */
-  --accent-rgb: 194, 254, 12; /* Ensure this is intended */
+  --foreground-rgb: 240, 240, 240; /* Improved contrast */
+  --accent-hex: #a0d00c; /* Darker shade for better contrast */
+  --accent-rgb: 160, 208, 12;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -133,6 +133,7 @@ const ToDo = () => {
                          bg-white dark:bg-neutral-900 group"
                 >
                   <ArkCheckbox.Root
+                    aria-labelledby={`label-${item.id}`}
                     checked={item.completed}
                     onCheckedChange={(details) =>
                       handleCheckboxChange(item.id, details)
@@ -159,6 +160,7 @@ const ToDo = () => {
                   </ArkCheckbox.Root>
 
                   <span
+                    id={`label-${item.id}`}
                     class={`flex-grow ${
                       item.completed
                         ? "line-through text-neutral-500 dark:text-neutral-400"

@@ -18,7 +18,7 @@ export default function Home() {
           <Counter />
           <Avatar
             name="Yang Yang"
-            src="https://minio.limingcn.com/bun/cloud.jpg"
+            src="https://minio.limingcn.com/solid-start/cloud.webp"
             size="md"
           />
           <Controlled />
