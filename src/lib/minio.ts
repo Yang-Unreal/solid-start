@@ -50,7 +50,8 @@ export async function uploadFile(
   key: string,
   data: Uint8Array,
   contentType: string,
-  metadata: Record<string, string> = {}
+  metadata: Record<string, string> = {},
+  cacheControl: string = "public, max-age=31536000, immutable" // Default to 1 year immutable cache
 ) {
   console.log(`Uploading file to key: ${key} in bucket ${bucket}`);
   const command = new PutObjectCommand({
@@ -59,6 +60,7 @@ export async function uploadFile(
     Body: data,
     ContentType: contentType,
     Metadata: metadata,
+    CacheControl: cacheControl,
   });
 
   try {
