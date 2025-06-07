@@ -1,3 +1,4 @@
+// src/components/list/Index.tsx
 import { createSignal, Index, Show } from "solid-js";
 import { Editable, type EditableValueChangeDetails } from "@ark-ui/solid";
 
@@ -28,7 +29,7 @@ function IndexList() {
         <ul class="border border-neutral-200 dark:border-neutral-700 rounded-md overflow-hidden">
           <Index each={inputs()}>
             {(input, index) => {
-              const inputId = `item-input-${index}`; // Dynamic ID
+              const inputId = `item-input-${index}`;
               return (
                 <li class="flex items-center justify-between px-3 py-2.5 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
                   <Editable.Root
@@ -38,7 +39,6 @@ function IndexList() {
                     }
                     class="flex items-center justify-between gap-2 sm:gap-4 w-full"
                   >
-                    {/* Correct: 'for' matches dynamic 'id' */}
                     <Editable.Label for={inputId} class="sr-only">
                       Item {index + 1}
                     </Editable.Label>
@@ -46,17 +46,9 @@ function IndexList() {
                     <Editable.Area class="flex-grow min-w-0">
                       <Editable.Preview class="w-full px-2 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800/50 truncate text-neutral-700 dark:text-neutral-300 cursor-text" />
                       <Editable.Input
-                        id={inputId} // Dynamic ID
+                        id={inputId}
                         name={`item-${index}`}
-                        class={`
-                          w-full px-2 py-1
-                          rounded-md border border-neutral-300
-                          transition duration-150 ease-in-out
-                          bg-white text-neutral-900
-                          focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c]
-                          dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600
-                          dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]
-                        `}
+                        class="w-full px-2 py-1 rounded-md border border-neutral-300 transition duration-150 ease-in-out bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c] dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600 dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]"
                       />
                     </Editable.Area>
 
@@ -67,24 +59,23 @@ function IndexList() {
                             when={editable().editing}
                             fallback={
                               <Editable.EditTrigger
-                                class={`${baseButtonClass}
-                                  text-sky-600 hover:bg-sky-500/10 focus:ring-sky-500
-                                  dark:text-sky-400 dark:hover:bg-sky-400/10`}
+                                class={
+                                  `${baseButtonClass}
+                                  text-sky-700 hover:bg-sky-500/10 focus:ring-sky-500
+                                  dark:text-[#c2fe0c] dark:hover:bg-neutral-700` /* ACCESSIBILITY FIX */
+                                }
                               >
                                 Edit
                               </Editable.EditTrigger>
                             }
                           >
                             <Editable.SubmitTrigger
-                              class={`${baseButtonClass}
-                                bg-[#c2fe0c] text-black hover:bg-[#a8e00a] focus:ring-[#c2fe0c]`}
+                              class={`${baseButtonClass} bg-[#c2fe0c] text-black hover:bg-[#a8e00a] focus:ring-[#c2fe0c]`}
                             >
                               Save
                             </Editable.SubmitTrigger>
                             <Editable.CancelTrigger
-                              class={`${baseButtonClass}
-                                text-neutral-700 border border-neutral-300 hover:bg-neutral-100 focus:ring-neutral-500
-                                dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700/50`}
+                              class={`${baseButtonClass} text-neutral-700 border border-neutral-300 hover:bg-neutral-100 focus:ring-neutral-500 dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700/50`}
                             >
                               Cancel
                             </Editable.CancelTrigger>

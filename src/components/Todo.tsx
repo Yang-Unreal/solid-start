@@ -12,7 +12,6 @@ interface TodoItem {
   text: string;
   completed: boolean;
 }
-
 interface ToDoState {
   items: TodoItem[];
   nextItemId: number;
@@ -27,7 +26,6 @@ const ToDo = () => {
     ],
     nextItemId: 4,
   });
-
   const [inputText, setInputText] = createSignal("");
 
   const addTodoItem = () => {
@@ -65,11 +63,12 @@ const ToDo = () => {
     );
   };
 
-  const baseButtonClass =
-    "rounded-lg font-medium transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-black";
-  const primaryButtonColors =
-    "bg-sky-600 hover:bg-sky-700 text-white focus:ring-sky-500 dark:bg-[#c2fe0c] dark:hover:bg-[#a8e00a] dark:text-black dark:focus:ring-[#c2fe0c]";
-  const regularButtonSize = "px-4 py-2 text-sm";
+  // ACCESSIBILITY FIX: Using high-contrast button style consistent with Counter.tsx
+  const primaryButtonClass = `
+    px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ease-in-out
+    bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a]
+    focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 dark:focus:ring-offset-black
+  `;
 
   return (
     <div class="w-full max-w-sm mx-auto space-y-4 text-left">
@@ -93,7 +92,7 @@ const ToDo = () => {
         />
         <button
           onClick={addTodoItem}
-          class={`${baseButtonClass} ${primaryButtonColors} ${regularButtonSize} flex items-center gap-x-1.5`}
+          class={`${primaryButtonClass} flex items-center gap-x-1.5`}
         >
           <Plus size={18} stroke-width={2.5} />
           <span>Add</span>
@@ -112,20 +111,14 @@ const ToDo = () => {
             <For each={state.items}>
               {(item) => (
                 <li class="flex items-center p-3 text-sm text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-900 group">
-                  {/* ACCESSIBILITY FIX: Use Ark UI's idiomatic pattern */}
                   <ArkCheckbox.Root
                     checked={item.completed}
                     onCheckedChange={(details) =>
                       handleCheckboxChange(item.id, details)
                     }
-                    class="flex items-center shrink-0 w-full group/checkbox cursor-pointer" // Make the whole root clickable
+                    class="flex items-center shrink-0 w-full group/checkbox cursor-pointer"
                   >
-                    <ArkCheckbox.Control class="w-5 h-5 rounded border transition-colors duration-150 flex items-center justify-center shrink-0 bg-white dark:bg-neutral-800 border-neutral-400 dark:border-neutral-500 group-data-[state=checked]/checkbox:bg-sky-500 dark:group-data-[state=checked]/checkbox:bg-[#c2fe0c] group-data-[state=checked]/checkbox:border-sky-500 dark:group-data-[state=checked]/checkbox:border-[#c2fe0c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 focus-visible:ring-sky-500 dark:focus-visible:ring-[#c2fe0c]">
-                      <ArkCheckbox.Indicator class="text-white dark:text-black">
-                        <Check size={14} stroke-width={3} />
-                      </ArkCheckbox.Indicator>
-                    </ArkCheckbox.Control>
-                    {/* Ark UI's Label component is automatically associated with the Control */}
+                    <ArkCheckbox.Control class="w-5 h-5 rounded border transition-colors duration-150 flex items-center justify-center shrink-0 bg-white dark:bg-neutral-800 border-neutral-400 dark:border-neutral-500 group-data-[state=checked]/checkbox:bg-sky-600 dark:group-data-[state=checked]/checkbox:bg-[#c2fe0c] group-data-[state=checked]/checkbox:border-sky-600 dark:group-data-[state=checked]/checkbox:border-[#c2fe0c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 focus-visible:ring-sky-500 dark:focus-visible:ring-[#c2fe0c]" />
                     <ArkCheckbox.Label
                       class={`ml-3 flex-grow transition-colors ${
                         item.completed

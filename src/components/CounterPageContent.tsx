@@ -18,7 +18,8 @@ const DisplayCount: Component = () => {
     <div class="text-center my-1">
       <p class="text-md text-neutral-600 dark:text-neutral-300">
         Shared Count:
-        <span class="block text-3xl font-bold font-mono mt-0.5 text-sky-600 dark:text-[#c2fe0c]">
+        {/* Using compliant text color */}
+        <span class="block text-3xl font-bold font-mono mt-0.5 text-sky-800 dark:text-sky-400">
           {count()}
         </span>
       </p>
@@ -26,10 +27,11 @@ const DisplayCount: Component = () => {
   );
 };
 
+// ACCESSIBILITY FIX: Using high-contrast lime green button style for all buttons
 const baseButtonClass =
-  "rounded-lg font-medium transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-neutral-900"; // Changed offset
+  "rounded-lg font-medium transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-black";
 const primaryButtonColors =
-  "bg-sky-600 hover:bg-sky-700 text-white focus:ring-sky-500 dark:bg-[#c2fe0c] dark:hover:bg-[#a8e00a] dark:text-black dark:focus:ring-[#c2fe0c]";
+  "bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:ring-[#c2fe0c]";
 const regularButtonSize = "px-4 py-2 text-sm";
 const smallButtonSize = "px-3 py-1.5 text-xs";
 
@@ -53,8 +55,8 @@ const NestedComponent: Component = () => {
         Nested Component
       </p>
       <p class="text-md text-neutral-700 dark:text-neutral-300">
-        Count is{" "}
-        <span class="font-semibold text-sky-600 dark:text-[#c2fe0c]">
+        Count is {/* Using compliant text color */}
+        <span class="font-semibold text-sky-800 dark:text-sky-400">
           {count()}
         </span>
       </p>

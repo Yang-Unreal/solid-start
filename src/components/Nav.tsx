@@ -72,10 +72,10 @@ export default function Nav() {
   });
 
   const activeLinkClasses = (path: string) => {
-    // ACCESSIBILITY FIX: Using a lighter shade of sky for better contrast against the dark background.
-    const baseActive = "text-sky-600 dark:text-sky-400 font-semibold";
+    // ACCESSIBILITY FIX: Using compliant colors for both light and dark modes.
+    const baseActive = "text-sky-700 dark:text-[#c2fe0c] font-semibold";
     const baseInactive =
-      "text-neutral-600 dark:text-neutral-200 hover:text-sky-600 dark:hover:text-sky-400 font-medium";
+      "text-neutral-600 dark:text-neutral-200 hover:text-sky-700 dark:hover:text-[#c2fe0c] font-medium";
     return location.pathname === path ? baseActive : baseInactive;
   };
 
@@ -83,7 +83,6 @@ export default function Nav() {
     e.stopPropagation();
     setIsDropdownOpen(!isDropdownOpen());
   };
-
   const handleLogout = async () => {
     await authClient.signOut();
     navigate("/login", { replace: true });
@@ -96,7 +95,7 @@ export default function Nav() {
     "transition-colors duration-150 text-sm flex items-center";
 
   return (
-    <nav class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
+    <nav class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-black border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm">
       <ul class="flex items-center h-full px-4 sm:px-6 lg:px-8 py-3 font-sans">
         <li class="mx-1.5 sm:mx-3">
           <A href="/" class={`${activeLinkClasses("/")} ${linkBaseClass}`}>
@@ -143,7 +142,7 @@ export default function Nav() {
               <li class="mx-1.5 sm:mx-3">
                 <button
                   onClick={handleLogout}
-                  class={`${linkBaseClass} text-neutral-600 dark:text-neutral-200 hover:text-sky-600 dark:hover:text-sky-400 font-medium`}
+                  class={`${linkBaseClass} text-neutral-600 dark:text-neutral-200 hover:text-sky-700 dark:hover:text-[#c2fe0c] font-medium`}
                   aria-label="Logout"
                 >
                   <LogOut size={authIconSize} class="mr-1 sm:mr-2" />
@@ -178,7 +177,7 @@ export default function Nav() {
                   isDropdownOpen()
                     ? "bg-neutral-200 dark:bg-neutral-700"
                     : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-sky-500 dark:focus:ring-sky-400`}
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-sky-500 dark:focus:ring-[#c2fe0c]`}
                 aria-label="Select theme"
                 aria-haspopup="true"
                 aria-expanded={isDropdownOpen()}
