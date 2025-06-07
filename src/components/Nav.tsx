@@ -1,4 +1,3 @@
-// src/components/Nav.tsx
 import { createSignal, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, A, useNavigate } from "@solidjs/router";
 import {
@@ -73,7 +72,7 @@ export default function Nav() {
   });
 
   const activeLinkClasses = (path: string) => {
-    // ACCESSIBILITY FIX: Using a lighter shade of sky for better contrast in dark mode.
+    // ACCESSIBILITY FIX: Using a lighter shade of sky for better contrast against the dark background.
     const baseActive = "text-sky-600 dark:text-sky-400 font-semibold";
     const baseInactive =
       "text-neutral-600 dark:text-neutral-200 hover:text-sky-600 dark:hover:text-sky-400 font-medium";
@@ -179,7 +178,7 @@ export default function Nav() {
                   isDropdownOpen()
                     ? "bg-neutral-200 dark:bg-neutral-700"
                     : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
-                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-sky-500 dark:focus:ring-sky-300`}
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-sky-500 dark:focus:ring-sky-400`}
                 aria-label="Select theme"
                 aria-haspopup="true"
                 aria-expanded={isDropdownOpen()}

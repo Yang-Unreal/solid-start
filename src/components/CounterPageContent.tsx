@@ -76,10 +76,6 @@ export default function CounterPageContent() {
   return (
     <>
       <CounterProvider>
-        <div class="text-center mb-1">
-          <h2 class={cardTitleClass}>Shared Counter</h2>
-          <p class={cardSubtitleClass}>Using Solid's Context API</p>
-        </div>
         <div class="flex flex-col items-center gap-2">
           <h2 class={cardTitleClass}>Shared Counter</h2>
           <p class={cardSubtitleClass}>Using Solid's Context API</p>

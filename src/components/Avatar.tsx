@@ -1,4 +1,3 @@
-// src/components/Avatar.tsx
 import { Avatar as ArkAvatar } from "@ark-ui/solid/avatar";
 import { UserIcon } from "lucide-solid";
 import { Show, splitProps } from "solid-js";
@@ -23,7 +22,7 @@ const iconSizeClasses = {
   lg: "w-10 h-10",
 };
 
-export const Avatar: Component<AvatarProps> = (props) => {
+const Avatar: Component<AvatarProps> = (props) => {
   const [localProps, rootProps] = splitProps(props, [
     "name",
     "src",
@@ -77,5 +76,4 @@ const getInitials = (name: string | undefined = ""): string =>
         .toUpperCase()
     : "";
 
-// Exporting as default for lazy loading
 export default Avatar;
