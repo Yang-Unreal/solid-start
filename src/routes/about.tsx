@@ -13,7 +13,7 @@ export default function About() {
         <h1 class="text-center text-2xl font-medium text-neutral-800 dark:text-neutral-200">
           About This Application
         </h1>
-        <p class="text-center text-base text-neutral-600 dark:text-neutral-400 max-w-xl mx-auto">
+        <p class="text-center text-base text-neutral-700 dark:text-neutral-300 max-w-xl mx-auto">
           Welcome to the about page! Here you'll find more information regarding
           this application and its features.
         </p>

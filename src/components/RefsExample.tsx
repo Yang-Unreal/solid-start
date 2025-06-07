@@ -33,7 +33,7 @@ export const RefsExample: Component = () => {
         Refs Example
       </h2>
 
-      <p class="text-sm text-neutral-600 dark:text-neutral-400 text-center">
+      <p class="text-sm text-neutral-700 dark:text-neutral-300 text-center">
         Click buttons to interact with the input field using a direct DOM
         reference.
       </p>
@@ -92,7 +92,7 @@ export const RefsExample: Component = () => {
           {message()}
         </p>
       </Show>
-      <div class="mt-auto pt-4 text-xs text-neutral-500 dark:text-neutral-400/80 text-center">
+      <div class="mt-auto pt-4 text-xs text-neutral-600 dark:text-neutral-300/80 text-center">
         <p>
           Input value (via signal):{" "}
           <span class="font-mono bg-neutral-100 dark:bg-neutral-700 p-1 rounded">

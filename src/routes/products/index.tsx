@@ -318,7 +318,7 @@ const ProductsPage = () => {
             <p class="text-xl text-red-600 dark:text-red-400">
               Error: {error()?.message || "An unknown error occurred."}
             </p>
-            <p class="text-neutral-600 dark:text-neutral-400 mt-2">
+            <p class="text-neutral-700 dark:text-neutral-300 mt-2">
               Please try refreshing.{" "}
               <button
                 onClick={() => productsQuery.refetch()}
@@ -364,17 +364,17 @@ const ProductsPage = () => {
                         {formatPrice(product.priceInCents)}
                       </p>
                       <Show when={product.description}>
-                        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-4 flex-grow min-h-[40px]">
+                        <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-4 flex-grow min-h-[40px]">
                           {product.description!.length > 100
                             ? product.description!.substring(0, 97) + "..."
                             : product.description}
                         </p>
                       </Show>
                       <div class="mt-auto pt-2 border-t border-neutral-200 dark:border-neutral-700">
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                        <p class="text-xs text-neutral-600 dark:text-neutral-300">
                           Category: {product.category || "N/A"}
                         </p>
-                        <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                        <p class="text-xs text-neutral-600 dark:text-neutral-300">
                           Stock: {product.stockQuantity}
                         </p>
                       </div>

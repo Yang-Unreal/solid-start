@@ -157,11 +157,9 @@ const AddProductPage = () => {
           body: imageFormData,
         });
         if (!uploadResponse.ok) {
-          const errData = await uploadResponse
-            .json()
-            .catch(() => ({
-              error: "Failed to parse image upload error response",
-            }));
+          const errData = await uploadResponse.json().catch(() => ({
+            error: "Failed to parse image upload error response",
+          }));
           throw new Error(
             errData.error || `Image upload failed: ${uploadResponse.status}`
           );
@@ -194,7 +192,7 @@ const AddProductPage = () => {
 
   const inputBaseClasses = `block w-full mt-1 py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c] dark:bg-neutral-700 dark:text-neutral-100 dark:border-neutral-600 dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]`;
   const labelBaseClasses = `block text-sm font-medium text-neutral-700 dark:text-neutral-300`;
-  const fileInputClasses = `mt-1 block w-full text-sm text-neutral-500 dark:text-neutral-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#c2fe0c] file:text-black hover:file:bg-[#a8e00a] dark:file:focus:ring-offset-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed`;
+  const fileInputClasses = `mt-1 block w-full text-sm text-neutral-600 dark:text-neutral-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#c2fe0c] file:text-black hover:file:bg-[#a8e00a] dark:file:focus:ring-offset-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed`;
 
   const fieldError = (fieldName: keyof ProductFormValues) =>
     formErrors()?.[fieldName]?._errors[0];
@@ -287,7 +285,7 @@ const AddProductPage = () => {
                     }
                   />
                   <Show when={selectedFile() && !fileUploadError()}>
-                    <p class="mt-1 text-xs text-neutral-600 dark:text-neutral-400">
+                    <p class="mt-1 text-xs text-neutral-700 dark:text-neutral-300">
                       Selected: {selectedFile()!.name} (
                       {(selectedFile()!.size / 1024).toFixed(2)} KB)
                     </p>

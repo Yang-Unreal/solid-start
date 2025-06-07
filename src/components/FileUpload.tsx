@@ -93,7 +93,7 @@ export function FileUpload() {
       <div class="border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
         <div class="mb-4">
           <svg
-            class="mx-auto h-12 w-12 text-neutral-400 dark:text-neutral-500"
+            class="mx-auto h-12 w-12 text-neutral-500 dark:text-neutral-400"
             stroke="currentColor"
             fill="none"
             viewBox="0 0 48 48"
@@ -123,7 +123,7 @@ export function FileUpload() {
           Choose Files
         </label>
 
-        <p class="text-neutral-500 dark:text-neutral-400 mt-2">
+        <p class="text-neutral-600 dark:text-neutral-300 mt-2">
           or drag and drop files here
           <br />
           <span class="text-xs">
@@ -159,7 +159,7 @@ export function FileUpload() {
                       <p class="font-medium text-neutral-900 dark:text-neutral-100">
                         {file.name}
                       </p>
-                      <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                      <p class="text-sm text-neutral-600 dark:text-neutral-300">
                         {formatFileSize(file.size)} •{" "}
                         {file.type || "Unknown type"}
                       </p>
@@ -233,7 +233,7 @@ export function FileUpload() {
                       <p class="font-medium text-neutral-900 dark:text-neutral-100">
                         {file.name}
                       </p>
-                      <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                      <p class="text-sm text-neutral-600 dark:text-neutral-300">
                         {formatFileSize(file.size)} • Uploaded{" "}
                         {new Date(file.uploadedAt).toLocaleString()}
                       </p>

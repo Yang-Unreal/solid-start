@@ -11,7 +11,7 @@ const RedDiv = () => (
     <p class="text-xl font-medium text-red-700 dark:text-red-400">
       Red Variant
     </p>
-    <p class="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400">
+    <p class="mt-1.5 text-sm text-neutral-700 dark:text-neutral-300">
       This content is dynamically rendered with a red accent.
     </p>
   </div>
@@ -24,7 +24,7 @@ const GreenDiv = () => (
     <p class="text-xl font-medium text-green-700 dark:text-green-400">
       Green Variant
     </p>
-    <p class="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400">
+    <p class="mt-1.5 text-sm text-neutral-700 dark:text-neutral-300">
       This content is dynamically rendered with a green accent.
     </p>
   </div>
@@ -37,7 +37,7 @@ const BlueDiv = () => (
     <p class="text-xl font-medium text-blue-700 dark:text-blue-400">
       Blue Variant
     </p>
-    <p class="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400">
+    <p class="mt-1.5 text-sm text-neutral-700 dark:text-neutral-300">
       This content is dynamically rendered with a blue accent.
     </p>
   </div>
@@ -63,7 +63,7 @@ export default function DynamicRender() {
         {/* Correct: 'for' matches 'id' */}
         <label
           for="colorSelectDR"
-          class="block mb-1.5 text-sm font-medium text-neutral-600 dark:text-neutral-400"
+          class="block mb-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300"
         >
           Select Accent Variant:
         </label>

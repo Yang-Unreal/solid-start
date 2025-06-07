@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /dashboard
+Disallow: /api/
+Disallow: /upload
+Disallow: /[...404]

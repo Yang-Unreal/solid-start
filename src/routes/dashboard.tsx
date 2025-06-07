@@ -79,7 +79,7 @@ export default function DashboardPage() {
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
         ></path>
       </svg>
-      <p class="ml-3 text-neutral-600 dark:text-neutral-400">
+      <p class="ml-3 text-neutral-700 dark:text-neutral-300">
         Loading session...
       </p>
     </div>
@@ -87,7 +87,7 @@ export default function DashboardPage() {
 
   const InitialCheckState = (): JSX.Element => ( // Shown on SSR for unauth, and client before session resolves
     <div class="flex-grow bg-neutral-100 dark:bg-neutral-900 text-slate-800 dark:text-neutral-200 min-h-[calc(100vh-4rem)] flex justify-center items-center">
-      <p class="text-lg text-neutral-600 dark:text-neutral-400">
+      <p class="text-lg text-neutral-700 dark:text-neutral-300">
         Checking session...
       </p>
     </div>
@@ -116,7 +116,7 @@ export default function DashboardPage() {
                     fallback={
                       <UserCircle
                         size={80}
-                        class="text-neutral-400 dark:text-neutral-500 mb-4"
+                        class="text-neutral-500 dark:text-neutral-400 mb-4"
                       />
                     }
                   >
@@ -131,7 +131,7 @@ export default function DashboardPage() {
                   <h2 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100">
                     {sessionSignal().data?.user?.name || "User"}
                   </h2>
-                  <p class="text-sm text-neutral-500 dark:text-neutral-400">
+                  <p class="text-sm text-neutral-600 dark:text-neutral-300">
                     {sessionSignal().data?.user?.email}
                   </p>
                   <button
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <div class="h-40 bg-neutral-100 dark:bg-neutral-800/70 rounded-md flex items-center justify-center">
-                    <p class="text-neutral-400 dark:text-neutral-500 italic">
+                    <p class="text-neutral-500 dark:text-neutral-400 italic">
                       [Chart Placeholder]
                     </p>
                   </div>
@@ -180,7 +180,7 @@ export default function DashboardPage() {
                 <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
                   Quick Stats
                 </h3>
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                <p class="text-sm text-neutral-700 dark:text-neutral-300">
                   Important numbers... <br /> More content. <br /> And more.
                 </p>
               </div>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
                 <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
                   Recent Activity
                 </h3>
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                <p class="text-sm text-neutral-700 dark:text-neutral-300">
                   Recent actions... <br /> Activity 1 <br /> Activity 2
                 </p>
               </div>
@@ -196,7 +196,7 @@ export default function DashboardPage() {
                 <h3 class="text-xl font-semibold text-neutral-800 dark:text-neutral-100 mb-4">
                   Notifications
                 </h3>
-                <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                <p class="text-sm text-neutral-700 dark:text-neutral-300">
                   No new notifications. <br /> Line 2 <br /> Line 3
                 </p>
               </div>

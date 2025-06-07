@@ -87,7 +87,7 @@ function AnimeTimer() {
         >
           <span
             class={`
-              block text-xs font-medium text-neutral-500 dark:text-neutral-400
+              block text-xs font-medium text-neutral-600 dark:text-neutral-300
               mb-1.5 tracking-normal
             `}
           >
@@ -111,7 +111,7 @@ function AnimeTimer() {
         >
           <span
             class={`
-              block text-xs font-medium text-neutral-500 dark:text-neutral-400
+              block text-xs font-medium text-neutral-600 dark:text-neutral-300
               mb-1.5 tracking-normal
             `}
           >

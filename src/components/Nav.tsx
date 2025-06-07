@@ -213,7 +213,7 @@ export default function Nav() {
                 >
                   <Sun
                     size={dropdownIconSize}
-                    class="mr-2 text-neutral-500 dark:text-neutral-400"
+                    class="mr-2 text-neutral-600 dark:text-neutral-300"
                   />
                   Light
                 </button>
@@ -226,7 +226,7 @@ export default function Nav() {
                 >
                   <Moon
                     size={dropdownIconSize}
-                    class="mr-2 text-neutral-500 dark:text-neutral-400"
+                    class="mr-2 text-neutral-600 dark:text-neutral-300"
                   />
                   Dark
                 </button>
@@ -239,7 +239,7 @@ export default function Nav() {
                 >
                   <Monitor
                     size={dropdownIconSize}
-                    class="mr-2 text-neutral-500 dark:text-neutral-400"
+                    class="mr-2 text-neutral-600 dark:text-neutral-300"
                   />
                   System
                 </button>

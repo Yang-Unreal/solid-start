@@ -80,7 +80,7 @@ export default function DragonflyPage() {
         <h1 class="text-3xl font-bold text-neutral-800 dark:text-neutral-200 mb-6">
           SolidStart & DragonflyDB Integration 🚀
         </h1>
-        <p class="text-neutral-600 dark:text-neutral-400 mb-8 max-w-xl mx-auto">
+        <p class="text-neutral-700 dark:text-neutral-300 mb-8 max-w-xl mx-auto">
           Demonstrates fetching and setting a message in DragonflyDB via
           SolidStart server functions.
         </p>
@@ -94,7 +94,7 @@ export default function DragonflyPage() {
               {/* Wrap the part that depends on dbMessage with Suspense */}
               <Suspense
                 fallback={
-                  <p class="text-neutral-500 dark:text-neutral-400 italic">
+                  <p class="text-neutral-600 dark:text-neutral-300 italic">
                     Loading message...
                   </p>
                 }
