@@ -1,8 +1,8 @@
 /* src/app.css */
-@import "tailwindcss"; /* Or @tailwind base; @tailwind components; @tailwind utilities; */
+@import "tailwindcss";
 
 @theme {
-  --breakpoint-3xl: 120rem;
+  --breakpoint-3xl: 120rem; /* 1920px */
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -20,16 +20,9 @@
 
 :root.dark {
   --background-rgb: 0, 0, 0;
-  --foreground-rgb: 240, 240, 240; /* Improved contrast */
-  --accent-hex: #a0d00c; /* Darker shade for better contrast */
-  --accent-rgb: 160, 208, 12;
-}
-
-/* Ensure sufficient contrast for links in dark mode */
-a.text-sky-600.dark\:text-\[\#c2fe0c\] {
-  color: var(
-    --accent-hex
-  ); /* Use the darker accent color for better contrast */
+  --foreground-rgb: 229, 231, 235;
+  --accent-hex: #c2fe0c;
+  --accent-rgb: 194, 254, 12;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -64,7 +57,7 @@ body {
            rounded-lg
            shadow-lg dark:shadow-xl dark:shadow-neutral-950/50
            h-full
-           overflow-hidden; /* This is for the individual card, not the grid */
+           overflow-hidden;
   }
 
   .card-error-boundary-host {
@@ -132,5 +125,9 @@ body {
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-neutral-500 dark:bg-neutral-500;
+  }
+
+  .product-grid {
+    justify-content: center;
   }
 }

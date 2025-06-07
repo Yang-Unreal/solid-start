@@ -1,12 +1,14 @@
+// src/routes/index.tsx
+
 import Counter from "~/components/Counter";
-import { Avatar } from "~/components/Avatar";
-import { Controlled } from "~/components/switch/Controlled";
+import Avatar from "~/components/Avatar";
+import Controlled from "~/components/switch/Controlled";
 import ForList from "~/components/list/For";
 import IndexList from "~/components/list/Index";
 import PortalExample from "~/components/Portal";
 import AnimeTimer from "~/components/AnimeTimer";
 import DynamicRender from "~/components/DynamicRender";
-import { RefsExample } from "~/components/RefsExample";
+import RefsExample from "~/components/RefsExample";
 import ToDo from "~/components/Todo";
 import CounterPageContent from "~/components/CounterPageContent";
 
@@ -32,11 +34,9 @@ export default function Home() {
         <div class="card-content-host">
           <IndexList />
         </div>
-
         <div class="card-content-host">
           <PortalExample />
         </div>
-
         <div class="card-content-host">
           <RefsExample />
         </div>

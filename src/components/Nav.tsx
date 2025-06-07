@@ -1,4 +1,4 @@
-// Nav.tsx
+// src/components/Nav.tsx
 import { createSignal, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, A, useNavigate } from "@solidjs/router";
 import {
@@ -73,11 +73,11 @@ export default function Nav() {
   });
 
   const activeLinkClasses = (path: string) => {
-    // Adjusted dark mode colors for better contrast
-    const baseActive = "text-sky-600 dark:text-sky-400 font-medium";
+    // ACCESSIBILITY FIX: Using a lighter shade of sky for better contrast in dark mode.
+    const baseActive = "text-sky-600 dark:text-sky-400 font-semibold";
     const baseInactive =
       "text-neutral-600 dark:text-neutral-200 hover:text-sky-600 dark:hover:text-sky-400 font-medium";
-    return path === location.pathname ? baseActive : baseInactive;
+    return location.pathname === path ? baseActive : baseInactive;
   };
 
   const toggleDropdown = (e: MouseEvent) => {
@@ -91,8 +91,6 @@ export default function Nav() {
   };
 
   const iconSize = 20;
-
-  const dropdownIconSize = 16;
   const authIconSize = 18;
   const iconBaseClass = "text-neutral-600 dark:text-neutral-300";
   const linkBaseClass =
@@ -130,7 +128,7 @@ export default function Nav() {
             Products
           </A>
         </li>
-        {/* This li contains the right-aligned navigation items and the theme toggle */}
+
         <li class="ml-auto">
           <ul class="flex items-center space-x-3 sm:space-x-4">
             <Show when={!session().isPending && session().data?.user}>
@@ -154,7 +152,6 @@ export default function Nav() {
                 </button>
               </li>
             </Show>
-
             <Show when={!session().isPending && !session().data?.user}>
               <li class="mx-1.5 sm:mx-3">
                 <A
@@ -175,19 +172,14 @@ export default function Nav() {
                 </A>
               </li>
             </Show>
-
             <li class="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}
-                class={`p-2 flex items-center justify-center transition-colors duration-150 rounded-full
-                         ${
-                           isDropdownOpen()
-                             ? "bg-neutral-200 dark:bg-neutral-700"
-                             : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
-                         }
-                         focus:outline-none focus:ring-2 focus:ring-offset-2 
-                         focus:ring-offset-white dark:focus:ring-offset-neutral-900 
-                         focus:ring-sky-500 dark:focus:ring-sky-400`}
+                class={`p-2 flex items-center justify-center transition-colors duration-150 rounded-full ${
+                  isDropdownOpen()
+                    ? "bg-neutral-200 dark:bg-neutral-700"
+                    : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
+                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-sky-500 dark:focus:ring-sky-300`}
                 aria-label="Select theme"
                 aria-haspopup="true"
                 aria-expanded={isDropdownOpen()}
@@ -200,48 +192,34 @@ export default function Nav() {
                 </Show>
               </button>
               <Show when={isDropdownOpen()}>
-                <div
-                  class="animate-fade-in absolute right-0 mt-2 w-44
-                         bg-white dark:bg-neutral-800 rounded-md shadow-lg 
-                         border border-neutral-200 dark:border-neutral-700 
-                         py-1 z-50"
-                >
+                <div class="animate-fade-in absolute right-0 mt-2 w-44 bg-white dark:bg-neutral-800 rounded-md shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 z-50">
                   <button
                     onClick={() => setTheme("light")}
-                    class="w-full text-left px-3 py-1.5 text-sm 
-                             text-neutral-700 dark:text-neutral-200 
-                             hover:bg-neutral-100 dark:hover:bg-neutral-700 
-                             flex items-center group transition-colors duration-150"
+                    class="w-full text-left px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center group transition-colors duration-150"
                   >
                     <Sun
-                      size={dropdownIconSize}
-                      class="mr-2 text-neutral-600 dark:text-neutral-300"
+                      size={16}
+                      class="mr-2 text-neutral-600 dark:text-neutral-100"
                     />
                     Light
                   </button>
                   <button
                     onClick={() => setTheme("dark")}
-                    class="w-full text-left px-3 py-1.5 text-sm 
-                             text-neutral-700 dark:text-neutral-200 
-                             hover:bg-neutral-100 dark:hover:bg-neutral-700 
-                             flex items-center group transition-colors duration-150"
+                    class="w-full text-left px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center group transition-colors duration-150"
                   >
                     <Moon
-                      size={dropdownIconSize}
-                      class="mr-2 text-neutral-600 dark:text-neutral-300"
+                      size={16}
+                      class="mr-2 text-neutral-600 dark:text-neutral-100"
                     />
                     Dark
                   </button>
                   <button
                     onClick={() => setTheme("system")}
-                    class="w-full text-left px-3 py-1.5 text-sm 
-                             text-neutral-700 dark:text-neutral-200 
-                             hover:bg-neutral-100 dark:hover:bg-neutral-700 
-                             flex items-center group transition-colors duration-150"
+                    class="w-full text-left px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center group transition-colors duration-150"
                   >
                     <Monitor
-                      size={dropdownIconSize}
-                      class="mr-2 text-neutral-600 dark:text-neutral-300"
+                      size={16}
+                      class="mr-2 text-neutral-600 dark:text-neutral-100"
                     />
                     System
                   </button>

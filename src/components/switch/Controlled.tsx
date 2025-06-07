@@ -1,7 +1,8 @@
 import { Switch as ArkSwitch } from "@ark-ui/solid/switch";
 import { createSignal, Switch as SolidSwitch, Match } from "solid-js";
 
-export const Controlled = () => {
+// Changed from a named export to a standard function declaration
+const Controlled = () => {
   const [checked, setChecked] = createSignal(false);
 
   return (
@@ -67,3 +68,5 @@ export const Controlled = () => {
     </div>
   );
 };
+
+export default Controlled;

@@ -1,7 +1,8 @@
 import { createSignal, Show } from "solid-js";
 import type { Component } from "solid-js";
 
-export const RefsExample: Component = () => {
+// Changed from a named export to a standard function declaration
+const RefsExample: Component = () => {
   let myInputRef: HTMLInputElement | undefined;
   const [inputValue, setInputValue] = createSignal("");
   const [message, setMessage] = createSignal("");
@@ -38,15 +39,12 @@ export const RefsExample: Component = () => {
         reference.
       </p>
 
-      {/* Ensure 'for' on label matches 'id' on input */}
       <label for="refs-example-text-input" class="sr-only">
-        {" "}
-        {/* Ensure this class is defined in your CSS */}
         Sample Input for Refs Example
       </label>
       <input
         ref={myInputRef}
-        id="refs-example-text-input" // Ensure this ID is unique on the page
+        id="refs-example-text-input"
         name="refs_example_value"
         type="text"
         value={inputValue()}
@@ -103,3 +101,5 @@ export const RefsExample: Component = () => {
     </div>
   );
 };
+
+export default RefsExample;

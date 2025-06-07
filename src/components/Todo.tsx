@@ -47,13 +47,8 @@ const ToDo = () => {
     itemId: number,
     details: CheckboxCheckedChangeDetails
   ) => {
-    const newCheckedState = details.checked;
-    let finalBooleanState: boolean;
-    if (typeof newCheckedState === "boolean") {
-      finalBooleanState = newCheckedState;
-    } else {
-      finalBooleanState = true;
-    }
+    const finalBooleanState =
+      typeof details.checked === "boolean" ? details.checked : true;
     setState(
       produce((s) => {
         const todoToUpdate = s.items.find((item) => item.id === itemId);
@@ -73,18 +68,14 @@ const ToDo = () => {
   const baseButtonClass =
     "rounded-lg font-medium transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-black";
   const primaryButtonColors =
-    "bg-sky-600 hover:bg-sky-700 text-white focus:ring-sky-500 dark:bg-sky-400 dark:hover:bg-sky-500 dark:text-black dark:focus:ring-sky-400";
+    "bg-sky-600 hover:bg-sky-700 text-white focus:ring-sky-500 dark:bg-[#c2fe0c] dark:hover:bg-[#a8e00a] dark:text-black dark:focus:ring-[#c2fe0c]";
   const regularButtonSize = "px-4 py-2 text-sm";
 
   return (
-    // The root element is now a simple div that takes the full width available
-    // inside the parent card. It uses flex and a max-width to look good.
-    <div class="w-full max-w-md mx-auto space-y-4 text-left">
-      {/* The h1 is explicitly centered, overriding the new root's text-left */}
-      <h1 class="text-center text-2xl font-medium text-neutral-800 dark:text-neutral-200">
+    <div class="w-full max-w-sm mx-auto space-y-4 text-left">
+      <h1 class="text-center text-2xl font-bold text-neutral-800 dark:text-neutral-200">
         To-Do List
       </h1>
-
       <div class="flex gap-x-3">
         <label for="todo-input" class="sr-only">
           Add new todo item
@@ -98,14 +89,7 @@ const ToDo = () => {
             if (e.key === "Enter") addTodoItem();
           }}
           placeholder="What needs to be done?"
-          class={`
-            flex-grow block w-full py-2 px-3 rounded-md border
-            transition duration-150 ease-in-out
-            bg-white text-neutral-900 border-neutral-300
-            focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500
-            dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600
-            dark:focus:ring-sky-400 dark:focus:border-sky-400
-          `}
+          class="flex-grow block w-full py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600 dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]"
         />
         <button
           onClick={addTodoItem}
@@ -115,7 +99,6 @@ const ToDo = () => {
           <span>Add</span>
         </button>
       </div>
-
       <div class="rounded-md overflow-hidden border border-neutral-200 dark:border-neutral-700">
         <Show
           when={state.items.length > 0}
@@ -128,56 +111,36 @@ const ToDo = () => {
           <ul class="divide-y divide-neutral-200 dark:divide-neutral-700">
             <For each={state.items}>
               {(item) => (
-                <li
-                  class="flex items-center p-3 text-sm text-neutral-700 dark:text-neutral-200
-                         bg-white dark:bg-neutral-900 group"
-                >
-                  <label class="flex items-center cursor-pointer">
-                    {" "}
-                    {/* Wrap checkbox and text in a label */}
-                    <ArkCheckbox.Root
-                      checked={item.completed}
-                      onCheckedChange={(details) =>
-                        handleCheckboxChange(item.id, details)
-                      }
-                      class="flex items-center shrink-0 mr-3 group/checkbox"
-                    >
-                      <ArkCheckbox.Control
-                        class={`
-                          w-5 h-5 rounded border transition-colors duration-150
-                          flex items-center justify-center cursor-pointer
-                          bg-white dark:bg-neutral-800
-                          border-neutral-400 dark:border-neutral-500
-                          group-data-[state=checked]/checkbox:bg-sky-500 dark:group-data-[state=checked]/checkbox:bg-sky-400
-                          group-data-[state=checked]/checkbox:border-sky-500 dark:group-data-[state=checked]/checkbox:border-sky-400
-                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900
-                          focus-visible:ring-sky-500 dark:focus-visible:ring-sky-400
-                        `}
-                      >
-                        <ArkCheckbox.Indicator class="text-white dark:text-black">
-                          <Check size={14} stroke-width={3} />
-                        </ArkCheckbox.Indicator>
-                      </ArkCheckbox.Control>
-                      <ArkCheckbox.HiddenInput />
-                    </ArkCheckbox.Root>
-                    <span
-                      class={`flex-grow ${
+                <li class="flex items-center p-3 text-sm text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-900 group">
+                  {/* ACCESSIBILITY FIX: Use Ark UI's idiomatic pattern */}
+                  <ArkCheckbox.Root
+                    checked={item.completed}
+                    onCheckedChange={(details) =>
+                      handleCheckboxChange(item.id, details)
+                    }
+                    class="flex items-center shrink-0 w-full group/checkbox cursor-pointer" // Make the whole root clickable
+                  >
+                    <ArkCheckbox.Control class="w-5 h-5 rounded border transition-colors duration-150 flex items-center justify-center shrink-0 bg-white dark:bg-neutral-800 border-neutral-400 dark:border-neutral-500 group-data-[state=checked]/checkbox:bg-sky-500 dark:group-data-[state=checked]/checkbox:bg-[#c2fe0c] group-data-[state=checked]/checkbox:border-sky-500 dark:group-data-[state=checked]/checkbox:border-[#c2fe0c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 focus-visible:ring-sky-500 dark:focus-visible:ring-[#c2fe0c]">
+                      <ArkCheckbox.Indicator class="text-white dark:text-black">
+                        <Check size={14} stroke-width={3} />
+                      </ArkCheckbox.Indicator>
+                    </ArkCheckbox.Control>
+                    {/* Ark UI's Label component is automatically associated with the Control */}
+                    <ArkCheckbox.Label
+                      class={`ml-3 flex-grow transition-colors ${
                         item.completed
                           ? "line-through text-neutral-500 dark:text-neutral-400"
-                          : ""
+                          : "text-neutral-800 dark:text-neutral-200"
                       }`}
                     >
                       {item.text}
-                    </span>
-                  </label>
+                    </ArkCheckbox.Label>
+                    <ArkCheckbox.HiddenInput />
+                  </ArkCheckbox.Root>
                   <button
                     onClick={() => deleteTodoItem(item.id)}
                     aria-label={`Delete ${item.text}`}
-                    class="ml-3 p-1.5 rounded-full text-neutral-600 dark:text-neutral-300
-                           hover:bg-red-100/70 dark:hover:bg-red-800/40
-                           hover:text-red-600 dark:hover:text-red-400
-                           opacity-0 group-hover:opacity-100 focus:opacity-100
-                           transition-all duration-150"
+                    class="ml-3 p-1.5 rounded-full text-neutral-600 dark:text-neutral-300 hover:bg-red-100/70 dark:hover:bg-red-800/40 hover:text-red-600 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-150"
                   >
                     <Trash2 size={16} stroke-width={2} />
                   </button>
@@ -190,5 +153,4 @@ const ToDo = () => {
     </div>
   );
 };
-
 export default ToDo;

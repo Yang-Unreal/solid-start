@@ -46,7 +46,6 @@ function AnimeTimer() {
   };
 
   return (
-    // Root div is now wider and handles main layout
     <div class="w-full max-w-sm mx-auto text-left">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-medium text-neutral-800 dark:text-neutral-200">
@@ -55,20 +54,12 @@ function AnimeTimer() {
         <button
           type="button"
           onClick={handleReset}
-          class={`
-            p-2 rounded-full transition-colors
-            text-neutral-600 hover:bg-neutral-200/70
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500
-            focus-visible:ring-offset-2 focus-visible:ring-offset-white
-            dark:text-neutral-400 dark:hover:bg-neutral-700/60
-            dark:focus-visible:ring-[#c2fe0c] dark:focus-visible:ring-offset-neutral-800
-          `}
+          class="p-2 rounded-full transition-colors text-neutral-600 hover:bg-neutral-200/70 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-neutral-400 dark:hover:bg-neutral-700/60 dark:focus-visible:ring-[#c2fe0c] dark:focus-visible:ring-offset-neutral-800"
           aria-label="Reset Timer"
         >
           <RefreshCw class="w-5 h-5" stroke-width="2.25" />
         </button>
       </div>
-      {/* Container for stats now uses grid for better alignment and equal width */}
       <div class="grid grid-cols-2 gap-4">
         <div class="p-4 rounded-lg flex flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-800/50 h-32">
           <span class="block text-sm font-medium text-neutral-600 dark:text-neutral-300 mb-1.5 tracking-normal">
