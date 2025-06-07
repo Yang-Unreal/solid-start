@@ -86,7 +86,11 @@ const ToDo = () => {
       </h1>
 
       <div class="flex gap-x-3">
+        <label for="todo-input" class="sr-only">
+          Add new todo item
+        </label>
         <input
+          id="todo-input"
           type="text"
           value={inputText()}
           onInput={(e) => setInputText(e.currentTarget.value)}

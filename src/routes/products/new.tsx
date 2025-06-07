@@ -344,14 +344,14 @@ const AddProductPage = () => {
                     formErrors()?._errors?.length && formErrors()?._errors[0]
                   }
                 >
-                  <p class="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md text-center">
+                  <p class="text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md text-center">
                     {formErrors()?._errors[0]}
                   </p>
                 </Show>
                 <div class="flex items-center justify-end space-x-4 pt-3">
                   <A
                     href="/products"
-                    class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-700 hover:bg-neutral-300 dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-500 ${
+                    class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-500 ${
                       isUploadingImage() || productCreationMutation.isPending
                         ? "opacity-50 cursor-not-allowed"
                         : ""
