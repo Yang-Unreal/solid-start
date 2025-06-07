@@ -25,6 +25,13 @@
   --accent-rgb: 160, 208, 12;
 }
 
+/* Ensure sufficient contrast for links in dark mode */
+a.text-sky-600.dark\:text-\[\#c2fe0c\] {
+  color: var(
+    --accent-hex
+  ); /* Use the darker accent color for better contrast */
+}
+
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
     --background-rgb: 0, 0, 0;

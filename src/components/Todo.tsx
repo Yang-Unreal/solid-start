@@ -73,7 +73,7 @@ const ToDo = () => {
   const baseButtonClass =
     "rounded-lg font-medium transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-black";
   const primaryButtonColors =
-    "bg-sky-600 hover:bg-sky-700 text-white focus:ring-sky-500 dark:bg-[#c2fe0c] dark:hover:bg-[#a8e00a] dark:text-black dark:focus:ring-[#c2fe0c]";
+    "bg-sky-600 hover:bg-sky-700 text-white focus:ring-sky-500 dark:bg-sky-400 dark:hover:bg-sky-500 dark:text-black dark:focus:ring-sky-400";
   const regularButtonSize = "px-4 py-2 text-sm";
 
   return (
@@ -104,7 +104,7 @@ const ToDo = () => {
             bg-white text-neutral-900 border-neutral-300
             focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500
             dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600
-            dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]
+            dark:focus:ring-sky-400 dark:focus:border-sky-400
           `}
         />
         <button
@@ -129,46 +129,47 @@ const ToDo = () => {
             <For each={state.items}>
               {(item) => (
                 <li
-                  class="flex items-center p-3 text-sm text-neutral-700 dark:text-neutral-300
+                  class="flex items-center p-3 text-sm text-neutral-700 dark:text-neutral-200
                          bg-white dark:bg-neutral-900 group"
                 >
-                  <ArkCheckbox.Root
-                    aria-labelledby={`label-${item.id}`}
-                    checked={item.completed}
-                    onCheckedChange={(details) =>
-                      handleCheckboxChange(item.id, details)
-                    }
-                    class="flex items-center shrink-0 mr-3 group/checkbox"
-                  >
-                    <ArkCheckbox.Control
-                      class={`
-                        w-5 h-5 rounded border transition-colors duration-150
-                        flex items-center justify-center cursor-pointer
-                        bg-white dark:bg-neutral-800
-                        border-neutral-400 dark:border-neutral-500
-                        group-data-[state=checked]/checkbox:bg-sky-500 dark:group-data-[state=checked]/checkbox:bg-[#c2fe0c]
-                        group-data-[state=checked]/checkbox:border-sky-500 dark:group-data-[state=checked]/checkbox:border-[#c2fe0c]
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900
-                        focus-visible:ring-sky-500 dark:focus-visible:ring-[#c2fe0c]
-                      `}
+                  <label class="flex items-center cursor-pointer">
+                    {" "}
+                    {/* Wrap checkbox and text in a label */}
+                    <ArkCheckbox.Root
+                      checked={item.completed}
+                      onCheckedChange={(details) =>
+                        handleCheckboxChange(item.id, details)
+                      }
+                      class="flex items-center shrink-0 mr-3 group/checkbox"
                     >
-                      <ArkCheckbox.Indicator class="text-white dark:text-black">
-                        <Check size={14} stroke-width={3} />
-                      </ArkCheckbox.Indicator>
-                    </ArkCheckbox.Control>
-                    <ArkCheckbox.HiddenInput />
-                  </ArkCheckbox.Root>
-
-                  <span
-                    id={`label-${item.id}`}
-                    class={`flex-grow ${
-                      item.completed
-                        ? "line-through text-neutral-500 dark:text-neutral-400"
-                        : ""
-                    }`}
-                  >
-                    {item.text}
-                  </span>
+                      <ArkCheckbox.Control
+                        class={`
+                          w-5 h-5 rounded border transition-colors duration-150
+                          flex items-center justify-center cursor-pointer
+                          bg-white dark:bg-neutral-800
+                          border-neutral-400 dark:border-neutral-500
+                          group-data-[state=checked]/checkbox:bg-sky-500 dark:group-data-[state=checked]/checkbox:bg-sky-400
+                          group-data-[state=checked]/checkbox:border-sky-500 dark:group-data-[state=checked]/checkbox:border-sky-400
+                          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900
+                          focus-visible:ring-sky-500 dark:focus-visible:ring-sky-400
+                        `}
+                      >
+                        <ArkCheckbox.Indicator class="text-white dark:text-black">
+                          <Check size={14} stroke-width={3} />
+                        </ArkCheckbox.Indicator>
+                      </ArkCheckbox.Control>
+                      <ArkCheckbox.HiddenInput />
+                    </ArkCheckbox.Root>
+                    <span
+                      class={`flex-grow ${
+                        item.completed
+                          ? "line-through text-neutral-500 dark:text-neutral-400"
+                          : ""
+                      }`}
+                    >
+                      {item.text}
+                    </span>
+                  </label>
                   <button
                     onClick={() => deleteTodoItem(item.id)}
                     aria-label={`Delete ${item.text}`}

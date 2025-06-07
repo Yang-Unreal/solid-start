@@ -73,9 +73,10 @@ export default function Nav() {
   });
 
   const activeLinkClasses = (path: string) => {
-    const baseActive = "text-sky-600 dark:text-[#c2fe0c] font-medium";
+    // Adjusted dark mode colors for better contrast
+    const baseActive = "text-sky-600 dark:text-sky-400 font-medium";
     const baseInactive =
-      "text-neutral-600 dark:text-neutral-300 hover:text-sky-600 dark:hover:text-[#c2fe0c] font-medium";
+      "text-neutral-600 dark:text-neutral-200 hover:text-sky-600 dark:hover:text-sky-400 font-medium";
     return path === location.pathname ? baseActive : baseInactive;
   };
 
@@ -129,124 +130,126 @@ export default function Nav() {
             Products
           </A>
         </li>
-
-        <div class="ml-auto flex items-center space-x-3 sm:space-x-4">
-          <Show when={!session().isPending && session().data?.user}>
-            <li class="mx-1.5 sm:mx-3">
-              <A
-                href="/dashboard"
-                class={`${activeLinkClasses("/dashboard")} ${linkBaseClass}`}
-              >
-                <LayoutDashboard size={authIconSize} class="mr-1 sm:mr-2" />
-                Dashboard
-              </A>
-            </li>
-            <li class="mx-1.5 sm:mx-3">
-              <button
-                onClick={handleLogout}
-                class={`${linkBaseClass} text-neutral-600 dark:text-neutral-300 hover:text-sky-600 dark:hover:text-[#c2fe0c] font-medium`}
-                aria-label="Logout"
-              >
-                <LogOut size={authIconSize} class="mr-1 sm:mr-2" />
-                Logout
-              </button>
-            </li>
-          </Show>
-
-          <Show when={!session().isPending && !session().data?.user}>
-            <li class="mx-1.5 sm:mx-3">
-              <A
-                href="/login"
-                class={`${activeLinkClasses("/login")} ${linkBaseClass}`}
-              >
-                <LogIn size={authIconSize} class="mr-1 sm:mr-2" />
-                Sign In
-              </A>
-            </li>
-            <li class="mx-1.5 sm:mx-3">
-              <A
-                href="/signup"
-                class={`${activeLinkClasses("/signup")} ${linkBaseClass}`}
-              >
-                <UserPlus size={authIconSize} class="mr-1 sm:mr-2" />
-                Sign Up
-              </A>
-            </li>
-          </Show>
-
-          <li class="relative" ref={dropdownRef}>
-            <button
-              onClick={toggleDropdown}
-              class={`p-2 flex items-center justify-center transition-colors duration-150 rounded-full
-                       ${
-                         isDropdownOpen()
-                           ? "bg-neutral-200 dark:bg-neutral-700"
-                           : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
-                       }
-                       focus:outline-none focus:ring-2 focus:ring-offset-2 
-                       focus:ring-offset-white dark:focus:ring-offset-neutral-900 
-                       focus:ring-sky-500 dark:focus:ring-[#c2fe0c]`}
-              aria-label="Select theme"
-              aria-haspopup="true"
-              aria-expanded={isDropdownOpen()}
-            >
-              <Show
-                when={isClientRendered()}
-                fallback={<Monitor size={iconSize} class={iconBaseClass} />}
-              >
-                <ThemeIconDisplay size={iconSize} class={iconBaseClass} />
-              </Show>
-            </button>
-            <Show when={isDropdownOpen()}>
-              <div
-                class="animate-fade-in absolute right-0 mt-2 w-44
-                       bg-white dark:bg-neutral-800 rounded-md shadow-lg 
-                       border border-neutral-200 dark:border-neutral-700 
-                       py-1 z-50"
-              >
-                <button
-                  onClick={() => setTheme("light")}
-                  class="w-full text-left px-3 py-1.5 text-sm 
-                           text-neutral-700 dark:text-neutral-200 
-                           hover:bg-neutral-100 dark:hover:bg-neutral-700 
-                           flex items-center group transition-colors duration-150"
+        {/* This li contains the right-aligned navigation items and the theme toggle */}
+        <li class="ml-auto">
+          <ul class="flex items-center space-x-3 sm:space-x-4">
+            <Show when={!session().isPending && session().data?.user}>
+              <li class="mx-1.5 sm:mx-3">
+                <A
+                  href="/dashboard"
+                  class={`${activeLinkClasses("/dashboard")} ${linkBaseClass}`}
                 >
-                  <Sun
-                    size={dropdownIconSize}
-                    class="mr-2 text-neutral-600 dark:text-neutral-300"
-                  />
-                  Light
-                </button>
+                  <LayoutDashboard size={authIconSize} class="mr-1 sm:mr-2" />
+                  Dashboard
+                </A>
+              </li>
+              <li class="mx-1.5 sm:mx-3">
                 <button
-                  onClick={() => setTheme("dark")}
-                  class="w-full text-left px-3 py-1.5 text-sm 
-                           text-neutral-700 dark:text-neutral-200 
-                           hover:bg-neutral-100 dark:hover:bg-neutral-700 
-                           flex items-center group transition-colors duration-150"
+                  onClick={handleLogout}
+                  class={`${linkBaseClass} text-neutral-600 dark:text-neutral-200 hover:text-sky-600 dark:hover:text-sky-400 font-medium`}
+                  aria-label="Logout"
                 >
-                  <Moon
-                    size={dropdownIconSize}
-                    class="mr-2 text-neutral-600 dark:text-neutral-300"
-                  />
-                  Dark
+                  <LogOut size={authIconSize} class="mr-1 sm:mr-2" />
+                  Logout
                 </button>
-                <button
-                  onClick={() => setTheme("system")}
-                  class="w-full text-left px-3 py-1.5 text-sm 
-                           text-neutral-700 dark:text-neutral-200 
-                           hover:bg-neutral-100 dark:hover:bg-neutral-700 
-                           flex items-center group transition-colors duration-150"
-                >
-                  <Monitor
-                    size={dropdownIconSize}
-                    class="mr-2 text-neutral-600 dark:text-neutral-300"
-                  />
-                  System
-                </button>
-              </div>
+              </li>
             </Show>
-          </li>
-        </div>
+
+            <Show when={!session().isPending && !session().data?.user}>
+              <li class="mx-1.5 sm:mx-3">
+                <A
+                  href="/login"
+                  class={`${activeLinkClasses("/login")} ${linkBaseClass}`}
+                >
+                  <LogIn size={authIconSize} class="mr-1 sm:mr-2" />
+                  Sign In
+                </A>
+              </li>
+              <li class="mx-1.5 sm:mx-3">
+                <A
+                  href="/signup"
+                  class={`${activeLinkClasses("/signup")} ${linkBaseClass}`}
+                >
+                  <UserPlus size={authIconSize} class="mr-1 sm:mr-2" />
+                  Sign Up
+                </A>
+              </li>
+            </Show>
+
+            <li class="relative" ref={dropdownRef}>
+              <button
+                onClick={toggleDropdown}
+                class={`p-2 flex items-center justify-center transition-colors duration-150 rounded-full
+                         ${
+                           isDropdownOpen()
+                             ? "bg-neutral-200 dark:bg-neutral-700"
+                             : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
+                         }
+                         focus:outline-none focus:ring-2 focus:ring-offset-2 
+                         focus:ring-offset-white dark:focus:ring-offset-neutral-900 
+                         focus:ring-sky-500 dark:focus:ring-sky-400`}
+                aria-label="Select theme"
+                aria-haspopup="true"
+                aria-expanded={isDropdownOpen()}
+              >
+                <Show
+                  when={isClientRendered()}
+                  fallback={<Monitor size={iconSize} class={iconBaseClass} />}
+                >
+                  <ThemeIconDisplay size={iconSize} class={iconBaseClass} />
+                </Show>
+              </button>
+              <Show when={isDropdownOpen()}>
+                <div
+                  class="animate-fade-in absolute right-0 mt-2 w-44
+                         bg-white dark:bg-neutral-800 rounded-md shadow-lg 
+                         border border-neutral-200 dark:border-neutral-700 
+                         py-1 z-50"
+                >
+                  <button
+                    onClick={() => setTheme("light")}
+                    class="w-full text-left px-3 py-1.5 text-sm 
+                             text-neutral-700 dark:text-neutral-200 
+                             hover:bg-neutral-100 dark:hover:bg-neutral-700 
+                             flex items-center group transition-colors duration-150"
+                  >
+                    <Sun
+                      size={dropdownIconSize}
+                      class="mr-2 text-neutral-600 dark:text-neutral-300"
+                    />
+                    Light
+                  </button>
+                  <button
+                    onClick={() => setTheme("dark")}
+                    class="w-full text-left px-3 py-1.5 text-sm 
+                             text-neutral-700 dark:text-neutral-200 
+                             hover:bg-neutral-100 dark:hover:bg-neutral-700 
+                             flex items-center group transition-colors duration-150"
+                  >
+                    <Moon
+                      size={dropdownIconSize}
+                      class="mr-2 text-neutral-600 dark:text-neutral-300"
+                    />
+                    Dark
+                  </button>
+                  <button
+                    onClick={() => setTheme("system")}
+                    class="w-full text-left px-3 py-1.5 text-sm 
+                             text-neutral-700 dark:text-neutral-200 
+                             hover:bg-neutral-100 dark:hover:bg-neutral-700 
+                             flex items-center group transition-colors duration-150"
+                  >
+                    <Monitor
+                      size={dropdownIconSize}
+                      class="mr-2 text-neutral-600 dark:text-neutral-300"
+                    />
+                    System
+                  </button>
+                </div>
+              </Show>
+            </li>
+          </ul>
+        </li>
       </ul>
     </nav>
   );
