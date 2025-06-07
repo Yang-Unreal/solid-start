@@ -1,3 +1,4 @@
+// src/components/AnimeTimer.tsx
 import { createSignal, onCleanup, onMount } from "solid-js";
 import { createTimer, type Timer } from "animejs";
 import { RefreshCw } from "lucide-solid";
@@ -45,21 +46,10 @@ function AnimeTimer() {
   };
 
   return (
-    <div
-      class={`
-        p-5 rounded-lg w-full mx-auto
-        bg-white dark:bg-neutral-800/50
-        text-neutral-700 dark:text-neutral-300
-        shadow-sm border border-neutral-200 dark:border-neutral-700/80
-      `}
-    >
+    // Root div is now wider and handles main layout
+    <div class="w-full max-w-sm mx-auto text-left">
       <div class="flex justify-between items-center mb-4">
-        <h2
-          class={`
-            text-lg font-medium
-            text-neutral-800 dark:text-neutral-200
-          `}
-        >
+        <h2 class="text-xl font-medium text-neutral-800 dark:text-neutral-200">
           Animation Timer
         </h2>
         <button
@@ -78,52 +68,21 @@ function AnimeTimer() {
           <RefreshCw class="w-5 h-5" stroke-width="2.25" />
         </button>
       </div>
-      <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-        <div
-          class={`
-            p-4 rounded-md flex-1 flex flex-col items-center
-            bg-neutral-100 dark:bg-neutral-700/50
-          `}
-        >
-          <span
-            class={`
-              block text-xs font-medium text-neutral-600 dark:text-neutral-300
-              mb-1.5 tracking-normal
-            `}
-          >
+      {/* Container for stats now uses grid for better alignment and equal width */}
+      <div class="grid grid-cols-2 gap-4">
+        <div class="p-4 rounded-lg flex flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-800/50 h-32">
+          <span class="block text-sm font-medium text-neutral-600 dark:text-neutral-300 mb-1.5 tracking-normal">
             Current Time
           </span>
-          <span
-            class={`
-              text-3xl font-mono font-medium
-              text-sky-600 dark:text-[#c2fe0c]
-              h-10 flex items-center justify-center
-            `}
-          >
+          <span class="text-4xl font-mono font-bold text-sky-600 dark:text-[#c2fe0c]">
             {currentTime()}
           </span>
         </div>
-        <div
-          class={`
-            p-4 rounded-md flex-1 flex flex-col items-center
-            bg-neutral-100 dark:bg-neutral-700/50
-          `}
-        >
-          <span
-            class={`
-              block text-xs font-medium text-neutral-600 dark:text-neutral-300
-              mb-1.5 tracking-normal
-            `}
-          >
+        <div class="p-4 rounded-lg flex flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-800/50 h-32">
+          <span class="block text-sm font-medium text-neutral-600 dark:text-neutral-300 mb-1.5 tracking-normal">
             Loops Completed
           </span>
-          <span
-            class={`
-              text-3xl font-mono font-medium
-              text-sky-600 dark:text-[#c2fe0c]
-              h-10 flex items-center justify-center
-            `}
-          >
+          <span class="text-4xl font-mono font-bold text-sky-600 dark:text-[#c2fe0c]">
             {loopCount()}
           </span>
         </div>

@@ -1,3 +1,4 @@
+// src/components/Todo.tsx
 import { For, createSignal, Show } from "solid-js";
 import { createStore, produce } from "solid-js/store";
 import {
@@ -76,7 +77,10 @@ const ToDo = () => {
   const regularButtonSize = "px-4 py-2 text-sm";
 
   return (
-    <div class="card-content-host p-6 sm:p-8 space-y-6 sm:space-y-8 max-w-2xl mx-auto">
+    // The root element is now a simple div that takes the full width available
+    // inside the parent card. It uses flex and a max-width to look good.
+    <div class="w-full max-w-md mx-auto space-y-4 text-left">
+      {/* The h1 is explicitly centered, overriding the new root's text-left */}
       <h1 class="text-center text-2xl font-medium text-neutral-800 dark:text-neutral-200">
         To-Do List
       </h1>
@@ -108,11 +112,11 @@ const ToDo = () => {
         </button>
       </div>
 
-      <div class="border border-neutral-200 dark:border-neutral-700 rounded-md overflow-hidden">
+      <div class="rounded-md overflow-hidden border border-neutral-200 dark:border-neutral-700">
         <Show
           when={state.items.length > 0}
           fallback={
-            <p class="px-4 py-5 text-center text-sm text-neutral-600 dark:text-neutral-300">
+            <p class="px-4 py-5 text-center text-sm text-neutral-500 dark:text-neutral-400">
               Your to-do list is empty.
             </p>
           }
