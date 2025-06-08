@@ -1,16 +1,20 @@
 // src/routes/index.tsx
 import { Suspense, lazy } from "solid-js";
 
-// Lazy-load all components to improve initial page performance and Total Blocking Time (TBT).
-// Solid's lazy() expects a default export from the imported file.
-const Counter = lazy(() => import("~/components/Counter"));
-const Avatar = lazy(() => import("~/components/Avatar"));
-const Controlled = lazy(() => import("~/components/switch/Controlled"));
-const ForList = lazy(() => import("~/components/list/For"));
+// --- MODIFIED: Eagerly load components visible "above the fold" ---
+// These components are visible immediately and should not be lazy-loaded.
+// This is the primary fix for the high "Render Delay".
+import Counter from "~/components/Counter";
+import Avatar from "~/components/Avatar";
+import Controlled from "~/components/switch/Controlled";
+import DynamicRender from "~/components/DynamicRender";
+import ForList from "~/components/list/For";
+
+// --- KEPT: Lazy-load components that are "below the fold" ---
+// These are not immediately visible, so lazy loading is appropriate here.
 const IndexList = lazy(() => import("~/components/list/Index"));
 const PortalExample = lazy(() => import("~/components/Portal"));
 const AnimeTimer = lazy(() => import("~/components/AnimeTimer"));
-const DynamicRender = lazy(() => import("~/components/DynamicRender"));
 const RefsExample = lazy(() => import("~/components/RefsExample"));
 const ToDo = lazy(() => import("~/components/Todo"));
 const CounterPageContent = lazy(
@@ -28,43 +32,27 @@ export default function Home() {
   return (
     <main class=" bg-neutral-100 p-4 sm:p-6 lg:p-8">
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+        {/* --- MODIFIED: Removed Suspense from eagerly loaded components --- */}
         <div class="card-wrapper">
-          <Suspense
-            fallback={
-              <div class="animate-pulse h-10 w-40 bg-neutral-200 rounded-lg" />
-            }
-          >
-            <Counter />
-          </Suspense>
-          <Suspense
-            fallback={
-              <div class="w-14 h-14 rounded-full bg-neutral-200 animate-pulse" />
-            }
-          >
-            <Avatar
-              name="Yang Yang"
-              src="https://minio.limingcn.com/solid-start/cloud.webp"
-              size="md"
-            />
-          </Suspense>
-          <Suspense
-            fallback={
-              <div class="animate-pulse h-6 w-24 bg-neutral-200 rounded-full" />
-            }
-          >
-            <Controlled />
-          </Suspense>
+          <Counter />
+          <Avatar
+            name="Yang Yang"
+            src="https://minio.limingcn.com/solid-start/cloud.webp"
+            size="md"
+          />
+          <Controlled />
         </div>
-        <Suspense fallback={<CardFallback />}>
-          <div class="card-content-host">
-            <DynamicRender />
-          </div>
-        </Suspense>
-        <Suspense fallback={<CardFallback />}>
-          <div class="card-content-host">
-            <ForList />
-          </div>
-        </Suspense>
+
+        {/* This component contains the LCP element and is now loaded eagerly */}
+        <div class="card-content-host">
+          <DynamicRender />
+        </div>
+
+        <div class="card-content-host">
+          <ForList />
+        </div>
+
+        {/* --- KEPT: Suspense is still used for components below the fold --- */}
         <Suspense fallback={<CardFallback />}>
           <div class="card-content-host">
             <IndexList />
