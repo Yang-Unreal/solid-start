@@ -22,12 +22,6 @@ export default function Counter() {
         focus:ring-[#c2fe0c]
         focus:ring-offset-2
         focus:ring-offset-neutral-100
-
-        dark:bg-[#c2fe0c]
-        dark:text-black
-        dark:hover:bg-[#a8e00a]
-        dark:active:bg-[#8ab40a]
-        dark:focus:ring-offset-black
       `}
       onClick={() => setCount(count() + 1)}
     >

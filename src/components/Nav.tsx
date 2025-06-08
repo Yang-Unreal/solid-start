@@ -1,9 +1,6 @@
 import { createSignal, onMount, onCleanup, Show } from "solid-js";
 import { useLocation, A, useNavigate } from "@solidjs/router";
 import {
-  Sun,
-  Moon,
-  Monitor,
   LogOut,
   LogIn,
   UserPlus,
@@ -11,61 +8,20 @@ import {
   AlignJustify, // Changed for mobile menu
   MenuSquare, // Changed for mobile menu close icon
 } from "lucide-solid";
-import {
-  currentTheme,
-  setCurrentTheme as setCurrentThemeSignal,
-  applyTheme,
-} from "./ThemeManager";
-import type { Component } from "solid-js";
 import { authClient } from "~/lib/auth-client";
 
-type Theme = "light" | "dark" | "system";
-const THEME_STORAGE_KEY = "theme";
-
-const [isDropdownOpen, setIsDropdownOpen] = createSignal(false);
 const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false); // New state for mobile menu
-
-function setTheme(newTheme: Theme) {
-  setCurrentThemeSignal(newTheme);
-  if (typeof window !== "undefined") {
-    localStorage.setItem(THEME_STORAGE_KEY, newTheme);
-  }
-  applyTheme(newTheme);
-  setIsDropdownOpen(false);
-}
-
-const ThemeIconDisplay: Component<{ size: number; class?: string }> = (
-  props
-) => {
-  return (
-    <Show
-      when={currentTheme() === "light"}
-      fallback={
-        <Show
-          when={currentTheme() === "dark"}
-          fallback={<Monitor size={props.size} class={props.class} />}
-        >
-          <Moon size={props.size} class={props.class} />
-        </Show>
-      }
-    >
-      <Sun size={props.size} class={props.class} />
-    </Show>
-  );
-};
 
 export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
   const session = authClient.useSession();
-  const [isClientRendered, setIsClientRendered] = createSignal(false);
   let dropdownRef: HTMLLIElement | undefined;
 
   onMount(() => {
-    setIsClientRendered(true);
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
+        // No dropdown to close, so this can be removed or adapted if other dropdowns exist
       }
     };
     document.addEventListener("click", handleClickOutside);
@@ -76,15 +32,9 @@ export default function Nav() {
 
   const activeLinkClasses = (path: string) => {
     // ACCESSIBILITY FIX: Using compliant colors for both light and dark modes.
-    const baseActive = "text-sky-700 dark:text-[#c2fe0c] font-semibold";
-    const baseInactive =
-      "text-neutral-600 dark:text-neutral-200 hover:text-sky-700 dark:hover:text-[#c2fe0c] font-medium";
+    const baseActive = "text-sky-700 font-semibold";
+    const baseInactive = "text-neutral-600 hover:text-sky-700 font-medium";
     return location.pathname === path ? baseActive : baseInactive;
-  };
-
-  const toggleDropdown = (e: MouseEvent) => {
-    e.stopPropagation();
-    setIsDropdownOpen(!isDropdownOpen());
   };
 
   const toggleMobileMenu = () => {
@@ -95,18 +45,16 @@ export default function Nav() {
     navigate("/login", { replace: true });
   };
 
-  const iconSize = 20;
   const authIconSize = 18;
-  const iconBaseClass = "text-neutral-600 dark:text-neutral-300";
-  const linkBaseClass =
-    "transition-colors duration-150 text-sm flex items-center";
+  const iconBaseClass = "text-neutral-600";
+  const linkBaseClass = "text-sm flex items-center";
 
   return (
     <nav
       class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
         isMobileMenuOpen()
-          ? "h-screen bg-white dark:bg-black" // Full screen when open
-          : "h-16 bg-white dark:bg-black border-b border-neutral-200 dark:border-neutral-700/80 shadow-sm"
+          ? "h-screen bg-white" // Full screen when open
+          : "h-16 bg-white border-b border-neutral-200 shadow-sm"
       }`}
     >
       {/* Header for both desktop and mobile (when closed) */}
@@ -148,7 +96,7 @@ export default function Nav() {
           </li>
         </ul>
 
-        {/* Right-aligned items (Auth and Theme) - always visible in desktop */}
+        {/* Right-aligned items (Auth) - always visible in desktop */}
         <ul class="flex items-center space-x-3 sm:space-x-4 ml-auto">
           <Show when={!session().isPending && session().data?.user}>
             <li class="hidden sm:block mx-1.5 sm:mx-3">
@@ -163,7 +111,7 @@ export default function Nav() {
             <li class="hidden sm:block mx-1.5 sm:mx-3">
               <button
                 onClick={handleLogout}
-                class={`${linkBaseClass} text-neutral-600 dark:text-neutral-200 hover:text-sky-700 dark:hover:text-[#c2fe0c] font-medium`}
+                class={`${linkBaseClass} text-neutral-600 hover:text-sky-700 font-medium`}
                 aria-label="Logout"
               >
                 <LogOut size={authIconSize} class="mr-1 sm:mr-2" />
@@ -191,60 +139,6 @@ export default function Nav() {
               </A>
             </li>
           </Show>
-          <li class="relative hidden sm:block" ref={dropdownRef}>
-            <button
-              onClick={toggleDropdown}
-              class={`p-2 flex items-center justify-center transition-colors duration-150 rounded-full ${
-                isDropdownOpen()
-                  ? "bg-neutral-200 dark:bg-neutral-700"
-                  : "hover:bg-neutral-100 dark:hover:bg-neutral-700/60"
-              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-sky-500 dark:focus:ring-[#c2fe0c]`}
-              aria-label="Select theme"
-              aria-haspopup="true"
-              aria-expanded={isDropdownOpen()}
-            >
-              <Show
-                when={isClientRendered()}
-                fallback={<Monitor size={iconSize} class={iconBaseClass} />}
-              >
-                <ThemeIconDisplay size={iconSize} class={iconBaseClass} />
-              </Show>
-            </button>
-            <Show when={isDropdownOpen()}>
-              <div class="animate-fade-in absolute right-0 mt-2 w-44 bg-white dark:bg-neutral-800 rounded-md shadow-lg border border-neutral-200 dark:border-neutral-700 py-1 z-50">
-                <button
-                  onClick={() => setTheme("light")}
-                  class="w-full text-left px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center group transition-colors duration-150"
-                >
-                  <Sun
-                    size={16}
-                    class="mr-2 text-neutral-600 dark:text-neutral-100"
-                  />
-                  Light
-                </button>
-                <button
-                  onClick={() => setTheme("dark")}
-                  class="w-full text-left px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center group transition-colors duration-150"
-                >
-                  <Moon
-                    size={16}
-                    class="mr-2 text-neutral-600 dark:text-neutral-100"
-                  />
-                  Dark
-                </button>
-                <button
-                  onClick={() => setTheme("system")}
-                  class="w-full text-left px-3 py-1.5 text-sm text-neutral-700 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center group transition-colors duration-150"
-                >
-                  <Monitor
-                    size={16}
-                    class="mr-2 text-neutral-600 dark:text-neutral-100"
-                  />
-                  System
-                </button>
-              </div>
-            </Show>
-          </li>
         </ul>
       </div>
 
@@ -252,7 +146,7 @@ export default function Nav() {
       <div class="absolute top-3 right-4 sm:hidden z-50">
         <button
           onClick={toggleMobileMenu}
-          class="p-2 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/60 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-sky-500 dark:focus:ring-[#c2fe0c]"
+          class="p-2 text-neutral-600 hover:bg-neutral-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-sky-500"
           aria-label="Toggle mobile menu"
         >
           <Show when={isMobileMenuOpen()} fallback={<AlignJustify size={24} />}>
@@ -264,7 +158,7 @@ export default function Nav() {
       {/* Full-screen Mobile Menu Content */}
       <Show when={isMobileMenuOpen()}>
         <div class="flex flex-col h-[calc(100vh-4rem)] justify-between items-center py-8">
-          <ul class="flex flex-col items-center space-y-6 text-xl text-neutral-800 dark:text-white">
+          <ul class="flex flex-col items-center space-y-6 text-xl text-neutral-800">
             <li>
               <A href="/" onClick={toggleMobileMenu}>
                 Home
@@ -287,7 +181,7 @@ export default function Nav() {
             </li>
           </ul>
 
-          <div class="flex flex-col items-center space-y-4 text-neutral-800 dark:text-white text-lg">
+          <div class="flex flex-col items-center space-y-4 text-neutral-800 text-lg">
             <Show when={!session().isPending && session().data?.user}>
               <A href="/dashboard" onClick={toggleMobileMenu}>
                 Dashboard
@@ -310,7 +204,7 @@ export default function Nav() {
               </A>
             </Show>
             {/* Placeholder for language/privacy notice */}
-            <div class="pt-8 text-sm text-neutral-600 dark:text-neutral-400">
+            <div class="pt-8 text-sm text-neutral-600">
               <span>Deutsch | English</span>
               <p class="mt-2">Privacy notice</p>
             </div>

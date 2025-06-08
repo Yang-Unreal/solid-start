@@ -42,23 +42,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div class="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-neutral-950 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen flex flex-col items-center justify-center bg-slate-50 px-4 sm:px-6 lg:px-8">
       <div class="w-full max-w-md space-y-8">
-        <div class="bg-white dark:bg-neutral-900/80 backdrop-blur-sm shadow-2xl rounded-xl p-8 sm:p-10">
+        <div class="bg-white backdrop-blur-sm shadow-2xl rounded-xl p-8 sm:p-10">
           <div class="text-center">
-            <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+            <h2 class="mt-2 text-3xl font-bold tracking-tight text-gray-900">
               Sign in
             </h2>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Welcome back!
-            </p>
+            <p class="mt-2 text-sm text-gray-600">Welcome back!</p>
           </div>
 
           <form onSubmit={handleLogin} class="mt-8 space-y-6">
             <div>
               <label
                 for="email"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                class="block text-sm font-medium text-gray-700 mb-1"
               >
                 Email address
               </label>
@@ -70,7 +68,7 @@ export default function LoginPage() {
                 required
                 value={email()}
                 onInput={(e) => setEmail(e.currentTarget.value)}
-                class="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-neutral-700 placeholder-gray-500 dark:placeholder-neutral-400 text-gray-900 dark:text-gray-100 bg-white dark:bg-neutral-800/50 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="you@example.com"
               />
             </div>
@@ -78,7 +76,7 @@ export default function LoginPage() {
             <div>
               <label
                 for="password"
-                class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                class="block text-sm font-medium text-gray-700 mb-1"
               >
                 Password
               </label>
@@ -90,7 +88,7 @@ export default function LoginPage() {
                 required
                 value={password()}
                 onInput={(e) => setPassword(e.currentTarget.value)}
-                class="appearance-none relative block w-full px-3 py-3 border border-gray-300 dark:border-neutral-700 placeholder-gray-500 dark:placeholder-neutral-400 text-gray-900 dark:text-gray-100 bg-white dark:bg-neutral-800/50 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                class="appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 placeholder="••••••••"
               />
             </div>
@@ -99,7 +97,7 @@ export default function LoginPage() {
               <div class="text-sm">
                 <a
                   href="#" // Replace with your actual forgot password link
-                  class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  class="font-medium text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot your password?
                 </a>
@@ -107,16 +105,14 @@ export default function LoginPage() {
             </div>
 
             <Show when={error()}>
-              <p class="text-sm text-red-600 dark:text-red-400 text-center">
-                {error()}
-              </p>
+              <p class="text-sm text-red-600 text-center">{error()}</p>
             </Show>
 
             <div>
               <button
                 type="submit"
                 disabled={loading()}
-                class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-900 focus:ring-indigo-500 dark:focus:ring-indigo-400 disabled:opacity-60 disabled:cursor-not-allowed"
+                class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-indigo-500 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading() ? (
                   <svg
@@ -145,11 +141,11 @@ export default function LoginPage() {
               </button>
             </div>
           </form>
-          <p class="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p class="mt-8 text-center text-sm text-gray-600">
             Don't have an account?{" "}
             <A
               href="/signup"
-              class="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+              class="font-medium text-indigo-600 hover:text-indigo-500"
             >
               Sign Up
             </A>

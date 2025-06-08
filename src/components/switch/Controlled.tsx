@@ -18,17 +18,15 @@ const Controlled = () => {
             w-10 h-5
             rounded-full
             transition-colors duration-150 ease-in-out
-            bg-neutral-300 dark:bg-neutral-600
+            bg-neutral-300
             data-[state=checked]:bg-[#c2fe0c]
             data-[hover]:not([data-state=checked]):bg-neutral-400
-            dark:data-[hover]:not([data-state=checked]):bg-neutral-500
             data-[state=checked]:data-[hover]:bg-[#a8e00a]
             data-[focus-visible]:outline-none
             data-[focus-visible]:ring-2
             data-[focus-visible]:ring-[#c2fe0c]
             data-[focus-visible]:ring-offset-2
             data-[focus-visible]:ring-offset-white
-            dark:data-[focus-visible]:ring-offset-black
           `}
         >
           <ArkSwitch.Thumb
@@ -50,8 +48,6 @@ const Controlled = () => {
             transition-colors duration-200
             text-neutral-700
             group-data-[state=checked]:text-neutral-900
-            dark:text-neutral-300
-            dark:group-data-[state=checked]:text-[#c2fe0c]
           `}
         >
           <SolidSwitch>

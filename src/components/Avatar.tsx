@@ -47,7 +47,7 @@ const Avatar: Component<AvatarProps> = (props) => {
       } ${localProps.class || ""}`}
       {...rootProps}
     >
-      <ArkAvatar.Fallback class="w-full h-full bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-100 font-medium flex items-center justify-center leading-none">
+      <ArkAvatar.Fallback class="w-full h-full bg-neutral-200 text-neutral-700 font-medium flex items-center justify-center leading-none">
         <Show
           when={localProps.name}
           fallback={<UserIcon class={`${iconSizeClasses[currentSize]}`} />}

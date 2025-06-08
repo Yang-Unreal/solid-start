@@ -62,7 +62,7 @@ async function deleteProductApi(
 }
 
 // THIS FUNCTION MUST ACCURATELY REFLECT THE TAILWIND CSS `grid-cols-*` BREAKPOINTS
-// USED IN THE JSX FOR THE PRODUCT GRID, INCLUDING CUSTOM BREAKPOINTS DEFINED VIA @theme in CSS.
+// THIS FUNCTION MUST ACCURATELY REFLECT THE TAILWIND CSS `grid-cols-*` BREAKPOINTS
 const getActiveColumnCount = () => {
   if (typeof window === "undefined") return 4; // SSR fallback (e.g., for 'lg')
 
@@ -70,7 +70,6 @@ const getActiveColumnCount = () => {
 
   // Pixel values for breakpoints:
   // Default Tailwind: sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px
-  // Custom via @theme (example): 3xl: 1920px (120rem * 16px/rem if base font is 16px)
 
   // Order from largest to smallest is important.
   if (screenWidth >= 1920) return 6; // Matches custom `3xl:grid-cols-6`
@@ -276,22 +275,20 @@ const ProductsPage = () => {
   };
   const formatPrice = (priceInCents: number) =>
     `$${(priceInCents / 100).toFixed(2)}`;
-  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100 dark:focus:ring-offset-black disabled:opacity-50 disabled:cursor-not-allowed`;
+  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed`;
   const userRole = () =>
     (session()?.data?.user as { role?: string } | undefined)?.role;
 
   return (
     <MetaProvider>
       <Title>Our Products</Title>
-      <main class="bg-neutral-100 dark:bg-neutral-900 p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-4rem)]">
+      <main class="bg-neutral-100 p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-4rem)]">
         <div class="flex justify-between items-center mb-8">
-          <h1 class="text-3xl font-bold text-neutral-800 dark:text-neutral-200">
-            Our Products
-          </h1>
+          <h1 class="text-3xl font-bold text-neutral-800">Our Products</h1>
           <Show when={!session().isPending && userRole() === "admin"}>
             <A
               href="/products/new"
-              class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100 dark:focus:ring-offset-black"
+              class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100"
             >
               <PlusCircle size={18} class="mr-2" /> Add Product
             </A>
@@ -299,30 +296,30 @@ const ProductsPage = () => {
         </div>
 
         <Show when={showSuccessMessage()}>
-          <div class="mb-4 p-3 rounded-md bg-green-100 text-green-700 border border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-500/50">
+          <div class="mb-4 p-3 rounded-md bg-green-100 text-green-700 border border-green-300">
             {showSuccessMessage()}
           </div>
         </Show>
         <Show when={deleteError()}>
-          <div class="mb-4 p-3 rounded-md bg-red-100 text-red-700 border border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-500/50">
+          <div class="mb-4 p-3 rounded-md bg-red-100 text-red-700 border border-red-300">
             Error: {deleteError()}
           </div>
         </Show>
         <Show when={isLoadingInitial()}>
-          <p class="text-center text-xl text-neutral-700 dark:text-neutral-300 py-10">
+          <p class="text-center text-xl text-neutral-700 py-10">
             Loading products...
           </p>
         </Show>
         <Show when={error() && !isFetching() && !isLoadingInitial()}>
           <div class="text-center py-10">
-            <p class="text-xl text-red-600 dark:text-red-400">
+            <p class="text-xl text-red-600">
               Error: {error()?.message || "An unknown error occurred."}
             </p>
-            <p class="text-neutral-700 dark:text-neutral-300 mt-2">
+            <p class="text-neutral-700 mt-2">
               Please try refreshing.{" "}
               <button
                 onClick={() => productsQuery.refetch()}
-                class="ml-2 text-sky-600 dark:text-[#c2fe0c] underline"
+                class="ml-2 text-sky-600 underline"
               >
                 Retry
               </button>
@@ -334,14 +331,13 @@ const ProductsPage = () => {
           <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
             {/*
               Tailwind classes define columns. `getActiveColumnCount` MUST match these.
-              Custom `3xl` breakpoint (e.g., 1920px) should be defined in `app.css` via @theme.
             */}
             <div class="justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6 sm:gap-8">
               <For each={products()}>
                 {(product) => (
-                  <div class="card-content-host flex flex-col bg-white dark:bg-black shadow-lg rounded-xl overflow-hidden">
+                  <div class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden">
                     <Show when={product.imageUrl}>
-                      <div class="w-full aspect-video bg-neutral-200 dark:bg-neutral-700 overflow-hidden">
+                      <div class="w-full aspect-video bg-neutral-200 overflow-hidden">
                         <img
                           src={product.imageUrl!}
                           alt={product.name}
@@ -355,33 +351,33 @@ const ProductsPage = () => {
                     </Show>
                     <div class="p-5 flex flex-col flex-grow">
                       <h2
-                        class="text-lg font-semibold mb-1 text-neutral-800 dark:text-neutral-200 truncate"
+                        class="text-lg font-semibold mb-1 text-neutral-800 truncate"
                         title={product.name}
                       >
                         {product.name}
                       </h2>
-                      <p class="text-xl mb-3 text-neutral-700 dark:text-neutral-300">
+                      <p class="text-xl mb-3 text-neutral-700">
                         {formatPrice(product.priceInCents)}
                       </p>
                       <Show when={product.description}>
-                        <p class="text-sm text-neutral-700 dark:text-neutral-300 mb-4 flex-grow min-h-[40px]">
+                        <p class="text-sm text-neutral-700 mb-4 flex-grow min-h-[40px]">
                           {product.description!.length > 100
                             ? product.description!.substring(0, 97) + "..."
                             : product.description}
                         </p>
                       </Show>
-                      <div class="mt-auto pt-2 border-t border-neutral-200 dark:border-neutral-700">
-                        <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                      <div class="mt-auto pt-2 border-t border-neutral-200">
+                        <p class="text-xs text-neutral-600">
                           Category: {product.category || "N/A"}
                         </p>
-                        <p class="text-xs text-neutral-600 dark:text-neutral-300">
+                        <p class="text-xs text-neutral-600">
                           Stock: {product.stockQuantity}
                         </p>
                       </div>
                       <Show
                         when={!session().isPending && userRole() === "admin"}
                       >
-                        <div class="mt-4 pt-3 border-t border-neutral-200 dark:border-neutral-700">
+                        <div class="mt-4 pt-3 border-t border-neutral-200">
                           <button
                             onClick={() =>
                               handleDeleteProduct(product.id, product.name)
@@ -390,7 +386,7 @@ const ProductsPage = () => {
                               deleteProductMutation.isPending &&
                               deleteProductMutation.variables === product.id
                             }
-                            class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-100  focus:ring-red-500 dark:text-red-400 dark:hover:bg-red-800/50 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-black"
+                            class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-100  focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2"
                           >
                             <Trash2 size={16} class="mr-2" />
                             {deleteProductMutation.isPending &&
@@ -415,7 +411,7 @@ const ProductsPage = () => {
               >
                 Previous
               </button>
-              <span class="text-neutral-700 dark:text-neutral-300 font-medium text-sm">
+              <span class="text-neutral-700 font-medium text-sm">
                 Page {pagination()!.currentPage} of {pagination()!.totalPages}
               </span>
               <button
@@ -436,7 +432,7 @@ const ProductsPage = () => {
             products().length === 0
           }
         >
-          <p class="text-center text-xl text-neutral-700 dark:text-neutral-300 py-10">
+          <p class="text-center text-xl text-neutral-700 py-10">
             No products found. Add some!
           </p>
         </Show>

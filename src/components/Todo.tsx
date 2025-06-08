@@ -67,12 +67,12 @@ const ToDo = () => {
   const primaryButtonClass = `
     px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ease-in-out
     bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a]
-    focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 dark:focus:ring-offset-black
+    focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2
   `;
 
   return (
     <div class="w-full max-w-sm mx-auto space-y-4 text-left">
-      <h1 class="text-center text-2xl font-bold text-neutral-800 dark:text-neutral-200">
+      <h1 class="text-center text-2xl font-bold text-neutral-800">
         To-Do List
       </h1>
       <div class="flex gap-x-3">
@@ -88,7 +88,7 @@ const ToDo = () => {
             if (e.key === "Enter") addTodoItem();
           }}
           placeholder="What needs to be done?"
-          class="flex-grow block w-full py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600 dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]"
+          class="flex-grow block w-full py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
         />
         <button
           onClick={addTodoItem}
@@ -98,19 +98,19 @@ const ToDo = () => {
           <span>Add</span>
         </button>
       </div>
-      <div class="rounded-md overflow-hidden border border-neutral-200 dark:border-neutral-700">
+      <div class="rounded-md overflow-hidden border border-neutral-200">
         <Show
           when={state.items.length > 0}
           fallback={
-            <p class="px-4 py-5 text-center text-sm text-neutral-500 dark:text-neutral-400">
+            <p class="px-4 py-5 text-center text-sm text-neutral-500">
               Your to-do list is empty.
             </p>
           }
         >
-          <ul class="divide-y divide-neutral-200 dark:divide-neutral-700">
+          <ul class="divide-y divide-neutral-200">
             <For each={state.items}>
               {(item) => (
-                <li class="flex items-center p-3 text-sm text-neutral-700 dark:text-neutral-200 bg-white dark:bg-neutral-900 group">
+                <li class="flex items-center p-3 text-sm text-neutral-700 bg-white group">
                   <ArkCheckbox.Root
                     checked={item.completed}
                     onCheckedChange={(details) =>
@@ -118,12 +118,12 @@ const ToDo = () => {
                     }
                     class="flex items-center shrink-0 w-full group/checkbox cursor-pointer"
                   >
-                    <ArkCheckbox.Control class="w-5 h-5 rounded border transition-colors duration-150 flex items-center justify-center shrink-0 bg-white dark:bg-neutral-800 border-neutral-400 dark:border-neutral-500 group-data-[state=checked]/checkbox:bg-sky-600 dark:group-data-[state=checked]/checkbox:bg-[#c2fe0c] group-data-[state=checked]/checkbox:border-sky-600 dark:group-data-[state=checked]/checkbox:border-[#c2fe0c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-neutral-900 focus-visible:ring-sky-500 dark:focus-visible:ring-[#c2fe0c]" />
+                    <ArkCheckbox.Control class="w-5 h-5 rounded border transition-colors duration-150 flex items-center justify-center shrink-0 bg-white border-neutral-400 group-data-[state=checked]/checkbox:bg-sky-600 group-data-[state=checked]/checkbox:border-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500" />
                     <ArkCheckbox.Label
                       class={`ml-3 flex-grow transition-colors ${
                         item.completed
-                          ? "line-through text-neutral-500 dark:text-neutral-400"
-                          : "text-neutral-800 dark:text-neutral-200"
+                          ? "line-through text-neutral-500"
+                          : "text-neutral-800"
                       }`}
                     >
                       {item.text}
@@ -133,7 +133,7 @@ const ToDo = () => {
                   <button
                     onClick={() => deleteTodoItem(item.id)}
                     aria-label={`Delete ${item.text}`}
-                    class="ml-3 p-1.5 rounded-full text-neutral-600 dark:text-neutral-300 hover:bg-red-100/70 dark:hover:bg-red-800/40 hover:text-red-600 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-150"
+                    class="ml-3 p-1.5 rounded-full text-neutral-600 hover:bg-red-100/70 hover:text-red-600 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-all duration-150"
                   >
                     <Trash2 size={16} stroke-width={2} />
                   </button>

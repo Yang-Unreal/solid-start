@@ -4,7 +4,6 @@ import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
 import Nav from "~/components/Nav";
 import "./app.css";
-import ThemeManager from "./components/ThemeManager";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 
@@ -37,7 +36,6 @@ export default function App() {
     <Router
       root={(props) => (
         <QueryClientProvider client={queryClient}>
-          <ThemeManager />
           <MetaProvider>
             <Title>SolidStart App</Title>
             <Nav />

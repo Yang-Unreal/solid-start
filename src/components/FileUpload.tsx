@@ -85,15 +85,15 @@ export function FileUpload() {
   };
 
   return (
-    <div class="max-w-2xl mx-auto p-6 sm:p-8 bg-white dark:bg-black text-neutral-800 dark:text-neutral-300 rounded-lg shadow-lg space-y-6">
-      <h2 class="text-2xl font-bold text-neutral-800 dark:text-neutral-200 mb-6 text-center">
+    <div class="max-w-2xl mx-auto p-6 sm:p-8 bg-white text-neutral-800 rounded-lg shadow-lg space-y-6">
+      <h2 class="text-2xl font-bold text-neutral-800 mb-6 text-center">
         File Upload
       </h2>
 
-      <div class="border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-lg p-8 text-center hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
+      <div class="border-2 border-dashed border-neutral-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
         <div class="mb-4">
           <svg
-            class="mx-auto h-12 w-12 text-neutral-500 dark:text-neutral-400"
+            class="mx-auto h-12 w-12 text-neutral-500"
             stroke="currentColor"
             fill="none"
             viewBox="0 0 48 48"
@@ -123,7 +123,7 @@ export function FileUpload() {
           Choose Files
         </label>
 
-        <p class="text-neutral-600 dark:text-neutral-300 mt-2">
+        <p class="text-neutral-600 mt-2">
           or drag and drop files here
           <br />
           <span class="text-xs">
@@ -134,17 +134,17 @@ export function FileUpload() {
 
       <Show when={files() && files()!.length > 0}>
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-neutral-700 dark:text-neutral-300">
+          <h3 class="text-lg font-semibold text-neutral-700">
             Selected Files:
           </h3>
           <div class="space-y-2">
             <For each={Array.from(files()!)}>
               {(file) => (
-                <div class="flex items-center justify-between p-3 bg-neutral-50 dark:bg-neutral-800 rounded-md">
+                <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-md">
                   <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/70 rounded-full flex items-center justify-center">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                       <svg
-                        class="w-4 h-4 text-blue-600 dark:text-blue-400"
+                        class="w-4 h-4 text-blue-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -156,10 +156,8 @@ export function FileUpload() {
                       </svg>
                     </div>
                     <div>
-                      <p class="font-medium text-neutral-900 dark:text-neutral-100">
-                        {file.name}
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                      <p class="font-medium text-neutral-900">{file.name}</p>
+                      <p class="text-sm text-neutral-600">
                         {formatFileSize(file.size)} •{" "}
                         {file.type || "Unknown type"}
                       </p>
@@ -173,7 +171,7 @@ export function FileUpload() {
           <button
             onClick={uploadFiles}
             disabled={uploading()}
-            class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:bg-neutral-400 dark:disabled:bg-neutral-600 disabled:cursor-not-allowed transition-colors"
+            class="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:bg-neutral-400 disabled:cursor-not-allowed transition-colors"
           >
             {uploading() ? "Uploading..." : "Upload Files"}
           </button>
@@ -181,10 +179,10 @@ export function FileUpload() {
       </Show>
 
       <Show when={error()}>
-        <div class="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-500/70 rounded-md">
+        <div class="p-4 bg-red-50 border border-red-200 rounded-md">
           <div class="flex">
             <svg
-              class="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0"
+              class="w-5 h-5 text-red-500 flex-shrink-0"
               fill="currentColor"
               viewBox="0 0 20 20"
             >
@@ -195,12 +193,8 @@ export function FileUpload() {
               />
             </svg>
             <div class="ml-3">
-              <p class="text-sm text-red-800 dark:text-red-200 font-medium">
-                Upload Error
-              </p>
-              <p class="text-sm text-red-700 dark:text-red-300 mt-1">
-                {error()}
-              </p>
+              <p class="text-sm text-red-800 font-medium">Upload Error</p>
+              <p class="text-sm text-red-700 mt-1">{error()}</p>
             </div>
           </div>
         </div>
@@ -208,17 +202,17 @@ export function FileUpload() {
 
       <Show when={uploadedFiles().length > 0}>
         <div class="space-y-4">
-          <h3 class="text-lg font-semibold text-neutral-700 dark:text-neutral-300">
+          <h3 class="text-lg font-semibold text-neutral-700">
             Uploaded Files:
           </h3>
           <div class="space-y-3">
             <For each={uploadedFiles()}>
               {(file) => (
-                <div class="flex items-center justify-between p-3 sm:p-4 bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-500/70 rounded-md">
+                <div class="flex items-center justify-between p-3 sm:p-4 bg-green-50 border border-green-200 rounded-md">
                   <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-green-100 dark:bg-green-800/70 rounded-full flex items-center justify-center">
+                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
                       <svg
-                        class="w-4 h-4 text-green-600 dark:text-green-400"
+                        class="w-4 h-4 text-green-600"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -230,10 +224,8 @@ export function FileUpload() {
                       </svg>
                     </div>
                     <div>
-                      <p class="font-medium text-neutral-900 dark:text-neutral-100">
-                        {file.name}
-                      </p>
-                      <p class="text-sm text-neutral-600 dark:text-neutral-300">
+                      <p class="font-medium text-neutral-900">{file.name}</p>
+                      <p class="text-sm text-neutral-600">
                         {formatFileSize(file.size)} • Uploaded{" "}
                         {new Date(file.uploadedAt).toLocaleString()}
                       </p>
@@ -243,7 +235,7 @@ export function FileUpload() {
                     href={file.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm"
+                    class="text-blue-600 hover:text-blue-800 font-medium text-sm"
                   >
                     View
                   </a>

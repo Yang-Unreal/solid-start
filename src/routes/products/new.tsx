@@ -190,9 +190,9 @@ const AddProductPage = () => {
     productCreationMutation.mutate(productDataForDB);
   };
 
-  const inputBaseClasses = `block w-full mt-1 py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c] dark:bg-neutral-700 dark:text-neutral-100 dark:border-neutral-600 dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]`;
-  const labelBaseClasses = `block text-sm font-medium text-neutral-700 dark:text-neutral-300`;
-  const fileInputClasses = `mt-1 block w-full text-sm text-neutral-600 dark:text-neutral-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#c2fe0c] file:text-black hover:file:bg-[#a8e00a] dark:file:focus:ring-offset-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed`;
+  const inputBaseClasses = `block w-full mt-1 py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c]`;
+  const labelBaseClasses = `block text-sm font-medium text-neutral-700`;
+  const fileInputClasses = `mt-1 block w-full text-sm text-neutral-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#c2fe0c] file:text-black hover:file:bg-[#a8e00a] disabled:opacity-50 disabled:cursor-not-allowed`;
 
   const fieldError = (fieldName: keyof ProductFormValues) =>
     formErrors()?.[fieldName]?._errors[0];
@@ -207,9 +207,9 @@ const AddProductPage = () => {
       <Show when={!session().isPending && isAuthorized()}>
         <MetaProvider>
           <Title>Add New Product</Title>
-          <main class="bg-neutral-100 dark:bg-neutral-900 p-4 sm:p-6 lg:p-8 flex justify-center items-start min-h-screen">
-            <div class="w-full max-w-2xl bg-white dark:bg-neutral-800 shadow-xl rounded-lg p-6 sm:p-8 my-8">
-              <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-neutral-800 dark:text-neutral-200">
+          <main class="bg-neutral-100 p-4 sm:p-6 lg:p-8 flex justify-center items-start min-h-screen">
+            <div class="w-full max-w-2xl bg-white shadow-xl rounded-lg p-6 sm:p-8 my-8">
+              <h1 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-neutral-800">
                 Create New Product
               </h1>
               <form onSubmit={handleSubmit} class="space-y-5">
@@ -285,7 +285,7 @@ const AddProductPage = () => {
                     }
                   />
                   <Show when={selectedFile() && !fileUploadError()}>
-                    <p class="mt-1 text-xs text-neutral-700 dark:text-neutral-300">
+                    <p class="mt-1 text-xs text-neutral-700">
                       Selected: {selectedFile()!.name} (
                       {(selectedFile()!.size / 1024).toFixed(2)} KB)
                     </p>
@@ -344,14 +344,14 @@ const AddProductPage = () => {
                     formErrors()?._errors?.length && formErrors()?._errors[0]
                   }
                 >
-                  <p class="text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/30 p-3 rounded-md text-center">
+                  <p class="text-sm text-red-700 bg-red-50 p-3 rounded-md text-center">
                     {formErrors()?._errors[0]}
                   </p>
                 </Show>
                 <div class="flex items-center justify-end space-x-4 pt-3">
                   <A
                     href="/products"
-                    class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-500 ${
+                    class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 ${
                       isUploadingImage() || productCreationMutation.isPending
                         ? "opacity-50 cursor-not-allowed"
                         : ""
@@ -371,7 +371,7 @@ const AddProductPage = () => {
                     disabled={
                       isUploadingImage() || productCreationMutation.isPending
                     }
-                    class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-neutral-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-white disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isUploadingImage()
                       ? "Uploading Image..."

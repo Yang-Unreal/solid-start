@@ -1,12 +1,6 @@
 /* src/app.css */
 @import "tailwindcss";
 
-@theme {
-  --breakpoint-3xl: 120rem; /* 1920px */
-}
-
-@custom-variant dark (&:where(.dark, .dark *));
-
 :root {
   --background-rgb: 255, 255, 255;
   --foreground-rgb: 17, 24, 39;
@@ -16,20 +10,6 @@
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-:root.dark {
-  --background-rgb: 0, 0, 0;
-  --foreground-rgb: 229, 231, 235;
-  --accent-hex: #c2fe0c;
-  --accent-rgb: 194, 254, 12;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --background-rgb: 0, 0, 0;
-    --foreground-rgb: 229, 231, 235;
-  }
 }
 
 body {
@@ -42,9 +22,9 @@ body {
 
 @layer components {
   .card-wrapper {
-    @apply bg-white dark:bg-black
+    @apply bg-white
            rounded-lg
-           shadow-lg dark:shadow-xl dark:shadow-neutral-950/50
+           shadow-lg
            p-6 sm:p-8
            flex flex-col items-center justify-center
            space-y-6 sm:space-y-8
@@ -53,17 +33,17 @@ body {
   }
 
   .card-content-host {
-    @apply bg-white dark:bg-black
+    @apply bg-white
            rounded-lg
-           shadow-lg dark:shadow-xl dark:shadow-neutral-950/50
+           shadow-lg
            h-full
            overflow-hidden;
   }
 
   .card-error-boundary-host {
-    @apply bg-white dark:bg-black
+    @apply bg-white
          rounded-lg
-         shadow-lg dark:shadow-xl dark:shadow-neutral-950/50
+         shadow-lg
          h-full
          overflow-hidden
          p-6 sm:p-8;
@@ -118,13 +98,13 @@ body {
     height: 8px;
   }
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-neutral-200 dark:bg-neutral-800 rounded-full;
+    @apply bg-neutral-200 rounded-full;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-neutral-400 dark:bg-neutral-600 rounded-full;
+    @apply bg-neutral-400 rounded-full;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-500 dark:bg-neutral-500;
+    @apply bg-neutral-500;
   }
 
   .product-grid {

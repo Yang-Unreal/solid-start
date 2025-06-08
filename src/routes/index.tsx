@@ -20,27 +20,25 @@ const CounterPageContent = lazy(
 // A reusable, styled fallback UI for suspended components
 const CardFallback = () => (
   <div class="card-wrapper min-h-[400px]">
-    <div class="animate-pulse text-lg text-neutral-400 dark:text-neutral-500">
-      Loading...
-    </div>
+    <div class="animate-pulse text-lg text-neutral-400">Loading...</div>
   </div>
 );
 
 export default function Home() {
   return (
-    <main class=" bg-neutral-100 dark:bg-neutral-900 p-4 sm:p-6 lg:p-8">
+    <main class=" bg-neutral-100 p-4 sm:p-6 lg:p-8">
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
         <div class="card-wrapper">
           <Suspense
             fallback={
-              <div class="animate-pulse h-10 w-40 bg-neutral-200 dark:bg-neutral-700 rounded-lg" />
+              <div class="animate-pulse h-10 w-40 bg-neutral-200 rounded-lg" />
             }
           >
             <Counter />
           </Suspense>
           <Suspense
             fallback={
-              <div class="w-14 h-14 rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse" />
+              <div class="w-14 h-14 rounded-full bg-neutral-200 animate-pulse" />
             }
           >
             <Avatar
@@ -51,7 +49,7 @@ export default function Home() {
           </Suspense>
           <Suspense
             fallback={
-              <div class="animate-pulse h-6 w-24 bg-neutral-200 dark:bg-neutral-700 rounded-full" />
+              <div class="animate-pulse h-6 w-24 bg-neutral-200 rounded-full" />
             }
           >
             <Controlled />

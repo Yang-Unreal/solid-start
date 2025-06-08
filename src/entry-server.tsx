@@ -1,6 +1,4 @@
 import { createHandler, StartServer } from "@solidjs/start/server";
-import { themeInitializerScript } from "./scripts/theme-initializer";
-
 export default createHandler(() => (
   <StartServer
     document={({ assets, children, scripts }) => (
@@ -12,9 +10,8 @@ export default createHandler(() => (
           <meta name="description" content="A SolidStart web application." />
           <link rel="icon" href="/favicon.ico" />
           {assets}
-          <script innerHTML={themeInitializerScript} />
         </head>
-        <body class="bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-slate-100 min-h-screen transition-colors duration-300">
+        <body class="bg-slate-100 text-slate-900 min-h-screen">
           <div id="app">{children}</div>
           {scripts}
         </body>

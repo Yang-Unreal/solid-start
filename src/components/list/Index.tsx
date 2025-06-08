@@ -17,21 +17,21 @@ function IndexList() {
   };
 
   const baseButtonClass =
-    "px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-black";
+    "px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2";
 
   return (
-    <div class="mx-auto p-6 sm:p-8 bg-white dark:bg-black text-neutral-800 dark:text-neutral-300 rounded-lg space-y-6 sm:space-y-8">
-      <h1 class="text-center text-2xl font-medium text-neutral-800 dark:text-neutral-200 mb-5">
+    <div class="mx-auto p-6 sm:p-8 bg-white text-neutral-800 rounded-lg space-y-6 sm:space-y-8">
+      <h1 class="text-center text-2xl font-medium text-neutral-800 mb-5">
         Index List
       </h1>
 
       <form onSubmit={(e) => e.preventDefault()}>
-        <ul class="border border-neutral-200 dark:border-neutral-700 rounded-md overflow-hidden">
+        <ul class="border border-neutral-200 rounded-md overflow-hidden">
           <Index each={inputs()}>
             {(input, index) => {
               const inputId = `item-input-${index}`;
               return (
-                <li class="flex items-center justify-between px-3 py-2.5 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 last:border-b-0">
+                <li class="flex items-center justify-between px-3 py-2.5 bg-white border-b border-neutral-200 last:border-b-0">
                   <Editable.Root
                     defaultValue={input()}
                     onValueChange={(details) =>
@@ -44,11 +44,11 @@ function IndexList() {
                     </Editable.Label>
 
                     <Editable.Area class="flex-grow min-w-0">
-                      <Editable.Preview class="w-full px-2 py-1.5 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800/50 truncate text-neutral-700 dark:text-neutral-300 cursor-text" />
+                      <Editable.Preview class="w-full px-2 py-1.5 rounded-md hover:bg-neutral-100 truncate text-neutral-700 cursor-text" />
                       <Editable.Input
                         id={inputId}
                         name={`item-${index}`}
-                        class="w-full px-2 py-1 rounded-md border border-neutral-300 transition duration-150 ease-in-out bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c] dark:bg-neutral-800 dark:text-neutral-200 dark:border-neutral-600 dark:focus:ring-[#c2fe0c] dark:focus:border-[#c2fe0c]"
+                        class="w-full px-2 py-1 rounded-md border border-neutral-300 transition duration-150 ease-in-out bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c]"
                       />
                     </Editable.Area>
 
@@ -59,11 +59,8 @@ function IndexList() {
                             when={editable().editing}
                             fallback={
                               <Editable.EditTrigger
-                                class={
-                                  `${baseButtonClass}
-                                  text-sky-700 hover:bg-sky-500/10 focus:ring-sky-500
-                                  dark:text-[#c2fe0c] dark:hover:bg-neutral-700` /* ACCESSIBILITY FIX */
-                                }
+                                class={`${baseButtonClass}
+                                  text-sky-700 hover:bg-sky-500/10 focus:ring-sky-500`}
                               >
                                 Edit
                               </Editable.EditTrigger>
@@ -75,7 +72,7 @@ function IndexList() {
                               Save
                             </Editable.SubmitTrigger>
                             <Editable.CancelTrigger
-                              class={`${baseButtonClass} text-neutral-700 border border-neutral-300 hover:bg-neutral-100 focus:ring-neutral-500 dark:text-neutral-300 dark:border-neutral-600 dark:hover:bg-neutral-700/50`}
+                              class={`${baseButtonClass} text-neutral-700 border border-neutral-300 hover:bg-neutral-100 focus:ring-neutral-500`}
                             >
                               Cancel
                             </Editable.CancelTrigger>
