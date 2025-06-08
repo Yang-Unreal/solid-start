@@ -342,7 +342,6 @@ const ProductsPage = () => {
                           src={product.imageUrl!}
                           alt={product.name}
                           class="w-full h-full object-cover"
-                          loading="lazy"
                           onError={(e) =>
                             (e.currentTarget.style.display = "none")
                           }
