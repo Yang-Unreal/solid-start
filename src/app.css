@@ -1,5 +1,6 @@
 /* src/app.css */
-@import "tailwindcss";
+@import "tailwindcss/preflight";
+@import "tailwindcss/utilities";
 
 :root {
   --background-rgb: 255, 255, 255;
