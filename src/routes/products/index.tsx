@@ -1,12 +1,5 @@
 // src/routes/products/index.tsx
-import {
-  For,
-  Show,
-  createSignal,
-  createEffect,
-  onMount,
-  onCleanup,
-} from "solid-js";
+import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
 import { useSearchParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query";
@@ -61,8 +54,6 @@ async function deleteProductApi(
   return response.json();
 }
 
-// THIS FUNCTION MUST ACCURATELY REFLECT THE TAILWIND CSS `grid-cols-*` BREAKPOINTS
-// THIS FUNCTION MUST ACCURATELY REFLECT THE TAILWIND CSS `grid-cols-*` BREAKPOINTS
 const getActiveColumnCount = () => {
   if (typeof window === "undefined") return 4; // SSR fallback (e.g., for 'lg')
 

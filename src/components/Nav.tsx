@@ -16,18 +16,14 @@ export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
   const session = authClient.useSession();
-  let dropdownRef: HTMLLIElement | undefined;
 
   onMount(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
-        // No dropdown to close, so this can be removed or adapted if other dropdowns exist
-      }
-    };
-    document.addEventListener("click", handleClickOutside);
-    onCleanup(() => {
-      document.removeEventListener("click", handleClickOutside);
-    });
+    // No dropdown to close, so this can be removed or adapted if other dropdowns exist
+    // The handleClickOutside function and dropdownRef are not used.
+  });
+  onCleanup(() => {
+    // No dropdown to close, so this can be removed or adapted if other dropdowns exist
+    // The handleClickOutside function and dropdownRef are not used.
   });
 
   const activeLinkClasses = (path: string) => {

@@ -118,7 +118,11 @@ const ToDo = () => {
                     }
                     class="flex items-center shrink-0 w-full group/checkbox cursor-pointer"
                   >
-                    <ArkCheckbox.Control class="w-5 h-5 rounded border transition-colors duration-150 flex items-center justify-center shrink-0 bg-white border-neutral-400 group-data-[state=checked]/checkbox:bg-sky-600 group-data-[state=checked]/checkbox:border-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500" />
+                    <ArkCheckbox.Control class="w-5 h-5 rounded border transition-colors duration-150 flex items-center justify-center shrink-0 bg-white border-neutral-400 group-data-[state=checked]/checkbox:bg-sky-600 group-data-[state=checked]/checkbox:border-sky-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-sky-500">
+                      <Show when={item.completed}>
+                        <Check size={16} class="text-white" stroke-width={3} />
+                      </Show>
+                    </ArkCheckbox.Control>
                     <ArkCheckbox.Label
                       class={`ml-3 flex-grow transition-colors ${
                         item.completed
