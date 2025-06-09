@@ -18,7 +18,27 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden; /* Hide scrollbar to prevent layout shift */
+  /* Removed overflow: hidden to allow scrolling */
+  overflow-y: auto; /* Ensure vertical scrolling is enabled */
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Brave) */
+body::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+body {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* For other browsers that might not support the above, or for a more aggressive hide */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+html::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Brave */
 }
 
 @layer components {

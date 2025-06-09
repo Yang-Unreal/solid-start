@@ -2,6 +2,7 @@
 import { Suspense, lazy, createSignal, onMount, Show } from "solid-js";
 
 // --- Eagerly load all components that are visible above the fold ---
+import HeroSection from "~/components/HeroSection"; // New Hero Section
 import DynamicRender from "~/components/DynamicRender"; // This contains the LCP element
 import Counter from "~/components/Counter";
 import Avatar from "~/components/Avatar";
@@ -36,8 +37,12 @@ export default function Home() {
   });
 
   return (
-    <main class=" bg-neutral-100 p-4 sm:p-6 lg:p-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+    <main class=" bg-neutral-100">
+      {/* New Hero Section */}
+      <HeroSection />
+
+      {/* Original content starts here */}
+      <div class="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
         {/* --- Card 1: Defer Hydration --- */}
         {/* This will initially render a simple placeholder div, which is very cheap. */}
         {/* The actual components will render after the page is interactive. */}
