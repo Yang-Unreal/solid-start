@@ -131,13 +131,4 @@ html::-webkit-scrollbar {
   .product-grid {
     justify-content: center;
   }
-
-  /* Explicit font-size for hero section title to address Lighthouse warning */
-  .hero-title {
-    font-size: clamp(
-      2.5rem,
-      5vw + 1rem,
-      4rem
-    ); /* Responsive font size with explicit base */
-  }
 }
