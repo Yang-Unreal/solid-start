@@ -1,14 +1,14 @@
 // src/routes/index.tsx
 import { Suspense, lazy, createSignal, onMount, Show } from "solid-js";
 
-// --- Eagerly load components visible "above the fold" ---
-import DynamicRender from "~/components/DynamicRender"; // LCP component
+// --- Eagerly load all components that are visible above the fold ---
+import DynamicRender from "~/components/DynamicRender"; // This contains the LCP element
 import Counter from "~/components/Counter";
 import Avatar from "~/components/Avatar";
 import Controlled from "~/components/switch/Controlled";
 import ForList from "~/components/list/For";
 
-// --- Lazy-load components that are "below the fold" ---
+// --- Lazy-load components that are below the fold ---
 const IndexList = lazy(() => import("~/components/list/Index"));
 const PortalExample = lazy(() => import("~/components/Portal"));
 const AnimeTimer = lazy(() => import("~/components/AnimeTimer"));
@@ -18,6 +18,7 @@ const CounterPageContent = lazy(
   () => import("~/components/CounterPageContent")
 );
 
+// A reusable, styled fallback UI for suspended components
 const CardFallback = () => (
   <div class="card-wrapper min-h-[400px]">
     <div class="animate-pulse text-lg text-neutral-400">Loading...</div>
@@ -25,23 +26,24 @@ const CardFallback = () => (
 );
 
 export default function Home() {
-  // Signal to defer rendering of non-LCP components
-  const [canShowOtherComponents, setCanShowOtherComponents] =
-    createSignal(false);
+  // Signal to defer rendering/hydration of non-LCP components
+  const [canShowOthers, setCanShowOthers] = createSignal(false);
 
   // onMount runs on the client after the initial render.
-  // This ensures the LCP content renders first, then we render the rest.
+  // This ensures the LCP content renders first, then we trigger the rest.
   onMount(() => {
-    setCanShowOtherComponents(true);
+    setCanShowOthers(true);
   });
 
   return (
     <main class=" bg-neutral-100 p-4 sm:p-6 lg:p-8">
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
-        {/* Render placeholder for other components initially */}
+        {/* --- Card 1: Defer Hydration --- */}
+        {/* This will initially render a simple placeholder div, which is very cheap. */}
+        {/* The actual components will render after the page is interactive. */}
         <Show
-          when={canShowOtherComponents()}
-          fallback={<div class="card-wrapper min-h-[300px] h-full"></div>}
+          when={canShowOthers()}
+          fallback={<div class="card-wrapper min-h-[300px] h-full" />}
         >
           <div class="card-wrapper">
             <Counter />
@@ -54,15 +56,16 @@ export default function Home() {
           </div>
         </Show>
 
-        {/* This component contains the LCP element and is rendered immediately */}
+        {/* --- Card 2: IMMEDIATE RENDER --- */}
+        {/* This component contains the LCP element and is rendered immediately. */}
         <div class="card-content-host">
           <DynamicRender />
         </div>
 
-        {/* Render placeholder for other components initially */}
+        {/* --- Card 3: Defer Hydration --- */}
         <Show
-          when={canShowOtherComponents()}
-          fallback={<div class="card-content-host min-h-[300px] h-full"></div>}
+          when={canShowOthers()}
+          fallback={<div class="card-content-host min-h-[300px] h-full" />}
         >
           <div class="card-content-host">
             <ForList />
@@ -70,7 +73,8 @@ export default function Home() {
         </Show>
 
         {/* --- Below-the-fold components are still lazy-loaded --- */}
-        <Show when={canShowOtherComponents()}>
+        {/* We also wrap these in the <Show> to ensure they don't trigger downloads until needed */}
+        <Show when={canShowOthers()}>
           <Suspense fallback={<CardFallback />}>
             <div class="card-content-host">
               <IndexList />
