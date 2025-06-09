@@ -37,9 +37,7 @@ export default function Home() {
 
   return (
     <main class=" bg-neutral-100">
-      <section>
-        <HeroSection />
-      </section>
+      <HeroSection />
 
       <div class="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
         <Show when={canShowOthers()}>

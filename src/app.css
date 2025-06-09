@@ -41,15 +41,6 @@ html::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Brave */
 }
 
-@layer base {
-  section h1,
-  nav h1,
-  article h1,
-  aside h1 {
-    @apply text-4xl font-bold tracking-tight md:text-6xl; /* You can choose any default size you like */
-  }
-}
-
 @layer components {
   .card-wrapper {
     @apply bg-white
