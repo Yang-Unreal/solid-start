@@ -2,7 +2,7 @@ import type { Component } from "solid-js";
 
 const HeroSection: Component = () => {
   return (
-    <section class="hero-section flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+    <div class=" flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white">
       <div class="text-center p-4">
         <h1 class="text-4xl font-extrabold tracking-tight md:text-6xl">
           Hello
@@ -11,7 +11,7 @@ const HeroSection: Component = () => {
           This is a subtitle for the hero section.
         </p>
       </div>
-    </section>
+    </div>
   );
 };
 

@@ -38,14 +38,9 @@ export default function Home() {
 
   return (
     <main class=" bg-neutral-100">
-      {/* New Hero Section */}
       <HeroSection />
 
-      {/* Original content starts here */}
       <div class="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
-        {/* --- Card 1: Defer Hydration --- */}
-        {/* This will initially render a simple placeholder div, which is very cheap. */}
-        {/* The actual components will render after the page is interactive. */}
         <Show
           when={canShowOthers()}
           fallback={<div class="card-wrapper min-h-[300px] h-full" />}
