@@ -1,9 +1,6 @@
 // src/routes/index.tsx
 import { Suspense, lazy, createSignal, onMount, Show } from "solid-js";
 
-// --- Eagerly load all components that are visible above the fold ---
-import HeroSection from "~/components/HeroSection"; // New Hero Section
-// --- Lazy-load components that are below the fold ---
 const DynamicRender = lazy(() => import("~/components/DynamicRender")); // This contains the LCP element
 const Counter = lazy(() => import("~/components/Counter"));
 const Avatar = lazy(() => import("~/components/Avatar"));
@@ -37,7 +34,16 @@ export default function Home() {
 
   return (
     <main class=" bg-neutral-100">
-      <HeroSection />
+      <div class=" flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+        <div class="text-center p-4">
+          <h1 class="hero-heading  text-4xl font-bold tracking-tight md:text-6xl">
+            Hello
+          </h1>
+          <p class="mt-4 text-lg md:text-xl text-white/80">
+            This is a subtitle for the hero section.
+          </p>
+        </div>
+      </div>
 
       <div class="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
         <Show when={canShowOthers()}>

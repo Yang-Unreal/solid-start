@@ -74,7 +74,7 @@ export default function DragonflyPage() {
   };
 
   return (
-    <main class="min-h-screen bg-neutral-100 p-4 sm:p-6 lg:p-8 text-center">
+    <main class="pt-20 min-h-screen bg-neutral-100 px-4 sm:px-6 lg:px-8 text-center">
       <Title>SolidStart + DragonflyDB Demo</Title>
       <div class="container mx-auto px-4">
         <h1 class="text-3xl font-bold text-neutral-800 mb-6">

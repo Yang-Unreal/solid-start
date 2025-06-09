@@ -67,7 +67,7 @@ export default function DashboardPage() {
     /* ... same as before ... */
     const handleViewProfile = () => alert("Profile page placeholder");
     return (
-      <div class="flex-grow bg-neutral-100 text-slate-800 min-h-[calc(100vh-4rem)]">
+      <div class="pt-16 flex-grow bg-neutral-100 text-slate-800 min-h-[calc(100vh-4rem)]">
         <main class="w-full max-w-none px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 flex flex-col grow overflow-hidden">
           <div class="flex flex-col h-full">
             <div class="mb-6 sm:mb-8 shrink-0">

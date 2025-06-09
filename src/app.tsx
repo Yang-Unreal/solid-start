@@ -39,7 +39,7 @@ export default function App() {
           <MetaProvider>
             <Title>SolidStart App</Title>
             <Nav />
-            <main class="flex-grow pt-16">
+            <main class="flex-grow">
               <Suspense
                 fallback={
                   <div class="flex justify-center items-center h-64">
