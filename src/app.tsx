@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
       // Prevent refetching on reconnect by default
       refetchOnReconnect: false,
       // Disable the experimental feature that's causing issues
-      experimental_prefetchInRender: true,
+      experimental_prefetchInRender: false,
     },
     mutations: {
       retry: 1,
