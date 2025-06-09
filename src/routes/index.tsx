@@ -3,13 +3,12 @@ import { Suspense, lazy, createSignal, onMount, Show } from "solid-js";
 
 // --- Eagerly load all components that are visible above the fold ---
 import HeroSection from "~/components/HeroSection"; // New Hero Section
-import DynamicRender from "~/components/DynamicRender"; // This contains the LCP element
-import Counter from "~/components/Counter";
-import Avatar from "~/components/Avatar";
-import Controlled from "~/components/switch/Controlled";
-import ForList from "~/components/list/For";
-
 // --- Lazy-load components that are below the fold ---
+const DynamicRender = lazy(() => import("~/components/DynamicRender")); // This contains the LCP element
+const Counter = lazy(() => import("~/components/Counter"));
+const Avatar = lazy(() => import("~/components/Avatar"));
+const Controlled = lazy(() => import("~/components/switch/Controlled"));
+const ForList = lazy(() => import("~/components/list/For"));
 const IndexList = lazy(() => import("~/components/list/Index"));
 const PortalExample = lazy(() => import("~/components/Portal"));
 const AnimeTimer = lazy(() => import("~/components/AnimeTimer"));
@@ -38,38 +37,41 @@ export default function Home() {
 
   return (
     <main class=" bg-neutral-100">
-      <HeroSection />
+      <section>
+        <HeroSection />
+      </section>
 
       <div class="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
-        <Show
-          when={canShowOthers()}
-          fallback={<div class="card-wrapper min-h-[300px] h-full" />}
-        >
-          <div class="card-wrapper">
-            <Counter />
-            <Avatar
-              name="Yang Yang"
-              src="https://minio.limingcn.com/solid-start/cloud.webp"
-              size="md"
-            />
-            <Controlled />
-          </div>
+        <Show when={canShowOthers()}>
+          <Suspense fallback={<CardFallback />}>
+            <div class="card-wrapper">
+              <Counter />
+              <Avatar
+                name="Yang Yang"
+                src="https://minio.limingcn.com/solid-start/cloud.webp"
+                size="md"
+              />
+              <Controlled />
+            </div>
+          </Suspense>
         </Show>
 
-        {/* --- Card 2: IMMEDIATE RENDER --- */}
-        {/* This component contains the LCP element and is rendered immediately. */}
-        <div class="card-content-host">
-          <DynamicRender />
-        </div>
+        {/* --- Card 2: IMMEDIATE RENDER (now lazy-loaded) --- */}
+        <Show when={canShowOthers()}>
+          <Suspense fallback={<CardFallback />}>
+            <div class="card-content-host">
+              <DynamicRender />
+            </div>
+          </Suspense>
+        </Show>
 
-        {/* --- Card 3: Defer Hydration --- */}
-        <Show
-          when={canShowOthers()}
-          fallback={<div class="card-content-host min-h-[300px] h-full" />}
-        >
-          <div class="card-content-host">
-            <ForList />
-          </div>
+        {/* --- Card 3: Defer Hydration (now lazy-loaded) --- */}
+        <Show when={canShowOthers()}>
+          <Suspense fallback={<CardFallback />}>
+            <div class="card-content-host">
+              <ForList />
+            </div>
+          </Suspense>
         </Show>
 
         {/* --- Below-the-fold components are still lazy-loaded --- */}
