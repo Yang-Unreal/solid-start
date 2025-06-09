@@ -4,7 +4,7 @@ const HeroSection: Component = () => {
   return (
     <section class="hero-section flex min-h-screen items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white">
       <div class="text-center p-4">
-        <h1 class="text-5xl font-extrabold leading-tight sm:text-6xl lg:text-7xl">
+        <h1 class="hero-title text-5xl font-extrabold leading-tight sm:text-6xl lg:text-7xl">
           SolidStart Performance
         </h1>
         <p class="mt-4 text-xl sm:text-2xl lg:text-3xl opacity-90">
