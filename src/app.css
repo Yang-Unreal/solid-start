@@ -69,6 +69,11 @@ html::-webkit-scrollbar {
          overflow-hidden
          p-6 sm:p-8;
   }
+
+  .hero-heading {
+    font-size: 2.25rem; /* 36px fallback */
+    font-size: clamp(2.25rem, 5vw, 3.75rem); /* Responsive sizing */
+  }
 }
 
 @layer utilities {
