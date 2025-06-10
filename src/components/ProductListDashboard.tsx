@@ -219,8 +219,6 @@ export default function ProductListDashboard() {
 
   const products = () => productsQuery.data?.data || [];
   const pagination = () => productsQuery.data?.pagination || null;
-  const isLoadingInitial = () =>
-    productsQuery.isLoading && !productsQuery.data && !productsQuery.isError;
   const isFetching = () => productsQuery.isFetching;
   const error = () => productsQuery.error;
 
@@ -289,10 +287,7 @@ export default function ProductListDashboard() {
         </div>
       </Show>
 
-      <Show when={isLoadingInitial()}>
-        <p class="text-center text-neutral-700 py-10">Loading products...</p>
-      </Show>
-      <Show when={error() && !isFetching() && !isLoadingInitial()}>
+      <Show when={error()}>
         <div class="text-center py-10">
           <p class="text-red-600">
             Error: {error()?.message || "An unknown error occurred."}
@@ -309,7 +304,7 @@ export default function ProductListDashboard() {
         </div>
       </Show>
 
-      <Show when={productsQuery.data && !error()}>
+      <Show when={products().length > 0}>
         <div class="overflow-x-auto bg-white shadow-md rounded-lg">
           <table class="min-w-full divide-y divide-neutral-200">
             <thead class="bg-neutral-50">
@@ -412,14 +407,7 @@ export default function ProductListDashboard() {
           </div>
         </Show>
       </Show>
-      <Show
-        when={
-          productsQuery.isSuccess &&
-          !isLoadingInitial() &&
-          !error() &&
-          products().length === 0
-        }
-      >
+      <Show when={products().length === 0 && !isFetching() && !error()}>
         <p class="text-center text-neutral-700 py-10">No products found.</p>
       </Show>
     </div>
