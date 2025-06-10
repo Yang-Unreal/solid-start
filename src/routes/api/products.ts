@@ -4,39 +4,35 @@ import db from "~/db/index";
 import { product as productTable } from "~/db/schema";
 import { asc, desc, count, eq, Column } from "drizzle-orm";
 import { z } from "zod/v4";
+import { kv } from "~/lib/redis"; // Import the Dragonfly/Redis client
 
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
-
-// --- In-memory cache for the GET endpoint ---
-interface Cache {
-  data: string | null;
-  timestamp: number;
-}
-const apiCache: Record<string, Cache> = {};
-const CACHE_DURATION_SECONDS = 60;
+const CACHE_DURATION_SECONDS = 60; // Cache duration for DragonflyDB
 
 // --- GET Handler ---
 export async function GET({ request }: APIEvent) {
   const url = new URL(request.url);
-  const cacheKey = url.searchParams.toString();
-  const cachedEntry = apiCache[cacheKey];
+  const cacheKey = `products:${url.searchParams.toString()}`; // Use a prefix for cache keys
 
-  if (
-    cachedEntry &&
-    Date.now() - cachedEntry.timestamp < CACHE_DURATION_SECONDS * 1000
-  ) {
-    console.log(
-      `API Route: /api/products GET - Cache HIT for key: ${cacheKey}`
-    );
-    return new Response(cachedEntry.data, {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "X-Cache": "HIT",
-        "Cache-Control": `public, max-age=${CACHE_DURATION_SECONDS}`,
-      },
-    });
+  try {
+    const cachedData = await kv.get(cacheKey);
+    if (cachedData) {
+      console.log(
+        `API Route: /api/products GET - Cache HIT for key: ${cacheKey}`
+      );
+      return new Response(cachedData, {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "X-Cache": "HIT",
+          "Cache-Control": `public, max-age=${CACHE_DURATION_SECONDS}`,
+        },
+      });
+    }
+  } catch (cacheError) {
+    console.error(`Redis Cache Read Error for key ${cacheKey}:`, cacheError);
+    // Continue to fetch from DB if cache read fails
   }
 
   console.log(`API Route: /api/products GET - Cache MISS for key: ${cacheKey}`);
@@ -128,10 +124,13 @@ export async function GET({ request }: APIEvent) {
     };
 
     const jsonBody = JSON.stringify(responseBody);
-    apiCache[cacheKey] = {
-      data: jsonBody,
-      timestamp: Date.now(),
-    };
+
+    try {
+      await kv.setex(cacheKey, CACHE_DURATION_SECONDS, jsonBody); // Set with expiry
+    } catch (cacheError) {
+      console.error(`Redis Cache Write Error for key ${cacheKey}:`, cacheError);
+      // Do not block response if cache write fails
+    }
 
     return new Response(jsonBody, {
       status: 200,
@@ -150,7 +149,6 @@ export async function GET({ request }: APIEvent) {
   }
 }
 
-// ... (POST and DELETE handlers remain unchanged)
 const NewProductPayloadSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().trim().nullable().optional(),
@@ -176,8 +174,23 @@ export async function POST({ request }: APIEvent) {
       .insert(productTable)
       .values(validationResult.data)
       .returning();
+
+    // Invalidate all product list caches after a new product is created
+    try {
+      const keys = await kv.keys("products:*");
+      if (keys.length > 0) {
+        await kv.del(...keys);
+        console.log(
+          `API Route: /api/products POST - Invalidated ${keys.length} product cache keys.`
+        );
+      }
+    } catch (cacheError) {
+      console.error("Redis Cache Invalidation Error (POST):", cacheError);
+    }
+
     return new Response(JSON.stringify(insertedProducts[0]), { status: 201 });
   } catch (error) {
+    console.error("API Route POST Error:", error);
     return new Response(
       JSON.stringify({ error: "Failed to create product." }),
       { status: 500 }
@@ -205,6 +218,20 @@ export async function DELETE({ request }: APIEvent) {
         status: 404,
       });
     }
+
+    // Invalidate all product list caches after a product is deleted
+    try {
+      const keys = await kv.keys("products:*");
+      if (keys.length > 0) {
+        await kv.del(...keys);
+        console.log(
+          `API Route: /api/products DELETE - Invalidated ${keys.length} product cache keys.`
+        );
+      }
+    } catch (cacheError) {
+      console.error("Redis Cache Invalidation Error (DELETE):", cacheError);
+    }
+
     return new Response(
       JSON.stringify({
         message: "Product deleted.",
@@ -213,6 +240,7 @@ export async function DELETE({ request }: APIEvent) {
       { status: 200 }
     );
   } catch (error) {
+    console.error("API Route DELETE Error:", error);
     return new Response(
       JSON.stringify({ error: "Failed to delete product." }),
       { status: 500 }
