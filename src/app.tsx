@@ -3,7 +3,6 @@ import { Router, useLocation } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
 import Nav from "~/components/Nav";
-import LoadingSpinner from "~/components/LoadingSpinner";
 import "./app.css";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
@@ -45,9 +44,7 @@ export default function App() {
               <Title>SolidStart App</Title>
               {showNav() && <Nav />}
               <main class="flex-grow">
-                <Suspense fallback={<LoadingSpinner />}>
-                  {props.children}
-                </Suspense>
+                <Suspense fallback={null}>{props.children}</Suspense>
               </main>
             </MetaProvider>
           </QueryClientProvider>
