@@ -2,8 +2,7 @@
 import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
 import { useSearchParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query";
-import { PlusCircle, Trash2 } from "lucide-solid";
+import { useQuery, useQueryClient } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 
 export interface Product {
@@ -36,23 +35,6 @@ interface ApiResponse {
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const TARGET_ROWS_ON_PAGE = 3;
 const MAX_API_PAGE_SIZE = 100;
-
-async function deleteProductApi(
-  productId: string
-): Promise<{ message: string; product: Product }> {
-  const fetchUrl = `/api/products?id=${productId}`;
-  const response = await fetch(fetchUrl, { method: "DELETE" });
-  if (!response.ok) {
-    const errorData = await response
-      .json()
-      .catch(() => ({ error: "Failed to parse error response from server" }));
-    throw new Error(
-      errorData.error ||
-        `Error deleting product: ${response.status} ${response.statusText}`
-    );
-  }
-  return response.json();
-}
 
 const getActiveColumnCount = () => {
   if (typeof window === "undefined") return 4; // SSR fallback (e.g., for 'lg')
@@ -227,36 +209,6 @@ const ProductsPage = () => {
   const isFetching = () => productsQuery.isFetching;
   const error = () => productsQuery.error;
 
-  const [deleteError, setDeleteError] = createSignal<string | null>(null);
-  const [showSuccessMessage, setShowSuccessMessage] = createSignal<
-    string | null
-  >(null);
-
-  const deleteProductMutation = useMutation(() => ({
-    mutationFn: deleteProductApi,
-    onSuccess: (data, variables) => {
-      setShowSuccessMessage(
-        `Product "${data.product.name}" deleted successfully.`
-      );
-      tanstackQueryClient.invalidateQueries({
-        queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
-      });
-      setDeleteError(null);
-      setTimeout(() => setShowSuccessMessage(null), 3000);
-    },
-    onError: (err: Error) => {
-      setDeleteError(err.message || "An unknown error occurred.");
-      setShowSuccessMessage(null);
-      setTimeout(() => setDeleteError(null), 5000);
-    },
-  }));
-  const handleDeleteProduct = (productId: string, productName: string) => {
-    if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
-      setDeleteError(null);
-      setShowSuccessMessage(null);
-      deleteProductMutation.mutate(productId);
-    }
-  };
   const handlePageChange = (newPage: number) => {
     setSearchParams({
       page: newPage.toString(),
@@ -267,35 +219,14 @@ const ProductsPage = () => {
   const formatPrice = (priceInCents: number) =>
     `$${(priceInCents / 100).toFixed(2)}`;
   const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed`;
-  const userRole = () =>
-    (session()?.data?.user as { role?: string } | undefined)?.role;
 
   return (
     <MetaProvider>
-      <Title>Our Products</Title>
-      <main class="bg-neutral-100 p-4 sm:p-6 lg:p-8 min-h-[calc(100vh-4rem)]">
+      <main class="bg-neutral-100 pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="flex justify-between items-center mb-8">
           <h1 class="text-3xl font-bold text-neutral-800">Our Products</h1>
-          <Show when={!session().isPending && userRole() === "admin"}>
-            <A
-              href="/products/new"
-              class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100"
-            >
-              <PlusCircle size={18} class="mr-2" /> Add Product
-            </A>
-          </Show>
         </div>
 
-        <Show when={showSuccessMessage()}>
-          <div class="mb-4 p-3 rounded-md bg-green-100 text-green-700 border border-green-300">
-            {showSuccessMessage()}
-          </div>
-        </Show>
-        <Show when={deleteError()}>
-          <div class="mb-4 p-3 rounded-md bg-red-100 text-red-700 border border-red-300">
-            Error: {deleteError()}
-          </div>
-        </Show>
         <Show when={isLoadingInitial()}>
           <p class="text-center text-xl text-neutral-700 py-10">
             Loading products...
@@ -364,28 +295,6 @@ const ProductsPage = () => {
                           Stock: {product.stockQuantity}
                         </p>
                       </div>
-                      <Show
-                        when={!session().isPending && userRole() === "admin"}
-                      >
-                        <div class="mt-4 pt-3 border-t border-neutral-200">
-                          <button
-                            onClick={() =>
-                              handleDeleteProduct(product.id, product.name)
-                            }
-                            disabled={
-                              deleteProductMutation.isPending &&
-                              deleteProductMutation.variables === product.id
-                            }
-                            class="w-full flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-100  focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2"
-                          >
-                            <Trash2 size={16} class="mr-2" />
-                            {deleteProductMutation.isPending &&
-                            deleteProductMutation.variables === product.id
-                              ? "Deleting..."
-                              : "Delete Product"}
-                          </button>
-                        </div>
-                      </Show>
                     </div>
                   </div>
                 )}

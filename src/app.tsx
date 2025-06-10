@@ -1,5 +1,5 @@
 // src/app.tsx
-import { Router } from "@solidjs/router";
+import { Router, useLocation } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import { Suspense } from "solid-js";
 import Nav from "~/components/Nav";
@@ -34,25 +34,30 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <Router
-      root={(props) => (
-        <QueryClientProvider client={queryClient}>
-          <MetaProvider>
-            <Title>SolidStart App</Title>
-            <Nav />
-            <main class="flex-grow">
-              <Suspense
-                fallback={
-                  <div class="flex justify-center items-center h-64">
-                    Loading...
-                  </div>
-                }
-              >
-                {props.children}
-              </Suspense>
-            </main>
-          </MetaProvider>
-        </QueryClientProvider>
-      )}
+      root={(props) => {
+        const location = useLocation();
+        const showNav = () => location.pathname !== "/dashboard";
+
+        return (
+          <QueryClientProvider client={queryClient}>
+            <MetaProvider>
+              <Title>SolidStart App</Title>
+              {showNav() && <Nav />}
+              <main class="flex-grow">
+                <Suspense
+                  fallback={
+                    <div class="flex justify-center items-center h-64">
+                      Loading...
+                    </div>
+                  }
+                >
+                  {props.children}
+                </Suspense>
+              </main>
+            </MetaProvider>
+          </QueryClientProvider>
+        );
+      }}
     >
       <FileRoutes />
     </Router>

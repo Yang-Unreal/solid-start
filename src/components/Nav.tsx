@@ -1,30 +1,14 @@
-import { createSignal, onMount, onCleanup, Show } from "solid-js";
-import { useLocation, A, useNavigate } from "@solidjs/router";
+import { createSignal, Show } from "solid-js";
+import { useLocation, A } from "@solidjs/router";
 import {
-  LogOut,
-  LogIn,
-  UserPlus,
-  LayoutDashboard,
   AlignJustify, // Changed for mobile menu
   MenuSquare, // Changed for mobile menu close icon
 } from "lucide-solid";
-import { authClient } from "~/lib/auth-client";
 
 const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false); // New state for mobile menu
 
 export default function Nav() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const session = authClient.useSession();
-
-  onMount(() => {
-    // No dropdown to close, so this can be removed or adapted if other dropdowns exist
-    // The handleClickOutside function and dropdownRef are not used.
-  });
-  onCleanup(() => {
-    // No dropdown to close, so this can be removed or adapted if other dropdowns exist
-    // The handleClickOutside function and dropdownRef are not used.
-  });
 
   const activeLinkClasses = (path: string) => {
     // ACCESSIBILITY FIX: Using compliant colors for both light and dark modes.
@@ -36,13 +20,7 @@ export default function Nav() {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen());
   };
-  const handleLogout = async () => {
-    await authClient.signOut();
-    navigate("/login", { replace: true });
-  };
 
-  const authIconSize = 18;
-  const iconBaseClass = "text-neutral-600";
   const linkBaseClass = "text-sm flex items-center";
 
   return (
@@ -93,49 +71,7 @@ export default function Nav() {
         </ul>
 
         {/* Right-aligned items (Auth) - always visible in desktop */}
-        <ul class="flex items-center space-x-3 sm:space-x-4 ml-auto">
-          <Show when={!session().isPending && session().data?.user}>
-            <li class="hidden sm:block mx-1.5 sm:mx-3">
-              <A
-                href="/dashboard"
-                class={`${activeLinkClasses("/dashboard")} ${linkBaseClass}`}
-              >
-                <LayoutDashboard size={authIconSize} class="mr-1 sm:mr-2" />
-                Dashboard
-              </A>
-            </li>
-            <li class="hidden sm:block mx-1.5 sm:mx-3">
-              <button
-                onClick={handleLogout}
-                class={`${linkBaseClass} text-neutral-600 hover:text-sky-700 font-medium`}
-                aria-label="Logout"
-              >
-                <LogOut size={authIconSize} class="mr-1 sm:mr-2" />
-                Logout
-              </button>
-            </li>
-          </Show>
-          <Show when={!session().isPending && !session().data?.user}>
-            <li class="hidden sm:block mx-1.5 sm:mx-3">
-              <A
-                href="/login"
-                class={`${activeLinkClasses("/login")} ${linkBaseClass}`}
-              >
-                <LogIn size={authIconSize} class="mr-1 sm:mr-2" />
-                Sign In
-              </A>
-            </li>
-            <li class="hidden sm:block mx-1.5 sm:mx-3">
-              <A
-                href="/signup"
-                class={`${activeLinkClasses("/signup")} ${linkBaseClass}`}
-              >
-                <UserPlus size={authIconSize} class="mr-1 sm:mr-2" />
-                Sign Up
-              </A>
-            </li>
-          </Show>
-        </ul>
+        <ul class="flex items-center space-x-3 sm:space-x-4 ml-auto"></ul>
       </div>
 
       {/* Mobile Menu Button (Hamburger/Close) - Always top right on mobile */}
@@ -178,27 +114,6 @@ export default function Nav() {
           </ul>
 
           <div class="flex flex-col items-center space-y-4 text-neutral-800 text-lg">
-            <Show when={!session().isPending && session().data?.user}>
-              <A href="/dashboard" onClick={toggleMobileMenu}>
-                Dashboard
-              </A>
-              <button
-                onClick={() => {
-                  handleLogout();
-                  toggleMobileMenu();
-                }}
-              >
-                Logout
-              </button>
-            </Show>
-            <Show when={!session().isPending && !session().data?.user}>
-              <A href="/login" onClick={toggleMobileMenu}>
-                Sign In
-              </A>
-              <A href="/signup" onClick={toggleMobileMenu}>
-                Sign Up
-              </A>
-            </Show>
             {/* Placeholder for language/privacy notice */}
             <div class="pt-8 text-sm text-neutral-600">
               <span>Deutsch | English</span>
