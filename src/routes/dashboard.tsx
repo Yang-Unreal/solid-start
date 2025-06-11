@@ -9,15 +9,8 @@ import ProductListDashboard from "~/components/ProductListDashboard";
 export default function DashboardPage() {
   const sessionSignal = authClient.useSession();
   const navigate = useNavigate();
-  const [activeContent, setActiveContent] = createSignal("user"); // 'user' or 'products'
-
-  // This signal will determine if we are ready to show actual content or redirect.
-  // It starts false, and only becomes true when the session is resolved on the client.
-  const [isSessionResolvedOnClient, setIsSessionResolvedOnClient] =
-    createSignal(false);
-
+  const [activeContent, setActiveContent] = createSignal("user");
   onMount(() => {
-    // This runs only on the client, after the initial render
     setActiveContent(localStorage.getItem("dashboardActiveContent") || "user");
 
     createEffect(() => {
@@ -25,43 +18,17 @@ export default function DashboardPage() {
     });
 
     const currentSession = sessionSignal();
-    console.log(
-      "DashboardPage: Client Mounted - Initial Session: isPending:",
-      currentSession.isPending,
-      "hasUser:",
-      !!currentSession.data?.user
-    );
-    if (!currentSession.isPending) {
-      setIsSessionResolvedOnClient(true); // Session was already resolved (e.g., from cache or SSR data)
-      if (!currentSession.data?.user) {
-        navigate("/login", { replace: true });
-      }
+    if (!currentSession.isPending && !currentSession.data?.user) {
+      navigate("/login", { replace: true });
     }
   });
 
   createEffect(() => {
     const currentSession = sessionSignal();
-    console.log(
-      "DashboardPage: Session Signal Changed - isPending:",
-      currentSession.isPending,
-      "hasUser:",
-      !!currentSession.data?.user
-    );
-
-    if (!currentSession.isPending) {
-      setIsSessionResolvedOnClient(true); // Session has now resolved
-      if (!currentSession.data?.user) {
-        // Ensure navigation happens after this effect's batch
-        queueMicrotask(() => {
-          console.log(
-            "DashboardPage: Effect (deferred) - No user session, navigating to /login."
-          );
-          navigate("/login", { replace: true });
-        });
-      }
-    } else {
-      // If session becomes pending again (e.g. due to refetch), reset resolved state
-      setIsSessionResolvedOnClient(false);
+    if (!currentSession.isPending && !currentSession.data?.user) {
+      queueMicrotask(() => {
+        navigate("/login", { replace: true });
+      });
     }
   });
 
@@ -79,12 +46,8 @@ export default function DashboardPage() {
             <div class="flex flex-col h-full">
               <Show when={activeContent() === "user"}>
                 <div class="w-full h-full">
-                  {" "}
-                  {/* Removed flex justify-center items-start */}
                   <Show when={sessionSignal().data?.user}>
                     <div class="p-6 h-full w-full">
-                      {" "}
-                      {/* Removed card styles */}
                       <div class="flex flex-col items-center">
                         <Show
                           when={sessionSignal().data?.user?.image}
