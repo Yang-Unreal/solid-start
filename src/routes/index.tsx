@@ -44,12 +44,12 @@ export default function Home() {
         >
           {/* Modern, efficient format first */}
           <source
-            src="https://minio.limingcn.com/solid-start/benz.webm"
+            src="https://minio.limingcn.com/solid-start/benz1.webm"
             type="video/webm"
           />
           {/* Universal fallback format second */}
           <source
-            src="https://minio.limingcn.com/solid-start/benz.mp4"
+            src="https://minio.limingcn.com/solid-start/benz1.mp4"
             type="video/mp4"
           />
           Your browser does not support the video tag.
