@@ -1,8 +1,8 @@
 // src/routes/dashboard.tsx
-import { createEffect, Show, onMount, createSignal, Suspense } from "solid-js";
+import { createEffect, Show, onMount, createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { authClient } from "~/lib/auth-client";
-import { UserCircle } from "lucide-solid";
+import { UserCircle, Menu } from "lucide-solid"; // Removed X
 import SideNav from "~/components/SideNav";
 import ProductListDashboard from "~/components/ProductListDashboard";
 
@@ -10,6 +10,8 @@ export default function DashboardPage() {
   const sessionSignal = authClient.useSession();
   const navigate = useNavigate();
   const [activeContent, setActiveContent] = createSignal("user");
+  const [sideNavOpen, setSideNavOpen] = createSignal(false);
+
   onMount(() => {
     setActiveContent(localStorage.getItem("dashboardActiveContent") || "user");
 
@@ -34,59 +36,96 @@ export default function DashboardPage() {
 
   const DashboardContent = () => {
     const handleViewProfile = () => alert("Profile page placeholder");
+
     return (
-      <div class="flex">
-        <SideNav
-          onProductClick={() => setActiveContent("products")}
-          onUserClick={() => setActiveContent("user")}
-          onLogoutSuccess={() => navigate("/login", { replace: true })}
-        />
-        <div class="flex-grow bg-neutral-100 text-slate-800 min-h-screen ml-64">
-          <main class="w-full max-w-none px-4 sm:px-6 lg:px-8 py-4 sm:py-6  flex flex-col grow overflow-hidden">
-            <div class="flex flex-col h-full">
-              <Show when={activeContent() === "user"}>
-                <div class="w-full h-full">
-                  <Show when={sessionSignal().data?.user}>
-                    <div class="p-6 h-full w-full">
-                      <div class="flex flex-col items-center">
-                        <Show
-                          when={sessionSignal().data?.user?.image}
-                          fallback={
-                            <UserCircle
-                              size={80}
-                              class="text-neutral-500 mb-4"
-                            />
-                          }
-                        >
-                          {(imageAccessor) => (
-                            <img
-                              src={imageAccessor()}
-                              alt="User avatar"
-                              class="w-24 h-24 rounded-full mb-4 object-cover border-2 border-neutral-200"
-                            />
-                          )}
-                        </Show>
-                        <h2 class="text-xl font-semibold text-neutral-800">
-                          {sessionSignal().data?.user?.name || "User"}
-                        </h2>
-                        <p class="text-sm text-neutral-600">
-                          {sessionSignal().data?.user?.email}
-                        </p>
-                        <button
-                          onClick={handleViewProfile}
-                          class="mt-6 px-5 py-2.5 text-sm font-medium text-black rounded-lg bg-[#c2fe0c] hover:bg-[#a8e00a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#c2fe0c]"
-                        >
-                          View Profile
-                        </button>
-                      </div>
+      <div class="flex h-screen bg-neutral-100">
+        {/* Mobile Menu Button */}
+        <button
+          id="mobile-menu-button"
+          onClick={() => setSideNavOpen(true)}
+          class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow-md border border-neutral-200 hover:bg-neutral-50"
+          aria-label="Open menu"
+        >
+          <Menu size={20} />
+        </button>
+
+        {/* Mobile Overlay */}
+        <Show when={sideNavOpen()}>
+          <div
+            class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+            onClick={() => setSideNavOpen(false)}
+          />
+        </Show>
+
+        {/* Sidebar */}
+        <div
+          id="mobile-sidebar"
+          class={`
+            fixed md:static inset-y-0 left-0 z-40
+            w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out
+            ${
+              sideNavOpen()
+                ? "translate-x-0"
+                : "-translate-x-full md:translate-x-0"
+            }
+          `}
+        >
+          <SideNav
+            onClose={() => setSideNavOpen(false)}
+            onProductClick={() => {
+              setActiveContent("products");
+              setSideNavOpen(false); // Close on mobile after selection
+            }}
+            onUserClick={() => {
+              setActiveContent("user");
+              setSideNavOpen(false); // Close on mobile after selection
+            }}
+            onLogoutSuccess={() => navigate("/login", { replace: true })}
+          />
+        </div>
+
+        {/* Main Content */}
+        <div class="flex-1 flex flex-col min-w-0">
+          <main class="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pt-16 md:pt-4">
+            <Show when={activeContent() === "user"}>
+              <div class="w-full h-full">
+                <Show when={sessionSignal().data?.user}>
+                  <div class="p-6 h-full w-full">
+                    <div class="flex flex-col items-center max-w-md mx-auto">
+                      <Show
+                        when={sessionSignal().data?.user?.image}
+                        fallback={
+                          <UserCircle size={80} class="text-neutral-500 mb-4" />
+                        }
+                      >
+                        {(imageAccessor) => (
+                          <img
+                            src={imageAccessor()}
+                            alt="User avatar"
+                            class="w-20 h-20 sm:w-24 sm:h-24 rounded-full mb-4 object-cover border-2 border-neutral-200"
+                          />
+                        )}
+                      </Show>
+                      <h2 class="text-xl font-semibold text-neutral-800 text-center">
+                        {sessionSignal().data?.user?.name || "User"}
+                      </h2>
+                      <p class="text-sm text-neutral-600 text-center break-all">
+                        {sessionSignal().data?.user?.email}
+                      </p>
+                      <button
+                        onClick={handleViewProfile}
+                        class="mt-6 px-5 py-2.5 text-sm font-medium text-black rounded-lg bg-[#c2fe0c] hover:bg-[#a8e00a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#c2fe0c]"
+                      >
+                        View Profile
+                      </button>
                     </div>
-                  </Show>
-                </div>
-              </Show>
-              <Show when={activeContent() === "products"}>
-                <ProductListDashboard />
-              </Show>
-            </div>
+                  </div>
+                </Show>
+              </div>
+            </Show>
+            <Show when={activeContent() === "products"}>
+              <ProductListDashboard />
+            </Show>
           </main>
         </div>
       </div>

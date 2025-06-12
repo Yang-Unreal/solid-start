@@ -1,7 +1,7 @@
 import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
-import { useSearchParams, A, useNavigate } from "@solidjs/router"; // Add A and useNavigate
-import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query"; // Add useMutation and useQueryClient
-import { PlusCircle, Trash2 } from "lucide-solid"; // Add icons
+import { useSearchParams, A, useNavigate } from "@solidjs/router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query";
+import { PlusCircle, Trash2, Package } from "lucide-solid";
 
 export interface Product {
   id: string;
@@ -52,40 +52,31 @@ async function deleteProductApi(
 }
 
 const getActiveColumnCount = () => {
-  if (typeof window === "undefined") return 4; // SSR fallback (e.g., for 'lg')
-
+  if (typeof window === "undefined") return 4;
   const screenWidth = window.innerWidth;
-
-  // Pixel values for breakpoints:
-  // Default Tailwind: sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px
-
-  // Order from largest to smallest is important.
-  if (screenWidth >= 1920) return 6; // Matches custom `3xl:grid-cols-6`
-  if (screenWidth >= 1536) return 5; // Matches `2xl:grid-cols-5`
-  if (screenWidth >= 1280) return 4; // Matches `xl:grid-cols-4`
-  if (screenWidth >= 1024) return 4; // Matches `lg:grid-cols-4`
-  if (screenWidth >= 768) return 3; // Matches `md:grid-cols-3`
-  if (screenWidth >= 640) return 2; // Matches `sm:grid-cols-2`
-  return 1; // Default `grid-cols-1`
+  if (screenWidth >= 1920) return 6;
+  if (screenWidth >= 1536) return 5;
+  if (screenWidth >= 1280) return 4;
+  if (screenWidth >= 1024) return 4;
+  if (screenWidth >= 768) return 3;
+  if (screenWidth >= 640) return 2;
+  return 1;
 };
 
 const calculatePageSize = () => {
   const columns = getActiveColumnCount();
   let newPageSize = columns * TARGET_ROWS_ON_PAGE;
-
   if (newPageSize === 0 && columns > 0) newPageSize = columns;
   if (newPageSize < columns && columns > 0) newPageSize = columns;
-
   const absoluteMinPageSize = Math.max(6, columns);
   newPageSize = Math.max(newPageSize, absoluteMinPageSize);
-
   return Math.min(newPageSize, MAX_API_PAGE_SIZE);
 };
 
 export default function ProductListDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate(); // Add navigate
-  const tanstackQueryClient = useQueryClient(); // Add queryClient
+  const navigate = useNavigate();
+  const tanstackQueryClient = useQueryClient();
 
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
@@ -305,7 +296,63 @@ export default function ProductListDashboard() {
       </Show>
 
       <Show when={products().length > 0}>
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg">
+        {/* Mobile List View */}
+        <div class="block md:hidden space-y-3">
+          <For each={products()}>
+            {(product) => (
+              <div class="bg-white rounded-lg shadow p-3 flex items-center space-x-4">
+                <div class="flex-shrink-0 w-24">
+                  <Show
+                    when={product.imageUrl}
+                    fallback={
+                      <div class="w-full aspect-video bg-neutral-100 rounded-md flex items-center justify-center">
+                        <Package size={24} class="text-neutral-400" />
+                      </div>
+                    }
+                  >
+                    <img
+                      src={product.imageUrl!}
+                      alt={product.name}
+                      class="w-full aspect-video rounded-md object-cover"
+                    />
+                  </Show>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-bold text-neutral-800 truncate">
+                    {product.name}
+                  </p>
+                  <p class="text-sm text-neutral-500">
+                    {product.category || "N/A"}
+                  </p>
+                  <p class="text-sm font-semibold text-neutral-700">
+                    {formatPrice(product.priceInCents)}
+                  </p>
+                </div>
+                <div class="flex flex-col items-center space-y-2">
+                  <span class="text-xs text-neutral-500">
+                    Stock: {product.stockQuantity}
+                  </span>
+                  <button
+                    onClick={() =>
+                      handleDeleteProduct(product.id, product.name)
+                    }
+                    disabled={
+                      deleteProductMutation.isPending &&
+                      deleteProductMutation.variables === product.id
+                    }
+                    class="p-1 rounded-md text-red-600 hover:bg-red-50 hover:text-red-800 disabled:opacity-50"
+                    aria-label={`Delete ${product.name}`}
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </For>
+        </div>
+
+        {/* Desktop Table View */}
+        <div class="hidden md:block overflow-x-auto bg-white shadow-md rounded-lg">
           <table class="min-w-full divide-y divide-neutral-200">
             <thead class="bg-neutral-50">
               <tr>
