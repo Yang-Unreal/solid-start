@@ -84,9 +84,7 @@ export default function DashboardPage() {
                 </div>
               </Show>
               <Show when={activeContent() === "products"}>
-                <Suspense fallback={null}>
-                  <ProductListDashboard />
-                </Suspense>
+                <ProductListDashboard />
               </Show>
             </div>
           </main>
