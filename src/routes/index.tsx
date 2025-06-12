@@ -1,6 +1,8 @@
 // src/routes/index.tsx
 import { Suspense, lazy, createSignal, onMount, Show } from "solid-js";
 
+// ... (your lazy imports remain the same) ...
+
 const DynamicRender = lazy(() => import("~/components/DynamicRender"));
 const Counter = lazy(() => import("~/components/Counter"));
 const Avatar = lazy(() => import("~/components/Avatar"));
@@ -29,25 +31,27 @@ export default function Home() {
   });
 
   return (
-    <main class="bg-neutral-100">
+    <main>
       {/* --- HERO SECTION WITH VIDEO BACKGROUND --- */}
-      <div class="relative flex min-h-screen items-center justify-center overflow-hidden text-white">
+      {/*
+        CHANGE: Replaced 'min-h-screen' with responsive height classes.
+        - h-[60vh]: Sets the height to 60% of the viewport height on mobile.
+        - md:min-h-screen: Overrides this for medium screens and up to restore the fullscreen effect.
+      */}
+      <div class="relative flex h-[60vh] md:min-h-screen items-end justify-center overflow-hidden text-white bg-black">
         {/* The Video Background */}
         <video
           autoplay
           loop
           muted
           playsinline
-          // CRITICAL: Create and add a poster image for fast perceived load times.
           poster="https://minio.limingcn.com/solid-start/poster.webp"
           class="absolute top-0 left-0 z-0 h-full w-full object-cover"
         >
-          {/* Modern, efficient format first */}
           <source
             src="https://minio.limingcn.com/solid-start/benz1.webm"
             type="video/webm"
           />
-          {/* Universal fallback format second */}
           <source
             src="https://minio.limingcn.com/solid-start/benz1.mp4"
             type="video/mp4"
@@ -55,11 +59,8 @@ export default function Home() {
           Your browser does not support the video tag.
         </video>
 
-        {/* Overlay to darken the video for better text readability */}
-        <div class="absolute top-0 left-0 z-10 h-full w-full bg-black/50"></div>
-
         {/* The Text Content */}
-        <div class="relative z-20 text-center p-4">
+        <div class="relative z-20 text-center p-4 pb-20 sm:pb-24">
           <h1 class="hero-heading text-4xl font-bold tracking-tight md:text-6xl">
             Hello
           </h1>
@@ -70,7 +71,7 @@ export default function Home() {
       </div>
 
       {/* --- Rest of the page content remains the same --- */}
-      <div class="p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+      <div class="bg-neutral-100 p-4 sm:p-6 lg:p-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
         <Show when={canShowOthers()}>
           <Suspense fallback={<CardFallback />}>
             <div class="card-wrapper">
@@ -85,6 +86,7 @@ export default function Home() {
           </Suspense>
         </Show>
 
+        {/* ... (Rest of your Show/Suspense components remain the same) ... */}
         <Show when={canShowOthers()}>
           <Suspense fallback={<CardFallback />}>
             <div class="card-content-host">
