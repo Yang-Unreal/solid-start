@@ -3,8 +3,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 async function uploadCloudWebp() {
-  const filePath = path.join(process.cwd(), "public", "cloud.webp");
-  const key = "cloud.webp"; // This should match the URL in index.tsx
+  const filePath = path.join(process.cwd(), "public", "poster.webp");
+  const key = "poster.webp"; // This should match the URL in index.tsx
   const contentType = "image/webp";
   const cacheControl = "public, max-age=31536000, immutable"; // 1 year cache
 
