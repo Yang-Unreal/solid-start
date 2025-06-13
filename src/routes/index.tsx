@@ -24,27 +24,24 @@ export default function Home() {
         </video>
 
         {/* The Text Content Card */}
-        {/* 
-          CHANGE: Added responsive max-width classes.
-          - `max-w-md`: Default for mobile, keeps the card compact.
-          - `lg:max-w-xl`: Increases size for large desktops.
-          - `2xl:max-w-3xl`: Increases size again for very high-res screens.
+        {/*
+          CHANGE 1: Removed max-width on large screens and made margins responsive.
+          - `lg:max-w-none`: Removes the max-width constraint on large screens.
+          - `lg:mx-[5vw]`: Sets horizontal margin to 5% of the viewport width.
         */}
         <div
-          class="relative z-20 mt-24 mx-4 md:mt-32 md:mx-16 lg:mx-20 
-                 max-w-md lg:max-w-xl 2xl:max-w-3xl
+          class="relative z-20 mt-24 mx-4 md:mt-32 lg:mx-[5vw] max-w-md lg:max-w-none
                  text-left p-4 sm:p-6 bg-black/50 
                  shadow-xl"
         >
+          {/* CHANGE 2: Significantly increased the scaling and max size of the fonts. */}
           <h1 class="flex flex-col font-bold tracking-tight text-shadow-md leading-tight">
-            <span class="text-[clamp(0.875rem,2.5vw,1.25rem)]">
+            <span class="text-[clamp(0.875rem,4vw,2.5rem)]">
               LET THE HIDDEN PEARLS
             </span>
-            <div class="w-16 h-[1px] bg-red-600 my-1.5"></div>
-            <span class="text-[clamp(1.875rem,6vw,3rem)]">SHINE</span>
-            <span class="text-[clamp(0.875rem,2.5vw,1.25rem)]">
-              FOR THE WORLD
-            </span>
+            <div class="w-16 h-[0.5px] bg-red-600 my-1.5"></div>
+            <span class="text-[clamp(1.875rem,10vw,7.5rem)]">SHINE</span>
+            <span class="text-[clamp(0.875rem,4vw,2.5rem)]">FOR THE WORLD</span>
           </h1>
         </div>
       </div>

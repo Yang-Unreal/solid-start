@@ -219,7 +219,7 @@ const ProductsPage = () => {
 
   return (
     <MetaProvider>
-      <main class="bg-neutral-100 pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
+      <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <Show when={isLoadingInitial()}>
           <p class="text-center text-xl text-neutral-700 py-10">
             Loading products...
