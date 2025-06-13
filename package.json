@@ -7,7 +7,9 @@
     "start": "vinxi start",
     "db:seed": "tsx ./src/scripts/seed.ts",
     "studio": "bunx drizzle-kit studio",
-    "db:push": "npx drizzle-kit push"
+    "db:push": "npx drizzle-kit push",
+    "uploadVideos": "./src/scripts/uploadVideos.ts",
+    "uploadImages": "./src/scripts/uploadImages.ts"
   },
   "dependencies": {
     "@ark-ui/solid": "^5.12.0",

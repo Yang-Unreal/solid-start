@@ -5,11 +5,11 @@ import * as path from "path";
 // Array of video files to upload
 const videosToUpload = [
   {
-    key: "benz1.webm",
+    key: "gt2_pro.webm",
     contentType: "video/webm",
   },
   {
-    key: "benz1.mp4",
+    key: "gt2_pro.mp4",
     contentType: "video/mp4",
   },
 ];

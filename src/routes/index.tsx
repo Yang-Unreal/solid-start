@@ -45,15 +45,16 @@ export default function Home() {
           loop
           muted
           playsinline
-          poster="https://minio.limingcn.com/solid-start/poster.webp"
+          // CRITICAL: Create and add a poster image for fast perceived load times.
+          poster="https://minio.limingcn.com/solid-start/gt2_pro_poster.webp"
           class="absolute top-0 left-0 z-0 h-full w-full object-cover"
         >
           <source
-            src="https://minio.limingcn.com/solid-start/benz1.webm"
+            src="https://minio.limingcn.com/solid-start/gt2_pro.webm"
             type="video/webm"
           />
           <source
-            src="https://minio.limingcn.com/solid-start/benz1.mp4"
+            src="https://minio.limingcn.com/solid-start/gt2_pro.mp4"
             type="video/mp4"
           />
           Your browser does not support the video tag.
