@@ -48,7 +48,7 @@ function IndexList() {
                       <Editable.Input
                         id={inputId}
                         name={`item-${index}`}
-                        class="w-full px-2 py-1 rounded-md border border-neutral-300 transition duration-150 ease-in-out bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c]"
+                        class="w-full px-2 py-1 rounded-md border border-neutral-300 transition duration-150 ease-in-out bg-white text-neutral-900 focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                       />
                     </Editable.Area>
 
@@ -67,7 +67,7 @@ function IndexList() {
                             }
                           >
                             <Editable.SubmitTrigger
-                              class={`${baseButtonClass} bg-[#c2fe0c] text-black hover:bg-[#a8e00a] focus:ring-[#c2fe0c]`}
+                              class={`${baseButtonClass} bg-black text-white hover:bg-neutral-800 focus:ring-black`}
                             >
                               Save
                             </Editable.SubmitTrigger>

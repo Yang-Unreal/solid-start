@@ -1,9 +1,8 @@
 // src/routes/products/index.tsx
 import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
-import { useSearchParams, A } from "@solidjs/router";
-import { MetaProvider, Title } from "@solidjs/meta";
-import { useQuery, useQueryClient } from "@tanstack/solid-query";
-import { authClient } from "~/lib/auth-client";
+import { useSearchParams } from "@solidjs/router";
+import { MetaProvider } from "@solidjs/meta";
+import { useQuery } from "@tanstack/solid-query";
 
 export interface Product {
   id: string;
@@ -69,8 +68,6 @@ const calculatePageSize = () => {
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const session = authClient.useSession();
-  const tanstackQueryClient = useQueryClient();
 
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
@@ -218,15 +215,11 @@ const ProductsPage = () => {
   };
   const formatPrice = (priceInCents: number) =>
     `$${(priceInCents / 100).toFixed(2)}`;
-  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed`;
+  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed`;
 
   return (
     <MetaProvider>
       <main class="bg-neutral-100 pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
-        <div class="flex justify-between items-center mb-8">
-          <h1 class="text-3xl font-bold text-neutral-800">Our Products</h1>
-        </div>
-
         <Show when={isLoadingInitial()}>
           <p class="text-center text-xl text-neutral-700 py-10">
             Loading products...

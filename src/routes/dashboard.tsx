@@ -114,7 +114,7 @@ export default function DashboardPage() {
                       </p>
                       <button
                         onClick={handleViewProfile}
-                        class="mt-6 px-5 py-2.5 text-sm font-medium text-black rounded-lg bg-[#c2fe0c] hover:bg-[#a8e00a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-[#c2fe0c]"
+                        class="mt-6 px-5 py-2.5 text-sm font-medium text-white rounded-lg bg-black hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-black"
                       >
                         View Profile
                       </button>

@@ -19,12 +19,12 @@ const Controlled = () => {
             rounded-full
             transition-colors duration-150 ease-in-out
             bg-neutral-300
-            data-[state=checked]:bg-[#c2fe0c]
+            data-[state=checked]:bg-black
             data-[hover]:not([data-state=checked]):bg-neutral-400
-            data-[state=checked]:data-[hover]:bg-[#a8e00a]
+            data-[state=checked]:data-[hover]:bg-neutral-800
             data-[focus-visible]:outline-none
             data-[focus-visible]:ring-2
-            data-[focus-visible]:ring-[#c2fe0c]
+            data-[focus-visible]:ring-black
             data-[focus-visible]:ring-offset-2
             data-[focus-visible]:ring-offset-white
           `}

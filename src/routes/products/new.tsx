@@ -190,9 +190,9 @@ const AddProductPage = () => {
     productCreationMutation.mutate(productDataForDB);
   };
 
-  const inputBaseClasses = `block w-full mt-1 py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c]`;
+  const inputBaseClasses = `block w-full mt-1 py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-black`;
   const labelBaseClasses = `block text-sm font-medium text-neutral-700`;
-  const fileInputClasses = `mt-1 block w-full text-sm text-neutral-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#c2fe0c] file:text-black hover:file:bg-[#a8e00a] disabled:opacity-50 disabled:cursor-not-allowed`;
+  const fileInputClasses = `mt-1 block w-full text-sm text-neutral-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed`;
 
   const fieldError = (fieldName: keyof ProductFormValues) =>
     formErrors()?.[fieldName]?._errors[0];
@@ -371,7 +371,7 @@ const AddProductPage = () => {
                     disabled={
                       isUploadingImage() || productCreationMutation.isPending
                     }
-                    class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a] focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 focus:ring-offset-white disabled:opacity-60 disabled:cursor-not-allowed"
+                    class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {isUploadingImage()
                       ? "Uploading Image..."

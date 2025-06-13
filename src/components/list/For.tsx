@@ -43,7 +43,7 @@ export default function ForList() {
             border
             transition duration-150 ease-in-out
             bg-white text-neutral-900 border-neutral-300
-            focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:border-[#c2fe0c]
+            focus:outline-none focus:ring-2 focus:ring-black focus:border-black
           `}
         />
       </Field.Root>

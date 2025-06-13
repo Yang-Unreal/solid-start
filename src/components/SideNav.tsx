@@ -51,7 +51,7 @@ export default function SideNav(props: SideNavProps) {
         <li>
           <button
             onClick={props.onUserClick}
-            class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2"
+            class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
           >
             <User size={20} class="mr-3 flex-shrink-0" />
             <span class="text-sm font-medium">User Profile</span>
@@ -60,7 +60,7 @@ export default function SideNav(props: SideNavProps) {
         <li>
           <button
             onClick={props.onProductClick}
-            class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2"
+            class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
           >
             <Package size={20} class="mr-3 flex-shrink-0" />
             <span class="text-sm font-medium">Products</span>
@@ -73,7 +73,7 @@ export default function SideNav(props: SideNavProps) {
         <button
           onClick={handleLogout}
           disabled={logoutMutation.isPending}
-          class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <LogOut size={20} class="mr-3 flex-shrink-0" />
           <span class="text-sm font-medium">

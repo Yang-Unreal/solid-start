@@ -15,7 +15,7 @@ export default function PortalExample() {
       <div class="flex flex-col items-center space-y-6">
         <button
           onClick={toggleModal}
-          class="min-w-[220px] px-5 py-2.5 text-sm font-medium rounded-lg transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 bg-[#c2fe0c] text-black hover:bg-[#a8e00a] focus:ring-[#c2fe0c]"
+          class="min-w-[220px] px-5 py-2.5 text-sm font-medium rounded-lg transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 bg-black text-white hover:bg-neutral-800 focus:ring-black"
         >
           {showModal() ? "Hide" : "Show"} Portaled Content
         </button>

@@ -66,8 +66,8 @@ const ToDo = () => {
   // ACCESSIBILITY FIX: Using high-contrast button style consistent with Counter.tsx
   const primaryButtonClass = `
     px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-150 ease-in-out
-    bg-[#c2fe0c] text-black hover:bg-[#a8e00a] active:bg-[#8ab40a]
-    focus:outline-none focus:ring-2 focus:ring-[#c2fe0c] focus:ring-offset-2
+    bg-black text-white hover:bg-neutral-800 active:bg-neutral-700
+    focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2
   `;
 
   return (

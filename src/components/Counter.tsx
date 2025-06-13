@@ -12,14 +12,14 @@ export default function Counter() {
         font-medium
         transition-colors duration-150 ease-in-out
 
-        bg-[#c2fe0c]
-        text-black
-        hover:bg-[#a8e00a]
-        active:bg-[#8ab40a]
+        bg-black
+        text-white
+        hover:bg-neutral-800
+        active:bg-neutral-700
         
         focus:outline-none
         focus:ring-2
-        focus:ring-[#c2fe0c]
+        focus:ring-black
         focus:ring-offset-2
         focus:ring-offset-neutral-100
       `}

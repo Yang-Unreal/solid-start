@@ -13,7 +13,7 @@ export default function Nav() {
   const activeLinkClasses = (path: string) => {
     // Updated text colors for a dark background
     const baseActive = "text-white font-semibold";
-    const baseInactive = "text-neutral-300 hover:text-white font-medium";
+    const baseInactive = "text-white hover:text-white font-medium";
     return location.pathname === path ? baseActive : baseInactive;
   };
 
@@ -28,8 +28,8 @@ export default function Nav() {
     <nav
       class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
         isMobileMenuOpen()
-          ? "h-screen bg-neutral-900" // Full screen when open, now dark
-          : "h-16 bg-neutral-900 border-b border-neutral-800 shadow-lg" // Dark background, updated border and shadow
+          ? "h-screen bg-black" // Full screen when open, now dark
+          : "h-16 bg-black shadow-lg" // Dark background, updated border and shadow
       }`}
     >
       {/* Header for both desktop and mobile (when closed) */}
@@ -53,14 +53,14 @@ export default function Nav() {
               About
             </A>
           </li>
-          <li class="mx-1.5 sm:mx-3">
+          {/* <li class="mx-1.5 sm:mx-3">
             <A
               href="/dragonfly"
               class={`${activeLinkClasses("/dragonfly")} ${linkBaseClass}`}
             >
               Dragonfly
             </A>
-          </li>
+          </li> */}
           <li class="mx-1.5 sm:mx-3">
             <A
               href="/products"
@@ -79,7 +79,7 @@ export default function Nav() {
       <div class="absolute top-3 right-4 sm:hidden z-50">
         <button
           onClick={toggleMobileMenu}
-          class="p-2 text-neutral-200 hover:bg-neutral-800 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-neutral-900 focus:ring-sky-500"
+          class="p-2 text-white hover:bg-neutral-800 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-black focus:ring-sky-500"
           aria-label="Toggle mobile menu"
         >
           <Show when={isMobileMenuOpen()} fallback={<AlignJustify size={24} />}>
@@ -91,7 +91,7 @@ export default function Nav() {
       {/* Full-screen Mobile Menu Content */}
       <Show when={isMobileMenuOpen()}>
         <div class="flex flex-col h-[calc(100vh-4rem)] justify-between items-center py-8">
-          <ul class="flex flex-col items-center space-y-6 text-xl text-neutral-100">
+          <ul class="flex flex-col items-center space-y-6 text-xl text-white">
             <li>
               <A href="/" onClick={toggleMobileMenu}>
                 Home
