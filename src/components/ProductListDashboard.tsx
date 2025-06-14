@@ -1,19 +1,10 @@
+// src/components/ProductListDashboard.tsx
 import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
-import { useSearchParams, A, useNavigate } from "@solidjs/router";
+import { useSearchParams, A } from "@solidjs/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query";
 import { PlusCircle, Trash2, Package } from "lucide-solid";
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  priceInCents: number;
-  imageUrl: string | null;
-  category: string | null;
-  stockQuantity: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// CHANGE: Import the new types directly from your schema file
+import type { Product, ProductImages } from "~/db/schema";
 
 interface PaginationInfo {
   currentPage: number;
@@ -24,6 +15,7 @@ interface PaginationInfo {
   hasPreviousPage: boolean;
 }
 
+// The API now returns the enhanced Product type
 interface ApiResponse {
   data: Product[];
   pagination: PaginationInfo;
@@ -51,6 +43,7 @@ async function deleteProductApi(
   return response.json();
 }
 
+// ... (calculatePageSize and getActiveColumnCount functions remain the same) ...
 const getActiveColumnCount = () => {
   if (typeof window === "undefined") return 4;
   const screenWidth = window.innerWidth;
@@ -75,9 +68,9 @@ const calculatePageSize = () => {
 
 export default function ProductListDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
   const tanstackQueryClient = useQueryClient();
 
+  // ... (data fetching logic and hooks remain the same) ...
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
     defaultValue: string
@@ -86,7 +79,6 @@ export default function ProductListDashboard() {
       ? paramValue[0] || defaultValue
       : paramValue || defaultValue;
   };
-
   const currentPage = () =>
     parseInt(getSearchParamString(searchParams.page, "1"), 10);
   const [dynamicPageSize, setDynamicPageSize] = createSignal(
@@ -94,12 +86,11 @@ export default function ProductListDashboard() {
   );
 
   onMount(() => {
+    // ... onMount logic is unchanged ...
     const initialSize = calculatePageSize();
     setDynamicPageSize(initialSize);
-
     const currentParamSizeValue = searchParams.pageSize;
     let currentParamSizeAsNumber: number | undefined = undefined;
-
     if (Array.isArray(currentParamSizeValue)) {
       const firstValue = currentParamSizeValue[0];
       if (firstValue) {
@@ -110,7 +101,6 @@ export default function ProductListDashboard() {
       const parsed = parseInt(currentParamSizeValue, 10);
       if (!isNaN(parsed)) currentParamSizeAsNumber = parsed;
     }
-
     if (
       currentParamSizeAsNumber === undefined ||
       currentParamSizeAsNumber !== initialSize
@@ -120,7 +110,6 @@ export default function ProductListDashboard() {
         { replace: true }
       );
     }
-
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== dynamicPageSize()) {
@@ -133,15 +122,14 @@ export default function ProductListDashboard() {
   });
 
   const pageSize = () => {
+    // ... pageSize logic is unchanged ...
     const paramPageSizeValue = searchParams.pageSize;
     let paramToUse: string | undefined = undefined;
-
     if (Array.isArray(paramPageSizeValue)) {
       paramToUse = paramPageSizeValue[0];
     } else {
       paramToUse = paramPageSizeValue;
     }
-
     if (paramToUse) {
       const numParamPageSize = parseInt(paramToUse, 10);
       if (
@@ -158,6 +146,7 @@ export default function ProductListDashboard() {
   const fetchProductsQueryFn = async (context: {
     queryKey: readonly [string, { page: number; size: number }];
   }): Promise<ApiResponse> => {
+    // ... fetchProductsQueryFn is unchanged ...
     const [_key, { page, size }] = context.queryKey;
     let baseUrl = "";
     if (import.meta.env.SSR && typeof window === "undefined") {
@@ -221,8 +210,9 @@ export default function ProductListDashboard() {
   const deleteProductMutation = useMutation(() => ({
     mutationFn: deleteProductApi,
     onSuccess: (data, variables) => {
+      // CHANGE: Updated success message
       setShowSuccessMessage(
-        `Product "${data.product.name}" deleted successfully.`
+        `Product "${data.product.brand} ${data.product.model}" deleted successfully.`
       );
       tanstackQueryClient.invalidateQueries({
         queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
@@ -236,11 +226,16 @@ export default function ProductListDashboard() {
       setTimeout(() => setDeleteError(null), 5000);
     },
   }));
-  const handleDeleteProduct = (productId: string, productName: string) => {
-    if (window.confirm(`Are you sure you want to delete "${productName}"?`)) {
+  const handleDeleteProduct = (product: Product) => {
+    // CHANGE: Updated confirmation dialog
+    if (
+      window.confirm(
+        `Are you sure you want to delete "${product.brand} ${product.model}"?`
+      )
+    ) {
       setDeleteError(null);
       setShowSuccessMessage(null);
-      deleteProductMutation.mutate(productId);
+      deleteProductMutation.mutate(product.id);
     }
   };
 
@@ -252,7 +247,7 @@ export default function ProductListDashboard() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const formatPrice = (priceInCents: number) =>
-    `$${(priceInCents / 100).toFixed(2)}`;
+    `$${(priceInCents / 100).toLocaleString("en-US")}`;
   const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed`;
 
   return (
@@ -302,29 +297,32 @@ export default function ProductListDashboard() {
             {(product) => (
               <div class="bg-white rounded-lg shadow p-3 flex items-center space-x-4">
                 <div class="flex-shrink-0 w-24">
-                  <Show
-                    when={product.imageUrl}
-                    fallback={
-                      <div class="w-full aspect-video bg-neutral-100 rounded-md flex items-center justify-center">
-                        <Package size={24} class="text-neutral-400" />
-                      </div>
-                    }
-                  >
+                  {/* CHANGE: Use <picture> tag for optimized images */}
+                  <picture>
+                    <source
+                      srcset={product.images.thumbnail.avif}
+                      type="image/avif"
+                    />
+                    <source
+                      srcset={product.images.thumbnail.webp}
+                      type="image/webp"
+                    />
                     <img
-                      src={product.imageUrl!}
-                      alt={product.name}
+                      src={product.images.thumbnail.jpeg}
+                      alt={`${product.brand} ${product.model}`}
                       class="w-full aspect-video rounded-md object-cover"
                     />
-                  </Show>
+                  </picture>
                 </div>
                 <div class="flex-1 min-w-0">
+                  {/* CHANGE: Display brand and model */}
+                  <p class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+                    {product.brand}
+                  </p>
                   <p class="font-bold text-neutral-800 truncate">
-                    {product.name}
+                    {product.model}
                   </p>
-                  <p class="text-sm text-neutral-500">
-                    {product.category || "N/A"}
-                  </p>
-                  <p class="text-sm font-semibold text-neutral-700">
+                  <p class="text-sm font-semibold text-neutral-700 mt-1">
                     {formatPrice(product.priceInCents)}
                   </p>
                 </div>
@@ -333,15 +331,13 @@ export default function ProductListDashboard() {
                     Stock: {product.stockQuantity}
                   </span>
                   <button
-                    onClick={() =>
-                      handleDeleteProduct(product.id, product.name)
-                    }
+                    onClick={() => handleDeleteProduct(product)}
                     disabled={
                       deleteProductMutation.isPending &&
                       deleteProductMutation.variables === product.id
                     }
                     class="p-1 rounded-md text-red-600 hover:bg-red-50 hover:text-red-800 disabled:opacity-50"
-                    aria-label={`Delete ${product.name}`}
+                    aria-label={`Delete ${product.brand} ${product.model}`}
                   >
                     <Trash2 size={18} />
                   </button>
@@ -360,7 +356,7 @@ export default function ProductListDashboard() {
                   Image
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Name
+                  Product
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Category
@@ -384,16 +380,29 @@ export default function ProductListDashboard() {
                 {(product) => (
                   <tr>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                      <Show when={product.imageUrl}>
-                        <img
-                          src={product.imageUrl!}
-                          alt={product.name}
-                          class="h-10 aspect-video rounded-md object-cover"
+                      {/* CHANGE: Use <picture> tag for optimized images */}
+                      <picture>
+                        <source
+                          srcset={product.images.thumbnail.avif}
+                          type="image/avif"
                         />
-                      </Show>
+                        <source
+                          srcset={product.images.thumbnail.webp}
+                          type="image/webp"
+                        />
+                        <img
+                          src={product.images.thumbnail.jpeg}
+                          alt={`${product.brand} ${product.model}`}
+                          class="h-10 w-16 rounded-md object-cover"
+                        />
+                      </picture>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
-                      {product.name}
+                      {/* CHANGE: Display brand and model */}
+                      <div>{product.brand}</div>
+                      <div class="font-normal text-neutral-600">
+                        {product.model}
+                      </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
                       {product.category || "N/A"}
@@ -409,9 +418,7 @@ export default function ProductListDashboard() {
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
                       <button
-                        onClick={() =>
-                          handleDeleteProduct(product.id, product.name)
-                        }
+                        onClick={() => handleDeleteProduct(product)}
                         disabled={
                           deleteProductMutation.isPending &&
                           deleteProductMutation.variables === product.id

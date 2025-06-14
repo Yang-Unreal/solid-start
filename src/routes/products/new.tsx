@@ -7,14 +7,17 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/solid-query";
-import type { Product } from "../products";
+// Import the new types from your schema definition if they are exported
+import type { Product, ProductImages } from "~/db/schema";
 import { authClient } from "~/lib/auth-client";
-import { z } from "zod/v4"; // Assuming this is the correct v4 import
+import { z } from "zod/v4";
 
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 
+// Use the new schema types, excluding server-generated fields
 type CreateProductDBData = Omit<Product, "id" | "createdAt" | "updatedAt">;
 
+// Updated Zod schema with new fields
 const NewProductFormSchema = z.object({
   name: z.string().trim().min(1, { message: "Product name is required." }),
   description: z.string().trim().optional(),
@@ -27,6 +30,10 @@ const NewProductFormSchema = z.object({
     .number({ message: "Stock quantity must be a number." })
     .int({ message: "Stock quantity must be an integer." })
     .min(0, { message: "Stock quantity cannot be negative." }),
+  // Add new required fields
+  brand: z.string().trim().min(1, { message: "Brand is required." }),
+  model: z.string().trim().min(1, { message: "Model is required." }),
+  fuelType: z.string().trim().min(1, { message: "Fuel type is required." }),
 });
 
 type ProductFormValues = z.infer<typeof NewProductFormSchema>;
@@ -81,15 +88,18 @@ const AddProductPage = () => {
     }
   });
 
+  // Form state signals
   const [name, setName] = createSignal("");
   const [description, setDescription] = createSignal("");
-  // Store raw string input for price and stock for Zod coercion
   const [priceInCentsInput, setPriceInCentsInput] = createSignal("");
   const [stockQuantityInput, setStockQuantityInput] = createSignal("");
-
-  const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
   const [category, setCategory] = createSignal("");
+  const [brand, setBrand] = createSignal("");
+  const [model, setModel] = createSignal("");
+  const [fuelType, setFuelType] = createSignal("");
+  const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
 
+  // Error and status signals
   const [formErrors, setFormErrors] =
     createSignal<z.ZodFormattedError<ProductFormValues> | null>(null);
   const [fileUploadError, setFileUploadError] = createSignal<string | null>(
@@ -103,9 +113,9 @@ const AddProductPage = () => {
     CreateProductDBData
   > = useMutation(() => ({
     mutationFn: createProductInDB,
-    onSuccess: (data: Product) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [PRODUCTS_QUERY_KEY_PREFIX] });
-      navigate("/products");
+      navigate("/dashboard"); // Navigate to dashboard or products list
     },
     onError: (error: Error) => {
       setFormErrors({
@@ -120,8 +130,12 @@ const AddProductPage = () => {
   const handleFileChange = (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
     const file = input.files?.[0];
-    setSelectedFile(file || null);
-    setFileUploadError(null);
+    if (file) {
+      setSelectedFile(file);
+      setFileUploadError(null);
+    } else {
+      setSelectedFile(null);
+    }
     setFormErrors(null);
   };
 
@@ -130,12 +144,16 @@ const AddProductPage = () => {
     setFormErrors(null);
     setFileUploadError(null);
 
+    // Validate all form fields including new ones
     const formDataToValidate = {
       name: name(),
       description: description(),
-      priceInCents: priceInCentsInput(), // Pass the string input for coercion
+      priceInCents: priceInCentsInput(),
       category: category(),
-      stockQuantity: stockQuantityInput(), // Pass the string input for coercion
+      stockQuantity: stockQuantityInput(),
+      brand: brand(),
+      model: model(),
+      fuelType: fuelType(),
     };
 
     const validationResult = NewProductFormSchema.safeParse(formDataToValidate);
@@ -146,46 +164,59 @@ const AddProductPage = () => {
     }
     const validatedFormData = validationResult.data;
 
-    let uploadedImageUrl: string | null = null;
-    if (selectedFile()) {
-      setIsUploadingImage(true);
-      const imageFormData = new FormData();
-      imageFormData.append("files", selectedFile()!);
-      try {
-        const uploadResponse = await fetch("/api/upload", {
-          method: "POST",
-          body: imageFormData,
-        });
-        if (!uploadResponse.ok) {
-          const errData = await uploadResponse.json().catch(() => ({
-            error: "Failed to parse image upload error response",
-          }));
-          throw new Error(
-            errData.error || `Image upload failed: ${uploadResponse.status}`
-          );
-        }
-        const uploadResult = await uploadResponse.json();
-        if (uploadResult.files?.[0]?.url) {
-          uploadedImageUrl = uploadResult.files[0].url;
-        } else {
-          throw new Error("Image uploaded, but no URL returned.");
-        }
-      } catch (uploadError: any) {
-        setFileUploadError(uploadError.message || "Image upload failed.");
-        setIsUploadingImage(false);
-        return;
-      } finally {
-        setIsUploadingImage(false);
-      }
+    // The form is now invalid if no file is selected
+    if (!selectedFile()) {
+      setFileUploadError("A product image is required.");
+      return;
     }
 
+    let uploadedImages: ProductImages | null = null;
+    setIsUploadingImage(true);
+    const imageFormData = new FormData();
+    imageFormData.append("file", selectedFile()!); // Use 'file' to match server
+    try {
+      // Assuming /api/upload now processes the image and returns a ProductImages object
+      const uploadResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: imageFormData,
+      });
+      if (!uploadResponse.ok) {
+        const errData = await uploadResponse.json().catch(() => ({
+          error: "Failed to parse image upload error response",
+        }));
+        throw new Error(
+          errData.error || `Image upload failed: ${uploadResponse.status}`
+        );
+      }
+      const uploadResult = (await uploadResponse.json()) as {
+        images: ProductImages;
+      };
+      if (uploadResult.images) {
+        uploadedImages = uploadResult.images;
+      } else {
+        throw new Error(
+          "Image uploaded, but the image URL structure was not returned."
+        );
+      }
+    } catch (uploadError: any) {
+      setFileUploadError(uploadError.message || "Image upload failed.");
+      setIsUploadingImage(false);
+      return;
+    } finally {
+      setIsUploadingImage(false);
+    }
+
+    // Construct the final data object for the database
     const productDataForDB: CreateProductDBData = {
       name: validatedFormData.name,
       description: validatedFormData.description || null,
       priceInCents: validatedFormData.priceInCents,
-      imageUrl: uploadedImageUrl,
+      images: uploadedImages!, // The image object is now required
       category: validatedFormData.category || null,
       stockQuantity: validatedFormData.stockQuantity,
+      brand: validatedFormData.brand,
+      model: validatedFormData.model,
+      fuelType: validatedFormData.fuelType,
     };
     productCreationMutation.mutate(productDataForDB);
   };
@@ -213,6 +244,7 @@ const AddProductPage = () => {
                 Create New Product
               </h1>
               <form onSubmit={handleSubmit} class="space-y-5">
+                {/* --- Standard Fields --- */}
                 <div>
                   <label for="name" class={labelBaseClasses}>
                     Product Name <span class="text-red-500">*</span>
@@ -223,7 +255,6 @@ const AddProductPage = () => {
                     value={name()}
                     onInput={(e) => setName(e.currentTarget.value)}
                     class={inputBaseClasses}
-                    autocomplete="off"
                     disabled={
                       isUploadingImage() || productCreationMutation.isPending
                     }
@@ -234,6 +265,69 @@ const AddProductPage = () => {
                     </p>
                   </Show>
                 </div>
+
+                {/* --- New Fields --- */}
+                <div>
+                  <label for="brand" class={labelBaseClasses}>
+                    Brand <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="brand"
+                    type="text"
+                    value={brand()}
+                    onInput={(e) => setBrand(e.currentTarget.value)}
+                    class={inputBaseClasses}
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                  <Show when={fieldError("brand")}>
+                    <p class="mt-1 text-xs text-red-500">
+                      {fieldError("brand")}
+                    </p>
+                  </Show>
+                </div>
+                <div>
+                  <label for="model" class={labelBaseClasses}>
+                    Model <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="model"
+                    type="text"
+                    value={model()}
+                    onInput={(e) => setModel(e.currentTarget.value)}
+                    class={inputBaseClasses}
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                  <Show when={fieldError("model")}>
+                    <p class="mt-1 text-xs text-red-500">
+                      {fieldError("model")}
+                    </p>
+                  </Show>
+                </div>
+                <div>
+                  <label for="fuelType" class={labelBaseClasses}>
+                    Fuel Type <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="fuelType"
+                    type="text"
+                    value={fuelType()}
+                    onInput={(e) => setFuelType(e.currentTarget.value)}
+                    class={inputBaseClasses}
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                  <Show when={fieldError("fuelType")}>
+                    <p class="mt-1 text-xs text-red-500">
+                      {fieldError("fuelType")}
+                    </p>
+                  </Show>
+                </div>
+
                 <div>
                   <label for="description" class={labelBaseClasses}>
                     Description
@@ -259,7 +353,6 @@ const AddProductPage = () => {
                     value={priceInCentsInput()}
                     onInput={(e) => setPriceInCentsInput(e.currentTarget.value)}
                     class={inputBaseClasses}
-                    autocomplete="off"
                     disabled={
                       isUploadingImage() || productCreationMutation.isPending
                     }
@@ -270,16 +363,18 @@ const AddProductPage = () => {
                     </p>
                   </Show>
                 </div>
+
+                {/* --- Image Upload --- */}
                 <div>
                   <label for="productImage" class={labelBaseClasses}>
-                    Product Image
+                    Product Image <span class="text-red-500">*</span>
                   </label>
                   <input
                     id="productImage"
                     type="file"
-                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
                     class={fileInputClasses}
-                    onInput={handleFileChange}
+                    onChange={handleFileChange}
                     disabled={
                       isUploadingImage() || productCreationMutation.isPending
                     }
@@ -294,6 +389,7 @@ const AddProductPage = () => {
                     <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
                   </Show>
                 </div>
+
                 <div>
                   <label for="category" class={labelBaseClasses}>
                     Category
@@ -304,7 +400,6 @@ const AddProductPage = () => {
                     value={category()}
                     onInput={(e) => setCategory(e.currentTarget.value)}
                     class={inputBaseClasses}
-                    autocomplete="off"
                     disabled={
                       isUploadingImage() || productCreationMutation.isPending
                     }
@@ -328,7 +423,6 @@ const AddProductPage = () => {
                       setStockQuantityInput(e.currentTarget.value)
                     }
                     class={inputBaseClasses}
-                    autocomplete="off"
                     disabled={
                       isUploadingImage() || productCreationMutation.isPending
                     }
@@ -339,6 +433,8 @@ const AddProductPage = () => {
                     </p>
                   </Show>
                 </div>
+
+                {/* --- Form-level Error --- */}
                 <Show
                   when={
                     formErrors()?._errors?.length && formErrors()?._errors[0]
@@ -348,9 +444,11 @@ const AddProductPage = () => {
                     {formErrors()?._errors[0]}
                   </p>
                 </Show>
+
+                {/* --- Action Buttons --- */}
                 <div class="flex items-center justify-end space-x-4 pt-3">
                   <A
-                    href="/products"
+                    href="/dashboard"
                     class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 ${
                       isUploadingImage() || productCreationMutation.isPending
                         ? "opacity-50 cursor-not-allowed"

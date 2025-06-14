@@ -3,18 +3,8 @@ import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
 import { useSearchParams } from "@solidjs/router";
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
-
-export interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  priceInCents: number;
-  imageUrl: string | null;
-  category: string | null;
-  stockQuantity: number;
-  createdAt: string;
-  updatedAt: string;
-}
+// CHANGE: Import the new types directly from your schema file
+import type { Product, ProductImages } from "~/db/schema";
 
 interface PaginationInfo {
   currentPage: number;
@@ -25,6 +15,7 @@ interface PaginationInfo {
   hasPreviousPage: boolean;
 }
 
+// The API now returns the enhanced Product type
 interface ApiResponse {
   data: Product[];
   pagination: PaginationInfo;
@@ -36,39 +27,31 @@ const TARGET_ROWS_ON_PAGE = 3;
 const MAX_API_PAGE_SIZE = 100;
 
 const getActiveColumnCount = () => {
-  if (typeof window === "undefined") return 4; // SSR fallback (e.g., for 'lg')
-
+  if (typeof window === "undefined") return 4;
   const screenWidth = window.innerWidth;
-
-  // Pixel values for breakpoints:
-  // Default Tailwind: sm: 640px, md: 768px, lg: 1024px, xl: 1280px, 2xl: 1536px
-
-  // Order from largest to smallest is important.
-  if (screenWidth >= 1920) return 6; // Matches custom `3xl:grid-cols-6`
-  if (screenWidth >= 1536) return 5; // Matches `2xl:grid-cols-5`
-  if (screenWidth >= 1280) return 4; // Matches `xl:grid-cols-4`
-  if (screenWidth >= 1024) return 4; // Matches `lg:grid-cols-4`
-  if (screenWidth >= 768) return 3; // Matches `md:grid-cols-3`
-  if (screenWidth >= 640) return 2; // Matches `sm:grid-cols-2`
-  return 1; // Default `grid-cols-1`
+  if (screenWidth >= 1920) return 6;
+  if (screenWidth >= 1536) return 5;
+  if (screenWidth >= 1280) return 4;
+  if (screenWidth >= 1024) return 4;
+  if (screenWidth >= 768) return 3;
+  if (screenWidth >= 640) return 2;
+  return 1;
 };
 
 const calculatePageSize = () => {
   const columns = getActiveColumnCount();
   let newPageSize = columns * TARGET_ROWS_ON_PAGE;
-
   if (newPageSize === 0 && columns > 0) newPageSize = columns;
   if (newPageSize < columns && columns > 0) newPageSize = columns;
-
   const absoluteMinPageSize = Math.max(6, columns);
   newPageSize = Math.max(newPageSize, absoluteMinPageSize);
-
   return Math.min(newPageSize, MAX_API_PAGE_SIZE);
 };
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  // ... (all the state and data fetching logic remains the same, as it will now fetch the new data shape) ...
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
     defaultValue: string
@@ -87,10 +70,8 @@ const ProductsPage = () => {
   onMount(() => {
     const initialSize = calculatePageSize();
     setDynamicPageSize(initialSize);
-
     const currentParamSizeValue = searchParams.pageSize;
     let currentParamSizeAsNumber: number | undefined = undefined;
-
     if (Array.isArray(currentParamSizeValue)) {
       const firstValue = currentParamSizeValue[0];
       if (firstValue) {
@@ -101,7 +82,6 @@ const ProductsPage = () => {
       const parsed = parseInt(currentParamSizeValue, 10);
       if (!isNaN(parsed)) currentParamSizeAsNumber = parsed;
     }
-
     if (
       currentParamSizeAsNumber === undefined ||
       currentParamSizeAsNumber !== initialSize
@@ -111,7 +91,6 @@ const ProductsPage = () => {
         { replace: true }
       );
     }
-
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== dynamicPageSize()) {
@@ -126,13 +105,11 @@ const ProductsPage = () => {
   const pageSize = () => {
     const paramPageSizeValue = searchParams.pageSize;
     let paramToUse: string | undefined = undefined;
-
     if (Array.isArray(paramPageSizeValue)) {
       paramToUse = paramPageSizeValue[0];
     } else {
       paramToUse = paramPageSizeValue;
     }
-
     if (paramToUse) {
       const numParamPageSize = parseInt(paramToUse, 10);
       if (
@@ -213,9 +190,10 @@ const ProductsPage = () => {
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   const formatPrice = (priceInCents: number) =>
-    `$${(priceInCents / 100).toFixed(2)}`;
-  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed`;
+    `$${(priceInCents / 100).toLocaleString("en-US")}`;
+  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed`;
 
   return (
     <MetaProvider>
@@ -244,43 +222,46 @@ const ProductsPage = () => {
 
         <Show when={productsQuery.data && !error()}>
           <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-            {/*
-              Tailwind classes define columns. `getActiveColumnCount` MUST match these.
-            */}
             <div class="justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6 sm:gap-8">
               <For each={products()}>
                 {(product) => (
-                  <div class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden">
-                    <Show when={product.imageUrl}>
-                      <div class="w-full aspect-video bg-neutral-200 overflow-hidden">
-                        <img
-                          src={product.imageUrl!}
-                          alt={product.name}
-                          class="w-full h-full object-cover"
-                          onError={(e) =>
-                            (e.currentTarget.style.display = "none")
-                          }
+                  <div class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group">
+                    {/* CHANGE: Replaced <img> with the <picture> element for optimal image loading */}
+                    <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
+                      <picture>
+                        <source
+                          srcset={product.images.thumbnail.avif}
+                          type="image/avif"
                         />
-                      </div>
-                    </Show>
+                        <source
+                          srcset={product.images.thumbnail.webp}
+                          type="image/webp"
+                        />
+                        <img
+                          src={product.images.thumbnail.jpeg}
+                          alt={`${product.brand} ${product.model}`}
+                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          loading="lazy"
+                          width="640"
+                          height="360"
+                        />
+                      </picture>
+                    </div>
                     <div class="p-5 flex flex-col flex-grow">
+                      {/* CHANGE: Display Brand and Model */}
+                      <p class="text-sm font-medium text-neutral-500">
+                        {product.brand}
+                      </p>
                       <h2
-                        class="text-lg font-semibold mb-1 text-neutral-800 truncate"
-                        title={product.name}
+                        class="text-lg font-semibold text-neutral-800 truncate"
+                        title={product.model}
                       >
-                        {product.name}
+                        {product.model}
                       </h2>
-                      <p class="text-xl mb-3 text-neutral-700">
+                      <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
                         {formatPrice(product.priceInCents)}
                       </p>
-                      <Show when={product.description}>
-                        <p class="text-sm text-neutral-700 mb-4 flex-grow min-h-[40px]">
-                          {product.description!.length > 100
-                            ? product.description!.substring(0, 97) + "..."
-                            : product.description}
-                        </p>
-                      </Show>
-                      <div class="mt-auto pt-2 border-t border-neutral-200">
+                      <div class="mt-auto pt-2 border-t border-neutral-100">
                         <p class="text-xs text-neutral-600">
                           Category: {product.category || "N/A"}
                         </p>

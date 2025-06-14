@@ -5,7 +5,11 @@ import {
   boolean,
   integer,
   uuid,
+  jsonb, // Import the jsonb type
 } from "drizzle-orm/pg-core";
+
+import type { InferSelectModel } from "drizzle-orm";
+// --- User, Session, Account, and Verification Tables (Unchanged) ---
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -72,15 +76,53 @@ export const verification = pgTable("verification", {
   ),
 });
 
+// --- Product Schema (Updated) ---
+
+/**
+ * Defines the expected structure for the 'images' JSONB column in the product table.
+ * This provides type safety when interacting with the data in your application.
+ */
+export type ProductImages = {
+  thumbnail: {
+    avif: string;
+    webp: string;
+    jpeg: string;
+  };
+  detail: {
+    avif: string;
+    webp: string;
+    jpeg: string;
+  };
+};
+
 export const product = pgTable("product", {
   id: uuid("id").defaultRandom().primaryKey(),
 
   name: text("name").notNull(),
   description: text("description"),
   priceInCents: integer("price_in_cents").notNull(),
-  imageUrl: text("image_url"),
+
+  /**
+   * CHANGE: Replaced `imageUrl` with a flexible `images` JSONB column.
+   * This stores structured data for all required image formats and sizes.
+   * Example data:
+   * {
+   *   thumbnail: { avif: '...', webp: '...', jpeg: '...' },
+   *   detail: { avif: '...', webp: '...', jpeg: '...' }
+   * }
+   */
+  images: jsonb("images").$type<ProductImages>().notNull(),
+
   category: text("category"),
   stockQuantity: integer("stock_quantity").default(0).notNull(),
+
+  // CHANGE: Added new fields for brand, model, and fuel type.
+  brand: text("brand").notNull(),
+  model: text("model").notNull(),
+  fuelType: text("fuel_type").notNull(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+export type Product = InferSelectModel<typeof product>;

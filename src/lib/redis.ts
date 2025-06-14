@@ -3,7 +3,7 @@ import Redis, { type RedisOptions } from "ioredis";
 import fs from "fs";
 import { URL } from "url";
 import net from "net";
-import tls, { type ConnectionOptions as TlsConnectionOptions } from "tls";
+import { type ConnectionOptions as TlsConnectionOptions } from "tls";
 
 declare global {
   var redisClient: Redis | undefined;

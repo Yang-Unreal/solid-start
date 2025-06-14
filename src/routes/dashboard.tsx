@@ -2,7 +2,7 @@
 import { createEffect, Show, onMount, createSignal } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { authClient } from "~/lib/auth-client";
-import { UserCircle, Menu } from "lucide-solid"; // Removed X
+import { UserCircle, Menu } from "lucide-solid";
 import SideNav from "~/components/SideNav";
 import ProductListDashboard from "~/components/ProductListDashboard";
 
@@ -14,11 +14,9 @@ export default function DashboardPage() {
 
   onMount(() => {
     setActiveContent(localStorage.getItem("dashboardActiveContent") || "user");
-
     createEffect(() => {
       localStorage.setItem("dashboardActiveContent", activeContent());
     });
-
     const currentSession = sessionSignal();
     if (!currentSession.isPending && !currentSession.data?.user) {
       navigate("/login", { replace: true });
@@ -39,7 +37,6 @@ export default function DashboardPage() {
 
     return (
       <div class="flex h-screen bg-neutral-100">
-        {/* Mobile Menu Button */}
         <button
           id="mobile-menu-button"
           onClick={() => setSideNavOpen(true)}
@@ -49,7 +46,6 @@ export default function DashboardPage() {
           <Menu size={20} />
         </button>
 
-        {/* Mobile Overlay */}
         <Show when={sideNavOpen()}>
           <div
             class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
@@ -57,34 +53,28 @@ export default function DashboardPage() {
           />
         </Show>
 
-        {/* Sidebar */}
         <div
           id="mobile-sidebar"
-          class={`
-            fixed md:static inset-y-0 left-0 z-40
-            w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out
-            ${
-              sideNavOpen()
-                ? "translate-x-0"
-                : "-translate-x-full md:translate-x-0"
-            }
-          `}
+          class={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
+            sideNavOpen()
+              ? "translate-x-0"
+              : "-translate-x-full md:translate-x-0"
+          }`}
         >
           <SideNav
             onClose={() => setSideNavOpen(false)}
             onProductClick={() => {
               setActiveContent("products");
-              setSideNavOpen(false); // Close on mobile after selection
+              setSideNavOpen(false);
             }}
             onUserClick={() => {
               setActiveContent("user");
-              setSideNavOpen(false); // Close on mobile after selection
+              setSideNavOpen(false);
             }}
             onLogoutSuccess={() => navigate("/login", { replace: true })}
           />
         </div>
 
-        {/* Main Content */}
         <div class="flex-1 flex flex-col min-w-0">
           <main class="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pt-16 md:pt-4">
             <Show when={activeContent() === "user"}>
@@ -112,6 +102,7 @@ export default function DashboardPage() {
                       <p class="text-sm text-neutral-600 text-center break-all">
                         {sessionSignal().data?.user?.email}
                       </p>
+                      {/* CHANGE: Updated button style for consistency */}
                       <button
                         onClick={handleViewProfile}
                         class="mt-6 px-5 py-2.5 text-sm font-medium text-white rounded-lg bg-black hover:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-black"
