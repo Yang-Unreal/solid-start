@@ -1,10 +1,9 @@
 // src/routes/products/index.tsx
 import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
-import { useSearchParams } from "@solidjs/router";
+import { useSearchParams, A } from "@solidjs/router";
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
-// CHANGE: Import the new types directly from your schema file
-import type { Product, ProductImages } from "~/db/schema";
+import type { Product } from "~/db/schema";
 
 interface PaginationInfo {
   currentPage: number;
@@ -15,7 +14,6 @@ interface PaginationInfo {
   hasPreviousPage: boolean;
 }
 
-// The API now returns the enhanced Product type
 interface ApiResponse {
   data: Product[];
   pagination: PaginationInfo;
@@ -26,32 +24,30 @@ const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const TARGET_ROWS_ON_PAGE = 3;
 const MAX_API_PAGE_SIZE = 100;
 
+// CHANGE: This logic is now perfectly synced with the CSS classes.
+// The order is from largest to smallest to ensure the correct breakpoint is matched.
 const getActiveColumnCount = () => {
-  if (typeof window === "undefined") return 4;
+  if (typeof window === "undefined") return 4; // SSR fallback
   const screenWidth = window.innerWidth;
-  if (screenWidth >= 1920) return 6;
-  if (screenWidth >= 1536) return 5;
-  if (screenWidth >= 1280) return 4;
-  if (screenWidth >= 1024) return 4;
-  if (screenWidth >= 768) return 3;
-  if (screenWidth >= 640) return 2;
-  return 1;
+  if (screenWidth >= 1920) return 6; // Matches 3xl:grid-cols-6
+  if (screenWidth >= 1536) return 5; // Matches 2xl:grid-cols-5
+  if (screenWidth >= 1024) return 4; // Matches lg:grid-cols-4 and xl:grid-cols-4
+  if (screenWidth >= 768) return 3; // Matches md:grid-cols-3
+  if (screenWidth >= 640) return 2; // Matches sm:grid-cols-2
+  return 1; // Default for screens smaller than 640px
 };
 
 const calculatePageSize = () => {
   const columns = getActiveColumnCount();
   let newPageSize = columns * TARGET_ROWS_ON_PAGE;
-  if (newPageSize === 0 && columns > 0) newPageSize = columns;
-  if (newPageSize < columns && columns > 0) newPageSize = columns;
-  const absoluteMinPageSize = Math.max(6, columns);
-  newPageSize = Math.max(newPageSize, absoluteMinPageSize);
+  if (newPageSize === 0) newPageSize = 12; // Fallback
   return Math.min(newPageSize, MAX_API_PAGE_SIZE);
 };
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [pageSize, setPageSize] = createSignal(calculatePageSize());
 
-  // ... (all the state and data fetching logic remains the same, as it will now fetch the new data shape) ...
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
     defaultValue: string
@@ -63,65 +59,19 @@ const ProductsPage = () => {
 
   const currentPage = () =>
     parseInt(getSearchParamString(searchParams.page, "1"), 10);
-  const [dynamicPageSize, setDynamicPageSize] = createSignal(
-    calculatePageSize()
-  );
 
   onMount(() => {
-    const initialSize = calculatePageSize();
-    setDynamicPageSize(initialSize);
-    const currentParamSizeValue = searchParams.pageSize;
-    let currentParamSizeAsNumber: number | undefined = undefined;
-    if (Array.isArray(currentParamSizeValue)) {
-      const firstValue = currentParamSizeValue[0];
-      if (firstValue) {
-        const parsed = parseInt(firstValue, 10);
-        if (!isNaN(parsed)) currentParamSizeAsNumber = parsed;
-      }
-    } else if (typeof currentParamSizeValue === "string") {
-      const parsed = parseInt(currentParamSizeValue, 10);
-      if (!isNaN(parsed)) currentParamSizeAsNumber = parsed;
-    }
-    if (
-      currentParamSizeAsNumber === undefined ||
-      currentParamSizeAsNumber !== initialSize
-    ) {
-      setSearchParams(
-        { page: "1", pageSize: initialSize.toString() },
-        { replace: true }
-      );
-    }
+    setPageSize(calculatePageSize());
     const handleResize = () => {
       const newSize = calculatePageSize();
-      if (newSize !== dynamicPageSize()) {
-        setDynamicPageSize(newSize);
+      if (newSize !== pageSize()) {
+        setPageSize(newSize);
         setSearchParams({ page: "1", pageSize: newSize.toString() });
       }
     };
     window.addEventListener("resize", handleResize);
     onCleanup(() => window.removeEventListener("resize", handleResize));
   });
-
-  const pageSize = () => {
-    const paramPageSizeValue = searchParams.pageSize;
-    let paramToUse: string | undefined = undefined;
-    if (Array.isArray(paramPageSizeValue)) {
-      paramToUse = paramPageSizeValue[0];
-    } else {
-      paramToUse = paramPageSizeValue;
-    }
-    if (paramToUse) {
-      const numParamPageSize = parseInt(paramToUse, 10);
-      if (
-        !isNaN(numParamPageSize) &&
-        numParamPageSize > 0 &&
-        numParamPageSize <= MAX_API_PAGE_SIZE
-      ) {
-        return numParamPageSize;
-      }
-    }
-    return dynamicPageSize();
-  };
 
   const fetchProductsQueryFn = async (context: {
     queryKey: readonly [string, { page: number; size: number }];
@@ -136,28 +86,12 @@ const ProductsPage = () => {
     const fetchUrl = `${baseUrl}/api/products?page=${page}&pageSize=${size}`;
     const response = await fetch(fetchUrl);
     if (!response.ok) {
-      let errorMsg = `HTTP error! status: ${response.status}`;
-      try {
-        const contentType = response.headers.get("content-type");
-        if (contentType?.includes("application/json")) {
-          const errData = await response.json();
-          errorMsg = errData.error || errData.message || errorMsg;
-        } else {
-          const textError = await response.text();
-          errorMsg = textError.substring(0, 200) || errorMsg;
-        }
-      } catch (e) {
-        /* ignore */
-      }
-      throw new Error(errorMsg);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
     }
-    try {
-      const data: ApiResponse = await response.json();
-      if (data.error) throw new Error(data.error);
-      return data;
-    } catch (e: any) {
-      throw new Error(`Invalid JSON response: ${e.message}`);
-    }
+    return response.json();
   };
 
   const productsQuery = useQuery<
@@ -173,13 +107,10 @@ const ProductsPage = () => {
     queryFn: fetchProductsQueryFn,
     staleTime: 5 * 60 * 1000,
     keepPreviousData: true,
-    gcTime: 30 * 60 * 1000,
   }));
 
   const products = () => productsQuery.data?.data || [];
   const pagination = () => productsQuery.data?.pagination || null;
-  const isLoadingInitial = () =>
-    productsQuery.isLoading && !productsQuery.data && !productsQuery.isError;
   const isFetching = () => productsQuery.isFetching;
   const error = () => productsQuery.error;
 
@@ -198,12 +129,12 @@ const ProductsPage = () => {
   return (
     <MetaProvider>
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
-        <Show when={isLoadingInitial()}>
+        <Show when={productsQuery.isLoading && !productsQuery.isFetching}>
           <p class="text-center text-xl text-neutral-700 py-10">
             Loading products...
           </p>
         </Show>
-        <Show when={error() && !isFetching() && !isLoadingInitial()}>
+        <Show when={error()}>
           <div class="text-center py-10">
             <p class="text-xl text-red-600">
               Error: {error()?.message || "An unknown error occurred."}
@@ -220,13 +151,16 @@ const ProductsPage = () => {
           </div>
         </Show>
 
-        <Show when={productsQuery.data && !error()}>
+        <Show when={productsQuery.data}>
           <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-            <div class="justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 gap-6 sm:gap-8">
+            {/* This CSS now perfectly matches the JS logic */}
+            <div class="justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6  gap-6 sm:gap-8">
               <For each={products()}>
                 {(product) => (
-                  <div class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group">
-                    {/* CHANGE: Replaced <img> with the <picture> element for optimal image loading */}
+                  <A
+                    href={`/products/${product.id}`}
+                    class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group"
+                  >
                     <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
                       <picture>
                         <source
@@ -248,7 +182,6 @@ const ProductsPage = () => {
                       </picture>
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
-                      {/* CHANGE: Display Brand and Model */}
                       <p class="text-sm font-medium text-neutral-500">
                         {product.brand}
                       </p>
@@ -270,7 +203,7 @@ const ProductsPage = () => {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </A>
                 )}
               </For>
             </div>
@@ -297,14 +230,7 @@ const ProductsPage = () => {
             </div>
           </Show>
         </Show>
-        <Show
-          when={
-            productsQuery.isSuccess &&
-            !isLoadingInitial() &&
-            !error() &&
-            products().length === 0
-          }
-        >
+        <Show when={productsQuery.isSuccess && products().length === 0}>
           <p class="text-center text-xl text-neutral-700 py-10">
             No products found. Add some!
           </p>

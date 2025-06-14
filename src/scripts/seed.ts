@@ -37,9 +37,28 @@ async function seedProducts() {
         faker.commerce.price({ min: 1000, max: 30000, dec: 0 }),
         10
       ),
-      imageUrl: faker.image.urlPicsumPhotos({ width: 640, height: 480 }),
+      // Replaced imageUrl with images (JSONB)
+      images: {
+        thumbnail: {
+          avif: faker.image.urlPicsumPhotos({ width: 100, height: 75 }),
+          webp: faker.image.urlPicsumPhotos({ width: 100, height: 75 }),
+          jpeg: faker.image.urlPicsumPhotos({ width: 100, height: 75 }),
+        },
+        detail: {
+          avif: faker.image.urlPicsumPhotos({ width: 640, height: 480 }),
+          webp: faker.image.urlPicsumPhotos({ width: 640, height: 480 }),
+          jpeg: faker.image.urlPicsumPhotos({ width: 640, height: 480 }),
+        },
+      },
       category: faker.commerce.department(),
       stockQuantity: faker.number.int({ min: 0, max: 100 }),
+      // Added new fields
+      brand: faker.company.name(),
+      model:
+        faker.commerce.productAdjective() +
+        " " +
+        faker.commerce.productMaterial(),
+      fuelType: faker.vehicle.fuel(),
     });
   }
 
