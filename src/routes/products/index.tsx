@@ -24,23 +24,21 @@ const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const TARGET_ROWS_ON_PAGE = 3;
 const MAX_API_PAGE_SIZE = 100;
 
-// CHANGE: This logic is now perfectly synced with the CSS classes.
-// The order is from largest to smallest to ensure the correct breakpoint is matched.
 const getActiveColumnCount = () => {
-  if (typeof window === "undefined") return 4; // SSR fallback
+  if (typeof window === "undefined") return 4;
   const screenWidth = window.innerWidth;
-  if (screenWidth >= 1920) return 6; // Matches 3xl:grid-cols-6
-  if (screenWidth >= 1536) return 5; // Matches 2xl:grid-cols-5
-  if (screenWidth >= 1024) return 4; // Matches lg:grid-cols-4 and xl:grid-cols-4
-  if (screenWidth >= 768) return 3; // Matches md:grid-cols-3
-  if (screenWidth >= 640) return 2; // Matches sm:grid-cols-2
-  return 1; // Default for screens smaller than 640px
+  if (screenWidth >= 1920) return 6;
+  if (screenWidth >= 1536) return 5;
+  if (screenWidth >= 1024) return 4;
+  if (screenWidth >= 768) return 3;
+  if (screenWidth >= 640) return 2;
+  return 1;
 };
 
 const calculatePageSize = () => {
   const columns = getActiveColumnCount();
   let newPageSize = columns * TARGET_ROWS_ON_PAGE;
-  if (newPageSize === 0) newPageSize = 12; // Fallback
+  if (newPageSize === 0) newPageSize = 12;
   return Math.min(newPageSize, MAX_API_PAGE_SIZE);
 };
 
@@ -153,8 +151,7 @@ const ProductsPage = () => {
 
         <Show when={productsQuery.data}>
           <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-            {/* This CSS now perfectly matches the JS logic */}
-            <div class="justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6  gap-6 sm:gap-8">
+            <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
               <For each={products()}>
                 {(product) => (
                   <A
@@ -208,8 +205,18 @@ const ProductsPage = () => {
               </For>
             </div>
           </div>
+
+          {/* --- PAGINATION CONTROLS --- */}
           <Show when={pagination() && pagination()!.totalPages > 1}>
-            <div class="mt-10 flex justify-center items-center space-x-3">
+            {/* CHANGE: Added "First" and "Last" buttons to the pagination controls */}
+            <div class="mt-10 flex justify-center items-center space-x-2 sm:space-x-3">
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={!pagination()!.hasPreviousPage || isFetching()}
+                class={paginationButtonClasses}
+              >
+                First
+              </button>
               <button
                 onClick={() => handlePageChange(pagination()!.currentPage - 1)}
                 disabled={!pagination()!.hasPreviousPage || isFetching()}
@@ -217,7 +224,7 @@ const ProductsPage = () => {
               >
                 Previous
               </button>
-              <span class="text-neutral-700 font-medium text-sm">
+              <span class="text-neutral-700 font-medium text-sm px-2">
                 Page {pagination()!.currentPage} of {pagination()!.totalPages}
               </span>
               <button
@@ -227,10 +234,20 @@ const ProductsPage = () => {
               >
                 Next
               </button>
+              <button
+                onClick={() => handlePageChange(pagination()!.totalPages)}
+                disabled={!pagination()!.hasNextPage || isFetching()}
+                class={paginationButtonClasses}
+              >
+                Last
+              </button>
             </div>
           </Show>
         </Show>
-        <Show when={productsQuery.isSuccess && products().length === 0}>
+
+        <Show
+          when={productsQuery.isSuccess && !error() && products().length === 0}
+        >
           <p class="text-center text-xl text-neutral-700 py-10">
             No products found. Add some!
           </p>

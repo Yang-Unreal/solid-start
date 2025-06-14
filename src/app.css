@@ -128,4 +128,10 @@ html::-webkit-scrollbar {
   .product-grid {
     justify-content: center;
   }
+
+  @media (min-width: 1920px) {
+    .product-grid-container {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
 }
