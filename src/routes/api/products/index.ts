@@ -2,7 +2,7 @@
 import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
 import { product as productTable, type ProductImages } from "~/db/schema"; // Import ProductImages type
-import { asc, desc, count, eq, Column } from "drizzle-orm";
+import { asc, desc, count, eq, and, Column } from "drizzle-orm";
 import { z } from "zod/v4";
 import { kv } from "~/lib/redis";
 
@@ -37,6 +37,10 @@ export async function GET({ request }: APIEvent) {
   let sortByInput = url.searchParams.get("sortBy") || "createdAt";
   const sortOrder =
     url.searchParams.get("sortOrder")?.toLowerCase() === "asc" ? "asc" : "desc";
+  const brand = url.searchParams.get("brand");
+  const category = url.searchParams.get("category");
+  const fuelType = url.searchParams.get("fuelType");
+
   const offset = (page - 1) * pageSize;
 
   if (!Object.keys(columns).includes(sortByInput)) {
@@ -52,14 +56,29 @@ export async function GET({ request }: APIEvent) {
   }
 
   try {
+    const whereClauses = [];
+    if (brand) {
+      whereClauses.push(eq(productTable.brand, brand));
+    }
+    if (category) {
+      whereClauses.push(eq(productTable.category, category));
+    }
+    if (fuelType) {
+      whereClauses.push(eq(productTable.fuelType, fuelType));
+    }
+
     const [productsData, totalCountResult] = await Promise.all([
       db
         .select()
         .from(productTable)
+        .where(whereClauses.length > 0 ? and(...whereClauses) : undefined)
         .orderBy(sortOrder === "asc" ? asc(sortColumn) : desc(sortColumn))
         .limit(pageSize)
         .offset(offset),
-      db.select({ total: count() }).from(productTable),
+      db
+        .select({ total: count() })
+        .from(productTable)
+        .where(whereClauses.length > 0 ? and(...whereClauses) : undefined),
     ]);
     const totalProducts = totalCountResult[0]?.total ?? 0;
     const totalPages = Math.ceil(totalProducts / pageSize);
