@@ -231,6 +231,36 @@ const ProductsPage = () => {
   const availableCategories = () => categoriesQuery.data || [];
   const availableFuelTypes = () => fuelTypesQuery.data || [];
 
+  // --- FIX START ---
+  // Create computed signals for options to ensure the currently selected value is always present
+  const brandOptions = () => {
+    const currentBrand = selectedBrand();
+    const brands = availableBrands();
+    if (currentBrand && !brands.includes(currentBrand)) {
+      return [currentBrand, ...brands];
+    }
+    return brands;
+  };
+
+  const categoryOptions = () => {
+    const currentCategory = selectedCategory();
+    const categories = availableCategories();
+    if (currentCategory && !categories.includes(currentCategory)) {
+      return [currentCategory, ...categories];
+    }
+    return categories;
+  };
+
+  const fuelTypeOptions = () => {
+    const currentFuelType = selectedFuelType();
+    const fuelTypes = availableFuelTypes();
+    if (currentFuelType && !fuelTypes.includes(currentFuelType)) {
+      return [currentFuelType, ...fuelTypes];
+    }
+    return fuelTypes;
+  };
+  // --- FIX END ---
+
   const handleFilterChange = (
     filterType: "brand" | "category" | "fuelType",
     value: string
@@ -255,24 +285,15 @@ const ProductsPage = () => {
     `$${(priceInCents / 100).toLocaleString("en-US")}`;
   const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed`;
 
-  // --- FIX START ---
-  // Combine all shared classes for the select elements
   const selectClasses =
     "w-full p-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent";
-  // --- FIX END ---
-
   return (
     <MetaProvider>
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-          {/* 
-            --- FIX START ---
-            - Replaced `flex` with `grid` for stable column widths.
-            - `grid-cols-1` on mobile, `md:grid-cols-3` on medium screens and up.
-            - Each select now has `w-full` to fill its grid column.
-            --- FIX END ---
-          */}
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* --- FIX START --- */}
+            {/* Use computed options to ensure selected value is always available */}
             <select
               value={selectedBrand()}
               onChange={(e) =>
@@ -282,7 +303,7 @@ const ProductsPage = () => {
               disabled={brandsQuery.isLoading || isFetching()}
             >
               <option value="">All Brands</option>
-              <For each={availableBrands()}>
+              <For each={brandOptions()}>
                 {(brand) => <option value={brand}>{brand}</option>}
               </For>
             </select>
@@ -296,7 +317,7 @@ const ProductsPage = () => {
               disabled={categoriesQuery.isLoading || isFetching()}
             >
               <option value="">All Categories</option>
-              <For each={availableCategories()}>
+              <For each={categoryOptions()}>
                 {(category) => <option value={category}>{category}</option>}
               </For>
             </select>
@@ -310,10 +331,11 @@ const ProductsPage = () => {
               disabled={fuelTypesQuery.isLoading || isFetching()}
             >
               <option value="">All Fuel Types</option>
-              <For each={availableFuelTypes()}>
+              <For each={fuelTypeOptions()}>
                 {(fuelType) => <option value={fuelType}>{fuelType}</option>}
               </For>
             </select>
+            {/* --- FIX END --- */}
           </div>
 
           <Show when={productsQuery.isLoading && !productsQuery.isFetching}>
