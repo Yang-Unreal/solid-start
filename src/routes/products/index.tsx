@@ -283,7 +283,7 @@ const ProductsPage = () => {
 
   const formatPrice = (priceInCents: number) =>
     `$${(priceInCents / 100).toLocaleString("en-US")}`;
-  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed`;
+  const paginationButtonClasses = `w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed sm:min-w-[100px] sm:px-4 sm:py-2`;
 
   const selectClasses =
     "w-full p-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent";
@@ -431,7 +431,14 @@ const ProductsPage = () => {
                     disabled={!pagination()!.hasPreviousPage || isFetching()}
                     class={paginationButtonClasses}
                   >
-                    First
+                    {/* --- FIX START --- */}
+                    {/* Responsive pagination buttons */}
+                    <span class="hidden sm:inline">First</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      &#171;
+                    </span>{" "}
+                    {/* First icon */}
+                    {/* --- FIX END --- */}
                   </button>
                   <button
                     onClick={() =>
@@ -440,7 +447,14 @@ const ProductsPage = () => {
                     disabled={!pagination()!.hasPreviousPage || isFetching()}
                     class={paginationButtonClasses}
                   >
-                    Previous
+                    {/* --- FIX START --- */}
+                    {/* Responsive pagination buttons */}
+                    <span class="hidden sm:inline">Previous</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      &#8249;
+                    </span>{" "}
+                    {/* Previous icon */}
+                    {/* --- FIX END --- */}
                   </button>
                   <span class="text-neutral-700 font-medium text-sm px-2">
                     Page {pagination()!.currentPage} of{" "}
@@ -453,14 +467,28 @@ const ProductsPage = () => {
                     disabled={!pagination()!.hasNextPage || isFetching()}
                     class={paginationButtonClasses}
                   >
-                    Next
+                    {/* --- FIX START --- */}
+                    {/* Responsive pagination buttons */}
+                    <span class="hidden sm:inline">Next</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      &#8250;
+                    </span>{" "}
+                    {/* Next icon */}
+                    {/* --- FIX END --- */}
                   </button>
                   <button
                     onClick={() => handlePageChange(pagination()!.totalPages)}
                     disabled={!pagination()!.hasNextPage || isFetching()}
                     class={paginationButtonClasses}
                   >
-                    Last
+                    {/* --- FIX START --- */}
+                    {/* Responsive pagination buttons */}
+                    <span class="hidden sm:inline">Last</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      &#187;
+                    </span>{" "}
+                    {/* Last icon */}
+                    {/* --- FIX END --- */}
                   </button>
                 </div>
               </Show>
