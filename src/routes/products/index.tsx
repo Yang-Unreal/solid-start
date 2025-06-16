@@ -231,8 +231,6 @@ const ProductsPage = () => {
   const availableCategories = () => categoriesQuery.data || [];
   const availableFuelTypes = () => fuelTypesQuery.data || [];
 
-  // --- FIX START ---
-  // Create computed signals for options to ensure the currently selected value is always present
   const brandOptions = () => {
     const currentBrand = selectedBrand();
     const brands = availableBrands();
@@ -259,7 +257,6 @@ const ProductsPage = () => {
     }
     return fuelTypes;
   };
-  // --- FIX END ---
 
   const handleFilterChange = (
     filterType: "brand" | "category" | "fuelType",
@@ -292,8 +289,6 @@ const ProductsPage = () => {
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {/* --- FIX START --- */}
-            {/* Use computed options to ensure selected value is always available */}
             <select
               value={selectedBrand()}
               onChange={(e) =>
@@ -335,143 +330,17 @@ const ProductsPage = () => {
                 {(fuelType) => <option value={fuelType}>{fuelType}</option>}
               </For>
             </select>
-            {/* --- FIX END --- */}
           </div>
 
-          {/* Always show products if available, even during refetch, to prevent flicker */}
-          <Show
-            when={products().length > 0}
-            fallback={
-              <Show
-                when={productsQuery.isLoading && !productsQuery.isFetching}
-                fallback={
-                  <p class="text-center text-xl text-neutral-700 py-10">
-                    No products found. Add some!
-                  </p>
-                }
-              >
-                <p class="text-center text-xl text-neutral-700 py-10">
-                  Loading products...
-                </p>
-              </Show>
-            }
-          >
-            <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
-              <For each={products()}>
-                {(product) => (
-                  <A
-                    href={`/products/${product.id}`}
-                    class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group"
-                  >
-                    <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
-                      <picture>
-                        <source
-                          srcset={product.images.thumbnail.avif}
-                          type="image/avif"
-                        />
-                        <source
-                          srcset={product.images.thumbnail.webp}
-                          type="image/webp"
-                        />
-                        <img
-                          src={product.images.thumbnail.jpeg}
-                          alt={product.name}
-                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
-                          width="640"
-                          height="360"
-                        />
-                      </picture>
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                      <h2
-                        class="text-lg font-semibold text-neutral-800 truncate"
-                        title={product.name}
-                      >
-                        {product.name}
-                      </h2>
-                      <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
-                        {formatPrice(product.priceInCents)}
-                      </p>
-                      <div class="mt-auto pt-2 border-t border-neutral-100">
-                        <p class="text-xs text-neutral-600">
-                          Brand: {product.brand || "N/A"}
-                        </p>
-                        <p class="text-xs text-neutral-600">
-                          Category: {product.category || "N/A"}
-                        </p>
-                        <p class="text-xs text-neutral-600">
-                          Stock: {product.stockQuantity}
-                        </p>
-                      </div>
-                    </div>
-                  </A>
-                )}
-              </For>
-            </div>
-
-            <Show when={pagination() && pagination()!.totalPages > 1}>
-              <div class="mt-10 flex justify-center items-center space-x-2 sm:space-x-3">
-                <button
-                  onClick={() => handlePageChange(1)}
-                  disabled={!pagination()!.hasPreviousPage || isFetching()}
-                  class={paginationButtonClasses}
-                >
-                  {/* Responsive pagination buttons */}
-                  <span class="hidden sm:inline">First</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    &#171;
-                  </span>{" "}
-                  {/* First icon */}
-                </button>
-                <button
-                  onClick={() =>
-                    handlePageChange(pagination()!.currentPage - 1)
-                  }
-                  disabled={!pagination()!.hasPreviousPage || isFetching()}
-                  class={paginationButtonClasses}
-                >
-                  {/* Responsive pagination buttons */}
-                  <span class="hidden sm:inline">Previous</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    &#8249;
-                  </span>{" "}
-                  {/* Previous icon */}
-                </button>
-                <span class="text-neutral-700 font-medium text-sm px-2">
-                  Page {pagination()!.currentPage} of {pagination()!.totalPages}
-                </span>
-                <button
-                  onClick={() =>
-                    handlePageChange(pagination()!.currentPage + 1)
-                  }
-                  disabled={!pagination()!.hasNextPage || isFetching()}
-                  class={paginationButtonClasses}
-                >
-                  {/* Responsive pagination buttons */}
-                  <span class="hidden sm:inline">Next</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    &#8250;
-                  </span>{" "}
-                  {/* Next icon */}
-                </button>
-                <button
-                  onClick={() => handlePageChange(pagination()!.totalPages)}
-                  disabled={!pagination()!.hasNextPage || isFetching()}
-                  class={paginationButtonClasses}
-                >
-                  {/* Responsive pagination buttons */}
-                  <span class="hidden sm:inline">Last</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    &#187;
-                  </span>{" "}
-                  {/* Last icon */}
-                </button>
-              </div>
-            </Show>
+          {/* --- FIX START --- */}
+          {/* Show a loading indicator on initial load to prevent flicker */}
+          <Show when={productsQuery.isLoading}>
+            <p class="text-center text-xl text-neutral-700 py-10">
+              Loading products...
+            </p>
           </Show>
 
-          <Show when={error()}>
+          <Show when={!productsQuery.isLoading && error()}>
             <div class="text-center py-10">
               <p class="text-xl text-red-600">
                 Error: {error()?.message || "An unknown error occurred."}
@@ -486,6 +355,126 @@ const ProductsPage = () => {
                 </button>
               </p>
             </div>
+          </Show>
+
+          {/* This block will only show when loading is finished and there's no error */}
+          <Show when={!productsQuery.isLoading && !error()}>
+            {/* --- FIX END --- */}
+            <Show
+              when={products().length > 0}
+              fallback={
+                <p class="text-center text-xl text-neutral-700 py-10">
+                  No products found. Add some!
+                </p>
+              }
+            >
+              <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
+                <For each={products()}>
+                  {(product) => (
+                    <A
+                      href={`/products/${product.id}`}
+                      class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group"
+                    >
+                      <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
+                        <picture>
+                          <source
+                            srcset={product.images.thumbnail.avif}
+                            type="image/avif"
+                          />
+                          <source
+                            srcset={product.images.thumbnail.webp}
+                            type="image/webp"
+                          />
+                          <img
+                            src={product.images.thumbnail.jpeg}
+                            alt={product.name}
+                            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            loading="lazy"
+                            width="640"
+                            height="360"
+                          />
+                        </picture>
+                      </div>
+                      <div class="p-5 flex flex-col flex-grow">
+                        <h2
+                          class="text-lg font-semibold text-neutral-800 truncate"
+                          title={product.name}
+                        >
+                          {product.name}
+                        </h2>
+                        <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
+                          {formatPrice(product.priceInCents)}
+                        </p>
+                        <div class="mt-auto pt-2 border-t border-neutral-100">
+                          <p class="text-xs text-neutral-600">
+                            Brand: {product.brand || "N/A"}
+                          </p>
+                          <p class="text-xs text-neutral-600">
+                            Category: {product.category || "N/A"}
+                          </p>
+                          <p class="text-xs text-neutral-600">
+                            Stock: {product.stockQuantity}
+                          </p>
+                        </div>
+                      </div>
+                    </A>
+                  )}
+                </For>
+              </div>
+
+              <Show when={pagination() && pagination()!.totalPages > 1}>
+                <div class="mt-10 flex justify-center items-center space-x-2 sm:space-x-3">
+                  <button
+                    onClick={() => handlePageChange(1)}
+                    disabled={!pagination()!.hasPreviousPage || isFetching()}
+                    class={paginationButtonClasses}
+                  >
+                    <span class="hidden sm:inline">First</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      «
+                    </span>{" "}
+                  </button>
+                  <button
+                    onClick={() =>
+                      handlePageChange(pagination()!.currentPage - 1)
+                    }
+                    disabled={!pagination()!.hasPreviousPage || isFetching()}
+                    class={paginationButtonClasses}
+                  >
+                    <span class="hidden sm:inline">Previous</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      ‹
+                    </span>{" "}
+                  </button>
+                  <span class="text-neutral-700 font-medium text-sm px-2">
+                    Page {pagination()!.currentPage} of{" "}
+                    {pagination()!.totalPages}
+                  </span>
+                  <button
+                    onClick={() =>
+                      handlePageChange(pagination()!.currentPage + 1)
+                    }
+                    disabled={!pagination()!.hasNextPage || isFetching()}
+                    class={paginationButtonClasses}
+                  >
+                    <span class="hidden sm:inline">Next</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      ›
+                    </span>{" "}
+                  </button>
+                  <button
+                    onClick={() => handlePageChange(pagination()!.totalPages)}
+                    disabled={!pagination()!.hasNextPage || isFetching()}
+                    class={paginationButtonClasses}
+                  >
+                    <span class="hidden sm:inline">Last</span>
+                    <span class="sm:hidden" aria-hidden="true">
+                      »
+                    </span>{" "}
+                  </button>
+                </div>
+              </Show>
+            </Show>
           </Show>
         </div>
       </main>
