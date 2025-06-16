@@ -5,6 +5,8 @@ import { product as productTable, type ProductImages } from "~/db/schema"; // Im
 import { asc, desc, count, eq, and, Column } from "drizzle-orm";
 import { z } from "zod/v4";
 import { kv } from "~/lib/redis";
+import { minio, bucket } from "~/lib/minio"; // Import minio client instance and bucket
+import { DeleteObjectCommand } from "@aws-sdk/client-s3"; // Import DeleteObjectCommand
 
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
@@ -296,27 +298,118 @@ export async function DELETE({ request }: APIEvent) {
     });
   }
   try {
-    const deletedProduct = await db
-      .delete(productTable)
+    // First, fetch the product to get image URLs
+    const productToDelete = await db
+      .select()
+      .from(productTable)
       .where(eq(productTable.id, idValidationResult.data))
-      .returning();
-    if (deletedProduct.length === 0) {
+      .limit(1);
+
+    if (productToDelete.length === 0) {
       return new Response(JSON.stringify({ error: "Product not found." }), {
         status: 404,
       });
     }
+
+    const product = productToDelete[0];
+    if (!product) {
+      // This case should ideally be caught by productToDelete.length === 0, but as a safeguard
+      return new Response(
+        JSON.stringify({ error: "Product data is corrupt." }),
+        {
+          status: 500,
+        }
+      );
+    }
+
+    const productImages = product.images;
+    // Use the 'bucket' constant imported from minio.ts for consistency
+    const bucketName = bucket;
+
+    if (bucketName && productImages) {
+      const imagePaths: string[] = [];
+      // Collect all image paths from the ProductImages object, ensuring properties exist at each level
+      if (productImages.thumbnail) {
+        const getMinioKey = (url: string | undefined) => {
+          if (!url) return null;
+          const parts = url.split("products/");
+          return parts.length > 1 ? `products/${parts[1]}` : null;
+        };
+
+        const thumbnailAvif = getMinioKey(productImages.thumbnail?.avif);
+        if (thumbnailAvif) imagePaths.push(thumbnailAvif);
+        const thumbnailWebp = getMinioKey(productImages.thumbnail?.webp);
+        if (thumbnailWebp) imagePaths.push(thumbnailWebp);
+        const thumbnailJpeg = getMinioKey(productImages.thumbnail?.jpeg);
+        if (thumbnailJpeg) imagePaths.push(thumbnailJpeg);
+      }
+      if (productImages.detail) {
+        const getMinioKey = (url: string | undefined) => {
+          if (!url) return null;
+          const parts = url.split("products/");
+          return parts.length > 1 ? `products/${parts[1]}` : null;
+        };
+        const detailAvif = getMinioKey(productImages.detail?.avif);
+        if (detailAvif) imagePaths.push(detailAvif);
+        const detailWebp = getMinioKey(productImages.detail?.webp);
+        if (detailWebp) imagePaths.push(detailWebp);
+        const detailJpeg = getMinioKey(productImages.detail?.jpeg);
+        if (detailJpeg) imagePaths.push(detailJpeg);
+      }
+
+      // Attempt to delete images from MinIO
+      try {
+        // Use Promise.all to concurrently delete all image files
+        await Promise.all(
+          imagePaths.map(async (key) => {
+            console.log(
+              `Attempting to delete image from MinIO. Bucket: ${bucketName}, Key: ${key}`
+            ); // Added for debugging
+            const command = new DeleteObjectCommand({
+              Bucket: bucketName,
+              Key: key,
+            });
+            await minio.send(command);
+            console.log(`Successfully deleted image: ${key}`);
+          })
+        );
+        console.log(
+          `Successfully deleted all associated images for product ID: ${idValidationResult.data}`
+        );
+      } catch (minioError) {
+        console.error(
+          `Failed to delete one or more images from MinIO for product ID ${idValidationResult.data}:`,
+          minioError
+        );
+        // Log the error but continue with database deletion to avoid orphaned records
+      }
+    } else {
+      console.warn(
+        `MinIO bucket name not set or no images found for product ID: ${idValidationResult.data}. Skipping image deletion.`
+      );
+    }
+
+    // Then, delete the product from the database
+    const deletedProduct = await db
+      .delete(productTable)
+      .where(eq(productTable.id, idValidationResult.data))
+      .returning();
+
+    // Invalidate Redis cache
     const keys = await kv.keys("products:*");
     if (keys.length > 0) {
       await kv.del(...keys);
     }
+
     return new Response(
       JSON.stringify({
-        message: "Product deleted.",
+        message: "Product and associated images deleted.",
         product: deletedProduct[0],
       }),
       { status: 200 }
     );
   } catch (error) {
+    console.error("Error deleting product:", error);
     return new Response(
       JSON.stringify({ error: "Failed to delete product." }),
       { status: 500 }
