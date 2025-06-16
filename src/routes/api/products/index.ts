@@ -10,7 +10,7 @@ import { DeleteObjectCommand } from "@aws-sdk/client-s3"; // Import DeleteObject
 
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
-const CACHE_DURATION_SECONDS = 60;
+const CACHE_DURATION_SECONDS = 300; // Increased to 5 minutes to align with client-side staleTime
 
 // --- Schemas ---
 const ProductImagesSchema = z.object({
