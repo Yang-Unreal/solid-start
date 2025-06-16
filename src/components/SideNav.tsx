@@ -33,7 +33,7 @@ export default function SideNav(props: SideNavProps) {
   };
 
   return (
-    <nav class="h-full w-full bg-white shadow-md flex flex-col">
+    <nav class="h-full w-full max-w-sm bg-white shadow-md flex flex-col">
       {/* Header/Logo area */}
       <div class="p-4 border-b border-neutral-200 flex justify-between items-center">
         <h1 class="text-lg font-semibold text-neutral-800">Dashboard</h1>

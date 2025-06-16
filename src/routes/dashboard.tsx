@@ -50,34 +50,45 @@ export default function DashboardPage() {
           </button>
         </div>
 
+        {/* Desktop Sidebar */}
+        <div class="hidden md:static md:inset-y-0 md:left-0 md:z-50 md:w-64 md:bg-white md:shadow-md md:flex md:flex-col">
+          <SideNav
+            onClose={() => setSideNavOpen(false)}
+            onProductClick={() => setActiveContent("products")}
+            onUserClick={() => setActiveContent("user")}
+            onLogoutSuccess={() => navigate("/login", { replace: true })}
+          />
+        </div>
+
         <Show when={sideNavOpen()}>
+          {/* Mobile Overlay */}
           <div
             class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setSideNavOpen(false)}
           />
+          {/* Mobile Full-Screen Menu Content */}
+          <div
+            id="mobile-full-screen-menu"
+            class={`fixed top-0 left-0 right-0 z-50 bg-black transform transition-all duration-300 ease-in-out flex flex-col items-center justify-center ${
+              sideNavOpen()
+                ? "h-screen opacity-100"
+                : "h-0 opacity-0 overflow-hidden pointer-events-none"
+            }`}
+          >
+            <SideNav
+              onClose={() => setSideNavOpen(false)}
+              onProductClick={() => {
+                setActiveContent("products");
+                setSideNavOpen(false);
+              }}
+              onUserClick={() => {
+                setActiveContent("user");
+                setSideNavOpen(false);
+              }}
+              onLogoutSuccess={() => navigate("/login", { replace: true })}
+            />
+          </div>
         </Show>
-
-        <div
-          id="mobile-sidebar"
-          class={`fixed top-0 left-0 right-0 z-50 bg-black transform transition-all duration-300 ease-in-out flex flex-col items-center justify-center ${
-            sideNavOpen()
-              ? "h-screen opacity-100"
-              : "h-0 opacity-0 overflow-hidden"
-          }`}
-        >
-          <SideNav
-            onClose={() => setSideNavOpen(false)}
-            onProductClick={() => {
-              setActiveContent("products");
-              setSideNavOpen(false);
-            }}
-            onUserClick={() => {
-              setActiveContent("user");
-              setSideNavOpen(false);
-            }}
-            onLogoutSuccess={() => navigate("/login", { replace: true })}
-          />
-        </div>
 
         <div class="flex-1 flex flex-col min-w-0">
           <main class="flex-1 overflow-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pt-16 md:pt-4">
