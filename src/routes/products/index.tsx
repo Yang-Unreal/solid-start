@@ -389,7 +389,7 @@ const ProductsPage = () => {
                           />
                           <img
                             src={product.images.thumbnail.jpeg}
-                            alt={`${product.brand} ${product.model}`}
+                            alt={product.name}
                             class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                             loading="lazy"
                             width="640"
@@ -398,19 +398,19 @@ const ProductsPage = () => {
                         </picture>
                       </div>
                       <div class="p-5 flex flex-col flex-grow">
-                        <p class="text-sm font-medium text-neutral-500">
-                          {product.brand}
-                        </p>
                         <h2
                           class="text-lg font-semibold text-neutral-800 truncate"
-                          title={product.model}
+                          title={product.name}
                         >
-                          {product.model}
+                          {product.name}
                         </h2>
                         <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
                           {formatPrice(product.priceInCents)}
                         </p>
                         <div class="mt-auto pt-2 border-t border-neutral-100">
+                          <p class="text-xs text-neutral-600">
+                            Brand: {product.brand || "N/A"}
+                          </p>
                           <p class="text-xs text-neutral-600">
                             Category: {product.category || "N/A"}
                           </p>

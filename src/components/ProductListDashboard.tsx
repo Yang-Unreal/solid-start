@@ -10,6 +10,7 @@ import {
   ChevronsRight,
   ChevronLeft,
   ChevronRight,
+  Pencil, // Added Pencil icon
 } from "lucide-solid";
 // CHANGE: Import the new types directly from your schema file
 import type { Product, ProductImages } from "~/db/schema";
@@ -93,6 +94,14 @@ export default function ProductListDashboard() {
     calculatePageSize()
   );
 
+  const currentBrand = () => getSearchParamString(searchParams.brand, "");
+  const currentCategory = () => getSearchParamString(searchParams.category, "");
+  const currentFuelType = () => getSearchParamString(searchParams.fuelType, "");
+  const currentSortBy = () =>
+    getSearchParamString(searchParams.sortBy, "createdAt");
+  const currentSortOrder = () =>
+    getSearchParamString(searchParams.sortOrder, "desc");
+
   onMount(() => {
     // ... onMount logic is unchanged ...
     const initialSize = calculatePageSize();
@@ -152,17 +161,37 @@ export default function ProductListDashboard() {
   };
 
   const fetchProductsQueryFn = async (context: {
-    queryKey: readonly [string, { page: number; size: number }];
+    queryKey: readonly [
+      string,
+      {
+        page: number;
+        size: number;
+        brand: string;
+        category: string;
+        fuelType: string;
+        sortBy: string;
+        sortOrder: string;
+      }
+    ];
   }): Promise<ApiResponse> => {
-    // ... fetchProductsQueryFn is unchanged ...
-    const [_key, { page, size }] = context.queryKey;
+    const [_key, { page, size, brand, category, fuelType, sortBy, sortOrder }] =
+      context.queryKey;
     let baseUrl = "";
     if (import.meta.env.SSR && typeof window === "undefined") {
       baseUrl =
         import.meta.env.VITE_INTERNAL_API_ORIGIN ||
         `http://localhost:${process.env.PORT || 3000}`;
     }
-    const fetchUrl = `${baseUrl}/api/products?page=${page}&pageSize=${size}`;
+    const params = new URLSearchParams();
+    params.append("page", page.toString());
+    params.append("pageSize", size.toString());
+    if (brand) params.append("brand", brand);
+    if (category) params.append("category", category);
+    if (fuelType) params.append("fuelType", fuelType);
+    if (sortBy) params.append("sortBy", sortBy);
+    if (sortOrder) params.append("sortOrder", sortOrder);
+
+    const fetchUrl = `${baseUrl}/api/products?${params.toString()}`;
     const response = await fetch(fetchUrl);
     if (!response.ok) {
       let errorMsg = `HTTP error! status: ${response.status}`;
@@ -193,11 +222,30 @@ export default function ProductListDashboard() {
     ApiResponse,
     Error,
     ApiResponse,
-    readonly [string, { page: number; size: number }]
+    readonly [
+      string,
+      {
+        page: number;
+        size: number;
+        brand: string;
+        category: string;
+        fuelType: string;
+        sortBy: string;
+        sortOrder: string;
+      }
+    ]
   >(() => ({
     queryKey: [
       PRODUCTS_QUERY_KEY_PREFIX,
-      { page: currentPage(), size: pageSize() },
+      {
+        page: currentPage(),
+        size: pageSize(),
+        brand: currentBrand(),
+        category: currentCategory(),
+        fuelType: currentFuelType(),
+        sortBy: currentSortBy(),
+        sortOrder: currentSortOrder(),
+      },
     ] as const,
     queryFn: fetchProductsQueryFn,
     staleTime: 5 * 60 * 1000,
@@ -298,14 +346,18 @@ export default function ProductListDashboard() {
         </div>
       </Show>
 
-      <Show when={products().length > 0}>
-        {/* Mobile List View */}
-        <div class="block md:hidden space-y-3">
+      {/* Mobile List View */}
+      <div class="block md:hidden space-y-3">
+        <Show
+          when={products().length > 0}
+          fallback={
+            <p class="text-center text-neutral-700 py-10">No products found.</p>
+          }
+        >
           <For each={products()}>
             {(product) => (
               <div class="bg-white rounded-lg shadow p-3 flex items-center space-x-4">
                 <div class="flex-shrink-0 w-24">
-                  {/* CHANGE: Use <picture> tag for optimized images */}
                   <picture>
                     <source
                       srcset={product.images.thumbnail.avif}
@@ -317,23 +369,22 @@ export default function ProductListDashboard() {
                     />
                     <img
                       src={product.images.thumbnail.jpeg}
-                      alt={`${product.brand} ${product.model}`}
+                      alt={product.name}
                       class="w-24 h-16 rounded-md object-cover"
                     />
                   </picture>
                 </div>
                 <div class="flex-1 min-w-0">
-                  {/* CHANGE: Display brand and model */}
-                  <p class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                    {product.brand}
-                  </p>
                   <p class="font-bold text-neutral-800 truncate">
-                    {product.model}
+                    {product.name}
                   </p>
                   <p class="text-sm font-semibold text-neutral-700 mt-1">
                     {formatPrice(product.priceInCents)}
                   </p>
                   <p class="text-xs text-neutral-500 mt-1">
+                    Brand: {product.brand || "N/A"}
+                  </p>
+                  <p class="text-xs text-neutral-500">
                     Category: {product.category || "N/A"}
                   </p>
                   <p class="text-xs text-neutral-500">
@@ -341,6 +392,13 @@ export default function ProductListDashboard() {
                   </p>
                 </div>
                 <div class="flex flex-col items-center space-y-2">
+                  <A
+                    href={`/products/${product.id}/edit`}
+                    class="p-1 rounded-md text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800"
+                    aria-label={`Edit ${product.name}`}
+                  >
+                    <Pencil size={18} />
+                  </A>
                   <button
                     onClick={() => handleDeleteProduct(product)}
                     disabled={
@@ -348,7 +406,7 @@ export default function ProductListDashboard() {
                       deleteProductMutation.variables === product.id
                     }
                     class="p-1 rounded-md text-red-600 hover:bg-red-50 hover:text-red-800 disabled:opacity-50"
-                    aria-label={`Delete ${product.brand} ${product.model}`}
+                    aria-label={`Delete ${product.name}`}
                   >
                     <Trash2 size={18} />
                   </button>
@@ -356,10 +414,17 @@ export default function ProductListDashboard() {
               </div>
             )}
           </For>
-        </div>
+        </Show>
+      </div>
 
-        {/* Desktop Table View */}
-        <div class="hidden md:block overflow-x-auto bg-white shadow-md rounded-lg">
+      {/* Desktop Table View */}
+      <div class="hidden md:block overflow-x-auto bg-white shadow-md rounded-lg">
+        <Show
+          when={products().length > 0}
+          fallback={
+            <p class="text-center text-neutral-700 py-10">No products found.</p>
+          }
+        >
           <table class="min-w-full divide-y divide-neutral-200">
             <thead class="bg-neutral-50">
               <tr>
@@ -391,7 +456,6 @@ export default function ProductListDashboard() {
                 {(product) => (
                   <tr>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-                      {/* CHANGE: Use <picture> tag for optimized images */}
                       <picture>
                         <source
                           srcset={product.images.thumbnail.avif}
@@ -403,17 +467,13 @@ export default function ProductListDashboard() {
                         />
                         <img
                           src={product.images.thumbnail.jpeg}
-                          alt={`${product.brand} ${product.model}`}
+                          alt={product.name}
                           class="h-10 w-16 rounded-md object-cover"
                         />
                       </picture>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
-                      {/* CHANGE: Display brand and model */}
-                      <div>{product.brand}</div>
-                      <div class="font-normal text-neutral-600">
-                        {product.model}
-                      </div>
+                      <div>{product.name}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
                       {product.category || "N/A"}
@@ -428,6 +488,13 @@ export default function ProductListDashboard() {
                       {new Date(product.createdAt).toLocaleDateString()}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
+                      <A
+                        href={`/products/${product.id}/edit`}
+                        class="text-sky-600 hover:text-sky-900 mr-4"
+                      >
+                        <Pencil size={16} class="inline-block mr-1" />
+                        Edit
+                      </A>
                       <button
                         onClick={() => handleDeleteProduct(product)}
                         disabled={
@@ -448,49 +515,46 @@ export default function ProductListDashboard() {
               </For>
             </tbody>
           </table>
-        </div>
-
-        <Show when={pagination() && pagination()!.totalPages > 1}>
-          <div class="mt-4 flex flex-wrap justify-center items-center space-x-1">
-            <button
-              onClick={() => handlePageChange(1)}
-              disabled={pagination()!.currentPage === 1 || isFetching()}
-              class={paginationButtonClasses}
-            >
-              <ChevronsLeft size={18} />
-            </button>
-            <button
-              onClick={() => handlePageChange(pagination()!.currentPage - 1)}
-              disabled={!pagination()!.hasPreviousPage || isFetching()}
-              class={paginationButtonClasses}
-            >
-              <ChevronLeft size={18} />
-            </button>
-            <span class="text-neutral-700 font-medium text-sm px-2 py-1">
-              Page {pagination()!.currentPage} of {pagination()!.totalPages}
-            </span>
-            <button
-              onClick={() => handlePageChange(pagination()!.currentPage + 1)}
-              disabled={!pagination()!.hasNextPage || isFetching()}
-              class={paginationButtonClasses}
-            >
-              <ChevronRight size={18} />
-            </button>
-            <button
-              onClick={() => handlePageChange(pagination()!.totalPages)}
-              disabled={
-                pagination()!.currentPage === pagination()!.totalPages ||
-                isFetching()
-              }
-              class={paginationButtonClasses}
-            >
-              <ChevronsRight size={18} />
-            </button>
-          </div>
         </Show>
-      </Show>
-      <Show when={products().length === 0 && !isFetching() && !error()}>
-        <p class="text-center text-neutral-700 py-10">No products found.</p>
+      </div>
+
+      <Show when={pagination() && pagination()!.totalPages > 1}>
+        <div class="mt-4 flex flex-wrap justify-center items-center space-x-1">
+          <button
+            onClick={() => handlePageChange(1)}
+            disabled={pagination()!.currentPage === 1 || isFetching()}
+            class={paginationButtonClasses}
+          >
+            <ChevronsLeft size={18} />
+          </button>
+          <button
+            onClick={() => handlePageChange(pagination()!.currentPage - 1)}
+            disabled={!pagination()!.hasPreviousPage || isFetching()}
+            class={paginationButtonClasses}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <span class="text-neutral-700 font-medium text-sm px-2 py-1">
+            Page {pagination()!.currentPage} of {pagination()!.totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(pagination()!.currentPage + 1)}
+            disabled={!pagination()!.hasNextPage || isFetching()}
+            class={paginationButtonClasses}
+          >
+            <ChevronRight size={18} />
+          </button>
+          <button
+            onClick={() => handlePageChange(pagination()!.totalPages)}
+            disabled={
+              pagination()!.currentPage === pagination()!.totalPages ||
+              isFetching()
+            }
+            class={paginationButtonClasses}
+          >
+            <ChevronsRight size={18} />
+          </button>
+        </div>
       </Show>
     </div>
   );

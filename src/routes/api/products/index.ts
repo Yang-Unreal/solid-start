@@ -10,7 +10,47 @@ const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
 const CACHE_DURATION_SECONDS = 60;
 
-// --- GET Handler (No changes needed, Drizzle handles it) ---
+// --- Schemas ---
+const ProductImagesSchema = z.object({
+  thumbnail: z.object({
+    avif: z.string().url(),
+    webp: z.string().url(),
+    jpeg: z.string().url(),
+  }),
+  detail: z.object({
+    avif: z.string().url(),
+    webp: z.string().url(),
+    jpeg: z.string().url(),
+  }),
+});
+
+const NewProductPayloadSchema = z.object({
+  name: z.string().trim().min(1),
+  description: z.string().trim().nullable().optional(),
+  priceInCents: z.number().int().positive(),
+  images: ProductImagesSchema,
+  category: z.string().trim().nullable().optional(),
+  stockQuantity: z.number().int().min(0),
+  brand: z.string().trim().min(1),
+  model: z.string().trim().min(1),
+  fuelType: z.string().trim().min(1),
+});
+
+const UpdateProductPayloadSchema = z
+  .object({
+    name: z.string().trim().min(1).optional(),
+    description: z.string().trim().nullable().optional(),
+    priceInCents: z.number().int().positive().optional(),
+    images: ProductImagesSchema.optional(),
+    category: z.string().trim().nullable().optional(),
+    stockQuantity: z.number().int().min(0).optional(),
+    brand: z.string().trim().min(1).optional(),
+    model: z.string().trim().min(1).optional(),
+    fuelType: z.string().trim().min(1).optional(),
+  })
+  .partial(); // Make all fields optional for partial update
+
+// --- GET Handler ---
 export async function GET({ request }: APIEvent) {
   const url = new URL(request.url);
   const cacheKey = `products:${url.searchParams.toString()}`;
@@ -25,6 +65,40 @@ export async function GET({ request }: APIEvent) {
     }
   } catch (cacheError) {
     console.error(`Redis Cache Read Error for key ${cacheKey}:`, cacheError);
+  }
+
+  const productId = url.searchParams.get("id");
+  if (productId) {
+    const idValidationResult = z.string().uuid().safeParse(productId);
+    if (!idValidationResult.success) {
+      return new Response(JSON.stringify({ error: "Invalid product ID." }), {
+        status: 400,
+      });
+    }
+    try {
+      const product = await db
+        .select()
+        .from(productTable)
+        .where(eq(productTable.id, idValidationResult.data))
+        .limit(1);
+      if (product.length === 0) {
+        return new Response(JSON.stringify({ error: "Product not found." }), {
+          status: 404,
+        });
+      }
+      return new Response(JSON.stringify({ data: product[0] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.error("Error fetching single product:", error);
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch product." }),
+        {
+          status: 500,
+        }
+      );
+    }
   }
 
   const columns = productTable as unknown as Record<string, Column>;
@@ -60,7 +134,8 @@ export async function GET({ request }: APIEvent) {
     if (brand) {
       whereClauses.push(eq(productTable.brand, brand));
     }
-    if (category) {
+    if (category && category !== "") {
+      // Only filter by category if a non-empty category is provided
       whereClauses.push(eq(productTable.category, category));
     }
     if (fuelType) {
@@ -97,7 +172,7 @@ export async function GET({ request }: APIEvent) {
     await kv.setex(cacheKey, CACHE_DURATION_SECONDS, jsonBody);
     return new Response(jsonBody, {
       status: 200,
-      headers: { "Content-Type": "application/json", "X-Cache": "MISS" },
+      headers: { "Content-Type": "application/json", "X-Cache": "MISS" }, // Indicate cache is now active
     });
   } catch (error: any) {
     return new Response(
@@ -107,32 +182,7 @@ export async function GET({ request }: APIEvent) {
   }
 }
 
-// --- POST Handler (Updated Schema) ---
-const ProductImagesSchema = z.object({
-  thumbnail: z.object({
-    avif: z.string().url(),
-    webp: z.string().url(),
-    jpeg: z.string().url(),
-  }),
-  detail: z.object({
-    avif: z.string().url(),
-    webp: z.string().url(),
-    jpeg: z.string().url(),
-  }),
-});
-
-const NewProductPayloadSchema = z.object({
-  name: z.string().trim().min(1),
-  description: z.string().trim().nullable().optional(),
-  priceInCents: z.number().int().positive(),
-  images: ProductImagesSchema,
-  category: z.string().trim().nullable().optional(),
-  stockQuantity: z.number().int().min(0),
-  brand: z.string().trim().min(1),
-  model: z.string().trim().min(1),
-  fuelType: z.string().trim().min(1),
-});
-
+// --- POST Handler ---
 export async function POST({ request }: APIEvent) {
   try {
     const body = await request.json();
@@ -163,7 +213,79 @@ export async function POST({ request }: APIEvent) {
   }
 }
 
-// --- DELETE Handler (No changes needed) ---
+// --- PUT Handler ---
+export async function PUT({ request }: APIEvent) {
+  const url = new URL(request.url);
+  const productId = url.searchParams.get("id");
+
+  const idValidationResult = z.string().uuid().safeParse(productId);
+  if (!idValidationResult.success) {
+    return new Response(JSON.stringify({ error: "Invalid product ID." }), {
+      status: 400,
+    });
+  }
+
+  try {
+    const body = await request.json();
+    const validationResult = UpdateProductPayloadSchema.safeParse(body);
+
+    if (!validationResult.success) {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid input for product update.",
+          issues: validationResult.error.flatten(),
+        }),
+        { status: 400 }
+      );
+    }
+
+    if (Object.keys(validationResult.data).length === 0) {
+      return new Response(
+        JSON.stringify({ message: "No update data provided." }),
+        { status: 200 }
+      );
+    }
+
+    // Explicitly set updatedAt for updates
+    const dataToUpdate = {
+      ...validationResult.data,
+      updatedAt: new Date(),
+    };
+
+    const updatedProducts = await db
+      .update(productTable)
+      .set(dataToUpdate)
+      .where(eq(productTable.id, idValidationResult.data))
+      .returning();
+
+    if (updatedProducts.length === 0) {
+      return new Response(JSON.stringify({ error: "Product not found." }), {
+        status: 404,
+      });
+    }
+
+    const keys = await kv.keys("products:*");
+    if (keys.length > 0) {
+      await kv.del(...keys);
+    }
+
+    return new Response(
+      JSON.stringify({
+        message: "Product updated successfully.",
+        product: updatedProducts[0],
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating product:", error);
+    return new Response(
+      JSON.stringify({ error: "Failed to update product." }),
+      { status: 500 }
+    );
+  }
+}
+
+// --- DELETE Handler ---
 export async function DELETE({ request }: APIEvent) {
   const url = new URL(request.url);
   const productId = url.searchParams.get("id");
