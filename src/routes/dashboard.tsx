@@ -52,17 +52,17 @@ export default function DashboardPage() {
 
         <Show when={sideNavOpen()}>
           <div
-            class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+            class="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setSideNavOpen(false)}
           />
         </Show>
 
         <div
           id="mobile-sidebar"
-          class={`fixed md:static inset-y-0 left-0 z-40 w-64 bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
+          class={`fixed top-0 left-0 right-0 z-50 bg-black transform transition-all duration-300 ease-in-out flex flex-col items-center justify-center ${
             sideNavOpen()
-              ? "translate-x-0"
-              : "-translate-x-full md:translate-x-0"
+              ? "h-screen opacity-100"
+              : "h-0 opacity-0 overflow-hidden"
           }`}
         >
           <SideNav
