@@ -2,7 +2,15 @@
 import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
 import { useSearchParams, A } from "@solidjs/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query";
-import { PlusCircle, Trash2, Package } from "lucide-solid";
+import {
+  PlusCircle,
+  Trash2,
+  Package,
+  ChevronsLeft,
+  ChevronsRight,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-solid";
 // CHANGE: Import the new types directly from your schema file
 import type { Product, ProductImages } from "~/db/schema";
 
@@ -248,7 +256,7 @@ export default function ProductListDashboard() {
   };
   const formatPrice = (priceInCents: number) =>
     `$${(priceInCents / 100).toLocaleString("en-US")}`;
-  const paginationButtonClasses = `min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed`;
+  const paginationButtonClasses = `h-10 w-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-300 text-neutral-700 hover:bg-neutral-400 active:bg-neutral-500 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:bg-neutral-200 disabled:text-neutral-500 disabled:cursor-not-allowed`;
 
   return (
     <div class="p-4">
@@ -310,7 +318,7 @@ export default function ProductListDashboard() {
                     <img
                       src={product.images.thumbnail.jpeg}
                       alt={`${product.brand} ${product.model}`}
-                      class="w-full aspect-video rounded-md object-cover"
+                      class="w-24 h-16 rounded-md object-cover"
                     />
                   </picture>
                 </div>
@@ -325,11 +333,14 @@ export default function ProductListDashboard() {
                   <p class="text-sm font-semibold text-neutral-700 mt-1">
                     {formatPrice(product.priceInCents)}
                   </p>
+                  <p class="text-xs text-neutral-500 mt-1">
+                    Category: {product.category || "N/A"}
+                  </p>
+                  <p class="text-xs text-neutral-500">
+                    Stock: {product.stockQuantity}
+                  </p>
                 </div>
                 <div class="flex flex-col items-center space-y-2">
-                  <span class="text-xs text-neutral-500">
-                    Stock: {product.stockQuantity}
-                  </span>
                   <button
                     onClick={() => handleDeleteProduct(product)}
                     disabled={
@@ -440,15 +451,22 @@ export default function ProductListDashboard() {
         </div>
 
         <Show when={pagination() && pagination()!.totalPages > 1}>
-          <div class="mt-4 flex justify-center items-center space-x-3">
+          <div class="mt-4 flex flex-wrap justify-center items-center space-x-1">
+            <button
+              onClick={() => handlePageChange(1)}
+              disabled={pagination()!.currentPage === 1 || isFetching()}
+              class={paginationButtonClasses}
+            >
+              <ChevronsLeft size={18} />
+            </button>
             <button
               onClick={() => handlePageChange(pagination()!.currentPage - 1)}
               disabled={!pagination()!.hasPreviousPage || isFetching()}
               class={paginationButtonClasses}
             >
-              Previous
+              <ChevronLeft size={18} />
             </button>
-            <span class="text-neutral-700 font-medium text-sm">
+            <span class="text-neutral-700 font-medium text-sm px-2 py-1">
               Page {pagination()!.currentPage} of {pagination()!.totalPages}
             </span>
             <button
@@ -456,7 +474,17 @@ export default function ProductListDashboard() {
               disabled={!pagination()!.hasNextPage || isFetching()}
               class={paginationButtonClasses}
             >
-              Next
+              <ChevronRight size={18} />
+            </button>
+            <button
+              onClick={() => handlePageChange(pagination()!.totalPages)}
+              disabled={
+                pagination()!.currentPage === pagination()!.totalPages ||
+                isFetching()
+              }
+              class={paginationButtonClasses}
+            >
+              <ChevronsRight size={18} />
             </button>
           </div>
         </Show>

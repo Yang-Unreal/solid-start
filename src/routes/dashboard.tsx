@@ -37,14 +37,18 @@ export default function DashboardPage() {
 
     return (
       <div class="flex h-screen bg-neutral-100">
-        <button
-          id="mobile-menu-button"
-          onClick={() => setSideNavOpen(true)}
-          class="md:hidden fixed top-4 left-4 z-20 p-2 rounded-md bg-white shadow-md border border-neutral-200 hover:bg-neutral-50"
-          aria-label="Open menu"
-        >
-          <Menu size={20} />
-        </button>
+        {/* Mobile Fixed Header */}
+        <div class="fixed top-0 left-0 right-0 z-10 bg-white shadow-md h-16 flex items-center justify-between px-4 md:hidden">
+          <h1 class="text-lg font-semibold text-neutral-800">Dashboard</h1>
+          <button
+            id="mobile-menu-button"
+            onClick={() => setSideNavOpen(true)}
+            class="p-2 rounded-md bg-white shadow-md border border-neutral-200 hover:bg-neutral-50"
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
 
         <Show when={sideNavOpen()}>
           <div
