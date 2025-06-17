@@ -332,14 +332,6 @@ const ProductsPage = () => {
             </select>
           </div>
 
-          {/* --- FIX START --- */}
-          {/* Show a loading indicator on initial load to prevent flicker */}
-          <Show when={productsQuery.isLoading}>
-            <p class="text-center text-xl text-neutral-700 py-10">
-              Loading products...
-            </p>
-          </Show>
-
           <Show when={!productsQuery.isLoading && error()}>
             <div class="text-center py-10">
               <p class="text-xl text-red-600">
@@ -364,7 +356,7 @@ const ProductsPage = () => {
               when={products().length > 0}
               fallback={
                 <p class="text-center text-xl text-neutral-700 py-10">
-                  No products found. Add some!
+                  No products found.
                 </p>
               }
             >
