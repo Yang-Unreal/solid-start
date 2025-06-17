@@ -44,18 +44,9 @@ const calculatePageSize = () => {
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  // --- FIX START ---
-  // Initialize with the server-side default to prevent query key mismatch on hydration.
-  // The server calculates 4 columns * 3 rows = 12.
-  const [pageSize, setPageSize] = createSignal(12);
-  // --- FIX END ---
-
-  let baseUrl = "";
-  if (import.meta.env.SSR && typeof window === "undefined") {
-    baseUrl =
-      import.meta.env.VITE_INTERNAL_API_ORIGIN ||
-      `http://localhost:${process.env.PORT || 3000}`;
-  }
+  const [dynamicPageSize, setDynamicPageSize] = createSignal(
+    calculatePageSize()
+  );
 
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
@@ -66,6 +57,28 @@ const ProductsPage = () => {
       : paramValue || defaultValue;
   };
 
+  const pageSize = () => {
+    const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
+    if (paramPageSizeValue) {
+      const numParamPageSize = parseInt(paramPageSizeValue, 10);
+      if (
+        !isNaN(numParamPageSize) &&
+        numParamPageSize > 0 &&
+        numParamPageSize <= MAX_API_PAGE_SIZE
+      ) {
+        return numParamPageSize;
+      }
+    }
+    return dynamicPageSize();
+  };
+
+  let baseUrl = "";
+  if (import.meta.env.SSR && typeof window === "undefined") {
+    baseUrl =
+      import.meta.env.VITE_INTERNAL_API_ORIGIN ||
+      `http://localhost:${process.env.PORT || 3000}`;
+  }
+
   const currentPage = () =>
     parseInt(getSearchParamString(searchParams.page, "1"), 10);
   const selectedBrand = () => getSearchParamString(searchParams.brand, "");
@@ -75,20 +88,29 @@ const ProductsPage = () => {
     getSearchParamString(searchParams.fuelType, "");
 
   onMount(() => {
+    const initialSize = calculatePageSize();
+    setDynamicPageSize(initialSize);
+
     // --- FIX START ---
-    // On the client, calculate the dynamic size and update the state.
-    // This will trigger a refetch, but `keepPreviousData` will prevent flicker.
-    const newSize = calculatePageSize();
-    if (newSize !== pageSize()) {
-      setPageSize(newSize);
-      setSearchParams({ page: "1", pageSize: newSize.toString() });
+    // Safely get the page size from the URL to prevent type errors.
+    const currentParamSize = getSearchParamString(searchParams.pageSize, "0");
+    if (parseInt(currentParamSize, 10) !== initialSize) {
+      setSearchParams(
+        { ...searchParams, page: "1", pageSize: initialSize.toString() },
+        { replace: true }
+      );
     }
     // --- FIX END ---
+
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== pageSize()) {
-        setPageSize(newSize);
-        setSearchParams({ page: "1", pageSize: newSize.toString() });
+        setDynamicPageSize(newSize);
+        setSearchParams({
+          ...searchParams,
+          page: "1",
+          pageSize: newSize.toString(),
+        });
       }
     };
     window.addEventListener("resize", handleResize);
@@ -361,9 +383,6 @@ const ProductsPage = () => {
             </div>
           </Show>
 
-          {/* --- FIX START --- */}
-          {/* This logic prevents flicker by showing the list while keeping previous data.
-              The fallback only shows when the query is done and there are no results. */}
           <Show
             when={products().length > 0}
             fallback={
@@ -374,7 +393,6 @@ const ProductsPage = () => {
               </Show>
             }
           >
-            {/* --- FIX END --- */}
             <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
               <For each={products()}>
                 {(product) => (
