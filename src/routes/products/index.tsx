@@ -44,7 +44,11 @@ const calculatePageSize = () => {
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [pageSize, setPageSize] = createSignal(calculatePageSize());
+  // --- FIX START ---
+  // Initialize with the server-side default to prevent query key mismatch on hydration.
+  // The server calculates 4 columns * 3 rows = 12.
+  const [pageSize, setPageSize] = createSignal(12);
+  // --- FIX END ---
 
   let baseUrl = "";
   if (import.meta.env.SSR && typeof window === "undefined") {
@@ -71,7 +75,15 @@ const ProductsPage = () => {
     getSearchParamString(searchParams.fuelType, "");
 
   onMount(() => {
-    setPageSize(calculatePageSize());
+    // --- FIX START ---
+    // On the client, calculate the dynamic size and update the state.
+    // This will trigger a refetch, but `keepPreviousData` will prevent flicker.
+    const newSize = calculatePageSize();
+    if (newSize !== pageSize()) {
+      setPageSize(newSize);
+      setSearchParams({ page: "1", pageSize: newSize.toString() });
+    }
+    // --- FIX END ---
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== pageSize()) {
@@ -350,7 +362,8 @@ const ProductsPage = () => {
           </Show>
 
           {/* --- FIX START --- */}
-          {/* This block no longer hides content during initial load, preventing flicker. */}
+          {/* This logic prevents flicker by showing the list while keeping previous data.
+              The fallback only shows when the query is done and there are no results. */}
           <Show
             when={products().length > 0}
             fallback={
