@@ -270,9 +270,39 @@ export default function ProductListDashboard() {
       setShowSuccessMessage(
         `Product "${data.product.brand} ${data.product.model}" deleted successfully.`
       );
+      // Invalidate all queries starting with PRODUCTS_QUERY_KEY_PREFIX
+      // to ensure the product list is refetched and up-to-date.
       tanstackQueryClient.invalidateQueries({
         queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
       });
+
+      // Manually remove the deleted product from all cached product list queries
+      // to ensure immediate visual update without waiting for refetch.
+      tanstackQueryClient.setQueriesData<ApiResponse | undefined>(
+        { queryKey: [PRODUCTS_QUERY_KEY_PREFIX], exact: false },
+        (oldData) => {
+          if (!oldData?.data) {
+            return oldData;
+          }
+          const newDataArray = oldData.data.filter(
+            (product) => product.id !== variables
+          );
+          return {
+            ...oldData,
+            data: newDataArray,
+          };
+        }
+      );
+
+      // Also remove the specific product detail query from the cache
+      // to ensure it's not displayed if navigated to directly.
+      tanstackQueryClient.removeQueries({
+        queryKey: ["product", variables],
+      });
+
+      setShowSuccessMessage(
+        `Product "${data.product.brand} ${data.product.model}" deleted successfully.`
+      );
       setDeleteError(null);
       setTimeout(() => setShowSuccessMessage(null), 3000);
     },

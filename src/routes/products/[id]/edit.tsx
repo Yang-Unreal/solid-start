@@ -154,24 +154,11 @@ const EditProductPage = () => {
     mutationFn: updateProductInDB,
     // --- FIX START ---
     onSuccess: (updatedProduct) => {
-      // Manually update all cached product list queries.
-      // This finds every query with a key starting with "products"
-      // and replaces the old product data with the fresh `updatedProduct`.
-      queryClient.setQueriesData<ApiResponse | undefined>(
-        { queryKey: [PRODUCTS_QUERY_KEY_PREFIX], exact: false },
-        (oldData) => {
-          if (!oldData?.data) {
-            return oldData;
-          }
-          const newDataArray = oldData.data.map((product) =>
-            product.id === updatedProduct.id ? updatedProduct : product
-          );
-          return {
-            ...oldData,
-            data: newDataArray,
-          };
-        }
-      );
+      // Invalidate all queries starting with PRODUCTS_QUERY_KEY_PREFIX
+      // to ensure the product list is refetched and up-to-date.
+      queryClient.invalidateQueries({
+        queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
+      });
 
       // Also manually update the specific cache entry for this product's detail view
       queryClient.setQueryData(["product", productId()], updatedProduct);

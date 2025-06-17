@@ -178,7 +178,7 @@ const ProductsPage = () => {
     ] as const,
     queryFn: fetchProductsQueryFn,
     staleTime: 5 * 60 * 1000,
-    keepPreviousData: true,
+    keepPreviousData: false, // Changed to false to prevent displaying stale data during refetch
   }));
 
   const products = () => productsQuery.data?.data || [];
