@@ -332,7 +332,8 @@ const ProductsPage = () => {
             </select>
           </div>
 
-          <Show when={!productsQuery.isLoading && error()}>
+          {/* Show error state */}
+          <Show when={error()}>
             <div class="text-center py-10">
               <p class="text-xl text-red-600">
                 Error: {error()?.message || "An unknown error occurred."}
@@ -349,15 +350,16 @@ const ProductsPage = () => {
             </div>
           </Show>
 
-          {/* This block will only show when loading is finished and there's no error */}
-          <Show when={!productsQuery.isLoading && !error()}>
-            {/* --- FIX END --- */}
+          {/* Show products when data is available and no error, or show "No products found" if loading is complete and no products */}
+          <Show when={!error()}>
             <Show
               when={products().length > 0}
               fallback={
-                <p class="text-center text-xl text-neutral-700 py-10">
-                  No products found.
-                </p>
+                <Show when={!productsQuery.isLoading}>
+                  <p class="text-center text-xl text-neutral-700 py-10">
+                    No products found.
+                  </p>
+                </Show>
               }
             >
               <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
