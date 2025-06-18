@@ -6,13 +6,13 @@ const Footer: Component = () => {
       <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
         {/* Company Info */}
         <div>
-          <h3 class="text-lg font-bold mb-4">LIMING</h3>
+          <h2 class="text-lg font-bold mb-4">LIMING</h2>
           <p class="text-sm">Let the hidden pearls shine for the world.</p>
         </div>
 
         {/* Quick Links */}
         <div>
-          <h3 class="text-lg font-bold mb-4">Quick Links</h3>
+          <h2 class="text-lg font-bold mb-4">Quick Links</h2>
           <ul class="space-y-2 text-sm">
             <li>
               <a href="#" class="hover:underline">
@@ -39,7 +39,7 @@ const Footer: Component = () => {
 
         {/* Social Links */}
         <div>
-          <h3 class="text-lg font-bold mb-4">Follow Us</h3>
+          <h2 class="text-lg font-bold mb-4">Follow Us</h2>
           <div class="flex justify-center md:justify-start space-x-4">
             <a href="#" class="hover:text-gray-400">
               Facebook

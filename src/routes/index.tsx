@@ -24,12 +24,6 @@ export default function Home() {
           />
         </video>
 
-        {/* The Text Content Card */}
-        {/*
-          CHANGE 1: Removed max-width on large screens and made margins responsive.
-          - `lg:max-w-none`: Removes the max-width constraint on large screens.
-          - `lg:mx-[5vw]`: Sets horizontal margin to 5% of the viewport width.
-        */}
         <div
           class="relative z-20 mt-24 mx-4 md:mt-32 lg:mx-[5vw] max-w-md lg:max-w-none
                  text-left p-4 sm:p-6 bg-black/50 
