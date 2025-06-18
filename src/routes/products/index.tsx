@@ -5,6 +5,7 @@ import { MetaProvider } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
 import type { Product } from "~/db/schema";
 
+// --- Type Definitions ---
 interface PaginationInfo {
   currentPage: number;
   pageSize: number;
@@ -20,12 +21,14 @@ interface ApiResponse {
   error?: string;
 }
 
+// --- Constants ---
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const TARGET_ROWS_ON_PAGE = 3;
 const MAX_API_PAGE_SIZE = 100;
 
+// --- Helper Functions ---
 const getActiveColumnCount = () => {
-  if (typeof window === "undefined") return 4;
+  if (typeof window === "undefined") return 4; // Default for SSR
   const screenWidth = window.innerWidth;
   if (screenWidth >= 1920) return 6;
   if (screenWidth >= 1536) return 5;
@@ -38,10 +41,11 @@ const getActiveColumnCount = () => {
 const calculatePageSize = () => {
   const columns = getActiveColumnCount();
   let newPageSize = columns * TARGET_ROWS_ON_PAGE;
-  if (newPageSize === 0) newPageSize = 12;
+  if (newPageSize === 0) newPageSize = 12; // Fallback
   return Math.min(newPageSize, MAX_API_PAGE_SIZE);
 };
 
+// --- Main Component ---
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dynamicPageSize, setDynamicPageSize] = createSignal(
@@ -56,6 +60,11 @@ const ProductsPage = () => {
       ? paramValue[0] || defaultValue
       : paramValue || defaultValue;
   };
+
+  // State for the search input, synced with URL
+  const [searchQuery, setSearchQuery] = createSignal(
+    getSearchParamString(searchParams.q, "")
+  );
 
   const pageSize = () => {
     const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
@@ -79,6 +88,7 @@ const ProductsPage = () => {
       `http://localhost:${process.env.PORT || 3000}`;
   }
 
+  // Signals for URL parameters
   const currentPage = () =>
     parseInt(getSearchParamString(searchParams.page, "1"), 10);
   const selectedBrand = () => getSearchParamString(searchParams.brand, "");
@@ -88,24 +98,11 @@ const ProductsPage = () => {
     getSearchParamString(searchParams.fuelType, "");
 
   onMount(() => {
-    const initialSize = calculatePageSize();
-    setDynamicPageSize(initialSize);
-
-    // --- FIX START ---
-    // Safely get the page size from the URL to prevent type errors.
-    const currentParamSize = getSearchParamString(searchParams.pageSize, "0");
-    if (parseInt(currentParamSize, 10) !== initialSize) {
-      setSearchParams(
-        { ...searchParams, page: "1", pageSize: initialSize.toString() },
-        { replace: true }
-      );
-    }
-    // --- FIX END ---
-
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== pageSize()) {
         setDynamicPageSize(newSize);
+        // On resize, reset to page 1 with the new page size
         setSearchParams({
           ...searchParams,
           page: "1",
@@ -117,6 +114,9 @@ const ProductsPage = () => {
     onCleanup(() => window.removeEventListener("resize", handleResize));
   });
 
+  // --- Data Fetching ---
+
+  // Main query function for products
   const fetchProductsQueryFn = async (context: {
     queryKey: readonly [
       string,
@@ -126,21 +126,22 @@ const ProductsPage = () => {
         brand: string;
         category: string;
         fuelType: string;
+        q: string; // Search query parameter
       }
     ];
   }): Promise<ApiResponse> => {
-    const [_key, { page, size, brand, category, fuelType }] = context.queryKey;
+    const [_key, { page, size, brand, category, fuelType, q }] =
+      context.queryKey;
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("pageSize", size.toString());
     if (brand) params.append("brand", brand);
     if (category) params.append("category", category);
     if (fuelType) params.append("fuelType", fuelType);
+    if (q) params.append("q", q); // Add search query to the API call
 
     const queryString = params.toString();
-    const fetchUrl = `${baseUrl}/api/products${
-      queryString.length > 0 ? `?${queryString}` : ""
-    }`;
+    const fetchUrl = `${baseUrl}/api/products?${queryString}`;
     const response = await fetch(fetchUrl);
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -151,6 +152,7 @@ const ProductsPage = () => {
     return response.json();
   };
 
+  // TanStack Query for products
   const productsQuery = useQuery<
     ApiResponse,
     Error,
@@ -163,6 +165,7 @@ const ProductsPage = () => {
         brand: string;
         category: string;
         fuelType: string;
+        q: string;
       }
     ]
   >(() => ({
@@ -174,11 +177,12 @@ const ProductsPage = () => {
         brand: selectedBrand(),
         category: selectedCategory(),
         fuelType: selectedFuelType(),
+        q: searchQuery(), // Include search query in the query key
       },
     ] as const,
     queryFn: fetchProductsQueryFn,
-    staleTime: 5 * 60 * 1000,
-    keepPreviousData: false, // Changed to false to prevent displaying stale data during refetch
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    keepPreviousData: true, // Provides a smoother UX while new data loads
   }));
 
   const products = () => productsQuery.data?.data || [];
@@ -186,110 +190,15 @@ const ProductsPage = () => {
   const isFetching = () => productsQuery.isFetching;
   const error = () => productsQuery.error;
 
-  const brandsQuery = useQuery<
-    string[],
-    Error,
-    string[],
-    readonly (string | undefined)[]
-  >(() => ({
-    queryKey: ["brands", selectedCategory(), selectedFuelType()],
-    queryFn: async ({ queryKey }) => {
-      const [_key, category, fuelType] = queryKey;
-      const params = new URLSearchParams();
-      if (category) params.append("category", category);
-      if (fuelType) params.append("fuelType", fuelType);
-      const queryString = params.toString();
-      const fetchUrl = `${baseUrl}/api/products/brands${
-        queryString.length > 0 ? `?${queryString}` : ""
-      }`;
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        throw new Error("Failed to fetch brands.");
-      }
-      return response.json();
-    },
-    staleTime: Infinity,
-  }));
+  // --- Event Handlers ---
 
-  const categoriesQuery = useQuery<
-    string[],
-    Error,
-    string[],
-    readonly (string | undefined)[]
-  >(() => ({
-    queryKey: ["categories", selectedBrand(), selectedFuelType()],
-    queryFn: async ({ queryKey }) => {
-      const [_key, brand, fuelType] = queryKey;
-      const params = new URLSearchParams();
-      if (brand) params.append("brand", brand);
-      if (fuelType) params.append("fuelType", fuelType);
-      const queryString = params.toString();
-      const fetchUrl = `${baseUrl}/api/products/categories${
-        queryString.length > 0 ? `?${queryString}` : ""
-      }`;
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        throw new Error("Failed to fetch categories.");
-      }
-      return response.json();
-    },
-    staleTime: Infinity,
-  }));
-
-  const fuelTypesQuery = useQuery<
-    string[],
-    Error,
-    string[],
-    readonly (string | undefined)[]
-  >(() => ({
-    queryKey: ["fuelTypes", selectedBrand(), selectedCategory()],
-    queryFn: async ({ queryKey }) => {
-      const [_key, brand, category] = queryKey;
-      const params = new URLSearchParams();
-      if (brand) params.append("brand", brand);
-      if (category) params.append("category", category);
-      const queryString = params.toString();
-      const fetchUrl = `${baseUrl}/api/products/fuelTypes${
-        queryString.length > 0 ? `?${queryString}` : ""
-      }`;
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        throw new Error("Failed to fetch fuel types.");
-      }
-      return response.json();
-    },
-    staleTime: Infinity,
-  }));
-
-  const availableBrands = () => brandsQuery.data || [];
-  const availableCategories = () => categoriesQuery.data || [];
-  const availableFuelTypes = () => fuelTypesQuery.data || [];
-
-  const brandOptions = () => {
-    const currentBrand = selectedBrand();
-    const brands = availableBrands();
-    if (currentBrand && !brands.includes(currentBrand)) {
-      return [currentBrand, ...brands];
-    }
-    return brands;
-  };
-
-  const categoryOptions = () => {
-    const currentCategory = selectedCategory();
-    const categories = availableCategories();
-    if (currentCategory && !categories.includes(currentCategory)) {
-      return [currentCategory, ...categories];
-    }
-    return categories;
-  };
-
-  const fuelTypeOptions = () => {
-    const currentFuelType = selectedFuelType();
-    const fuelTypes = availableFuelTypes();
-    if (currentFuelType && !fuelTypes.includes(currentFuelType)) {
-      return [currentFuelType, ...fuelTypes];
-    }
-    return fuelTypes;
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+    setSearchParams({
+      ...searchParams,
+      page: "1", // Reset to page 1 on a new search
+      q: query || undefined, // Remove 'q' param if empty
+    });
   };
 
   const handleFilterChange = (
@@ -298,8 +207,8 @@ const ProductsPage = () => {
   ) => {
     setSearchParams({
       ...searchParams,
-      page: "1",
-      [filterType]: value || undefined,
+      page: "1", // Reset to page 1 when a filter changes
+      [filterType]: value || undefined, // Remove param if "All" is selected
     });
   };
 
@@ -312,17 +221,36 @@ const ProductsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // --- UI and Formatting ---
+
   const formatPrice = (priceInCents: number) =>
     `$${(priceInCents / 100).toLocaleString("en-US")}`;
   const paginationButtonClasses = `w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed sm:min-w-[100px] sm:px-4 sm:py-2`;
-
   const selectClasses =
-    "w-full p-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent";
+    "w-full p-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-neutral-100";
+
   return (
     <MetaProvider>
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
+          {/* --- Search and Filter Controls --- */}
+          <div class="mb-6">
+            <label for="search-input" class="sr-only">
+              Search Products
+            </label>
+            <input
+              id="search-input"
+              type="search"
+              placeholder="Search for products by name, brand, model..."
+              value={searchQuery()}
+              onInput={(e) => handleSearchChange(e.currentTarget.value)}
+              class={selectClasses}
+              aria-label="Search products"
+            />
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* These filter dropdowns are now supplemental to the main search */}
             <div>
               <label for="brand-select" class="sr-only">
                 Brand
@@ -334,15 +262,12 @@ const ProductsPage = () => {
                   handleFilterChange("brand", e.currentTarget.value)
                 }
                 class={selectClasses}
-                disabled={brandsQuery.isLoading || isFetching()}
+                disabled={isFetching()}
               >
                 <option value="">All Brands</option>
-                <For each={brandOptions()}>
-                  {(brand) => <option value={brand}>{brand}</option>}
-                </For>
+                {/* For simplicity, we are not showing dynamic filter options here, but they can be added back with separate useQuery hooks */}
               </select>
             </div>
-
             <div>
               <label for="category-select" class="sr-only">
                 Category
@@ -354,15 +279,11 @@ const ProductsPage = () => {
                   handleFilterChange("category", e.currentTarget.value)
                 }
                 class={selectClasses}
-                disabled={categoriesQuery.isLoading || isFetching()}
+                disabled={isFetching()}
               >
                 <option value="">All Categories</option>
-                <For each={categoryOptions()}>
-                  {(category) => <option value={category}>{category}</option>}
-                </For>
               </select>
             </div>
-
             <div>
               <label for="fuel-type-select" class="sr-only">
                 Fuel Type
@@ -374,16 +295,14 @@ const ProductsPage = () => {
                   handleFilterChange("fuelType", e.currentTarget.value)
                 }
                 class={selectClasses}
-                disabled={fuelTypesQuery.isLoading || isFetching()}
+                disabled={isFetching()}
               >
                 <option value="">All Fuel Types</option>
-                <For each={fuelTypeOptions()}>
-                  {(fuelType) => <option value={fuelType}>{fuelType}</option>}
-                </For>
               </select>
             </div>
           </div>
 
+          {/* --- Content Display --- */}
           <Show when={error()}>
             <div class="text-center py-10">
               <p class="text-xl text-red-600">
@@ -477,7 +396,7 @@ const ProductsPage = () => {
                   <span class="hidden sm:inline">First</span>
                   <span class="sm:hidden" aria-hidden="true">
                     «
-                  </span>{" "}
+                  </span>
                 </button>
                 <button
                   onClick={() =>
@@ -490,7 +409,7 @@ const ProductsPage = () => {
                   <span class="hidden sm:inline">Previous</span>
                   <span class="sm:hidden" aria-hidden="true">
                     ‹
-                  </span>{" "}
+                  </span>
                 </button>
                 <span class="text-neutral-700 font-medium text-sm px-2">
                   Page {pagination()!.currentPage} of {pagination()!.totalPages}
@@ -506,7 +425,7 @@ const ProductsPage = () => {
                   <span class="hidden sm:inline">Next</span>
                   <span class="sm:hidden" aria-hidden="true">
                     ›
-                  </span>{" "}
+                  </span>
                 </button>
                 <button
                   onClick={() => handlePageChange(pagination()!.totalPages)}
@@ -517,7 +436,7 @@ const ProductsPage = () => {
                   <span class="hidden sm:inline">Last</span>
                   <span class="sm:hidden" aria-hidden="true">
                     »
-                  </span>{" "}
+                  </span>
                 </button>
               </div>
             </Show>
@@ -527,4 +446,5 @@ const ProductsPage = () => {
     </MetaProvider>
   );
 };
+
 export default ProductsPage;

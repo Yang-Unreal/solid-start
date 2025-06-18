@@ -1,16 +1,17 @@
-// src/routes/api/products.ts
+// src/routes/api/products/index.ts
 import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
-import { product as productTable, type ProductImages } from "~/db/schema"; // Import ProductImages type
-import { asc, desc, count, eq, and, Column, inArray } from "drizzle-orm"; // Added inArray
-import { z } from "zod/v4";
+import { product as productTable, type ProductImages } from "~/db/schema";
+import { asc, desc, count, eq, and, Column } from "drizzle-orm"; // Corrected Drizzle imports
+import { z } from "zod"; // Corrected Zod import
 import { kv } from "~/lib/redis";
-import { minio, bucket } from "~/lib/minio"; // Import minio client instance and bucket
-import { DeleteObjectCommand } from "@aws-sdk/client-s3"; // Import DeleteObjectCommand
+import { minio, bucket } from "~/lib/minio";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { productsIndex } from "~/lib/meilisearch";
 
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
-const CACHE_DURATION_SECONDS = 300; // Increased to 5 minutes to align with client-side staleTime
+const CACHE_DURATION_SECONDS = 300;
 
 // --- Schemas ---
 const ProductImagesSchema = z.object({
@@ -38,28 +39,17 @@ const NewProductPayloadSchema = z.object({
   fuelType: z.string().trim().min(1),
 });
 
-const UpdateProductPayloadSchema = z
-  .object({
-    name: z.string().trim().min(1).optional(),
-    description: z.string().trim().nullable().optional(),
-    priceInCents: z.number().int().positive().optional(),
-    images: ProductImagesSchema.optional(),
-    category: z.string().trim().nullable().optional(),
-    stockQuantity: z.number().int().min(0).optional(),
-    brand: z.string().trim().min(1).optional(),
-    model: z.string().trim().min(1).optional(),
-    fuelType: z.string().trim().min(1).optional(),
-  })
-  .partial(); // Make all fields optional for partial update
+const UpdateProductPayloadSchema = NewProductPayloadSchema.partial();
 
 const BulkDeletePayloadSchema = z.object({
+  // Re-added missing schema
   ids: z.array(z.string().uuid()).min(1),
 });
 
 // --- GET Handler ---
 export async function GET({ request }: APIEvent) {
   const url = new URL(request.url);
-  const cacheKey = `products:${url.searchParams.toString()}`;
+  const cacheKey = `products:meilisearch:${url.searchParams.toString()}`;
 
   try {
     const cachedData = await kv.get(cacheKey);
@@ -73,116 +63,52 @@ export async function GET({ request }: APIEvent) {
     console.error(`Redis Cache Read Error for key ${cacheKey}:`, cacheError);
   }
 
-  const productId = url.searchParams.get("id");
-  if (productId) {
-    const idValidationResult = z.string().uuid().safeParse(productId);
-    if (!idValidationResult.success) {
-      return new Response(JSON.stringify({ error: "Invalid product ID." }), {
-        status: 400,
-      });
-    }
-    try {
-      const product = await db
-        .select()
-        .from(productTable)
-        .where(eq(productTable.id, idValidationResult.data))
-        .limit(1);
-      if (product.length === 0) {
-        return new Response(JSON.stringify({ error: "Product not found." }), {
-          status: 404,
-        });
-      }
-      return new Response(JSON.stringify({ data: product[0] }), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      });
-    } catch (error) {
-      console.error("Error fetching single product:", error);
-      return new Response(
-        JSON.stringify({ error: "Failed to fetch product." }),
-        {
-          status: 500,
-        }
-      );
-    }
-  }
-
-  const columns = productTable as unknown as Record<string, Column>;
   const page = parseInt(url.searchParams.get("page") || "1", 10);
   let pageSize = parseInt(
     url.searchParams.get("pageSize") || `${DEFAULT_PAGE_SIZE}`,
     10
   );
   pageSize = Math.min(pageSize, MAX_PAGE_SIZE);
-  let sortByInput = url.searchParams.get("sortBy") || "createdAt";
-  const sortOrder =
-    url.searchParams.get("sortOrder")?.toLowerCase() === "asc" ? "asc" : "desc";
+
   const brand = url.searchParams.get("brand");
   const category = url.searchParams.get("category");
   const fuelType = url.searchParams.get("fuelType");
+  const searchQuery = url.searchParams.get("q") || "";
 
-  const offset = (page - 1) * pageSize;
-
-  if (!Object.keys(columns).includes(sortByInput)) {
-    sortByInput = "createdAt";
-  }
-  const sortColumn = columns[sortByInput];
-
-  if (!sortColumn) {
-    return new Response(
-      JSON.stringify({ error: "Server configuration error." }),
-      { status: 500 }
-    );
-  }
+  const filter: string[] = [];
+  if (brand) filter.push(`brand = "${brand}"`);
+  if (category) filter.push(`category = "${category}"`);
+  if (fuelType) filter.push(`fuelType = "${fuelType}"`);
 
   try {
-    const whereClauses = [];
-    if (brand) {
-      whereClauses.push(eq(productTable.brand, brand));
-    }
-    if (category && category !== "") {
-      // Only filter by category if a non-empty category is provided
-      whereClauses.push(eq(productTable.category, category));
-    }
-    if (fuelType) {
-      whereClauses.push(eq(productTable.fuelType, fuelType));
-    }
+    const searchResult = await productsIndex.search(searchQuery, {
+      page,
+      hitsPerPage: pageSize,
+      filter,
+    });
 
-    const [productsData, totalCountResult] = await Promise.all([
-      db
-        .select()
-        .from(productTable)
-        .where(whereClauses.length > 0 ? and(...whereClauses) : undefined)
-        .orderBy(sortOrder === "asc" ? asc(sortColumn) : desc(sortColumn))
-        .limit(pageSize)
-        .offset(offset),
-      db
-        .select({ total: count() })
-        .from(productTable)
-        .where(whereClauses.length > 0 ? and(...whereClauses) : undefined),
-    ]);
-    const totalProducts = totalCountResult[0]?.total ?? 0;
-    const totalPages = Math.ceil(totalProducts / pageSize);
     const responseBody = {
-      data: productsData,
+      data: searchResult.hits,
       pagination: {
-        currentPage: page,
-        pageSize,
-        totalProducts,
-        totalPages,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
+        currentPage: searchResult.page,
+        pageSize: searchResult.hitsPerPage,
+        totalProducts: searchResult.totalHits,
+        totalPages: searchResult.totalPages,
+        hasNextPage: searchResult.page < searchResult.totalPages,
+        hasPreviousPage: searchResult.page > 1,
       },
     };
     const jsonBody = JSON.stringify(responseBody);
     await kv.setex(cacheKey, CACHE_DURATION_SECONDS, jsonBody);
+
     return new Response(jsonBody, {
       status: 200,
-      headers: { "Content-Type": "application/json", "X-Cache": "MISS" }, // Indicate cache is now active
+      headers: { "Content-Type": "application/json", "X-Cache": "MISS" },
     });
   } catch (error: any) {
+    console.error("MeiliSearch search error:", error);
     return new Response(
-      JSON.stringify({ error: "Failed to fetch products." }),
+      JSON.stringify({ error: "Failed to search for products." }),
       { status: 500 }
     );
   }
@@ -193,6 +119,7 @@ export async function POST({ request }: APIEvent) {
   try {
     const body = await request.json();
     const validationResult = NewProductPayloadSchema.safeParse(body);
+
     if (!validationResult.success) {
       return new Response(
         JSON.stringify({
@@ -202,16 +129,23 @@ export async function POST({ request }: APIEvent) {
         { status: 400 }
       );
     }
+
     const insertedProducts = await db
       .insert(productTable)
       .values(validationResult.data)
       .returning();
-    const keys = await kv.keys("products:*");
-    if (keys.length > 0) {
-      await kv.del(...keys);
+
+    if (insertedProducts.length > 0) {
+      const newProduct = insertedProducts[0]!; // Assert newProduct is not undefined
+      await productsIndex.addDocuments([newProduct]);
     }
+
+    const keys = await kv.keys("products:*");
+    if (keys.length > 0) await kv.del(...keys);
+
     return new Response(JSON.stringify(insertedProducts[0]), { status: 201 });
   } catch (error) {
+    console.error("Failed to create product:", error);
     return new Response(
       JSON.stringify({ error: "Failed to create product." }),
       { status: 500 }
@@ -223,7 +157,6 @@ export async function POST({ request }: APIEvent) {
 export async function PUT({ request }: APIEvent) {
   const url = new URL(request.url);
   const productId = url.searchParams.get("id");
-
   const idValidationResult = z.string().uuid().safeParse(productId);
   if (!idValidationResult.success) {
     return new Response(JSON.stringify({ error: "Invalid product ID." }), {
@@ -252,28 +185,24 @@ export async function PUT({ request }: APIEvent) {
       );
     }
 
-    // Explicitly set updatedAt for updates
-    const dataToUpdate = {
-      ...validationResult.data,
-      updatedAt: new Date(),
-    };
-
+    const dataToUpdate = { ...validationResult.data, updatedAt: new Date() };
     const updatedProducts = await db
       .update(productTable)
       .set(dataToUpdate)
       .where(eq(productTable.id, idValidationResult.data))
       .returning();
 
-    if (updatedProducts.length === 0) {
+    if (updatedProducts.length > 0) {
+      const updatedProduct = updatedProducts[0]!; // Assert updatedProduct is not undefined
+      await productsIndex.updateDocuments([updatedProduct]);
+    } else {
       return new Response(JSON.stringify({ error: "Product not found." }), {
         status: 404,
       });
     }
 
     const keys = await kv.keys("products:*");
-    if (keys.length > 0) {
-      await kv.del(...keys);
-    }
+    if (keys.length > 0) await kv.del(...keys);
 
     return new Response(
       JSON.stringify({
@@ -398,6 +327,9 @@ export async function DELETE({ request }: APIEvent) {
       .delete(productTable)
       .where(eq(productTable.id, idValidationResult.data))
       .returning();
+
+    // Delete from MeiliSearch
+    await productsIndex.deleteDocument(idValidationResult.data);
 
     // Invalidate Redis cache
     const keys = await kv.keys("products:*");
