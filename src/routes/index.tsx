@@ -1,5 +1,6 @@
 // src/routes/index.tsx
 import { Suspense, lazy, createSignal, onMount, Show } from "solid-js";
+import Footer from "~/components/Footer";
 
 export default function Home() {
   return (
@@ -45,6 +46,7 @@ export default function Home() {
           </h1>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }
