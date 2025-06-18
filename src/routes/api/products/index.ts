@@ -2,7 +2,7 @@
 import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
 import { product as productTable, type ProductImages } from "~/db/schema"; // Import ProductImages type
-import { asc, desc, count, eq, and, Column } from "drizzle-orm";
+import { asc, desc, count, eq, and, Column, inArray } from "drizzle-orm"; // Added inArray
 import { z } from "zod/v4";
 import { kv } from "~/lib/redis";
 import { minio, bucket } from "~/lib/minio"; // Import minio client instance and bucket
@@ -51,6 +51,10 @@ const UpdateProductPayloadSchema = z
     fuelType: z.string().trim().min(1).optional(),
   })
   .partial(); // Make all fields optional for partial update
+
+const BulkDeletePayloadSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1),
+});
 
 // --- GET Handler ---
 export async function GET({ request }: APIEvent) {
@@ -287,7 +291,7 @@ export async function PUT({ request }: APIEvent) {
   }
 }
 
-// --- DELETE Handler ---
+// --- DELETE Handler (single product) ---
 export async function DELETE({ request }: APIEvent) {
   const url = new URL(request.url);
   const productId = url.searchParams.get("id");

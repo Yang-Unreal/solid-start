@@ -10,7 +10,9 @@ import {
   ChevronsRight,
   ChevronLeft,
   ChevronRight,
-  Pencil, // Added Pencil icon
+  Pencil,
+  Square, // Added Square icon for unchecked checkbox
+  CheckSquare, // Added CheckSquare icon for checked checkbox
 } from "lucide-solid";
 // CHANGE: Import the new types directly from your schema file
 import type { Product, ProductImages } from "~/db/schema";
@@ -78,8 +80,39 @@ const calculatePageSize = () => {
 export default function ProductListDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const tanstackQueryClient = useQueryClient();
+  const [selectedProductIds, setSelectedProductIds] = createSignal<Set<string>>(
+    new Set()
+  );
 
-  // ... (data fetching logic and hooks remain the same) ...
+  const toggleProductSelection = (productId: string) => {
+    setSelectedProductIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(productId)) {
+        newSet.delete(productId);
+      } else {
+        newSet.add(productId);
+      }
+      return newSet;
+    });
+  };
+
+  const isProductSelected = (productId: string) =>
+    selectedProductIds().has(productId);
+
+  const toggleSelectAll = () => {
+    const allProductIds: string[] = products().map((p) => p.id);
+    if (selectedProductIds().size === allProductIds.length) {
+      setSelectedProductIds(new Set<string>());
+    } else {
+      setSelectedProductIds(new Set<string>(allProductIds as string[]));
+    }
+  };
+
+  const isAllSelected = () =>
+    products().length > 0 &&
+    selectedProductIds().size === products().length &&
+    products().every((p) => selectedProductIds().has(p.id));
+
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
     defaultValue: string
@@ -263,21 +296,38 @@ export default function ProductListDashboard() {
     string | null
   >(null);
 
+  async function bulkDeleteProductsApi(
+    productIds: string[]
+  ): Promise<{ message: string; deletedCount: number }> {
+    const response = await fetch("/api/products/bulk-delete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids: productIds }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response
+        .json()
+        .catch(() => ({ error: "Failed to parse error response from server" }));
+      throw new Error(
+        errorData.error ||
+          `Error deleting products: ${response.status} ${response.statusText}`
+      );
+    }
+    return response.json();
+  }
+
   const deleteProductMutation = useMutation(() => ({
     mutationFn: deleteProductApi,
     onSuccess: (data, variables) => {
-      // CHANGE: Updated success message
       setShowSuccessMessage(
         `Product "${data.product.brand} ${data.product.model}" deleted successfully.`
       );
-      // Invalidate all queries starting with PRODUCTS_QUERY_KEY_PREFIX
-      // to ensure the product list is refetched and up-to-date.
       tanstackQueryClient.invalidateQueries({
         queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
       });
-
-      // Manually remove the deleted product from all cached product list queries
-      // to ensure immediate visual update without waiting for refetch.
       tanstackQueryClient.setQueriesData<ApiResponse | undefined>(
         { queryKey: [PRODUCTS_QUERY_KEY_PREFIX], exact: false },
         (oldData) => {
@@ -293,16 +343,9 @@ export default function ProductListDashboard() {
           };
         }
       );
-
-      // Also remove the specific product detail query from the cache
-      // to ensure it's not displayed if navigated to directly.
       tanstackQueryClient.removeQueries({
         queryKey: ["product", variables],
       });
-
-      setShowSuccessMessage(
-        `Product "${data.product.brand} ${data.product.model}" deleted successfully.`
-      );
       setDeleteError(null);
       setTimeout(() => setShowSuccessMessage(null), 3000);
     },
@@ -312,8 +355,101 @@ export default function ProductListDashboard() {
       setTimeout(() => setDeleteError(null), 5000);
     },
   }));
+
+  const bulkDeleteProductsMutation = useMutation(() => ({
+    mutationFn: bulkDeleteProductsApi,
+    onSuccess: (data, variables) => {
+      setShowSuccessMessage(
+        `${data.deletedCount} products deleted successfully.`
+      );
+
+      const currentPagination = pagination(); // Get current pagination info before cache update
+      const productsBeforeOptimisticUpdate = products(); // Capture current products array before optimistic update
+
+      // Optimistically update the cache
+      tanstackQueryClient.setQueriesData<ApiResponse | undefined>(
+        { queryKey: [PRODUCTS_QUERY_KEY_PREFIX], exact: false },
+        (oldData) => {
+          if (!oldData?.data) {
+            return oldData;
+          }
+          const deletedIds = new Set(variables);
+          const newDataArray = oldData.data.filter(
+            (product) => !deletedIds.has(product.id)
+          );
+          return {
+            ...oldData,
+            data: newDataArray,
+          };
+        }
+      );
+
+      variables.forEach((id) => {
+        tanstackQueryClient.removeQueries({
+          queryKey: ["product", id],
+        });
+      });
+      setSelectedProductIds(new Set<string>()); // Clear selection after successful deletion
+      setDeleteError(null);
+
+      if (currentPagination && data.deletedCount > 0) {
+        let newPage = currentPagination.currentPage;
+        const currentProductsCountOnPage =
+          productsBeforeOptimisticUpdate.length;
+
+        // If all products on the current page were deleted
+        if (data.deletedCount === currentProductsCountOnPage) {
+          // If it's not the first page, go to the previous page
+          if (currentPagination.currentPage > 1) {
+            newPage = currentPagination.currentPage - 1;
+          } else {
+            // If it's the first page and all products on it were deleted,
+            // and there are no more products in total, stay on page 1.
+            // The "No products found" message will correctly appear if total products is 0.
+            newPage = 1;
+          }
+        } else {
+          // If not all products on the current page were deleted,
+          // or if we are on the first page and some products remain,
+          // we might need to adjust if the total pages changed.
+          const expectedTotalProductsAfterDeletion = Math.max(
+            0,
+            currentPagination.totalProducts - data.deletedCount
+          );
+          const expectedTotalPages = Math.max(
+            1,
+            Math.ceil(
+              expectedTotalProductsAfterDeletion / currentPagination.pageSize
+            )
+          );
+
+          if (newPage > expectedTotalPages) {
+            newPage = expectedTotalPages;
+          }
+        }
+
+        if (newPage !== currentPagination.currentPage) {
+          handlePageChange(newPage);
+        }
+      }
+
+      // Invalidate queries *after* determining the new page, so the next fetch is for the correct page.
+      tanstackQueryClient.invalidateQueries({
+        queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
+      });
+
+      setTimeout(() => setShowSuccessMessage(null), 3000);
+    },
+    onError: (err: Error) => {
+      setDeleteError(
+        err.message || "An unknown error occurred during bulk delete."
+      );
+      setShowSuccessMessage(null);
+      setTimeout(() => setDeleteError(null), 5000);
+    },
+  }));
+
   const handleDeleteProduct = (product: Product) => {
-    // CHANGE: Updated confirmation dialog
     if (
       window.confirm(
         `Are you sure you want to delete "${product.brand} ${product.model}"?`
@@ -322,6 +458,23 @@ export default function ProductListDashboard() {
       setDeleteError(null);
       setShowSuccessMessage(null);
       deleteProductMutation.mutate(product.id);
+    }
+  };
+
+  const handleBulkDelete = () => {
+    const idsToDelete = Array.from(selectedProductIds());
+    if (idsToDelete.length === 0) {
+      setDeleteError("No products selected for deletion.");
+      return;
+    }
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${idsToDelete.length} selected products?`
+      )
+    ) {
+      setDeleteError(null);
+      setShowSuccessMessage(null);
+      bulkDeleteProductsMutation.mutate(idsToDelete);
     }
   };
 
@@ -340,12 +493,26 @@ export default function ProductListDashboard() {
     <div class="p-4">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-2xl font-bold">Products List</h2>
-        <A
-          href="/products/new"
-          class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-neutral-100"
-        >
-          <PlusCircle size={18} class="mr-2" /> Add Product
-        </A>
+        <div class="flex items-center space-x-2">
+          <A
+            href="/products/new"
+            class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-neutral-100"
+          >
+            <PlusCircle size={18} class="mr-2" /> Add Product
+          </A>
+          <Show when={selectedProductIds().size > 0}>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkDeleteProductsMutation.isPending}
+              class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-red-600 text-white hover:bg-red-700 active:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 focus:ring-offset-neutral-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Trash2 size={18} class="mr-2" />{" "}
+              {bulkDeleteProductsMutation.isPending
+                ? "Deleting..."
+                : `Delete Selected (${selectedProductIds().size})`}
+            </button>
+          </Show>
+        </div>
       </div>
 
       <Show when={showSuccessMessage()}>
@@ -387,6 +554,20 @@ export default function ProductListDashboard() {
           <For each={products()}>
             {(product) => (
               <div class="bg-white rounded-lg shadow p-3 flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                  <button
+                    onClick={() => toggleProductSelection(product.id)}
+                    class="p-1 rounded-md text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800"
+                    aria-label={`Select ${product.name}`}
+                  >
+                    <Show
+                      when={isProductSelected(product.id)}
+                      fallback={<Square size={20} />}
+                    >
+                      <CheckSquare size={20} />
+                    </Show>
+                  </button>
+                </div>
                 <div class="flex-shrink-0 w-24">
                   <picture>
                     <source
@@ -460,6 +641,20 @@ export default function ProductListDashboard() {
             <thead class="bg-neutral-50">
               <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                  <button
+                    onClick={toggleSelectAll}
+                    class="p-1 rounded-md text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800"
+                    aria-label="Select all products"
+                  >
+                    <Show
+                      when={isAllSelected()}
+                      fallback={<Square size={20} />}
+                    >
+                      <CheckSquare size={20} />
+                    </Show>
+                  </button>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                   Image
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
@@ -486,6 +681,20 @@ export default function ProductListDashboard() {
               <For each={products()}>
                 {(product) => (
                   <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
+                      <button
+                        onClick={() => toggleProductSelection(product.id)}
+                        class="p-1 rounded-md text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800"
+                        aria-label={`Select ${product.name}`}
+                      >
+                        <Show
+                          when={isProductSelected(product.id)}
+                          fallback={<Square size={20} />}
+                        >
+                          <CheckSquare size={20} />
+                        </Show>
+                      </button>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
                       <picture>
                         <source
