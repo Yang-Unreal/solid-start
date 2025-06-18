@@ -1,8 +1,11 @@
 // src/routes/products/index.tsx
-import { For, Show, createSignal, onMount, onCleanup } from "solid-js";
-import { useSearchParams, A } from "@solidjs/router";
+import { createSignal, onMount, onCleanup } from "solid-js";
+import { useSearchParams } from "@solidjs/router";
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
+import ProductDisplayArea from "~/components/ProductDisplayArea";
+import SearchInput from "~/components/SearchInput"; // Import SearchInput
+import FilterDropdowns from "~/components/FilterDropdowns"; // Import FilterDropdowns
 import type { Product } from "~/db/schema";
 
 // --- Type Definitions ---
@@ -61,10 +64,8 @@ const ProductsPage = () => {
       : paramValue || defaultValue;
   };
 
-  // State for the search input, synced with URL
-  const [searchQuery, setSearchQuery] = createSignal(
-    getSearchParamString(searchParams.q, "")
-  );
+  // State for the search input, NOT synced with URL
+  const [searchQuery, setSearchQuery] = createSignal(""); // Initialize as empty, not from URL
 
   const pageSize = () => {
     const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
@@ -185,20 +186,67 @@ const ProductsPage = () => {
     keepPreviousData: true, // Provides a smoother UX while new data loads
   }));
 
-  const products = () => productsQuery.data?.data || [];
-  const pagination = () => productsQuery.data?.pagination || null;
-  const isFetching = () => productsQuery.isFetching;
-  const error = () => productsQuery.error;
+  // Queries for filter options
+  const fetchFilterOptions = async (
+    endpoint: string,
+    params: Record<string, string> = {}
+  ): Promise<string[]> => {
+    const urlParams = new URLSearchParams();
+    for (const key in params) {
+      if (params[key]) {
+        urlParams.append(key, params[key]);
+      }
+    }
+    const queryString = urlParams.toString();
+    const fetchUrl = `${baseUrl}/api/products/${endpoint}${
+      queryString ? `?${queryString}` : ""
+    }`;
+    const response = await fetch(fetchUrl);
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(
+        errorData.error || `HTTP error! status: ${response.status}`
+      );
+    }
+    return response.json();
+  };
+
+  const brandsQuery = useQuery<string[], Error>(() => ({
+    queryKey: ["brands", selectedCategory(), selectedFuelType()], // Brands depend on selected category and fuel type
+    queryFn: ({ queryKey }) =>
+      fetchFilterOptions("brands", {
+        category: queryKey[1] as string,
+        fuelType: queryKey[2] as string,
+      }),
+    staleTime: Infinity, // Brands list is unlikely to change often
+  }));
+
+  const categoriesQuery = useQuery<string[], Error>(() => ({
+    queryKey: ["categories", selectedBrand()], // Categories depend on selected brand
+    queryFn: ({ queryKey }) =>
+      fetchFilterOptions("categories", { brand: queryKey[1] as string }),
+    staleTime: Infinity,
+    // Removed 'enabled' property to always fetch, letting fetchFilterOptions handle empty brand
+  }));
+
+  const fuelTypesQuery = useQuery<string[], Error>(() => ({
+    queryKey: ["fuelTypes", selectedBrand(), selectedCategory()], // Fuel types depend on brand and category
+    queryFn: ({ queryKey }) =>
+      fetchFilterOptions("fuelTypes", {
+        brand: queryKey[1] as string,
+        category: queryKey[2] as string,
+      }),
+    staleTime: Infinity,
+    // Removed 'enabled' property to always fetch, letting fetchFilterOptions handle empty brand/category
+  }));
 
   // --- Event Handlers ---
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    setSearchParams({
-      ...searchParams,
-      page: "1", // Reset to page 1 on a new search
-      q: query || undefined, // Remove 'q' param if empty
-    });
+    // Trigger a refetch of products based on the new search query
+    // No need to update searchParams.q, as it's no longer in the URL
+    productsQuery.refetch();
   };
 
   const handleFilterChange = (
@@ -223,9 +271,6 @@ const ProductsPage = () => {
 
   // --- UI and Formatting ---
 
-  const formatPrice = (priceInCents: number) =>
-    `$${(priceInCents / 100).toLocaleString("en-US")}`;
-  const paginationButtonClasses = `w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed sm:min-w-[100px] sm:px-4 sm:py-2`;
   const selectClasses =
     "w-full p-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-neutral-100";
 
@@ -234,213 +279,30 @@ const ProductsPage = () => {
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
           {/* --- Search and Filter Controls --- */}
-          <div class="mb-6">
-            <label for="search-input" class="sr-only">
-              Search Products
-            </label>
-            <input
-              id="search-input"
-              type="search"
-              placeholder="Search for products by name, brand, model..."
-              value={searchQuery()}
-              onInput={(e) => handleSearchChange(e.currentTarget.value)}
-              class={selectClasses}
-              aria-label="Search products"
-            />
-          </div>
+          <SearchInput
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            selectClasses={selectClasses}
+          />
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {/* These filter dropdowns are now supplemental to the main search */}
-            <div>
-              <label for="brand-select" class="sr-only">
-                Brand
-              </label>
-              <select
-                id="brand-select"
-                value={selectedBrand()}
-                onChange={(e) =>
-                  handleFilterChange("brand", e.currentTarget.value)
-                }
-                class={selectClasses}
-                disabled={isFetching()}
-              >
-                <option value="">All Brands</option>
-                {/* For simplicity, we are not showing dynamic filter options here, but they can be added back with separate useQuery hooks */}
-              </select>
-            </div>
-            <div>
-              <label for="category-select" class="sr-only">
-                Category
-              </label>
-              <select
-                id="category-select"
-                value={selectedCategory()}
-                onChange={(e) =>
-                  handleFilterChange("category", e.currentTarget.value)
-                }
-                class={selectClasses}
-                disabled={isFetching()}
-              >
-                <option value="">All Categories</option>
-              </select>
-            </div>
-            <div>
-              <label for="fuel-type-select" class="sr-only">
-                Fuel Type
-              </label>
-              <select
-                id="fuel-type-select"
-                value={selectedFuelType()}
-                onChange={(e) =>
-                  handleFilterChange("fuelType", e.currentTarget.value)
-                }
-                class={selectClasses}
-                disabled={isFetching()}
-              >
-                <option value="">All Fuel Types</option>
-              </select>
-            </div>
-          </div>
+          <FilterDropdowns
+            selectedBrand={selectedBrand}
+            selectedCategory={selectedCategory}
+            selectedFuelType={selectedFuelType}
+            handleFilterChange={handleFilterChange}
+            isFetching={() => productsQuery.isFetching}
+            selectClasses={selectClasses}
+            brands={brandsQuery.data || []}
+            categories={categoriesQuery.data || []}
+            fuelTypes={fuelTypesQuery.data || []}
+          />
 
           {/* --- Content Display --- */}
-          <Show when={error()}>
-            <div class="text-center py-10">
-              <p class="text-xl text-red-600">
-                Error: {error()?.message || "An unknown error occurred."}
-              </p>
-              <p class="text-neutral-700 mt-2">
-                Please try refreshing.{" "}
-                <button
-                  onClick={() => productsQuery.refetch()}
-                  class="ml-2 text-sky-600 underline"
-                  aria-label="Retry fetching products"
-                >
-                  Retry
-                </button>
-              </p>
-            </div>
-          </Show>
-
-          <Show
-            when={products().length > 0}
-            fallback={
-              <Show when={!isFetching()}>
-                <p class="text-center text-xl text-neutral-700 py-10">
-                  No products found.
-                </p>
-              </Show>
-            }
-          >
-            <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
-              <For each={products()}>
-                {(product) => (
-                  <A
-                    href={`/products/${product.id}`}
-                    class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group"
-                  >
-                    <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
-                      <picture>
-                        <source
-                          srcset={product.images.thumbnail.avif}
-                          type="image/avif"
-                        />
-                        <source
-                          srcset={product.images.thumbnail.webp}
-                          type="image/webp"
-                        />
-                        <img
-                          src={product.images.thumbnail.jpeg}
-                          alt={product.name}
-                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          fetchpriority="high"
-                          width="640"
-                          height="360"
-                        />
-                      </picture>
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                      <h2
-                        class="text-lg font-semibold text-neutral-800 truncate"
-                        title={product.name}
-                      >
-                        {product.name}
-                      </h2>
-                      <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
-                        {formatPrice(product.priceInCents)}
-                      </p>
-                      <div class="mt-auto pt-2 border-t border-neutral-100">
-                        <p class="text-xs text-neutral-600">
-                          Brand: {product.brand || "N/A"}
-                        </p>
-                        <p class="text-xs text-neutral-600">
-                          Category: {product.category || "N/A"}
-                        </p>
-                        <p class="text-xs text-neutral-600">
-                          Stock: {product.stockQuantity}
-                        </p>
-                      </div>
-                    </div>
-                  </A>
-                )}
-              </For>
-            </div>
-
-            <Show when={pagination() && pagination()!.totalPages > 1}>
-              <div class="mt-10 flex justify-center items-center space-x-2 sm:space-x-3">
-                <button
-                  onClick={() => handlePageChange(1)}
-                  disabled={!pagination()!.hasPreviousPage || isFetching()}
-                  class={paginationButtonClasses}
-                  aria-label="First page"
-                >
-                  <span class="hidden sm:inline">First</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    «
-                  </span>
-                </button>
-                <button
-                  onClick={() =>
-                    handlePageChange(pagination()!.currentPage - 1)
-                  }
-                  disabled={!pagination()!.hasPreviousPage || isFetching()}
-                  class={paginationButtonClasses}
-                  aria-label="Previous page"
-                >
-                  <span class="hidden sm:inline">Previous</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    ‹
-                  </span>
-                </button>
-                <span class="text-neutral-700 font-medium text-sm px-2">
-                  Page {pagination()!.currentPage} of {pagination()!.totalPages}
-                </span>
-                <button
-                  onClick={() =>
-                    handlePageChange(pagination()!.currentPage + 1)
-                  }
-                  disabled={!pagination()!.hasNextPage || isFetching()}
-                  class={paginationButtonClasses}
-                  aria-label="Next page"
-                >
-                  <span class="hidden sm:inline">Next</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    ›
-                  </span>
-                </button>
-                <button
-                  onClick={() => handlePageChange(pagination()!.totalPages)}
-                  disabled={!pagination()!.hasNextPage || isFetching()}
-                  class={paginationButtonClasses}
-                  aria-label="Last page"
-                >
-                  <span class="hidden sm:inline">Last</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    »
-                  </span>
-                </button>
-              </div>
-            </Show>
-          </Show>
+          <ProductDisplayArea
+            productsQuery={productsQuery}
+            handlePageChange={handlePageChange}
+            pageSize={pageSize}
+          />
         </div>
       </main>
     </MetaProvider>

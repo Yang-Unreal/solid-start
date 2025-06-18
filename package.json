@@ -8,7 +8,7 @@
     "db:seed": "tsx ./src/scripts/seed.ts",
     "studio": "bunx drizzle-kit studio",
     "db:push": "npx drizzle-kit push",
-    "db:sync-meili": "bun run scripts/sync-meilisearch.ts",
+    "db:sync-meili": "bun run ./src/scripts/sync-meilisearch.ts",
     "uploadVideos": "./src/scripts/uploadVideos.ts",
     "uploadImages": "./src/scripts/uploadImages.ts"
   },
