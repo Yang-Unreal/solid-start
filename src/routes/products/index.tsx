@@ -323,47 +323,65 @@ const ProductsPage = () => {
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <select
-              value={selectedBrand()}
-              onChange={(e) =>
-                handleFilterChange("brand", e.currentTarget.value)
-              }
-              class={selectClasses}
-              disabled={brandsQuery.isLoading || isFetching()}
-            >
-              <option value="">All Brands</option>
-              <For each={brandOptions()}>
-                {(brand) => <option value={brand}>{brand}</option>}
-              </For>
-            </select>
+            <div>
+              <label for="brand-select" class="sr-only">
+                Brand
+              </label>
+              <select
+                id="brand-select"
+                value={selectedBrand()}
+                onChange={(e) =>
+                  handleFilterChange("brand", e.currentTarget.value)
+                }
+                class={selectClasses}
+                disabled={brandsQuery.isLoading || isFetching()}
+              >
+                <option value="">All Brands</option>
+                <For each={brandOptions()}>
+                  {(brand) => <option value={brand}>{brand}</option>}
+                </For>
+              </select>
+            </div>
 
-            <select
-              value={selectedCategory()}
-              onChange={(e) =>
-                handleFilterChange("category", e.currentTarget.value)
-              }
-              class={selectClasses}
-              disabled={categoriesQuery.isLoading || isFetching()}
-            >
-              <option value="">All Categories</option>
-              <For each={categoryOptions()}>
-                {(category) => <option value={category}>{category}</option>}
-              </For>
-            </select>
+            <div>
+              <label for="category-select" class="sr-only">
+                Category
+              </label>
+              <select
+                id="category-select"
+                value={selectedCategory()}
+                onChange={(e) =>
+                  handleFilterChange("category", e.currentTarget.value)
+                }
+                class={selectClasses}
+                disabled={categoriesQuery.isLoading || isFetching()}
+              >
+                <option value="">All Categories</option>
+                <For each={categoryOptions()}>
+                  {(category) => <option value={category}>{category}</option>}
+                </For>
+              </select>
+            </div>
 
-            <select
-              value={selectedFuelType()}
-              onChange={(e) =>
-                handleFilterChange("fuelType", e.currentTarget.value)
-              }
-              class={selectClasses}
-              disabled={fuelTypesQuery.isLoading || isFetching()}
-            >
-              <option value="">All Fuel Types</option>
-              <For each={fuelTypeOptions()}>
-                {(fuelType) => <option value={fuelType}>{fuelType}</option>}
-              </For>
-            </select>
+            <div>
+              <label for="fuel-type-select" class="sr-only">
+                Fuel Type
+              </label>
+              <select
+                id="fuel-type-select"
+                value={selectedFuelType()}
+                onChange={(e) =>
+                  handleFilterChange("fuelType", e.currentTarget.value)
+                }
+                class={selectClasses}
+                disabled={fuelTypesQuery.isLoading || isFetching()}
+              >
+                <option value="">All Fuel Types</option>
+                <For each={fuelTypeOptions()}>
+                  {(fuelType) => <option value={fuelType}>{fuelType}</option>}
+                </For>
+              </select>
+            </div>
           </div>
 
           <Show when={error()}>
@@ -376,6 +394,7 @@ const ProductsPage = () => {
                 <button
                   onClick={() => productsQuery.refetch()}
                   class="ml-2 text-sky-600 underline"
+                  aria-label="Retry fetching products"
                 >
                   Retry
                 </button>
@@ -414,7 +433,7 @@ const ProductsPage = () => {
                           src={product.images.thumbnail.jpeg}
                           alt={product.name}
                           class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          loading="lazy"
+                          fetchpriority="high"
                           width="640"
                           height="360"
                         />
@@ -453,6 +472,7 @@ const ProductsPage = () => {
                   onClick={() => handlePageChange(1)}
                   disabled={!pagination()!.hasPreviousPage || isFetching()}
                   class={paginationButtonClasses}
+                  aria-label="First page"
                 >
                   <span class="hidden sm:inline">First</span>
                   <span class="sm:hidden" aria-hidden="true">
@@ -465,6 +485,7 @@ const ProductsPage = () => {
                   }
                   disabled={!pagination()!.hasPreviousPage || isFetching()}
                   class={paginationButtonClasses}
+                  aria-label="Previous page"
                 >
                   <span class="hidden sm:inline">Previous</span>
                   <span class="sm:hidden" aria-hidden="true">
@@ -480,6 +501,7 @@ const ProductsPage = () => {
                   }
                   disabled={!pagination()!.hasNextPage || isFetching()}
                   class={paginationButtonClasses}
+                  aria-label="Next page"
                 >
                   <span class="hidden sm:inline">Next</span>
                   <span class="sm:hidden" aria-hidden="true">
@@ -490,6 +512,7 @@ const ProductsPage = () => {
                   onClick={() => handlePageChange(pagination()!.totalPages)}
                   disabled={!pagination()!.hasNextPage || isFetching()}
                   class={paginationButtonClasses}
+                  aria-label="Last page"
                 >
                   <span class="hidden sm:inline">Last</span>
                   <span class="sm:hidden" aria-hidden="true">
