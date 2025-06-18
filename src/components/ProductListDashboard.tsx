@@ -401,6 +401,7 @@ export default function ProductListDashboard() {
                       src={product.images.thumbnail.jpeg}
                       alt={product.name}
                       class="w-24 h-16 rounded-md object-cover"
+                      fetchpriority="high"
                     />
                   </picture>
                 </div>
