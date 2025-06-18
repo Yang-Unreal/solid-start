@@ -546,7 +546,7 @@ export default function ProductListDashboard() {
       {/* Mobile List View */}
       <div class="block md:hidden space-y-3">
         <Show
-          when={products().length > 0}
+          when={pagination() && pagination()!.totalProducts > 0}
           fallback={
             <p class="text-center text-neutral-700 py-10">No products found.</p>
           }
@@ -632,7 +632,7 @@ export default function ProductListDashboard() {
       {/* Desktop Table View */}
       <div class="hidden md:block overflow-x-auto bg-white shadow-md rounded-lg">
         <Show
-          when={products().length > 0}
+          when={pagination() && pagination()!.totalProducts > 0}
           fallback={
             <p class="text-center text-neutral-700 py-10">No products found.</p>
           }
