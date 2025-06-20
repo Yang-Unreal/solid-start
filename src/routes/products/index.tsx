@@ -67,6 +67,11 @@ const ProductsPage = () => {
   // State for the search input, NOT synced with URL
   const [searchQuery, setSearchQuery] = createSignal("");
 
+  // New signals for filter selections, NOT synced with URL
+  const [selectedBrand, setSelectedBrand] = createSignal("");
+  const [selectedCategory, setSelectedCategory] = createSignal("");
+  const [selectedFuelType, setSelectedFuelType] = createSignal("");
+
   const pageSize = () => {
     const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
     if (paramPageSizeValue) {
@@ -89,22 +94,21 @@ const ProductsPage = () => {
       `http://localhost:${process.env.PORT || 3000}`;
   }
 
-  // Signals for URL parameters
+  // Signals for URL parameters (only page and pageSize remain)
   const currentPage = () =>
     parseInt(getSearchParamString(searchParams.page, "1"), 10);
-  const selectedBrand = () => getSearchParamString(searchParams.brand, "");
-  const selectedCategory = () =>
-    getSearchParamString(searchParams.category, "");
-  const selectedFuelType = () =>
-    getSearchParamString(searchParams.fuelType, "");
 
   onMount(() => {
+    // Initialize internal filter signals from URL search params on mount
+    setSelectedBrand(getSearchParamString(searchParams.brand, ""));
+    setSelectedCategory(getSearchParamString(searchParams.category, ""));
+    setSelectedFuelType(getSearchParamString(searchParams.fuelType, ""));
+
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== pageSize()) {
         setDynamicPageSize(newSize);
         setSearchParams({
-          ...searchParams,
           page: "1",
           pageSize: newSize.toString(),
         });
@@ -172,9 +176,9 @@ const ProductsPage = () => {
       {
         page: currentPage(),
         size: pageSize(),
-        brand: selectedBrand(),
-        category: selectedCategory(),
-        fuelType: selectedFuelType(),
+        brand: selectedBrand(), // Use internal signal
+        category: selectedCategory(), // Use internal signal
+        fuelType: selectedFuelType(), // Use internal signal
         q: searchQuery(),
       },
     ] as const,
@@ -245,16 +249,24 @@ const ProductsPage = () => {
     filterType: "brand" | "category" | "fuelType",
     value: string
   ) => {
+    // Update the internal signals, not the URL search params
+    if (filterType === "brand") {
+      setSelectedBrand(value);
+    } else if (filterType === "category") {
+      setSelectedCategory(value);
+    } else if (filterType === "fuelType") {
+      setSelectedFuelType(value);
+    }
+    // Always reset to page 1 when filters change
     setSearchParams({
-      ...searchParams,
       page: "1",
-      [filterType]: value || undefined,
+      pageSize: pageSize().toString(), // Keep pageSize in URL
     });
   };
 
   const handlePageChange = (newPage: number) => {
+    // Only update page and pageSize in the URL
     setSearchParams({
-      ...searchParams,
       page: newPage.toString(),
       pageSize: pageSize().toString(),
     });
