@@ -4,8 +4,8 @@ import { useSearchParams } from "@solidjs/router";
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
-import SearchInput from "~/components/SearchInput"; // Import SearchInput
-import FilterDropdowns from "~/components/FilterDropdowns"; // Import FilterDropdowns
+import SearchInput from "~/components/SearchInput";
+import FilterDropdowns from "~/components/FilterDropdowns";
 import type { Product } from "~/db/schema";
 
 // --- Type Definitions ---
@@ -65,7 +65,7 @@ const ProductsPage = () => {
   };
 
   // State for the search input, NOT synced with URL
-  const [searchQuery, setSearchQuery] = createSignal(""); // Initialize as empty, not from URL
+  const [searchQuery, setSearchQuery] = createSignal("");
 
   const pageSize = () => {
     const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
@@ -103,7 +103,6 @@ const ProductsPage = () => {
       const newSize = calculatePageSize();
       if (newSize !== pageSize()) {
         setDynamicPageSize(newSize);
-        // On resize, reset to page 1 with the new page size
         setSearchParams({
           ...searchParams,
           page: "1",
@@ -117,7 +116,6 @@ const ProductsPage = () => {
 
   // --- Data Fetching ---
 
-  // Main query function for products
   const fetchProductsQueryFn = async (context: {
     queryKey: readonly [
       string,
@@ -127,7 +125,7 @@ const ProductsPage = () => {
         brand: string;
         category: string;
         fuelType: string;
-        q: string; // Search query parameter
+        q: string;
       }
     ];
   }): Promise<ApiResponse> => {
@@ -139,7 +137,7 @@ const ProductsPage = () => {
     if (brand) params.append("brand", brand);
     if (category) params.append("category", category);
     if (fuelType) params.append("fuelType", fuelType);
-    if (q) params.append("q", q); // Add search query to the API call
+    if (q) params.append("q", q);
 
     const queryString = params.toString();
     const fetchUrl = `${baseUrl}/api/products?${queryString}`;
@@ -153,7 +151,6 @@ const ProductsPage = () => {
     return response.json();
   };
 
-  // TanStack Query for products
   const productsQuery = useQuery<
     ApiResponse,
     Error,
@@ -178,15 +175,14 @@ const ProductsPage = () => {
         brand: selectedBrand(),
         category: selectedCategory(),
         fuelType: selectedFuelType(),
-        q: searchQuery(), // Include search query in the query key
+        q: searchQuery(),
       },
     ] as const,
     queryFn: fetchProductsQueryFn,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    keepPreviousData: true, // Provides a smoother UX while new data loads
+    staleTime: 5 * 60 * 1000,
+    keepPreviousData: true,
   }));
 
-  // Queries for filter options
   const fetchFilterOptions = async (
     endpoint: string,
     params: Record<string, string> = {}
@@ -212,41 +208,37 @@ const ProductsPage = () => {
   };
 
   const brandsQuery = useQuery<string[], Error>(() => ({
-    queryKey: ["brands", selectedCategory(), selectedFuelType()], // Brands depend on selected category and fuel type
+    queryKey: ["brands", selectedCategory(), selectedFuelType()],
     queryFn: ({ queryKey }) =>
       fetchFilterOptions("brands", {
         category: queryKey[1] as string,
         fuelType: queryKey[2] as string,
       }),
-    staleTime: Infinity, // Brands list is unlikely to change often
+    staleTime: Infinity,
   }));
 
   const categoriesQuery = useQuery<string[], Error>(() => ({
-    queryKey: ["categories", selectedBrand()], // Categories depend on selected brand
+    queryKey: ["categories", selectedBrand()],
     queryFn: ({ queryKey }) =>
       fetchFilterOptions("categories", { brand: queryKey[1] as string }),
     staleTime: Infinity,
-    // Removed 'enabled' property to always fetch, letting fetchFilterOptions handle empty brand
   }));
 
   const fuelTypesQuery = useQuery<string[], Error>(() => ({
-    queryKey: ["fuelTypes", selectedBrand(), selectedCategory()], // Fuel types depend on brand and category
+    queryKey: ["fuelTypes", selectedBrand(), selectedCategory()],
     queryFn: ({ queryKey }) =>
       fetchFilterOptions("fuelTypes", {
         brand: queryKey[1] as string,
         category: queryKey[2] as string,
       }),
     staleTime: Infinity,
-    // Removed 'enabled' property to always fetch, letting fetchFilterOptions handle empty brand/category
   }));
 
   // --- Event Handlers ---
 
+  // The search handler no longer needs to manually trigger a refetch.
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
-    // Trigger a refetch of products based on the new search query
-    // No need to update searchParams.q, as it's no longer in the URL
-    productsQuery.refetch();
   };
 
   const handleFilterChange = (
@@ -255,8 +247,8 @@ const ProductsPage = () => {
   ) => {
     setSearchParams({
       ...searchParams,
-      page: "1", // Reset to page 1 when a filter changes
-      [filterType]: value || undefined, // Remove param if "All" is selected
+      page: "1",
+      [filterType]: value || undefined,
     });
   };
 
@@ -269,13 +261,10 @@ const ProductsPage = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // --- UI and Formatting ---
-
   return (
     <MetaProvider>
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-          {/* --- Search and Filter Controls --- */}
           <SearchInput
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
@@ -292,7 +281,6 @@ const ProductsPage = () => {
             fuelTypes={fuelTypesQuery.data || []}
           />
 
-          {/* --- Content Display --- */}
           <ProductDisplayArea
             productsQuery={productsQuery}
             handlePageChange={handlePageChange}
