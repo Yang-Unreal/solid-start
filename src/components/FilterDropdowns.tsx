@@ -1,4 +1,4 @@
-import { For, createEffect } from "solid-js";
+import { For, createMemo } from "solid-js"; // Import createMemo
 import type { Accessor } from "solid-js";
 import { Select, createListCollection } from "@ark-ui/solid/select";
 import { Portal } from "solid-js/web";
@@ -18,19 +18,25 @@ interface FilterDropdownsProps {
 }
 
 const FilterDropdowns = (props: FilterDropdownsProps) => {
-  // The original createEffect blocks for native select elements are no longer needed
-  // as Ark UI handles the value internally and provides its own reactivity.
-
-  const brandCollection = createListCollection({ items: props.brands });
-  const categoryCollection = createListCollection({ items: props.categories });
-  const fuelTypeCollection = createListCollection({ items: props.fuelTypes });
+  // FIX: Wrap createListCollection in createMemo to make it reactive.
+  // This will re-create the collection whenever the props.items array changes.
+  const brandCollection = createMemo(() =>
+    createListCollection({ items: props.brands })
+  );
+  const categoryCollection = createMemo(() =>
+    createListCollection({ items: props.categories })
+  );
+  const fuelTypeCollection = createMemo(() =>
+    createListCollection({ items: props.fuelTypes })
+  );
 
   return (
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {/* Brand Filter */}
       <div>
         <Select.Root
-          collection={brandCollection}
+          // FIX: Access the memo's value by calling it as a function.
+          collection={brandCollection()}
           value={[props.selectedBrand()]}
           onValueChange={(details) =>
             props.handleFilterChange("brand", details.value[0] || "")
@@ -39,14 +45,11 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
         >
           <Select.Label class="sr-only">Brand</Select.Label>
           <Select.Control>
-            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
+            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
               <Select.ValueText>
                 {props.selectedBrand() || "All Brands"}
               </Select.ValueText>
-              <Select.Indicator class="ml-2 text-gray-500">
-                &#x25BC;
-              </Select.Indicator>{" "}
-              {/* Dropdown arrow */}
+              <Select.Indicator class="ml-2 text-gray-500">▼</Select.Indicator>{" "}
             </Select.Trigger>
             <Select.ClearTrigger class="mt-2 px-3 py-1 text-sm text-gray-600 hover:text-red-600 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md">
               Clear
@@ -63,7 +66,8 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
                     <Select.ItemText>All Brands</Select.ItemText>
                     <Select.ItemIndicator>✓</Select.ItemIndicator>
                   </Select.Item>
-                  <For each={brandCollection.items}>
+                  {/* FIX: Iterate over the memo's value. */}
+                  <For each={brandCollection().items}>
                     {(brand) => (
                       <Select.Item
                         item={brand}
@@ -85,7 +89,7 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
       {/* Category Filter */}
       <div>
         <Select.Root
-          collection={categoryCollection}
+          collection={categoryCollection()}
           value={[props.selectedCategory()]}
           onValueChange={(details) =>
             props.handleFilterChange("category", details.value[0] || "")
@@ -94,14 +98,11 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
         >
           <Select.Label class="sr-only">Category</Select.Label>
           <Select.Control>
-            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
+            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
               <Select.ValueText>
                 {props.selectedCategory() || "All Categories"}
               </Select.ValueText>
-              <Select.Indicator class="ml-2 text-gray-500">
-                &#x25BC;
-              </Select.Indicator>{" "}
-              {/* Dropdown arrow */}
+              <Select.Indicator class="ml-2 text-gray-500">▼</Select.Indicator>{" "}
             </Select.Trigger>
             <Select.ClearTrigger class="mt-2 px-3 py-1 text-sm text-gray-600 hover:text-red-600 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md">
               Clear
@@ -118,7 +119,7 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
                     <Select.ItemText>All Categories</Select.ItemText>
                     <Select.ItemIndicator>✓</Select.ItemIndicator>
                   </Select.Item>
-                  <For each={categoryCollection.items}>
+                  <For each={categoryCollection().items}>
                     {(category) => (
                       <Select.Item
                         item={category}
@@ -140,7 +141,7 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
       {/* Fuel Type Filter */}
       <div>
         <Select.Root
-          collection={fuelTypeCollection}
+          collection={fuelTypeCollection()}
           value={[props.selectedFuelType()]}
           onValueChange={(details) =>
             props.handleFilterChange("fuelType", details.value[0] || "")
@@ -149,14 +150,11 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
         >
           <Select.Label class="sr-only">Fuel Type</Select.Label>
           <Select.Control>
-            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
+            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
               <Select.ValueText>
                 {props.selectedFuelType() || "All Fuel Types"}
               </Select.ValueText>
-              <Select.Indicator class="ml-2 text-gray-500">
-                &#x25BC;
-              </Select.Indicator>{" "}
-              {/* Dropdown arrow */}
+              <Select.Indicator class="ml-2 text-gray-500">▼</Select.Indicator>{" "}
             </Select.Trigger>
             <Select.ClearTrigger class="mt-2 px-3 py-1 text-sm text-gray-600 hover:text-red-600 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md">
               Clear
@@ -173,7 +171,7 @@ const FilterDropdowns = (props: FilterDropdownsProps) => {
                     <Select.ItemText>All Fuel Types</Select.ItemText>
                     <Select.ItemIndicator>✓</Select.ItemIndicator>
                   </Select.Item>
-                  <For each={fuelTypeCollection.items}>
+                  <For each={fuelTypeCollection().items}>
                     {(fuelType) => (
                       <Select.Item
                         item={fuelType}
