@@ -49,10 +49,83 @@ const BulkDeletePayloadSchema = z.object({
 // --- GET Handler ---
 export async function GET({ request }: APIEvent) {
   const url = new URL(request.url);
-  const cacheKey = `products:meilisearch:${url.searchParams.toString()}`;
+  const productId = url.searchParams.get("id");
 
+  // Handle fetching a single product by ID
+  if (productId) {
+    const idValidationResult = z.string().uuid().safeParse(productId);
+    if (!idValidationResult.success) {
+      return new Response(
+        JSON.stringify({ error: "Invalid product ID format." }),
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const singleProductCacheKey = `product:${idValidationResult.data}`;
+    try {
+      const cachedData = await kv.get(singleProductCacheKey);
+      if (cachedData) {
+        return new Response(cachedData, {
+          status: 200,
+          headers: { "Content-Type": "application/json", "X-Cache": "HIT" },
+        });
+      }
+    } catch (cacheError) {
+      console.error(
+        `Redis Cache Read Error for key ${singleProductCacheKey}:`,
+        cacheError
+      );
+    }
+
+    try {
+      const product = await db
+        .select()
+        .from(productTable)
+        .where(eq(productTable.id, idValidationResult.data))
+        .limit(1);
+
+      if (product.length === 0) {
+        return new Response(JSON.stringify({ error: "Product not found." }), {
+          status: 404,
+        });
+      }
+
+      const responseBody = {
+        data: [product[0]], // Wrap the single product object in an array
+        pagination: {
+          currentPage: 1,
+          pageSize: 1,
+          totalProducts: 1,
+          totalPages: 1,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      };
+      const jsonBody = JSON.stringify(responseBody);
+      await kv.setex(singleProductCacheKey, CACHE_DURATION_SECONDS, jsonBody);
+
+      return new Response(jsonBody, {
+        status: 200,
+        headers: { "Content-Type": "application/json", "X-Cache": "MISS" },
+      });
+    } catch (error: any) {
+      console.error(
+        `Error fetching product by ID ${idValidationResult.data}:`,
+        error
+      );
+      return new Response(
+        JSON.stringify({ error: "Failed to fetch product by ID." }),
+        { status: 500 }
+      );
+    }
+  }
+
+  // Existing logic for fetching product lists (MeiliSearch)
+  const listCacheKey = `products:list:${url.searchParams.toString()}`;
   try {
-    const cachedData = await kv.get(cacheKey);
+    const cachedData = await kv.get(listCacheKey);
     if (cachedData) {
       return new Response(cachedData, {
         status: 200,
@@ -60,7 +133,10 @@ export async function GET({ request }: APIEvent) {
       });
     }
   } catch (cacheError) {
-    console.error(`Redis Cache Read Error for key ${cacheKey}:`, cacheError);
+    console.error(
+      `Redis Cache Read Error for key ${listCacheKey}:`,
+      cacheError
+    );
   }
 
   const page = parseInt(url.searchParams.get("page") || "1", 10);
@@ -99,7 +175,7 @@ export async function GET({ request }: APIEvent) {
       },
     };
     const jsonBody = JSON.stringify(responseBody);
-    await kv.setex(cacheKey, CACHE_DURATION_SECONDS, jsonBody);
+    await kv.setex(listCacheKey, CACHE_DURATION_SECONDS, jsonBody);
 
     return new Response(jsonBody, {
       status: 200,

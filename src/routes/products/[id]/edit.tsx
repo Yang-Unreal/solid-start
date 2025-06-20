@@ -1,5 +1,6 @@
 // src/routes/products/edit.tsx
 import { createSignal, Show, createEffect } from "solid-js";
+import { isServer } from "solid-js/web"; // Import isServer
 import { useNavigate, A, useParams } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -44,15 +45,12 @@ type ProductFormValues = z.infer<typeof NewProductFormSchema>;
 async function updateProductInDB(
   updatedProduct: Partial<CreateProductDBData> & { id: string }
 ): Promise<Product> {
-  let baseUrl = "";
-  if (typeof window !== "undefined") {
-    baseUrl = window.location.origin;
-  } else {
-    baseUrl =
-      import.meta.env.VITE_INTERNAL_API_ORIGIN ||
-      `http://localhost:${process.env.PORT || 3000}`;
-  }
-  const fetchUrl = `${baseUrl}/api/products?id=${updatedProduct.id}`;
+  const fetchUrl = isServer
+    ? `${
+        import.meta.env.VITE_INTERNAL_API_ORIGIN ||
+        `http://localhost:${process.env.PORT || 3000}`
+      }/api/products?id=${updatedProduct.id}`
+    : `/api/products?id=${updatedProduct.id}`; // Use relative path on client
 
   const response = await fetch(fetchUrl, {
     method: "PUT",
@@ -88,18 +86,26 @@ const EditProductPage = () => {
     queryFn: async ({ queryKey }) => {
       const [, id] = queryKey;
       if (!id) return null;
-      const response = await fetch(`/api/products?id=${id}`);
+
+      const fetchUrl = isServer
+        ? `${
+            import.meta.env.VITE_INTERNAL_API_ORIGIN ||
+            `http://localhost:${process.env.PORT || 3000}`
+          }/api/products?id=${id}`
+        : `/api/products?id=${id}`; // Use relative path on client
+
+      const response = await fetch(fetchUrl);
       if (!response.ok) {
         throw new Error("Failed to fetch product for editing.");
       }
       const data = await response.json();
-      return data.data as Product;
+      return data as ApiResponse; // Return the full ApiResponse object
     },
     enabled: !!productId(),
     staleTime: 5 * 60 * 1000,
   }));
 
-  const existingProduct = () => productQuery.data;
+  const existingProduct = () => productQuery.data?.data?.[0]; // Directly get the first product from data array
 
   createEffect(() => {
     const currentSession = session();
@@ -118,14 +124,21 @@ const EditProductPage = () => {
   createEffect(() => {
     if (existingProduct()) {
       const product = existingProduct()!;
-      setName(product.name);
+      console.log("Existing product data:", product); // Debugging line
+      setName(product.name ?? ""); // Ensure name is always a string
       setDescription(product.description || "");
-      setPriceInCentsInput(product.priceInCents.toString());
-      setStockQuantityInput(product.stockQuantity.toString());
+      setPriceInCentsInput((product.priceInCents ?? "").toString());
+      setStockQuantityInput((product.stockQuantity ?? "").toString());
       setCategory(product.category || "");
-      setBrand(product.brand);
-      setModel(product.model);
-      setFuelType(product.fuelType);
+      setBrand(product.brand ?? ""); // Ensure brand is always a string
+      setModel(product.model ?? ""); // Ensure model is always a string
+      setFuelType(product.fuelType ?? ""); // Ensure fuelType is always a string
+    } else if (productQuery.isSuccess && !existingProduct()) {
+      console.warn(
+        "Product query was successful but existingProduct is null/undefined (after attempting to extract from data array)."
+      );
+    } else if (productQuery.isError) {
+      console.error("Product query failed:", productQuery.error);
     }
   });
 
