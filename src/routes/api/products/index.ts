@@ -1,8 +1,8 @@
 // src/routes/api/products/index.ts
 import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
-import { product as productTable, type ProductImages } from "~/db/schema";
-import { asc, desc, count, eq, and, Column } from "drizzle-orm"; // Corrected Drizzle imports
+import { product as productTable } from "~/db/schema";
+import { eq } from "drizzle-orm"; // Corrected Drizzle imports
 import { z } from "zod"; // Corrected Zod import
 import { kv } from "~/lib/redis";
 import { minio, bucket } from "~/lib/minio";
