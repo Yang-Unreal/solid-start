@@ -214,7 +214,8 @@ const EditProductPage = () => {
     }
     const validatedFormData = validationResult.data;
 
-    let uploadedImages: ProductImages | null = null;
+    let imagesToSave: ProductImages | undefined;
+
     if (selectedFile()) {
       setIsUploadingImage(true);
       const imageFormData = new FormData();
@@ -236,7 +237,7 @@ const EditProductPage = () => {
           images: ProductImages;
         };
         if (uploadResult.images) {
-          uploadedImages = uploadResult.images;
+          imagesToSave = uploadResult.images;
         } else {
           throw new Error(
             "Image uploaded, but the image URL structure was not returned."
@@ -249,6 +250,10 @@ const EditProductPage = () => {
       } finally {
         setIsUploadingImage(false);
       }
+    } else if (existingProduct()?.images) {
+      // If no new file is selected, but there's an existing product with images,
+      // use the existing images.
+      imagesToSave = existingProduct()!.images;
     }
 
     const productDataForDB: Partial<CreateProductDBData> = {
@@ -260,9 +265,15 @@ const EditProductPage = () => {
       brand: validatedFormData.brand,
       model: validatedFormData.model,
       fuelType: validatedFormData.fuelType,
+      images: imagesToSave, // Assign the determined imagesToSave
     };
-    if (uploadedImages) {
-      productDataForDB.images = uploadedImages;
+
+    // Ensure images is not undefined if it's a required field in the schema
+    if (!productDataForDB.images) {
+      setFormErrors({
+        _errors: ["Product image is required."],
+      } as any);
+      return;
     }
 
     productUpdateMutation.mutate({ id: productId()!, ...productDataForDB });
