@@ -271,9 +271,6 @@ const ProductsPage = () => {
 
   // --- UI and Formatting ---
 
-  const selectClasses =
-    "w-full p-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent disabled:bg-neutral-100";
-
   return (
     <MetaProvider>
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
@@ -282,7 +279,6 @@ const ProductsPage = () => {
           <SearchInput
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
-            selectClasses={selectClasses}
           />
 
           <FilterDropdowns
@@ -291,7 +287,6 @@ const ProductsPage = () => {
             selectedFuelType={selectedFuelType}
             handleFilterChange={handleFilterChange}
             isFetching={() => productsQuery.isFetching}
-            selectClasses={selectClasses}
             brands={brandsQuery.data || []}
             categories={categoriesQuery.data || []}
             fuelTypes={fuelTypesQuery.data || []}

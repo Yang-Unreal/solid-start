@@ -1,5 +1,7 @@
 import { For, createEffect } from "solid-js";
 import type { Accessor } from "solid-js";
+import { Select, createListCollection } from "@ark-ui/solid/select";
+import { Portal } from "solid-js/web";
 
 interface FilterDropdownsProps {
   selectedBrand: Accessor<string>;
@@ -10,115 +12,184 @@ interface FilterDropdownsProps {
     value: string
   ) => void;
   isFetching: Accessor<boolean>;
-  selectClasses: string;
   brands: string[];
   categories: string[];
   fuelTypes: string[];
 }
 
 const FilterDropdowns = (props: FilterDropdownsProps) => {
-  let brandSelectRef: HTMLSelectElement | undefined;
-  let categorySelectRef: HTMLSelectElement | undefined;
-  let fuelTypeSelectRef: HTMLSelectElement | undefined;
+  // The original createEffect blocks for native select elements are no longer needed
+  // as Ark UI handles the value internally and provides its own reactivity.
 
-  // Effect to ensure brand dropdown value is set correctly after options load
-  createEffect(() => {
-    if (brandSelectRef && props.brands.length > 0) {
-      const selectedValue = props.selectedBrand();
-      if (selectedValue && brandSelectRef.value !== selectedValue) {
-        brandSelectRef.value = selectedValue;
-      } else if (!selectedValue && brandSelectRef.value !== "") {
-        brandSelectRef.value = ""; // Reset to "All Brands" if no value
-      }
-    }
-  });
-
-  // Effect to ensure category dropdown value is set correctly after options load
-  createEffect(() => {
-    if (categorySelectRef && props.categories.length > 0) {
-      const selectedValue = props.selectedCategory();
-      if (selectedValue && categorySelectRef.value !== selectedValue) {
-        categorySelectRef.value = selectedValue;
-      } else if (!selectedValue && categorySelectRef.value !== "") {
-        categorySelectRef.value = ""; // Reset to "All Categories" if no value
-      }
-    }
-  });
-
-  // Effect to ensure fuel type dropdown value is set correctly after options load
-  createEffect(() => {
-    if (fuelTypeSelectRef && props.fuelTypes.length > 0) {
-      const selectedValue = props.selectedFuelType();
-      if (selectedValue && fuelTypeSelectRef.value !== selectedValue) {
-        fuelTypeSelectRef.value = selectedValue;
-      } else if (!selectedValue && fuelTypeSelectRef.value !== "") {
-        fuelTypeSelectRef.value = ""; // Reset to "All Fuel Types" if no value
-      }
-    }
-  });
+  const brandCollection = createListCollection({ items: props.brands });
+  const categoryCollection = createListCollection({ items: props.categories });
+  const fuelTypeCollection = createListCollection({ items: props.fuelTypes });
 
   return (
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      {/* These filter dropdowns are now supplemental to the main search */}
+      {/* Brand Filter */}
       <div>
-        <label for="brand-select" class="sr-only">
-          Brand
-        </label>
-        <select
-          id="brand-select"
-          ref={brandSelectRef}
-          value={props.selectedBrand()} // Keep value prop for initial render and reactivity
-          onChange={(e) =>
-            props.handleFilterChange("brand", e.currentTarget.value)
+        <Select.Root
+          collection={brandCollection}
+          value={[props.selectedBrand()]}
+          onValueChange={(details) =>
+            props.handleFilterChange("brand", details.value[0] || "")
           }
-          class={props.selectClasses}
           disabled={props.isFetching()}
         >
-          <option value="">All Brands</option>
-          <For each={props.brands}>
-            {(brand) => <option value={brand}>{brand}</option>}
-          </For>
-        </select>
+          <Select.Label class="sr-only">Brand</Select.Label>
+          <Select.Control>
+            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
+              <Select.ValueText>
+                {props.selectedBrand() || "All Brands"}
+              </Select.ValueText>
+              <Select.Indicator class="ml-2 text-gray-500">
+                &#x25BC;
+              </Select.Indicator>{" "}
+              {/* Dropdown arrow */}
+            </Select.Trigger>
+            <Select.ClearTrigger class="mt-2 px-3 py-1 text-sm text-gray-600 hover:text-red-600 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md">
+              Clear
+            </Select.ClearTrigger>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content class="bg-white border border-gray-200 rounded-lg shadow-xl z-10 max-h-60 overflow-auto p-1 mt-1">
+                <Select.ItemGroup>
+                  <Select.Item
+                    item=""
+                    class="p-2 cursor-pointer rounded-md hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 ease-in-out text-gray-800"
+                  >
+                    <Select.ItemText>All Brands</Select.ItemText>
+                    <Select.ItemIndicator>✓</Select.ItemIndicator>
+                  </Select.Item>
+                  <For each={brandCollection.items}>
+                    {(brand) => (
+                      <Select.Item
+                        item={brand}
+                        class="p-2 cursor-pointer rounded-md hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 ease-in-out text-gray-800"
+                      >
+                        <Select.ItemText>{brand}</Select.ItemText>
+                        <Select.ItemIndicator>✓</Select.ItemIndicator>
+                      </Select.Item>
+                    )}
+                  </For>
+                </Select.ItemGroup>
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+          <Select.HiddenSelect />
+        </Select.Root>
       </div>
+
+      {/* Category Filter */}
       <div>
-        <label for="category-select" class="sr-only">
-          Category
-        </label>
-        <select
-          id="category-select"
-          ref={categorySelectRef}
-          value={props.selectedCategory()} // Keep value prop for initial render and reactivity
-          onChange={(e) =>
-            props.handleFilterChange("category", e.currentTarget.value)
+        <Select.Root
+          collection={categoryCollection}
+          value={[props.selectedCategory()]}
+          onValueChange={(details) =>
+            props.handleFilterChange("category", details.value[0] || "")
           }
-          class={props.selectClasses}
           disabled={props.isFetching()}
         >
-          <option value="">All Categories</option>
-          <For each={props.categories}>
-            {(category) => <option value={category}>{category}</option>}
-          </For>
-        </select>
+          <Select.Label class="sr-only">Category</Select.Label>
+          <Select.Control>
+            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
+              <Select.ValueText>
+                {props.selectedCategory() || "All Categories"}
+              </Select.ValueText>
+              <Select.Indicator class="ml-2 text-gray-500">
+                &#x25BC;
+              </Select.Indicator>{" "}
+              {/* Dropdown arrow */}
+            </Select.Trigger>
+            <Select.ClearTrigger class="mt-2 px-3 py-1 text-sm text-gray-600 hover:text-red-600 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md">
+              Clear
+            </Select.ClearTrigger>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content class="bg-white border border-gray-200 rounded-lg shadow-xl z-10 max-h-60 overflow-auto p-1 mt-1">
+                <Select.ItemGroup>
+                  <Select.Item
+                    item=""
+                    class="p-2 cursor-pointer rounded-md hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 ease-in-out text-gray-800"
+                  >
+                    <Select.ItemText>All Categories</Select.ItemText>
+                    <Select.ItemIndicator>✓</Select.ItemIndicator>
+                  </Select.Item>
+                  <For each={categoryCollection.items}>
+                    {(category) => (
+                      <Select.Item
+                        item={category}
+                        class="p-2 cursor-pointer rounded-md hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 ease-in-out text-gray-800"
+                      >
+                        <Select.ItemText>{category}</Select.ItemText>
+                        <Select.ItemIndicator>✓</Select.ItemIndicator>
+                      </Select.Item>
+                    )}
+                  </For>
+                </Select.ItemGroup>
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+          <Select.HiddenSelect />
+        </Select.Root>
       </div>
+
+      {/* Fuel Type Filter */}
       <div>
-        <label for="fuel-type-select" class="sr-only">
-          Fuel Type
-        </label>
-        <select
-          id="fuel-type-select"
-          ref={fuelTypeSelectRef}
-          value={props.selectedFuelType()} // Keep value prop for initial render and reactivity
-          onChange={(e) =>
-            props.handleFilterChange("fuelType", e.currentTarget.value)
+        <Select.Root
+          collection={fuelTypeCollection}
+          value={[props.selectedFuelType()]}
+          onValueChange={(details) =>
+            props.handleFilterChange("fuelType", details.value[0] || "")
           }
-          class={props.selectClasses}
           disabled={props.isFetching()}
         >
-          <option value="">All Fuel Types</option>
-          <For each={props.fuelTypes}>
-            {(fuelType) => <option value={fuelType}>{fuelType}</option>}
-          </For>
-        </select>
+          <Select.Label class="sr-only">Fuel Type</Select.Label>
+          <Select.Control>
+            <Select.Trigger class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out">
+              <Select.ValueText>
+                {props.selectedFuelType() || "All Fuel Types"}
+              </Select.ValueText>
+              <Select.Indicator class="ml-2 text-gray-500">
+                &#x25BC;
+              </Select.Indicator>{" "}
+              {/* Dropdown arrow */}
+            </Select.Trigger>
+            <Select.ClearTrigger class="mt-2 px-3 py-1 text-sm text-gray-600 hover:text-red-600 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 rounded-md">
+              Clear
+            </Select.ClearTrigger>
+          </Select.Control>
+          <Portal>
+            <Select.Positioner>
+              <Select.Content class="bg-white border border-gray-200 rounded-lg shadow-xl z-10 max-h-60 overflow-auto p-1 mt-1">
+                <Select.ItemGroup>
+                  <Select.Item
+                    item=""
+                    class="p-2 cursor-pointer rounded-md hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 ease-in-out text-gray-800"
+                  >
+                    <Select.ItemText>All Fuel Types</Select.ItemText>
+                    <Select.ItemIndicator>✓</Select.ItemIndicator>
+                  </Select.Item>
+                  <For each={fuelTypeCollection.items}>
+                    {(fuelType) => (
+                      <Select.Item
+                        item={fuelType}
+                        class="p-2 cursor-pointer rounded-md hover:bg-blue-50 hover:text-blue-700 transition-colors duration-150 ease-in-out text-gray-800"
+                      >
+                        <Select.ItemText>{fuelType}</Select.ItemText>
+                        <Select.ItemIndicator>✓</Select.ItemIndicator>
+                      </Select.Item>
+                    )}
+                  </For>
+                </Select.ItemGroup>
+              </Select.Content>
+            </Select.Positioner>
+          </Portal>
+          <Select.HiddenSelect />
+        </Select.Root>
       </div>
     </div>
   );

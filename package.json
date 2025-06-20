@@ -13,7 +13,7 @@
     "uploadImages": "./src/scripts/uploadImages.ts"
   },
   "dependencies": {
-    "@ark-ui/solid": "^5.14.1",
+    "@ark-ui/solid": "^5.14.2",
     "@aws-sdk/client-s3": "^3.830.0",
     "@aws-sdk/s3-request-presigner": "^3.830.0",
     "@faker-js/faker": "^9.8.0",
