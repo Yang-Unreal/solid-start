@@ -13,6 +13,7 @@ import { MetaProvider } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
 import SearchInput from "~/components/SearchInput";
+import FilterDropdown from "~/components/FilterDropdowns"; // Import the new component
 import type { Product } from "~/db/schema";
 
 // --- Type Definitions ---
@@ -468,87 +469,39 @@ const ProductsPage = () => {
 
           {/* Filter Section */}
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {/* Brand Filter */}
-            <div class="p-4 border border-gray-200 rounded-md shadow-sm">
-              <h3 class="font-semibold text-lg mb-2">Brand</h3>
-              <For each={availableBrands()}>
-                {(brand) => (
-                  <label class="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedBrands().includes(brand.value)}
-                      onChange={(e) => {
-                        const newBrands = e.currentTarget.checked
-                          ? [...selectedBrands(), brand.value]
-                          : selectedBrands().filter((b) => b !== brand.value);
-                        setSelectedBrands(newBrands);
-                        // Removed setSearchParams for 'brand'
-                      }}
-                      class="form-checkbox h-4 w-4 text-blue-600"
-                    />
-                    <span>
-                      {brand.value} ({brand.count})
-                    </span>
-                  </label>
-                )}
-              </For>
-            </div>
-
-            {/* Category Filter */}
-            <div class="p-4 border border-gray-200 rounded-md shadow-sm">
-              <h3 class="font-semibold text-lg mb-2">Category</h3>
-              <For each={availableCategories()}>
-                {(category) => (
-                  <label class="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories().includes(category.value)}
-                      onChange={(e) => {
-                        const newCategories = e.currentTarget.checked
-                          ? [...selectedCategories(), category.value]
-                          : selectedCategories().filter(
-                              (c) => c !== category.value
-                            );
-                        setSelectedCategories(newCategories);
-                        // Removed setSearchParams for 'category'
-                      }}
-                      class="form-checkbox h-4 w-4 text-blue-600"
-                    />
-                    <span>
-                      {category.value} ({category.count})
-                    </span>
-                  </label>
-                )}
-              </For>
-            </div>
-
-            {/* Fuel Type Filter */}
-            <div class="p-4 border border-gray-200 rounded-md shadow-sm">
-              <h3 class="font-semibold text-lg mb-2">Fuel Type</h3>
-              <For each={availableFuelTypes()}>
-                {(fuelType) => (
-                  <label class="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedFuelTypes().includes(fuelType.value)}
-                      onChange={(e) => {
-                        const newFuelTypes = e.currentTarget.checked
-                          ? [...selectedFuelTypes(), fuelType.value]
-                          : selectedFuelTypes().filter(
-                              (f) => f !== fuelType.value
-                            );
-                        setSelectedFuelTypes(newFuelTypes);
-                        // Removed setSearchParams for 'fuelType'
-                      }}
-                      class="form-checkbox h-4 w-4 text-blue-600"
-                    />
-                    <span>
-                      {fuelType.value} ({fuelType.count})
-                    </span>
-                  </label>
-                )}
-              </For>
-            </div>
+            <FilterDropdown
+              title="Brand"
+              options={availableBrands().map((b) => b.value)}
+              selectedOptions={selectedBrands()}
+              onSelect={(option) => {
+                const newBrands = selectedBrands().includes(option)
+                  ? selectedBrands().filter((b) => b !== option)
+                  : [...selectedBrands(), option];
+                setSelectedBrands(newBrands);
+              }}
+            />
+            <FilterDropdown
+              title="Category"
+              options={availableCategories().map((c) => c.value)}
+              selectedOptions={selectedCategories()}
+              onSelect={(option) => {
+                const newCategories = selectedCategories().includes(option)
+                  ? selectedCategories().filter((c) => c !== option)
+                  : [...selectedCategories(), option];
+                setSelectedCategories(newCategories);
+              }}
+            />
+            <FilterDropdown
+              title="Fuel Type"
+              options={availableFuelTypes().map((f) => f.value)}
+              selectedOptions={selectedFuelTypes()}
+              onSelect={(option) => {
+                const newFuelTypes = selectedFuelTypes().includes(option)
+                  ? selectedFuelTypes().filter((f) => f !== option)
+                  : [...selectedFuelTypes(), option];
+                setSelectedFuelTypes(newFuelTypes);
+              }}
+            />
           </div>
 
           <ProductDisplayArea
