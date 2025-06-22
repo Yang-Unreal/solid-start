@@ -25,8 +25,8 @@ export const productsIndex = meilisearch.index<Product>("products");
  */
 export const pollTask = async (
   taskUid: number,
-  timeoutMs = 5000,
-  intervalMs = 50
+  timeoutMs = 10000, // Increased timeout to 10 seconds
+  intervalMs = 10 // Decreased interval to 10ms for more frequent polling
 ): Promise<Task> => {
   const startTime = Date.now();
 

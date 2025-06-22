@@ -7,7 +7,7 @@ import { z } from "zod/v4";
 import { kv } from "~/lib/redis";
 import { minio, bucket } from "~/lib/minio";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { productsIndex } from "~/lib/meilisearch"; // <-- Import MeiliSearch index
+import { productsIndex, pollTask } from "~/lib/meilisearch"; // <-- Import MeiliSearch index and pollTask
 
 const BulkDeletePayloadSchema = z.object({
   ids: z.array(z.string().uuid()).min(1),
@@ -41,12 +41,14 @@ export async function POST({ request }: APIEvent) {
     // Sync bulk deletion to MeiliSearch
     if (deletedProducts.length > 0) {
       const deletedIds = deletedProducts.map((p) => p.id);
-      await productsIndex.deleteDocuments(deletedIds);
+      const task = await productsIndex.deleteDocuments(deletedIds);
+      await pollTask(task.taskUid); // Wait for MeiliSearch to process the bulk deletion
     }
 
-    // Invalidate Redis cache
-    const keys = await kv.keys("products:*");
-    if (keys.length > 0) await kv.del(...keys);
+    // Invalidate Redis cache for products and filter options
+    const productKeys = await kv.keys("products:*");
+    if (productKeys.length > 0) await kv.del(...productKeys);
+    await kv.del("filter-options"); // Invalidate filter options cache
 
     return new Response(
       JSON.stringify({

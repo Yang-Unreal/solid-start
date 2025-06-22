@@ -7,11 +7,12 @@ import { z } from "zod"; // Corrected Zod import
 import { kv } from "~/lib/redis";
 import { minio, bucket } from "~/lib/minio";
 import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { productsIndex } from "~/lib/meilisearch";
+import { productsIndex, pollTask } from "~/lib/meilisearch";
 
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 100;
 const CACHE_DURATION_SECONDS = 300;
+const FILTER_OPTIONS_CACHE_KEY = "filter-options"; // Define the cache key for filter options
 
 // --- Schemas ---
 const ProductImagesSchema = z.object({
@@ -146,21 +147,15 @@ export async function GET({ request }: APIEvent) {
   );
   pageSize = Math.min(pageSize, MAX_PAGE_SIZE);
 
-  const brand = url.searchParams.get("brand");
-  const category = url.searchParams.get("category");
-  const fuelType = url.searchParams.get("fuelType");
   const searchQuery = url.searchParams.get("q") || "";
-
-  const filter: string[] = [];
-  if (brand) filter.push(`brand = "${brand}"`);
-  if (category) filter.push(`category = "${category}"`);
-  if (fuelType) filter.push(`fuelType = "${fuelType}"`);
+  const filterQuery = url.searchParams.get("filter") || ""; // Get the filter string from the URL
 
   try {
     const searchResult = await productsIndex.search(searchQuery, {
       page,
       hitsPerPage: pageSize,
-      filter,
+      filter: filterQuery, // Pass the filterQuery directly to MeiliSearch
+      facets: ["brand", "category", "fuelType"], // Request facet distributions
     });
 
     const responseBody = {
@@ -173,6 +168,7 @@ export async function GET({ request }: APIEvent) {
         hasNextPage: searchResult.page < searchResult.totalPages,
         hasPreviousPage: searchResult.page > 1,
       },
+      facets: searchResult.facetDistribution, // Include facet distributions in the response
     };
     const jsonBody = JSON.stringify(responseBody);
     await kv.setex(listCacheKey, CACHE_DURATION_SECONDS, jsonBody);
@@ -213,11 +209,13 @@ export async function POST({ request }: APIEvent) {
 
     if (insertedProducts.length > 0) {
       const newProduct = insertedProducts[0]!; // Assert newProduct is not undefined
-      await productsIndex.addDocuments([newProduct]);
+      const task = await productsIndex.addDocuments([newProduct]);
+      await pollTask(task.taskUid); // Wait for MeiliSearch to process the addition
     }
 
     const keys = await kv.keys("products:*");
     if (keys.length > 0) await kv.del(...keys);
+    await kv.del(FILTER_OPTIONS_CACHE_KEY); // Invalidate filter options cache
 
     return new Response(JSON.stringify(insertedProducts[0]), { status: 201 });
   } catch (error) {
@@ -270,7 +268,8 @@ export async function PUT({ request }: APIEvent) {
 
     if (updatedProducts.length > 0) {
       const updatedProduct = updatedProducts[0]!; // Assert updatedProduct is not undefined
-      await productsIndex.updateDocuments([updatedProduct]);
+      const task = await productsIndex.updateDocuments([updatedProduct]);
+      await pollTask(task.taskUid); // Wait for MeiliSearch to process the update
     } else {
       return new Response(JSON.stringify({ error: "Product not found." }), {
         status: 404,
@@ -279,6 +278,7 @@ export async function PUT({ request }: APIEvent) {
 
     const keys = await kv.keys("products:*");
     if (keys.length > 0) await kv.del(...keys);
+    await kv.del(FILTER_OPTIONS_CACHE_KEY); // Invalidate filter options cache
 
     return new Response(
       JSON.stringify({
@@ -405,13 +405,15 @@ export async function DELETE({ request }: APIEvent) {
       .returning();
 
     // Delete from MeiliSearch
-    await productsIndex.deleteDocument(idValidationResult.data);
+    const task = await productsIndex.deleteDocument(idValidationResult.data);
+    await pollTask(task.taskUid); // Wait for MeiliSearch to process the deletion
 
     // Invalidate Redis cache
     const keys = await kv.keys("products:*");
     if (keys.length > 0) {
       await kv.del(...keys);
     }
+    await kv.del(FILTER_OPTIONS_CACHE_KEY); // Invalidate filter options cache
 
     return new Response(
       JSON.stringify({
