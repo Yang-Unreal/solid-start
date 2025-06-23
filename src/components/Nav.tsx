@@ -45,10 +45,11 @@ export default function Nav(props: NavProps) {
 
   return (
     <nav
-      class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out ${
-        isMobileMenuOpen() ? "h-screen bg-black" : "h-16 bg-black shadow-lg"
+      class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-black shadow-lg ${
+        isMobileMenuOpen() ? "h-screen" : ""
       }`}
     >
+      {/* Main top row */}
       <div
         class={`flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 font-sans ${
           isMobileMenuOpen() ? "hidden" : ""
@@ -63,9 +64,9 @@ export default function Nav(props: NavProps) {
         <div class="flex items-center space-x-4 h-full">
           {" "}
           {/* Added h-full to align items vertically */}
-          {/* Search Input (Desktop only for now) */}
+          {/* Search Input (Desktop only) */}
           <Show when={location.pathname === "/products"}>
-            <div class="hidden sm:block w-64">
+            <div class="hidden md:block w-64">
               {" "}
               {/* Adjust width as needed */}
               <SearchInput
@@ -111,6 +112,20 @@ export default function Nav(props: NavProps) {
         </div>
       </div>
 
+      {/* Mobile Search Bar (Second Row) */}
+      <Show when={location.pathname === "/products"}>
+        <div
+          class={`sm:block md:hidden px-4 pb-4 max-w-xs mx-auto ${
+            isMobileMenuOpen() ? "hidden" : ""
+          }`}
+        >
+          <SearchInput
+            searchQuery={props.searchQuery}
+            onSearchChange={props.onSearchChange}
+          />
+        </div>
+      </Show>
+
       {/* Full-screen Mobile Menu Content */}
       <Show when={isMobileMenuOpen()}>
         <div class="h-screen flex flex-col items-center justify-center">
@@ -138,15 +153,6 @@ export default function Nav(props: NavProps) {
               </A>
             </li>
           </ul>
-          {/* Search Input in Mobile Menu */}
-          <Show when={location.pathname === "/products"}>
-            <div class="w-full px-4 mt-6">
-              <SearchInput
-                searchQuery={props.searchQuery}
-                onSearchChange={props.onSearchChange}
-              />
-            </div>
-          </Show>
         </div>
       </Show>
     </nav>

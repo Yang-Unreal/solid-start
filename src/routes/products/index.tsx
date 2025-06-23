@@ -385,7 +385,7 @@ const ProductsPage = () => {
           {/* SearchInput component is now in Nav.tsx, so remove it from here */}
 
           {/* Filter Section */}
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <FilterDropdown
               title="Brand"
               options={availableBrands().map((b) => b.value)}

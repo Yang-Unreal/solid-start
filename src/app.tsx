@@ -105,7 +105,15 @@ export default function App() {
                   onSearchChange={handleSearchChange}
                 />
               )}
-              <main class="flex-grow">
+              <main
+                class={`flex-grow ${
+                  location.pathname === "/products" &&
+                  typeof window !== "undefined" &&
+                  window.innerWidth < 768 // Tailwind's 'md' breakpoint is 768px
+                    ? "pt-32" // Adjust this value based on the actual height of your mobile nav + search bar
+                    : "pt-16" // Default padding for the top nav
+                }`}
+              >
                 <Suspense fallback={null}>
                   <Show
                     when={
