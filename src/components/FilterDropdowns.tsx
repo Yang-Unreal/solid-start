@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, Show, onMount, onCleanup } from "solid-js";
 
 interface FilterDropdownProps {
   title: string;
@@ -9,6 +9,7 @@ interface FilterDropdownProps {
 
 const FilterDropdown = (props: FilterDropdownProps) => {
   const [isOpen, setIsOpen] = createSignal(false);
+  let dropdownRef: HTMLDivElement | undefined;
 
   const toggleDropdown = () => setIsOpen(!isOpen());
 
@@ -16,8 +17,22 @@ const FilterDropdown = (props: FilterDropdownProps) => {
     props.onSelect(option);
   };
 
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
+      setIsOpen(false);
+    }
+  };
+
+  onMount(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+  });
+
+  onCleanup(() => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  });
+
   return (
-    <div class="relative inline-block text-left">
+    <div class="relative inline-block text-left" ref={dropdownRef}>
       <div>
         <button
           type="button"
@@ -57,6 +72,8 @@ const FilterDropdown = (props: FilterDropdownProps) => {
                 <label class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
                   <input
                     type="checkbox"
+                    id={`filter-${props.title}-${option}`}
+                    name={`filter-${props.title}`}
                     class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
                     checked={props.selectedOptions.includes(option)}
                     onChange={() => handleSelect(option)}

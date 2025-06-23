@@ -42,6 +42,7 @@ const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const FILTER_OPTIONS_QUERY_KEY = "filterOptions";
 const TARGET_ROWS_ON_PAGE = 3;
 const MAX_API_PAGE_SIZE = 100;
+const SSR_DEFAULT_PAGE_SIZE = 12; // Explicit default for SSR
 
 // Local Storage Keys
 const LS_SEARCH_QUERY_KEY = "productSearchQuery";
@@ -64,7 +65,7 @@ const getActiveColumnCount = () => {
 const calculatePageSize = () => {
   const columns = getActiveColumnCount();
   let newPageSize = columns * TARGET_ROWS_ON_PAGE;
-  if (newPageSize === 0) newPageSize = 12; // Fallback
+  if (newPageSize === 0) newPageSize = SSR_DEFAULT_PAGE_SIZE; // Fallback
   return Math.min(newPageSize, MAX_API_PAGE_SIZE);
 };
 
@@ -81,34 +82,14 @@ const getSearchParamString = (
 // --- Main Component ---
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [dynamicPageSize, setDynamicPageSize] = createSignal(
-    calculatePageSize()
-  );
 
-  // State for the search input, initialized from localStorage
-  const [searchQuery, setSearchQuery] = createSignal(
-    typeof window !== "undefined"
-      ? localStorage.getItem(LS_SEARCH_QUERY_KEY) || ""
-      : ""
-  );
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = createSignal(
-    typeof window !== "undefined"
-      ? localStorage.getItem(LS_SEARCH_QUERY_KEY) || ""
-      : ""
-  );
-
-  // Debounce search query and persist to localStorage
-  createEffect(
-    on(searchQuery, (query) => {
-      const handler = setTimeout(() => {
-        setDebouncedSearchQuery(query);
-        if (typeof window !== "undefined") {
-          localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
-        }
-      }, 300); // Debounce for 300ms
-      onCleanup(() => clearTimeout(handler));
-    })
-  );
+  // Create a memoized signal for the search query from URL search params
+  // This ensures reactivity for the queryKey when searchParams.q changes.
+  const currentSearchQuery = createMemo(() => {
+    const q = searchParams.q;
+    const value = Array.isArray(q) ? q[0] : q;
+    return value === "" ? undefined : value; // Return undefined if empty string to trigger re-fetch
+  });
 
   // State for filters, initialized from localStorage
   const [selectedBrands, setSelectedBrands] = createSignal<string[]>(
@@ -156,45 +137,63 @@ const ProductsPage = () => {
     })
   );
 
-  // Adjust page size on client mount and attach resize listener
-  onMount(() => {
-    if (typeof window !== "undefined") {
-      // Calculate initial page size based on screen width
-      const initialCalculatedPageSize = calculatePageSize();
-      const currentParamPageSize = parseInt(
-        getSearchParamString(searchParams.pageSize, ""),
-        10
-      );
-
-      // Only update searchParams if the current pageSize in URL is different from calculated
-      // or if it's not a valid number
+  // Initialize currentCalculatedPageSize based on URL param or SSR default.
+  // This value will be used for both SSR and initial client hydration.
+  const initialPageSizeFromUrlOrSSR = createMemo(() => {
+    const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
+    if (paramPageSizeValue) {
+      const numParamPageSize = parseInt(paramPageSizeValue, 10);
       if (
-        isNaN(currentParamPageSize) ||
-        currentParamPageSize !== initialCalculatedPageSize
+        !isNaN(numParamPageSize) &&
+        numParamPageSize > 0 &&
+        numParamPageSize <= MAX_API_PAGE_SIZE
       ) {
-        setDynamicPageSize(initialCalculatedPageSize); // Update signal
-        // Removed setSearchParams here to prevent extra refetch on mount
-      } else {
-        // If URL pageSize is already correct, ensure dynamicPageSize signal is in sync
-        setDynamicPageSize(currentParamPageSize);
+        return numParamPageSize;
       }
     }
+    return SSR_DEFAULT_PAGE_SIZE;
+  });
 
-    // Attach resize listener after initial setup
+  const [currentCalculatedPageSize, setCurrentCalculatedPageSize] =
+    createSignal(initialPageSizeFromUrlOrSSR());
+
+  // Effect to update currentCalculatedPageSize and URL param on client-side resize/mount
+  createEffect(
+    on(
+      () => {
+        // Only run on client
+        if (typeof window === "undefined") return;
+        return calculatePageSize();
+      },
+      (newCalculatedSize) => {
+        if (newCalculatedSize === undefined) return; // Skip SSR run
+
+        // If the client-calculated size is different from the current effective size (from URL or initial SSR)
+        // then update the URL param and the signal.
+        if (newCalculatedSize !== currentCalculatedPageSize()) {
+          setCurrentCalculatedPageSize(newCalculatedSize);
+          setSearchParams({
+            ...searchParams,
+            page: "1", // Reset to page 1 on page size change
+            pageSize: newCalculatedSize.toString(),
+          });
+        }
+      },
+      { defer: true } // Defer this effect until after initial render/hydration
+    )
+  );
+
+  // Attach resize listener
+  onMount(() => {
     const handleResize = () => {
-      const newSize = calculatePageSize();
-      if (newSize !== pageSize()) {
-        // pageSize() will reflect current dynamicPageSize or URL param
-        setDynamicPageSize(newSize);
-        setSearchParams({
-          ...searchParams,
-          page: "1",
-          pageSize: newSize.toString(),
-        });
-      }
+      // Trigger the effect by changing the window size, which will re-run calculatePageSize
+      // The effect itself handles the update logic.
+      // No direct signal update here, let the effect handle it.
     };
-    window.addEventListener("resize", handleResize);
-    onCleanup(() => window.removeEventListener("resize", handleResize));
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
+      onCleanup(() => window.removeEventListener("resize", handleResize));
+    }
   });
 
   // Helper to build MeiliSearch filter string
@@ -224,20 +223,8 @@ const ProductsPage = () => {
     return filters.join(" AND ");
   };
 
-  const pageSize = () => {
-    const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
-    if (paramPageSizeValue) {
-      const numParamPageSize = parseInt(paramPageSizeValue, 10);
-      if (
-        !isNaN(numParamPageSize) &&
-        numParamPageSize > 0 &&
-        numParamPageSize <= MAX_API_PAGE_SIZE
-      ) {
-        return numParamPageSize;
-      }
-    }
-    return dynamicPageSize();
-  };
+  // The pageSize signal now directly reflects the current calculated/URL-derived page size
+  const pageSize = () => currentCalculatedPageSize();
 
   let baseUrl = "";
   if (import.meta.env.SSR && typeof window === "undefined") {
@@ -258,7 +245,7 @@ const ProductsPage = () => {
       {
         page: number;
         size: number;
-        q: string;
+        q?: string; // Make q optional in the function parameter type
         filter: string; // Add filter parameter
       }
     ];
@@ -267,7 +254,7 @@ const ProductsPage = () => {
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("pageSize", size.toString());
-    if (q) params.append("q", q);
+    if (q) params.append("q", q); // Only append if q is not undefined or empty string
     if (filter) params.append("filter", filter); // Add filter to params
 
     const queryString = params.toString();
@@ -291,24 +278,26 @@ const ProductsPage = () => {
       {
         page: number;
         size: number;
-        q: string;
+        q?: string; // Make q optional in the queryKey type
         filter: string; // Add filter parameter
       }
     ]
-  >(() => ({
-    queryKey: [
-      PRODUCTS_QUERY_KEY_PREFIX,
-      {
-        page: currentPage(),
-        size: pageSize(),
-        q: debouncedSearchQuery(), // Use debounced query here
-        filter: buildFilterString(), // Pass the filter string
-      },
-    ] as const,
-    queryFn: fetchProductsQueryFn,
-    staleTime: 5 * 60 * 1000, // Revert staleTime to 5 minutes
-    keepPreviousData: true,
-  }));
+  >(() => {
+    return {
+      queryKey: [
+        PRODUCTS_QUERY_KEY_PREFIX,
+        {
+          page: currentPage(),
+          size: pageSize(),
+          q: currentSearchQuery(), // Use the memoized signal here
+          filter: buildFilterString(), // Pass the filter string
+        },
+      ] as const,
+      queryFn: fetchProductsQueryFn,
+      staleTime: 5 * 60 * 1000, // Revert staleTime to 5 minutes
+      keepPreviousData: true,
+    };
+  });
 
   // --- Data Fetching (Filter Options) ---
   const fetchFilterOptionsQueryFn =
@@ -467,12 +456,6 @@ const ProductsPage = () => {
 
   // --- Event Handlers ---
 
-  // The search handler now updates localStorage
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-    // Removed setSearchParams for 'q'
-  };
-
   const handlePageChange = (newPage: number) => {
     setSearchParams({
       ...searchParams,
@@ -490,10 +473,7 @@ const ProductsPage = () => {
     <MetaProvider>
       <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-          />
+          {/* SearchInput component is now in Nav.tsx, so remove it from here */}
 
           {/* Filter Section */}
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

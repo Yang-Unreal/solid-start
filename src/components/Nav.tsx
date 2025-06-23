@@ -4,6 +4,8 @@ import {
   AlignJustify, // Mobile menu open icon
   MenuSquare, // Mobile menu close icon
 } from "lucide-solid";
+import SearchInput from "~/components/SearchInput"; // Import SearchInput
+import type { Accessor } from "solid-js"; // Revert to Accessor type
 
 const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false);
 
@@ -21,7 +23,12 @@ const YourLogo = (props: { class?: string }) => (
   </svg>
 );
 
-export default function Nav() {
+interface NavProps {
+  searchQuery: Accessor<string>; // Reverted to Accessor
+  onSearchChange: (query: string) => void;
+}
+
+export default function Nav(props: NavProps) {
   const location = useLocation();
   const activeLinkClasses = (path: string) => {
     const baseActive = "text-white font-semibold";
@@ -53,7 +60,18 @@ export default function Nav() {
         </A>
 
         {/* --- RIGHT SIDE: Desktop Links or Mobile Menu Button --- */}
-        <div>
+        <div class="flex items-center space-x-4 h-full">
+          {" "}
+          {/* Added h-full to align items vertically */}
+          {/* Search Input (Desktop only for now) */}
+          <div class="hidden sm:block w-64">
+            {" "}
+            {/* Adjust width as needed */}
+            <SearchInput
+              searchQuery={props.searchQuery}
+              onSearchChange={props.onSearchChange}
+            />
+          </div>
           {/* Desktop-only Links */}
           <ul class="hidden sm:flex items-center h-full space-x-3 sm:space-x-4">
             <li>
@@ -78,7 +96,6 @@ export default function Nav() {
               </A>
             </li>
           </ul>
-
           {/* Mobile-only Menu Button */}
           <div class="sm:hidden">
             <button
@@ -119,6 +136,13 @@ export default function Nav() {
               </A>
             </li>
           </ul>
+          {/* Search Input in Mobile Menu */}
+          <div class="w-full px-4 mt-6">
+            <SearchInput
+              searchQuery={props.searchQuery}
+              onSearchChange={props.onSearchChange}
+            />
+          </div>
         </div>
       </Show>
     </nav>

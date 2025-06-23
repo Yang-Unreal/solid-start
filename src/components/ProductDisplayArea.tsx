@@ -66,139 +66,129 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
         </div>
       </Show>
 
-      {/* 
-        MODIFIED: This block previously showed "Loading...". 
-        It now renders nothing, effectively hiding any indicator during the initial load.
-      */}
-      <Show when={isLoading()}>{null}</Show>
-
-      {/* State 2: Content is ready (or refetching over existing content) */}
-      <Show when={!isLoading() && !error()}>
-        <div class={containerClasses()}>
-          <Show
-            when={products().length > 0}
-            fallback={
-              <p class="text-center text-xl text-neutral-700 py-10">
-                No products found.
-              </p>
-            }
-          >
-            {/* --- Product Grid --- */}
-            <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
-              <For each={products()}>
-                {(product) => (
-                  <A
-                    href={`/products/${product.id}`}
-                    class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group"
-                  >
-                    <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
-                      <picture>
-                        <source
-                          srcset={product.images.thumbnail.avif}
-                          type="image/avif"
-                        />
-                        <source
-                          srcset={product.images.thumbnail.webp}
-                          type="image/webp"
-                        />
-                        <img
-                          src={product.images.thumbnail.jpeg}
-                          alt={product.name}
-                          class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          fetchpriority="high"
-                          width="640"
-                          height="360"
-                        />
-                      </picture>
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                      <h2
-                        class="text-lg font-semibold text-neutral-800 truncate"
-                        title={product.name}
-                      >
-                        {product.name}
-                      </h2>
-                      <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
-                        {formatPrice(product.priceInCents)}
+      <div class={containerClasses()}>
+        {/* --- Product Grid Container (Always rendered for hydration stability) --- */}
+        <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
+          {/* Only show products if not loading and no error, and products exist */}
+          <Show when={!isLoading() && !error() && products().length > 0}>
+            <For each={products()}>
+              {(product) => (
+                <A
+                  href={`/products/${product.id}`}
+                  class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group"
+                >
+                  <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
+                    <picture>
+                      <source
+                        srcset={product.images.thumbnail.avif}
+                        type="image/avif"
+                      />
+                      <source
+                        srcset={product.images.thumbnail.webp}
+                        type="image/webp"
+                      />
+                      <img
+                        src={product.images.thumbnail.jpeg}
+                        alt={product.name}
+                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        fetchpriority="high"
+                        width="640"
+                        height="360"
+                      />
+                    </picture>
+                  </div>
+                  <div class="p-5 flex flex-col flex-grow">
+                    <h2
+                      class="text-lg font-semibold text-neutral-800 truncate"
+                      title={product.name}
+                    >
+                      {product.name}
+                    </h2>
+                    <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
+                      {formatPrice(product.priceInCents)}
+                    </p>
+                    <div class="mt-auto pt-2 border-t border-neutral-100">
+                      <p class="text-xs text-neutral-600">
+                        Brand: {product.brand || "N/A"}
                       </p>
-                      <div class="mt-auto pt-2 border-t border-neutral-100">
-                        <p class="text-xs text-neutral-600">
-                          Brand: {product.brand || "N/A"}
-                        </p>
-                        <p class="text-xs text-neutral-600">
-                          Category: {product.category || "N/A"}
-                        </p>
-                        <p class="text-xs text-neutral-600">
-                          Stock: {product.stockQuantity}
-                        </p>
-                      </div>
+                      <p class="text-xs text-neutral-600">
+                        Category: {product.category || "N/A"}
+                      </p>
+                      <p class="text-xs text-neutral-600">
+                        Stock: {product.stockQuantity}
+                      </p>
                     </div>
-                  </A>
-                )}
-              </For>
-            </div>
-
-            {/* --- Pagination Controls --- */}
-            <Show when={pagination() && pagination()!.totalPages > 1}>
-              <div class="mt-10 flex justify-center items-center space-x-2 sm:space-x-3">
-                <button
-                  onClick={() => props.handlePageChange(1)}
-                  disabled={!pagination()!.hasPreviousPage}
-                  class={paginationButtonClasses}
-                  aria-label="First page"
-                >
-                  <span class="hidden sm:inline">First</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    «
-                  </span>
-                </button>
-                <button
-                  onClick={() =>
-                    props.handlePageChange(pagination()!.currentPage - 1)
-                  }
-                  disabled={!pagination()!.hasPreviousPage}
-                  class={paginationButtonClasses}
-                  aria-label="Previous page"
-                >
-                  <span class="hidden sm:inline">Previous</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    ‹
-                  </span>
-                </button>
-                <span class="text-neutral-700 font-medium text-sm px-2">
-                  Page {pagination()!.currentPage} of {pagination()!.totalPages}
-                </span>
-                <button
-                  onClick={() =>
-                    props.handlePageChange(pagination()!.currentPage + 1)
-                  }
-                  disabled={!pagination()!.hasNextPage}
-                  class={paginationButtonClasses}
-                  aria-label="Next page"
-                >
-                  <span class="hidden sm:inline">Next</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    ›
-                  </span>
-                </button>
-                <button
-                  onClick={() =>
-                    props.handlePageChange(pagination()!.totalPages)
-                  }
-                  disabled={!pagination()!.hasNextPage}
-                  class={paginationButtonClasses}
-                  aria-label="Last page"
-                >
-                  <span class="hidden sm:inline">Last</span>
-                  <span class="sm:hidden" aria-hidden="true">
-                    »
-                  </span>
-                </button>
-              </div>
-            </Show>
+                  </div>
+                </A>
+              )}
+            </For>
           </Show>
         </div>
-      </Show>
+
+        {/* --- Pagination Controls (Only show if not loading, no error, and pagination exists) --- */}
+        <Show
+          when={
+            !isLoading() &&
+            !error() &&
+            pagination() &&
+            pagination()!.totalPages > 1
+          }
+        >
+          <div class="mt-10 flex justify-center items-center space-x-2 sm:space-x-3">
+            <button
+              onClick={() => props.handlePageChange(1)}
+              disabled={!pagination()!.hasPreviousPage}
+              class={paginationButtonClasses}
+              aria-label="First page"
+            >
+              <span class="hidden sm:inline">First</span>
+              <span class="sm:hidden" aria-hidden="true">
+                «
+              </span>
+            </button>
+            <button
+              onClick={() =>
+                props.handlePageChange(pagination()!.currentPage - 1)
+              }
+              disabled={!pagination()!.hasPreviousPage}
+              class={paginationButtonClasses}
+              aria-label="Previous page"
+            >
+              <span class="hidden sm:inline">Previous</span>
+              <span class="sm:hidden" aria-hidden="true">
+                ‹
+              </span>
+            </button>
+            <span class="text-neutral-700 font-medium text-sm px-2">
+              Page {pagination()!.currentPage} of {pagination()!.totalPages}
+            </span>
+            <button
+              onClick={() =>
+                props.handlePageChange(pagination()!.currentPage + 1)
+              }
+              disabled={!pagination()!.hasNextPage}
+              class={paginationButtonClasses}
+              aria-label="Next page"
+            >
+              <span class="hidden sm:inline">Next</span>
+              <span class="sm:hidden" aria-hidden="true">
+                ›
+              </span>
+            </button>
+            <button
+              onClick={() => props.handlePageChange(pagination()!.totalPages)}
+              disabled={!pagination()!.hasNextPage}
+              class={paginationButtonClasses}
+              aria-label="Last page"
+            >
+              <span class="hidden sm:inline">Last</span>
+              <span class="sm:hidden" aria-hidden="true">
+                »
+              </span>
+            </button>
+          </div>
+        </Show>
+      </div>
     </>
   );
 };
