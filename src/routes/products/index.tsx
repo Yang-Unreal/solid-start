@@ -59,7 +59,7 @@ const getSearchParamString = (
 
 // --- Main Component ---
 const ProductsPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams(); // Still needed for 'q' param
 
   // Create a memoized signal for the search query from URL search params
   const currentSearchQuery = createMemo(() => {

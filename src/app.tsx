@@ -64,11 +64,14 @@ export default function App() {
             if (typeof window !== "undefined") {
               localStorage.setItem(LS_SEARCH_QUERY_KEY, query); // Persist to localStorage
             }
-            // Update URL search param 'q' only if it's different to avoid unnecessary history entries
-            const currentUrlQuery = getSearchParamString(searchParams.q, "");
-            if (currentUrlQuery !== query) {
-              setSearchParams({ ...searchParams, q: query });
-            }
+            // Update URL search param 'q'
+            setSearchParams(
+              {
+                ...searchParams, // Keep existing params
+                q: query || undefined, // Set 'q' or remove if empty
+              },
+              { replace: true } // Use replace to avoid cluttering history
+            );
           })
         );
 
@@ -111,6 +114,8 @@ export default function App() {
                   typeof window !== "undefined" &&
                   window.innerWidth < 768 // Tailwind's 'md' breakpoint is 768px
                     ? "pt-32" // Adjust this value based on the actual height of your mobile nav + search bar
+                    : location.pathname === "/dashboard"
+                    ? "" // No padding for dashboard on desktop
                     : "pt-16" // Default padding for the top nav
                 }`}
               >

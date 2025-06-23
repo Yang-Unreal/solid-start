@@ -78,7 +78,7 @@ const calculatePageSize = () => {
 };
 
 export default function ProductListDashboard() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const tanstackQueryClient = useQueryClient();
   const [selectedProductIds, setSelectedProductIds] = createSignal<Set<string>>(
     new Set()
@@ -121,8 +121,9 @@ export default function ProductListDashboard() {
       ? paramValue[0] || defaultValue
       : paramValue || defaultValue;
   };
-  const currentPage = () =>
-    parseInt(getSearchParamString(searchParams.page, "1"), 10);
+
+  // Internal signals for page and pageSize, not tied to URL
+  const [currentPage, setCurrentPage] = createSignal(1);
   const [dynamicPageSize, setDynamicPageSize] = createSignal(
     calculatePageSize()
   );
@@ -136,62 +137,21 @@ export default function ProductListDashboard() {
     getSearchParamString(searchParams.sortOrder, "desc");
 
   onMount(() => {
-    // ... onMount logic is unchanged ...
     const initialSize = calculatePageSize();
-    setDynamicPageSize(initialSize);
-    const currentParamSizeValue = searchParams.pageSize;
-    let currentParamSizeAsNumber: number | undefined = undefined;
-    if (Array.isArray(currentParamSizeValue)) {
-      const firstValue = currentParamSizeValue[0];
-      if (firstValue) {
-        const parsed = parseInt(firstValue, 10);
-        if (!isNaN(parsed)) currentParamSizeAsNumber = parsed;
-      }
-    } else if (typeof currentParamSizeValue === "string") {
-      const parsed = parseInt(currentParamSizeValue, 10);
-      if (!isNaN(parsed)) currentParamSizeAsNumber = parsed;
-    }
-    if (
-      currentParamSizeAsNumber === undefined ||
-      currentParamSizeAsNumber !== initialSize
-    ) {
-      setSearchParams(
-        { page: "1", pageSize: initialSize.toString() },
-        { replace: true }
-      );
-    }
+    setDynamicPageSize(initialSize); // Set initial page size
+
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== dynamicPageSize()) {
         setDynamicPageSize(newSize);
-        setSearchParams({ page: "1", pageSize: newSize.toString() });
+        setCurrentPage(1); // Reset to page 1 on resize
       }
     };
     window.addEventListener("resize", handleResize);
     onCleanup(() => window.removeEventListener("resize", handleResize));
   });
 
-  const pageSize = () => {
-    // ... pageSize logic is unchanged ...
-    const paramPageSizeValue = searchParams.pageSize;
-    let paramToUse: string | undefined = undefined;
-    if (Array.isArray(paramPageSizeValue)) {
-      paramToUse = paramPageSizeValue[0];
-    } else {
-      paramToUse = paramPageSizeValue;
-    }
-    if (paramToUse) {
-      const numParamPageSize = parseInt(paramToUse, 10);
-      if (
-        !isNaN(numParamPageSize) &&
-        numParamPageSize > 0 &&
-        numParamPageSize <= MAX_API_PAGE_SIZE
-      ) {
-        return numParamPageSize;
-      }
-    }
-    return dynamicPageSize();
-  };
+  const pageSize = () => dynamicPageSize(); // Always use internal dynamicPageSize
 
   const fetchProductsQueryFn = async (context: {
     queryKey: readonly [
@@ -199,6 +159,7 @@ export default function ProductListDashboard() {
       {
         page: number;
         size: number;
+        q?: string; // Add q parameter
         brand: string;
         category: string;
         fuelType: string;
@@ -207,8 +168,10 @@ export default function ProductListDashboard() {
       }
     ];
   }): Promise<ApiResponse> => {
-    const [_key, { page, size, brand, category, fuelType, sortBy, sortOrder }] =
-      context.queryKey;
+    const [
+      _key,
+      { page, size, q, brand, category, fuelType, sortBy, sortOrder },
+    ] = context.queryKey; // Destructure q
     let baseUrl = "";
     if (import.meta.env.SSR && typeof window === "undefined") {
       baseUrl =
@@ -218,6 +181,7 @@ export default function ProductListDashboard() {
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("pageSize", size.toString());
+    if (q) params.append("q", q); // Add this line
     if (brand) params.append("brand", brand);
     if (category) params.append("category", category);
     if (fuelType) params.append("fuelType", fuelType);
@@ -260,6 +224,7 @@ export default function ProductListDashboard() {
       {
         page: number;
         size: number;
+        q?: string; // Add q parameter
         brand: string;
         category: string;
         fuelType: string;
@@ -271,8 +236,9 @@ export default function ProductListDashboard() {
     queryKey: [
       PRODUCTS_QUERY_KEY_PREFIX,
       {
-        page: currentPage(),
-        size: pageSize(),
+        page: currentPage(), // Use internal currentPage signal
+        size: pageSize(), // Use internal pageSize signal
+        q: getSearchParamString(searchParams.q, ""),
         brand: currentBrand(),
         category: currentCategory(),
         fuelType: currentFuelType(),
@@ -479,10 +445,7 @@ export default function ProductListDashboard() {
   };
 
   const handlePageChange = (newPage: number) => {
-    setSearchParams({
-      page: newPage.toString(),
-      pageSize: pageSize().toString(),
-    });
+    setCurrentPage(newPage); // Update internal page signal
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const formatPrice = (priceInCents: number) =>
