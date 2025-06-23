@@ -3,7 +3,7 @@ import { A } from "@solidjs/router";
 import type { Product } from "~/db/schema";
 import type { QueryObserverResult } from "@tanstack/solid-query";
 
-// --- Interface Definitions (unchanged) ---
+// --- Interface Definitions (reverted to include full pagination info) ---
 interface PaginationInfo {
   currentPage: number;
   pageSize: number;
@@ -21,7 +21,7 @@ interface ApiResponse {
 
 interface ProductDisplayAreaProps {
   productsQuery: QueryObserverResult<ApiResponse, Error>;
-  handlePageChange: (newPage: number) => void;
+  handlePageChange: (newPage: number) => void; // Re-added
   pageSize: () => number;
 }
 

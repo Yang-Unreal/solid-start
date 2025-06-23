@@ -4,7 +4,7 @@ import { product, user as userTable } from "~/db/schema";
 import { faker } from "@faker-js/faker";
 import { sql, eq } from "drizzle-orm";
 
-const NUM_PRODUCTS_TO_SEED = 50;
+const NUM_PRODUCTS_TO_SEED = 200;
 const ADMIN_EMAIL = "1@gmail.com";
 
 async function seedProducts() {

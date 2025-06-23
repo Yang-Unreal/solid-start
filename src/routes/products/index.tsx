@@ -8,7 +8,7 @@ import {
   on,
   createMemo,
 } from "solid-js";
-import { useSearchParams } from "@solidjs/router"; // Still needed for page/pageSize
+import { useSearchParams } from "@solidjs/router"; // Still needed for 'q' param
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
@@ -30,7 +30,6 @@ interface ApiResponse {
   data: Product[];
   pagination: PaginationInfo;
   error?: string;
-  // Removed facets property
 }
 
 // New type for filter options API response
@@ -40,9 +39,7 @@ interface FilterOptionsResponse
 // --- Constants ---
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const FILTER_OPTIONS_QUERY_KEY = "filterOptions";
-const TARGET_ROWS_ON_PAGE = 3;
-const MAX_API_PAGE_SIZE = 100;
-const SSR_DEFAULT_PAGE_SIZE = 12; // Explicit default for SSR
+const FIXED_PAGE_SIZE = 50; // Fixed page size as requested
 
 // Local Storage Keys
 const LS_SEARCH_QUERY_KEY = "productSearchQuery";
@@ -50,26 +47,7 @@ const LS_SELECTED_BRANDS_KEY = "productSelectedBrands";
 const LS_SELECTED_CATEGORIES_KEY = "productSelectedCategories";
 const LS_SELECTED_FUEL_TYPES_KEY = "productSelectedFuelTypes";
 
-// --- Helper Functions ---
-const getActiveColumnCount = () => {
-  if (typeof window === "undefined") return 4; // Default for SSR
-  const screenWidth = window.innerWidth;
-  if (screenWidth >= 1920) return 6;
-  if (screenWidth >= 1536) return 5;
-  if (screenWidth >= 1024) return 4;
-  if (screenWidth >= 768) return 3;
-  if (screenWidth >= 640) return 2;
-  return 1;
-};
-
-const calculatePageSize = () => {
-  const columns = getActiveColumnCount();
-  let newPageSize = columns * TARGET_ROWS_ON_PAGE;
-  if (newPageSize === 0) newPageSize = SSR_DEFAULT_PAGE_SIZE; // Fallback
-  return Math.min(newPageSize, MAX_API_PAGE_SIZE);
-};
-
-// Helper to get a single string search param, or default (still needed for page/pageSize)
+// Helper to get a single string search param, or default (only for 'q' now)
 const getSearchParamString = (
   paramValue: string | string[] | undefined,
   defaultValue: string
@@ -84,7 +62,6 @@ const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Create a memoized signal for the search query from URL search params
-  // This ensures reactivity for the queryKey when searchParams.q changes.
   const currentSearchQuery = createMemo(() => {
     const q = searchParams.q;
     const value = Array.isArray(q) ? q[0] : q;
@@ -137,64 +114,9 @@ const ProductsPage = () => {
     })
   );
 
-  // Initialize currentCalculatedPageSize based on URL param or SSR default.
-  // This value will be used for both SSR and initial client hydration.
-  const initialPageSizeFromUrlOrSSR = createMemo(() => {
-    const paramPageSizeValue = getSearchParamString(searchParams.pageSize, "");
-    if (paramPageSizeValue) {
-      const numParamPageSize = parseInt(paramPageSizeValue, 10);
-      if (
-        !isNaN(numParamPageSize) &&
-        numParamPageSize > 0 &&
-        numParamPageSize <= MAX_API_PAGE_SIZE
-      ) {
-        return numParamPageSize;
-      }
-    }
-    return SSR_DEFAULT_PAGE_SIZE;
-  });
-
-  const [currentCalculatedPageSize, setCurrentCalculatedPageSize] =
-    createSignal(initialPageSizeFromUrlOrSSR());
-
-  // Effect to update currentCalculatedPageSize and URL param on client-side resize/mount
-  createEffect(
-    on(
-      () => {
-        // Only run on client
-        if (typeof window === "undefined") return;
-        return calculatePageSize();
-      },
-      (newCalculatedSize) => {
-        if (newCalculatedSize === undefined) return; // Skip SSR run
-
-        // If the client-calculated size is different from the current effective size (from URL or initial SSR)
-        // then update the URL param and the signal.
-        if (newCalculatedSize !== currentCalculatedPageSize()) {
-          setCurrentCalculatedPageSize(newCalculatedSize);
-          setSearchParams({
-            ...searchParams,
-            page: "1", // Reset to page 1 on page size change
-            pageSize: newCalculatedSize.toString(),
-          });
-        }
-      },
-      { defer: true } // Defer this effect until after initial render/hydration
-    )
-  );
-
-  // Attach resize listener
-  onMount(() => {
-    const handleResize = () => {
-      // Trigger the effect by changing the window size, which will re-run calculatePageSize
-      // The effect itself handles the update logic.
-      // No direct signal update here, let the effect handle it.
-    };
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-      onCleanup(() => window.removeEventListener("resize", handleResize));
-    }
-  });
+  // Internal state for current page, not tied to URL
+  const [currentPage, setCurrentPage] = createSignal(1);
+  const pageSize = () => FIXED_PAGE_SIZE; // Fixed page size
 
   // Helper to build MeiliSearch filter string
   const buildFilterString = () => {
@@ -223,9 +145,6 @@ const ProductsPage = () => {
     return filters.join(" AND ");
   };
 
-  // The pageSize signal now directly reflects the current calculated/URL-derived page size
-  const pageSize = () => currentCalculatedPageSize();
-
   let baseUrl = "";
   if (import.meta.env.SSR && typeof window === "undefined") {
     baseUrl =
@@ -233,20 +152,16 @@ const ProductsPage = () => {
       `http://localhost:${process.env.PORT || 3000}`;
   }
 
-  // Signals for URL parameters
-  const currentPage = () =>
-    parseInt(getSearchParamString(searchParams.page, "1"), 10);
-
   // --- Data Fetching (Products) ---
 
   const fetchProductsQueryFn = async (context: {
     queryKey: readonly [
       string,
       {
-        page: number;
-        size: number;
-        q?: string; // Make q optional in the function parameter type
-        filter: string; // Add filter parameter
+        page: number; // Page is now internal, but still passed to API
+        size: number; // Size is now fixed, but still passed to API
+        q?: string;
+        filter: string;
       }
     ];
   }): Promise<ApiResponse> => {
@@ -254,8 +169,8 @@ const ProductsPage = () => {
     const params = new URLSearchParams();
     params.append("page", page.toString());
     params.append("pageSize", size.toString());
-    if (q) params.append("q", q); // Only append if q is not undefined or empty string
-    if (filter) params.append("filter", filter); // Add filter to params
+    if (q) params.append("q", q);
+    if (filter) params.append("filter", filter);
 
     const queryString = params.toString();
     const fetchUrl = `${baseUrl}/api/products?${queryString}`;
@@ -278,8 +193,8 @@ const ProductsPage = () => {
       {
         page: number;
         size: number;
-        q?: string; // Make q optional in the queryKey type
-        filter: string; // Add filter parameter
+        q?: string;
+        filter: string;
       }
     ]
   >(() => {
@@ -287,14 +202,14 @@ const ProductsPage = () => {
       queryKey: [
         PRODUCTS_QUERY_KEY_PREFIX,
         {
-          page: currentPage(),
-          size: pageSize(),
-          q: currentSearchQuery(), // Use the memoized signal here
-          filter: buildFilterString(), // Pass the filter string
+          page: currentPage(), // Use internal currentPage signal
+          size: pageSize(), // Use fixed pageSize
+          q: currentSearchQuery(),
+          filter: buildFilterString(),
         },
       ] as const,
       queryFn: fetchProductsQueryFn,
-      staleTime: 5 * 60 * 1000, // Revert staleTime to 5 minutes
+      staleTime: 5 * 60 * 1000,
       keepPreviousData: true,
     };
   });
@@ -321,16 +236,15 @@ const ProductsPage = () => {
   >(() => ({
     queryKey: [FILTER_OPTIONS_QUERY_KEY] as const,
     queryFn: fetchFilterOptionsQueryFn,
-    // Removed staleTime: Infinity to allow refetch to work correctly
-    cacheTime: 0, // Set cacheTime to 0 to always refetch when triggered
-    refetchOnWindowFocus: true, // Refetch on window focus to automatically update filters
-    refetchOnMount: true, // Refetch on mount to ensure fresh data when navigating to the page
+    cacheTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   }));
 
   // Memoized filter options to prevent unnecessary re-renders of For loops
   const availableBrands = createMemo(
     (prevBrands: { value: string; count: number }[] = []) => {
-      const newFacets = filterOptionsQuery.data?.brand || {}; // Use filterOptionsQuery.data
+      const newFacets = filterOptionsQuery.data?.brand || {};
       const newBrandEntries = Object.entries(newFacets);
 
       const prevBrandMap = new Map(prevBrands.map((b) => [b.value, b]));
@@ -350,7 +264,7 @@ const ProductsPage = () => {
 
   const availableCategories = createMemo(
     (prevCategories: { value: string; count: number }[] = []) => {
-      const newFacets = filterOptionsQuery.data?.category || {}; // Use filterOptionsQuery.data
+      const newFacets = filterOptionsQuery.data?.category || {};
       const newCategoryEntries = Object.entries(newFacets);
 
       const prevCategoryMap = new Map(prevCategories.map((c) => [c.value, c]));
@@ -370,7 +284,7 @@ const ProductsPage = () => {
 
   const availableFuelTypes = createMemo(
     (prevFuelTypes: { value: string; count: number }[] = []) => {
-      const newFacets = filterOptionsQuery.data?.fuelType || {}; // Use filterOptionsQuery.data
+      const newFacets = filterOptionsQuery.data?.fuelType || {};
       const newFuelTypeEntries = Object.entries(newFacets);
 
       const prevFuelTypeMap = new Map(prevFuelTypes.map((f) => [f.value, f]));
@@ -455,13 +369,8 @@ const ProductsPage = () => {
   );
 
   // --- Event Handlers ---
-
   const handlePageChange = (newPage: number) => {
-    setSearchParams({
-      ...searchParams,
-      page: newPage.toString(),
-      pageSize: pageSize().toString(),
-    });
+    setCurrentPage(newPage); // Update internal page signal
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
