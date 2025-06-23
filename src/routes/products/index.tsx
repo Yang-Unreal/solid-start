@@ -85,9 +85,17 @@ const ProductsPage = () => {
     calculatePageSize()
   );
 
-  // State for the search input, initialized to empty, then loaded from localStorage in onMount
-  const [searchQuery, setSearchQuery] = createSignal("");
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = createSignal("");
+  // State for the search input, initialized from localStorage
+  const [searchQuery, setSearchQuery] = createSignal(
+    typeof window !== "undefined"
+      ? localStorage.getItem(LS_SEARCH_QUERY_KEY) || ""
+      : ""
+  );
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = createSignal(
+    typeof window !== "undefined"
+      ? localStorage.getItem(LS_SEARCH_QUERY_KEY) || ""
+      : ""
+  );
 
   // Debounce search query and persist to localStorage
   createEffect(
@@ -102,12 +110,22 @@ const ProductsPage = () => {
     })
   );
 
-  // State for filters, initialized to empty, then loaded from localStorage in onMount
-  const [selectedBrands, setSelectedBrands] = createSignal<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = createSignal<string[]>(
-    []
+  // State for filters, initialized from localStorage
+  const [selectedBrands, setSelectedBrands] = createSignal<string[]>(
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem(LS_SELECTED_BRANDS_KEY) || "[]")
+      : []
   );
-  const [selectedFuelTypes, setSelectedFuelTypes] = createSignal<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = createSignal<string[]>(
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem(LS_SELECTED_CATEGORIES_KEY) || "[]")
+      : []
+  );
+  const [selectedFuelTypes, setSelectedFuelTypes] = createSignal<string[]>(
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem(LS_SELECTED_FUEL_TYPES_KEY) || "[]")
+      : []
+  );
 
   // Persist filter changes to localStorage
   createEffect(
@@ -138,25 +156,35 @@ const ProductsPage = () => {
     })
   );
 
-  // Load initial state from localStorage on client mount
+  // Adjust page size on client mount and attach resize listener
   onMount(() => {
     if (typeof window !== "undefined") {
-      setSearchQuery(localStorage.getItem(LS_SEARCH_QUERY_KEY) || "");
-      setDebouncedSearchQuery(localStorage.getItem(LS_SEARCH_QUERY_KEY) || "");
-      setSelectedBrands(
-        JSON.parse(localStorage.getItem(LS_SELECTED_BRANDS_KEY) || "[]")
+      // Calculate initial page size based on screen width
+      const initialCalculatedPageSize = calculatePageSize();
+      const currentParamPageSize = parseInt(
+        getSearchParamString(searchParams.pageSize, ""),
+        10
       );
-      setSelectedCategories(
-        JSON.parse(localStorage.getItem(LS_SELECTED_CATEGORIES_KEY) || "[]")
-      );
-      setSelectedFuelTypes(
-        JSON.parse(localStorage.getItem(LS_SELECTED_FUEL_TYPES_KEY) || "[]")
-      );
+
+      // Only update searchParams if the current pageSize in URL is different from calculated
+      // or if it's not a valid number
+      if (
+        isNaN(currentParamPageSize) ||
+        currentParamPageSize !== initialCalculatedPageSize
+      ) {
+        setDynamicPageSize(initialCalculatedPageSize); // Update signal
+        // Removed setSearchParams here to prevent extra refetch on mount
+      } else {
+        // If URL pageSize is already correct, ensure dynamicPageSize signal is in sync
+        setDynamicPageSize(currentParamPageSize);
+      }
     }
 
+    // Attach resize listener after initial setup
     const handleResize = () => {
       const newSize = calculatePageSize();
       if (newSize !== pageSize()) {
+        // pageSize() will reflect current dynamicPageSize or URL param
         setDynamicPageSize(newSize);
         setSearchParams({
           ...searchParams,
@@ -278,7 +306,7 @@ const ProductsPage = () => {
       },
     ] as const,
     queryFn: fetchProductsQueryFn,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // Revert staleTime to 5 minutes
     keepPreviousData: true,
   }));
 

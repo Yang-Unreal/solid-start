@@ -16,7 +16,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 const accessKeyId = process.env.S3_ACCESS_KEY_ID;
 const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
 const bucketEnv = process.env.S3_BUCKET;
-const endpoint = process.env.S3_ENDPOINT;
+export const endpoint = process.env.S3_ENDPOINT; // Export endpoint
 const region = "us-east-1";
 
 console.log("MinIO Configuration (AWS SDK):", {
