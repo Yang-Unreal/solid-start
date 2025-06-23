@@ -64,14 +64,16 @@ export default function Nav(props: NavProps) {
           {" "}
           {/* Added h-full to align items vertically */}
           {/* Search Input (Desktop only for now) */}
-          <div class="hidden sm:block w-64">
-            {" "}
-            {/* Adjust width as needed */}
-            <SearchInput
-              searchQuery={props.searchQuery}
-              onSearchChange={props.onSearchChange}
-            />
-          </div>
+          <Show when={location.pathname === "/products"}>
+            <div class="hidden sm:block w-64">
+              {" "}
+              {/* Adjust width as needed */}
+              <SearchInput
+                searchQuery={props.searchQuery}
+                onSearchChange={props.onSearchChange}
+              />
+            </div>
+          </Show>
           {/* Desktop-only Links */}
           <ul class="hidden sm:flex items-center h-full space-x-3 sm:space-x-4">
             <li>
@@ -137,12 +139,14 @@ export default function Nav(props: NavProps) {
             </li>
           </ul>
           {/* Search Input in Mobile Menu */}
-          <div class="w-full px-4 mt-6">
-            <SearchInput
-              searchQuery={props.searchQuery}
-              onSearchChange={props.onSearchChange}
-            />
-          </div>
+          <Show when={location.pathname === "/products"}>
+            <div class="w-full px-4 mt-6">
+              <SearchInput
+                searchQuery={props.searchQuery}
+                onSearchChange={props.onSearchChange}
+              />
+            </div>
+          </Show>
         </div>
       </Show>
     </nav>
