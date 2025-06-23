@@ -1,21 +1,20 @@
 import { A, useNavigate } from "@solidjs/router";
-import { Package, User, LogOut, X } from "lucide-solid"; // Imported X
+import { Package, User, LogOut, X } from "lucide-solid";
 import { useMutation } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
-import SearchInput from "~/components/SearchInput"; // Import SearchInput
-import type { Accessor } from "solid-js"; // Import Accessor type
+import SearchInput from "~/components/SearchInput";
+import { useSearch } from "~/context/SearchContext"; // Correct import path
 
 interface SideNavProps {
   onProductClick: () => void;
   onUserClick: () => void;
   onLogoutSuccess: () => void;
-  onClose: () => void; // Added onClose prop
-  searchQuery: Accessor<string>; // Add searchQuery prop
-  onSearchChange: (query: string) => void; // Add onSearchChange prop
+  onClose: () => void;
 }
 
 export default function SideNav(props: SideNavProps) {
   const navigate = useNavigate();
+  const { searchQuery, onSearchChange } = useSearch();
 
   const logoutMutation = useMutation(() => ({
     mutationFn: async () => {
@@ -53,8 +52,8 @@ export default function SideNav(props: SideNavProps) {
       {/* Search Input for SideNav */}
       <div class="p-4">
         <SearchInput
-          searchQuery={props.searchQuery}
-          onSearchChange={props.onSearchChange}
+          searchQuery={searchQuery}
+          onSearchChange={onSearchChange}
         />
       </div>
 

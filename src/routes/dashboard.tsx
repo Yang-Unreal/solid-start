@@ -1,59 +1,20 @@
 // src/routes/dashboard.tsx
-import { createEffect, Show, onMount, createSignal, on } from "solid-js"; // Added 'on'
-import { useNavigate, useSearchParams } from "@solidjs/router"; // Added useSearchParams
+import { createEffect, Show, onMount, createSignal } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 import { authClient } from "~/lib/auth-client";
 import { UserCircle, Menu } from "lucide-solid";
 import SideNav from "~/components/SideNav";
 import ProductListDashboard from "~/components/ProductListDashboard";
-
-// Helper to get a single string search param, or default
-const getSearchParamString = (
-  paramValue: string | string[] | undefined,
-  defaultValue: string
-): string => {
-  return Array.isArray(paramValue)
-    ? paramValue[0] || defaultValue
-    : paramValue || defaultValue;
-};
-
-// Local Storage Key for search query
-const LS_SEARCH_QUERY_KEY = "productSearchQuery";
+import { useSearch } from "~/context/SearchContext"; // Import useSearch
 
 export default function DashboardPage() {
   const sessionSignal = authClient.useSession();
   const navigate = useNavigate();
   const [activeContent, setActiveContent] = createSignal("user");
   const [sideNavOpen, setSideNavOpen] = createSignal(false);
-  const [searchParams, setSearchParams] = useSearchParams(); // Get searchParams here
 
-  // State for the global search input
-  const [searchQuery, setSearchQuery] = createSignal(
-    getSearchParamString(searchParams.q, "")
-  );
-
-  // Persist search query to localStorage and URL whenever it changes.
-  // This effect runs after initial render/hydration.
-  createEffect(
-    on(searchQuery, (query) => {
-      if (typeof window !== "undefined") {
-        localStorage.setItem(LS_SEARCH_QUERY_KEY, query); // Persist to localStorage
-      }
-
-      // Update search params directly
-      setSearchParams(
-        {
-          ...searchParams, // Keep existing params (for consistency with app.tsx)
-          q: query || undefined, // Set 'q' or remove if empty
-        },
-        { replace: true }
-      );
-    })
-  );
-
-  // Handler for search input changes
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
+  // Consume from search context
+  const { searchQuery, onSearchChange } = useSearch();
 
   onMount(() => {
     setActiveContent(localStorage.getItem("dashboardActiveContent") || "user");
@@ -100,8 +61,7 @@ export default function DashboardPage() {
             onProductClick={() => setActiveContent("products")}
             onUserClick={() => setActiveContent("user")}
             onLogoutSuccess={() => navigate("/login", { replace: true })}
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
+            // No need to pass searchQuery and onSearchChange as props anymore
           />
         </div>
 
@@ -131,8 +91,7 @@ export default function DashboardPage() {
                 setSideNavOpen(false);
               }}
               onLogoutSuccess={() => navigate("/login", { replace: true })}
-              searchQuery={searchQuery}
-              onSearchChange={handleSearchChange}
+              // No need to pass searchQuery and onSearchChange as props anymore
             />
           </div>
         </Show>

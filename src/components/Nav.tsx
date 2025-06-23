@@ -4,8 +4,8 @@ import {
   AlignJustify, // Mobile menu open icon
   MenuSquare, // Mobile menu close icon
 } from "lucide-solid";
-import SearchInput from "~/components/SearchInput"; // Import SearchInput
-import type { Accessor } from "solid-js"; // Revert to Accessor type
+import SearchInput from "~/components/SearchInput";
+import { useSearch } from "~/context/SearchContext"; // Correct import path
 
 const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false);
 
@@ -23,13 +23,9 @@ const YourLogo = (props: { class?: string }) => (
   </svg>
 );
 
-interface NavProps {
-  searchQuery: Accessor<string>; // Reverted to Accessor
-  onSearchChange: (query: string) => void;
-}
-
-export default function Nav(props: NavProps) {
+export default function Nav() {
   const location = useLocation();
+  const { searchQuery, onSearchChange } = useSearch(); // Consume from context
   const activeLinkClasses = (path: string) => {
     const baseActive = "text-white font-semibold";
     const baseInactive = "text-white/70 hover:text-white font-medium";
@@ -70,8 +66,8 @@ export default function Nav(props: NavProps) {
               {" "}
               {/* Adjust width as needed */}
               <SearchInput
-                searchQuery={props.searchQuery}
-                onSearchChange={props.onSearchChange}
+                searchQuery={searchQuery}
+                onSearchChange={onSearchChange}
               />
             </div>
           </Show>
@@ -120,8 +116,8 @@ export default function Nav(props: NavProps) {
           }`}
         >
           <SearchInput
-            searchQuery={props.searchQuery}
-            onSearchChange={props.onSearchChange}
+            searchQuery={searchQuery}
+            onSearchChange={onSearchChange}
           />
         </div>
       </Show>

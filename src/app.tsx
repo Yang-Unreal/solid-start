@@ -1,30 +1,13 @@
 // src/app.tsx
-import {
-  Router,
-  useLocation,
-  useNavigate,
-  useSearchParams,
-} from "@solidjs/router"; // Import useSearchParams
+import { Router, useLocation, useNavigate } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
-import { Suspense, Show, createEffect, createSignal, on } from "solid-js"; // Import createSignal, on
+import { Suspense, Show, createEffect } from "solid-js";
 import Nav from "~/components/Nav";
 import "./app.css";
 import { MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
-
-// Helper to get a single string search param, or default
-const getSearchParamString = (
-  paramValue: string | string[] | undefined,
-  defaultValue: string
-): string => {
-  return Array.isArray(paramValue)
-    ? paramValue[0] || defaultValue
-    : paramValue || defaultValue;
-};
-
-// Local Storage Key for search query
-const LS_SEARCH_QUERY_KEY = "productSearchQuery";
+import { SearchProvider, useSearch } from "~/context/SearchContext"; // Import SearchProvider and useSearch
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,37 +33,8 @@ export default function App() {
       root={(props) => {
         const location = useLocation();
         const navigate = useNavigate();
-        const [searchParams, setSearchParams] = useSearchParams(); // Get searchParams here
-
-        // State for the global search input
-        const [searchQuery, setSearchQuery] = createSignal(
-          getSearchParamString(searchParams.q, "")
-        );
-
-        // Persist search query to localStorage and URL whenever it changes.
-        // This effect runs after initial render/hydration.
-        createEffect(
-          on(searchQuery, (query) => {
-            if (typeof window !== "undefined") {
-              localStorage.setItem(LS_SEARCH_QUERY_KEY, query); // Persist to localStorage
-            }
-            // Update URL search param 'q'
-            setSearchParams(
-              {
-                ...searchParams, // Keep existing params
-                q: query || undefined, // Set 'q' or remove if empty
-              },
-              { replace: true } // Use replace to avoid cluttering history
-            );
-          })
-        );
-
-        // Handler for search input changes
-        const handleSearchChange = (query: string) => {
-          setSearchQuery(query);
-        };
-
         const session = authClient.useSession();
+
         const showNav = () =>
           location.pathname !== "/dashboard" &&
           location.pathname !== "/products/new";
@@ -99,47 +53,46 @@ export default function App() {
         });
 
         return (
-          <QueryClientProvider client={queryClient}>
-            <MetaProvider>
-              <Title>SolidStart App</Title>
-              {showNav() && (
-                <Nav
-                  searchQuery={searchQuery}
-                  onSearchChange={handleSearchChange}
-                />
-              )}
-              <main
-                class={`flex-grow ${
-                  location.pathname === "/products" &&
-                  typeof window !== "undefined" &&
-                  window.innerWidth < 768 // Tailwind's 'md' breakpoint is 768px
-                    ? "pt-32" // Adjust this value based on the actual height of your mobile nav + search bar
-                    : location.pathname === "/dashboard"
-                    ? "" // No padding for dashboard on desktop
-                    : "pt-16" // Default padding for the top nav
-                }`}
-              >
-                <Suspense fallback={null}>
-                  <Show
-                    when={
-                      !session().isPending &&
-                      (session().data?.user ||
-                        !(
-                          location.pathname === "/dashboard" ||
-                          location.pathname === "/products/new"
-                        ))
-                    }
-                  >
-                    {props.children}
-                  </Show>
-                </Suspense>
-              </main>
-            </MetaProvider>
-          </QueryClientProvider>
+          <SearchProvider>
+            {" "}
+            {/* Move SearchProvider here */}
+            <QueryClientProvider client={queryClient}>
+              <MetaProvider>
+                <Title>SolidStart App</Title>
+                {showNav() && <Nav />}
+                <main
+                  class={`flex-grow ${
+                    location.pathname === "/products" &&
+                    typeof window !== "undefined" &&
+                    window.innerWidth < 768 // Tailwind's 'md' breakpoint is 768px
+                      ? "pt-32" // Adjust this value based on the actual height of your mobile nav + search bar
+                      : location.pathname === "/dashboard"
+                      ? "" // No padding for dashboard on desktop
+                      : "pt-16" // Default padding for the top nav
+                  }`}
+                >
+                  <Suspense fallback={null}>
+                    <Show
+                      when={
+                        !session().isPending &&
+                        (session().data?.user ||
+                          !(
+                            location.pathname === "/dashboard" ||
+                            location.pathname === "/products/new"
+                          ))
+                      }
+                    >
+                      {props.children}
+                    </Show>
+                  </Suspense>
+                </main>
+              </MetaProvider>
+            </QueryClientProvider>
+          </SearchProvider>
         );
       }}
     >
-      <FileRoutes />
+      <FileRoutes /> {/* FileRoutes is now inside the SearchProvider */}
     </Router>
   );
 }

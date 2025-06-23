@@ -209,7 +209,7 @@ const ProductsPage = () => {
         },
       ] as const,
       queryFn: fetchProductsQueryFn,
-      staleTime: 5 * 60 * 1000,
+      staleTime: 10 * 1000, // 10 seconds
       keepPreviousData: true,
     };
   });
@@ -236,9 +236,7 @@ const ProductsPage = () => {
   >(() => ({
     queryKey: [FILTER_OPTIONS_QUERY_KEY] as const,
     queryFn: fetchFilterOptionsQueryFn,
-    cacheTime: 0,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
+    staleTime: 10 * 1000, // 10 seconds
   }));
 
   // Memoized filter options to prevent unnecessary re-renders of For loops
