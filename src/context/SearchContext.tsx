@@ -4,11 +4,9 @@ import {
   createContext,
   useContext,
   createSignal,
-  createEffect,
-  on,
   type Accessor,
 } from "solid-js";
-import { useSearchParams } from "@solidjs/router";
+import { useSearchParams, useLocation } from "@solidjs/router";
 
 interface SearchContextType {
   searchQuery: Accessor<string>;
@@ -20,7 +18,8 @@ const SearchContext = createContext<SearchContextType>();
 const LS_SEARCH_QUERY_KEY = "productSearchQuery";
 
 export function SearchProvider(props: { children: any }) {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   const getSearchParamString = (
     paramValue: string | string[] | undefined,
@@ -35,29 +34,33 @@ export function SearchProvider(props: { children: any }) {
     getSearchParamString(searchParams.q, "")
   );
 
-  createEffect(
-    on(searchQuery, (query) => {
-      console.log(
-        `[${Date.now()}] 2. SearchContext Effect: Calling setSearchParams with q=${query}`
-      );
-      if (typeof window !== "undefined") {
-        localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
-      }
-      setSearchParams(
-        {
-          ...searchParams,
-          q: query || undefined,
-        },
-        { replace: true }
-      );
-    })
-  );
-
   const onSearchChange = (query: string) => {
     console.log(
       `[${Date.now()}] 1. onSearchChange: User typed. New query: '${query}'`
     );
     setSearchQuery(query);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
+    }
+
+    const newSearchParams = new URLSearchParams();
+    for (const key in searchParams) {
+      const value = searchParams[key];
+      if (Array.isArray(value)) {
+        value.forEach((v) => newSearchParams.append(key, v));
+      } else if (value !== undefined) {
+        newSearchParams.set(key, value);
+      }
+    }
+
+    if (query) {
+      newSearchParams.set("q", query);
+    } else {
+      newSearchParams.delete("q");
+    }
+
+    const newUrl = `${location.pathname}?${newSearchParams.toString()}`;
+    window.history.replaceState({}, "", newUrl);
   };
 
   const value = {

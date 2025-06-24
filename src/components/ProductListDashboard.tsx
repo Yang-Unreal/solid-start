@@ -1,7 +1,8 @@
 // src/components/ProductListDashboard.tsx
 import { For, Show, createSignal, createMemo } from "solid-js";
-import { useSearchParams, A } from "@solidjs/router";
+import { A } from "@solidjs/router"; // Removed useSearchParams
 import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query";
+import { useSearch } from "~/context/SearchContext"; // Import useSearch
 import {
   PlusCircle,
   Trash2,
@@ -61,7 +62,8 @@ async function bulkDeleteProductsApi(
 }
 
 export default function ProductListDashboard() {
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams(); // Removed
+  const { searchQuery } = useSearch(); // Get searchQuery from context
   const tanstackQueryClient = useQueryClient();
   const [selectedProductIds, setSelectedProductIds] = createSignal<Set<string>>(
     new Set()
@@ -71,16 +73,17 @@ export default function ProductListDashboard() {
     string | null
   >(null);
 
-  const getSearchParamString = (
-    paramValue: string | string[] | undefined,
-    defaultValue: string
-  ): string =>
-    Array.isArray(paramValue)
-      ? paramValue[0] || defaultValue
-      : paramValue || defaultValue;
-  const currentSearchQuery = createMemo(() =>
-    getSearchParamString(searchParams.q, "")
-  );
+  // No longer needed as searchQuery is directly from context
+  // const getSearchParamString = (
+  //   paramValue: string | string[] | undefined,
+  //   defaultValue: string
+  // ): string =>
+  //   Array.isArray(paramValue)
+  //     ? paramValue[0] || defaultValue
+  //     : paramValue || defaultValue;
+  // const currentSearchQuery = createMemo(() =>
+  //   getSearchParamString(searchParams.q, "")
+  // );
 
   const [currentPage, setCurrentPage] = createSignal(1);
   const pageSize = () => FIXED_PAGE_SIZE;
@@ -88,7 +91,7 @@ export default function ProductListDashboard() {
   const productsQuery = useQuery<ApiResponse, Error>(() => ({
     queryKey: [
       PRODUCTS_QUERY_KEY_PREFIX,
-      { page: currentPage(), size: pageSize(), q: currentSearchQuery() },
+      { page: currentPage(), size: pageSize(), q: searchQuery() }, // Use searchQuery() directly
     ],
     queryFn: async ({ queryKey }) => {
       const [_key, { page, size, q }] = queryKey as [
