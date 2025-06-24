@@ -1,11 +1,11 @@
 // src/routes/products/index.tsx
 import { createSignal, onMount, createEffect, on, createMemo } from "solid-js";
-import { useSearchParams } from "@solidjs/router";
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query"; // Import UseQueryResult
 import ProductDisplayArea from "~/components/ProductDisplayArea";
 import FilterDropdown from "~/components/FilterDropdowns";
 import type { Product } from "~/db/schema";
+import { useSearch } from "~/context/SearchContext"; // Import useSearch
 
 interface PaginationInfo {
   currentPage: number;
@@ -32,11 +32,14 @@ const LS_SELECTED_CATEGORIES_KEY = "productSelectedCategories";
 const LS_SELECTED_FUEL_TYPES_KEY = "productSelectedFuelTypes";
 
 export default function ProductsPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const currentSearchQuery = createMemo(() => {
-    const q = searchParams.q;
-    return Array.isArray(q) ? q[0] : q || undefined;
-  });
+  // const [searchParams, setSearchParams] = useSearchParams(); // Removed
+  const { searchQuery } = useSearch(); // Get searchQuery from context
+
+  // No longer needed as searchQuery is directly from context
+  // const currentSearchQuery = createMemo(() => {
+  //   const q = searchParams.q;
+  //   return Array.isArray(q) ? q[0] : q || undefined;
+  // });
 
   const [selectedBrands, setSelectedBrands] = createSignal<string[]>([]);
   const [selectedCategories, setSelectedCategories] = createSignal<string[]>(
@@ -148,7 +151,7 @@ export default function ProductsPage() {
       {
         page: currentPage(),
         size: pageSize(),
-        q: currentSearchQuery(),
+        q: searchQuery(), // Use searchQuery() directly
         filter: buildFilterString(),
       },
     ] as const,
