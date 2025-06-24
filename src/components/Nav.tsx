@@ -1,9 +1,6 @@
 import { createSignal, Show } from "solid-js";
 import { useLocation, A } from "@solidjs/router";
-import {
-  AlignJustify, // Mobile menu open icon
-  MenuSquare, // Mobile menu close icon
-} from "lucide-solid";
+import { AlignJustify, MenuSquare } from "lucide-solid";
 import SearchInput from "~/components/SearchInput";
 import { useSearch } from "~/context/SearchContext"; // Correct import path
 

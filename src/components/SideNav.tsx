@@ -1,19 +1,19 @@
-import { A, useNavigate } from "@solidjs/router";
+// src/components/SideNav.tsx
+import { A, useNavigate, useLocation } from "@solidjs/router";
 import { Package, User, LogOut, X } from "lucide-solid";
 import { useMutation } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 import SearchInput from "~/components/SearchInput";
-import { useSearch } from "~/context/SearchContext"; // Correct import path
+import { useSearch } from "~/context/SearchContext";
 
 interface SideNavProps {
-  onProductClick: () => void;
-  onUserClick: () => void;
   onLogoutSuccess: () => void;
   onClose: () => void;
 }
 
 export default function SideNav(props: SideNavProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { searchQuery, onSearchChange } = useSearch();
 
   const logoutMutation = useMutation(() => ({
@@ -35,9 +35,21 @@ export default function SideNav(props: SideNavProps) {
     logoutMutation.mutate();
   };
 
+  const linkClasses = (path: string) => {
+    const baseClasses =
+      "flex items-center w-full text-left px-4 py-3 text-neutral-700 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2";
+    // Use exact match for the dashboard index to prevent it from always being active
+    const isActive =
+      path === "/dashboard"
+        ? location.pathname === path
+        : location.pathname.startsWith(path);
+    return isActive
+      ? `${baseClasses} bg-neutral-100`
+      : `${baseClasses} hover:bg-neutral-100`;
+  };
+
   return (
     <nav class="h-full w-full max-w-sm bg-white shadow-md flex flex-col">
-      {/* Header/Logo area */}
       <div class="p-4 border-b border-neutral-200 flex justify-between items-center">
         <h1 class="text-lg font-semibold text-neutral-800">Dashboard</h1>
         <button
@@ -49,7 +61,6 @@ export default function SideNav(props: SideNavProps) {
         </button>
       </div>
 
-      {/* Search Input for SideNav */}
       <div class="p-4">
         <SearchInput
           searchQuery={searchQuery}
@@ -57,29 +68,29 @@ export default function SideNav(props: SideNavProps) {
         />
       </div>
 
-      {/* Navigation items */}
       <ul class="flex flex-col p-4 space-y-2 flex-1">
         <li>
-          <button
-            onClick={props.onUserClick}
-            class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+          <A
+            href="/dashboard"
+            class={linkClasses("/dashboard")}
+            onClick={props.onClose}
           >
             <User size={20} class="mr-3 flex-shrink-0" />
             <span class="text-sm font-medium">User Profile</span>
-          </button>
+          </A>
         </li>
         <li>
-          <button
-            onClick={props.onProductClick}
-            class="flex items-center w-full text-left px-4 py-3 text-neutral-700 hover:bg-neutral-100 rounded-md transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+          <A
+            href="/dashboard/products"
+            class={linkClasses("/dashboard/products")}
+            onClick={props.onClose}
           >
             <Package size={20} class="mr-3 flex-shrink-0" />
             <span class="text-sm font-medium">Products</span>
-          </button>
+          </A>
         </li>
       </ul>
 
-      {/* Logout button at bottom */}
       <div class="p-4 border-t border-neutral-200">
         <button
           onClick={handleLogout}

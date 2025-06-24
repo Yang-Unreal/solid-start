@@ -37,13 +37,12 @@ export default function App() {
 
         const showNav = () =>
           location.pathname !== "/dashboard" &&
-          location.pathname !== "/products/new";
+          location.pathname !== "/products/new" &&
+          !location.pathname.startsWith("/dashboard/products");
 
         createEffect(() => {
           const currentSession = session();
-          const isProtectedPath =
-            location.pathname === "/dashboard" ||
-            location.pathname === "/products/new";
+          const isProtectedPath = location.pathname.startsWith("/dashboard");
 
           if (!currentSession.isPending) {
             if (!currentSession.data?.user && isProtectedPath) {
@@ -66,8 +65,9 @@ export default function App() {
                     typeof window !== "undefined" &&
                     window.innerWidth < 768 // Tailwind's 'md' breakpoint is 768px
                       ? "pt-32" // Adjust this value based on the actual height of your mobile nav + search bar
-                      : location.pathname === "/dashboard"
-                      ? "" // No padding for dashboard on desktop
+                      : location.pathname === "/dashboard" ||
+                        location.pathname.startsWith("/dashboard/products")
+                      ? "" // No padding for dashboard or dashboard products
                       : "pt-16" // Default padding for the top nav
                   }`}
                 >
@@ -76,10 +76,7 @@ export default function App() {
                       when={
                         !session().isPending &&
                         (session().data?.user ||
-                          !(
-                            location.pathname === "/dashboard" ||
-                            location.pathname === "/products/new"
-                          ))
+                          !location.pathname.startsWith("/dashboard"))
                       }
                     >
                       {props.children}

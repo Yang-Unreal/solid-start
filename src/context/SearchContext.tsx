@@ -1,3 +1,5 @@
+// src/context/SearchContext.tsx
+
 import {
   createContext,
   useContext,
@@ -35,6 +37,9 @@ export function SearchProvider(props: { children: any }) {
 
   createEffect(
     on(searchQuery, (query) => {
+      console.log(
+        `[${Date.now()}] 2. SearchContext Effect: Calling setSearchParams with q=${query}`
+      );
       if (typeof window !== "undefined") {
         localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
       }
@@ -49,6 +54,9 @@ export function SearchProvider(props: { children: any }) {
   );
 
   const onSearchChange = (query: string) => {
+    console.log(
+      `[${Date.now()}] 1. onSearchChange: User typed. New query: '${query}'`
+    );
     setSearchQuery(query);
   };
 

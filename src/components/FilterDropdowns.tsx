@@ -1,4 +1,7 @@
-import { createSignal, For, Show, onMount, onCleanup } from "solid-js";
+// src/components/FilterDropdowns.tsx
+import { createSignal, createEffect, onCleanup, For, Show } from "solid-js";
+import { isServer } from "solid-js/web"; // Import the isServer utility
+import { ChevronDown } from "lucide-solid";
 
 interface FilterDropdownProps {
   title: string;
@@ -7,86 +10,83 @@ interface FilterDropdownProps {
   onSelect: (option: string) => void;
 }
 
-const FilterDropdown = (props: FilterDropdownProps) => {
+export default function FilterDropdown(props: FilterDropdownProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   let dropdownRef: HTMLDivElement | undefined;
 
+  // --- THE FIX ---
+  // This entire effect contains browser-only code (document, MouseEvent).
+  // We wrap it in a check to ensure it ONLY runs on the client, not on the server.
+  if (!isServer) {
+    createEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        // If the dropdown is open and the click is not inside the ref, close it.
+        if (
+          isOpen() &&
+          dropdownRef &&
+          !dropdownRef.contains(event.target as Node)
+        ) {
+          setIsOpen(false);
+        }
+      };
+
+      // Add the event listener to the document
+      document.addEventListener("mousedown", handleClickOutside);
+
+      // Important: clean up the event listener when the component is destroyed
+      onCleanup(() => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      });
+    });
+  }
+
   const toggleDropdown = () => setIsOpen(!isOpen());
-
-  const handleSelect = (option: string) => {
-    props.onSelect(option);
-  };
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (dropdownRef && !dropdownRef.contains(event.target as Node)) {
-      setIsOpen(false);
-    }
-  };
-
-  onMount(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-  });
-
-  onCleanup(() => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  });
+  const selectedCount = () => props.selectedOptions.length;
 
   return (
-    <div class="relative inline-block text-left" ref={dropdownRef}>
-      <div>
-        <button
-          type="button"
-          class="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          id={`menu-button-${props.title}`}
-          aria-expanded="true"
-          aria-haspopup="true"
-          onClick={toggleDropdown}
-        >
-          {props.title}
-          <svg
-            class="-mr-1 ml-2 h-5 w-5"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </button>
-      </div>
+    <div class="relative font-sans" ref={dropdownRef}>
+      <button
+        onClick={toggleDropdown}
+        class="w-full h-12 px-4 py-2 text-left bg-white border border-neutral-300 rounded-md shadow-sm flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-black"
+      >
+        <span class="flex items-center">
+          <span class="text-neutral-800 font-medium">{props.title}</span>
+          <Show when={selectedCount() > 0}>
+            <span class="ml-2 bg-black text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center">
+              {selectedCount()}
+            </span>
+          </Show>
+        </span>
+        <ChevronDown
+          size={20}
+          class={`text-neutral-500 transition-transform duration-200 ${
+            isOpen() ? "rotate-180" : ""
+          }`}
+        />
+      </button>
 
       <Show when={isOpen()}>
-        <div
-          class="origin-top-right absolute right-0 mt-2 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-          role="menu"
-          aria-orientation="vertical"
-          aria-labelledby={`menu-button-${props.title}`}
-        >
-          <div class="py-1" role="none">
+        <div class="absolute top-full mt-2 w-full bg-white border border-neutral-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+          <ul>
             <For each={props.options}>
               {(option) => (
-                <label class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900">
+                <li
+                  onClick={() => props.onSelect(option)}
+                  class="px-4 py-2 text-neutral-700 hover:bg-neutral-100 cursor-pointer flex items-center justify-between"
+                >
+                  <span>{option}</span>
                   <input
                     type="checkbox"
-                    id={`filter-${props.title}-${option}`}
-                    name={`filter-${props.title}`}
-                    class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+                    class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
                     checked={props.selectedOptions.includes(option)}
-                    onChange={() => handleSelect(option)}
+                    readOnly
                   />
-                  <span class="ml-2">{option}</span>
-                </label>
+                </li>
               )}
             </For>
-          </div>
+          </ul>
         </div>
       </Show>
     </div>
   );
-};
-
-export default FilterDropdown;
+}
