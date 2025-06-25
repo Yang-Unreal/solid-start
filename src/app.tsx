@@ -1,5 +1,5 @@
 // src/app.tsx
-import { Router, useLocation, useNavigate, Route } from "@solidjs/router";
+import { Router, useLocation, useNavigate } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import {
   Suspense,
@@ -14,9 +14,8 @@ import { MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
-import SideNav from "~/components/SideNav"; // Import SideNav
-import { Menu } from "lucide-solid"; // Import Menu icon
-import DashboardLayout from "~/routes/dashboard"; // Keep DashboardLayout import for the route
+import SideNav from "~/components/SideNav";
+import { Menu } from "lucide-solid";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,7 +71,7 @@ export default function App() {
           <SearchProvider>
             <QueryClientProvider client={queryClient}>
               <MetaProvider>
-                <Title>SolidStart App</Title>
+                <Title>LIMING</Title>
 
                 <Show when={isDashboardRoute()}>
                   <div class="flex h-screen bg-neutral-100">

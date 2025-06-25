@@ -25,7 +25,7 @@ interface FilterOptionsResponse
 
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const FILTER_OPTIONS_QUERY_KEY = "filterOptions";
-const FIXED_PAGE_SIZE = 50;
+const FIXED_PAGE_SIZE = 30;
 
 const LS_SELECTED_BRANDS_KEY = "productSelectedBrands";
 const LS_SELECTED_CATEGORIES_KEY = "productSelectedCategories";
