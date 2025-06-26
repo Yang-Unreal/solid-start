@@ -37,13 +37,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
   const pagination = () => props.productsQuery.data?.pagination || null;
   const error = () => props.productsQuery.error;
 
-  const isFetching = () => props.productsQuery.isFetching;
   const isLoading = () => props.productsQuery.isLoading;
-
-  const containerClasses = () =>
-    `relative transition-opacity duration-300 ${
-      isFetching() && !isLoading() ? "opacity-60 pointer-events-none" : ""
-    }`;
 
   return (
     <>
@@ -66,7 +60,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
         </div>
       </Show>
 
-      <div class={containerClasses()}>
+      <div class="relative">
         {/* --- Product Grid Container (Always rendered for hydration stability) --- */}
         <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
           {/* Only show products if not loading and no error, and products exist */}
