@@ -9,12 +9,13 @@ import {
   createMemo,
 } from "solid-js";
 import Nav from "~/components/Nav";
+import SideNav from "~/components/SideNav";
 import "./app.css";
-import { MetaProvider, Title } from "@solidjs/meta";
+import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
-import SideNav from "~/components/SideNav";
+
 import { Menu } from "lucide-solid";
 
 const queryClient = new QueryClient({
@@ -71,8 +72,11 @@ export default function App() {
           <SearchProvider>
             <QueryClientProvider client={queryClient}>
               <MetaProvider>
-                <Title>LIMING</Title>
-
+                <Title>Liming</Title>
+                <Meta
+                  name="description"
+                  content="Let the hidden pears shine for the world"
+                />
                 <Show when={isDashboardRoute()}>
                   <div class="flex h-screen bg-neutral-100">
                     {/* Mobile Header */}
