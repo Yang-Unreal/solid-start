@@ -20,7 +20,7 @@ const SearchInput = (props: SearchInputProps) => {
         type="search"
         value={props.searchQuery()} // Call the accessor to get the value
         onInput={(e) => props.onSearchChange(e.currentTarget.value)}
-        class="w-full px-4 py-1 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out"
+        class="w-full px-4 py-1 text-left bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out text-black"
         aria-label="Search products"
       />
     </div>

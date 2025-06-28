@@ -66,17 +66,7 @@ export default function Nav() {
         <div class="flex items-center space-x-4 h-full">
           {" "}
           {/* Added h-full to align items vertically */}
-          {/* Search Input (Desktop only) */}
-          <Show when={location.pathname === "/products"}>
-            <div class="hidden md:block w-64">
-              {" "}
-              {/* Adjust width as needed */}
-              <SearchInput
-                searchQuery={searchQuery}
-                onSearchChange={onSearchChange}
-              />
-            </div>
-          </Show>
+          
           {/* Desktop-only Links */}
           <ul class="hidden sm:flex items-center h-full space-x-3 sm:space-x-4">
             <li>
@@ -113,19 +103,7 @@ export default function Nav() {
         </div>
       </div>
 
-      {/* Mobile Search Bar (Second Row) */}
-      <Show when={location.pathname === "/products"}>
-        <div
-          class={`sm:block md:hidden px-4 pb-4 max-w-xs mx-auto ${
-            isMobileMenuOpen() ? "hidden" : ""
-          }`}
-        >
-          <SearchInput
-            searchQuery={searchQuery}
-            onSearchChange={onSearchChange}
-          />
-        </div>
-      </Show>
+      
 
       {/* Full-screen Mobile Menu Content */}
       <Show when={isMobileMenuOpen()}>

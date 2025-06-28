@@ -1,8 +1,12 @@
 // src/components/ProductListDashboard.tsx
 import { For, Show, createSignal, createMemo } from "solid-js";
-import { A } from "@solidjs/router"; // Removed useSearchParams
-import { useQuery, useMutation, useQueryClient } from "@tanstack/solid-query";
-import { useSearch } from "~/context/SearchContext"; // Import useSearch
+import { A } from "@solidjs/router";
+import {
+  useMutation,
+  useQueryClient,
+  type UseQueryResult,
+} from "@tanstack/solid-query";
+import type { Accessor, Setter } from "solid-js";
 import {
   PlusCircle,
   Trash2,
@@ -31,6 +35,7 @@ interface ApiResponse {
   pagination: PaginationInfo;
   error?: string;
 }
+
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const FIXED_PAGE_SIZE = 10;
 
@@ -61,9 +66,12 @@ async function bulkDeleteProductsApi(
   return response.json();
 }
 
-export default function ProductListDashboard() {
-  // const [searchParams] = useSearchParams(); // Removed
-  const { searchQuery } = useSearch(); // Get searchQuery from context
+export default function ProductListDashboard(props: {
+  productsQuery: UseQueryResult<ApiResponse, Error>;
+  currentPage: Accessor<number>;
+  setCurrentPage: Setter<number>;
+  pageSize: Accessor<number>;
+}) {
   const tanstackQueryClient = useQueryClient();
   const [selectedProductIds, setSelectedProductIds] = createSignal<Set<string>>(
     new Set()
@@ -73,56 +81,8 @@ export default function ProductListDashboard() {
     string | null
   >(null);
 
-  // No longer needed as searchQuery is directly from context
-  // const getSearchParamString = (
-  //   paramValue: string | string[] | undefined,
-  //   defaultValue: string
-  // ): string =>
-  //   Array.isArray(paramValue)
-  //     ? paramValue[0] || defaultValue
-  //     : paramValue || defaultValue;
-  // const currentSearchQuery = createMemo(() =>
-  //   getSearchParamString(searchParams.q, "")
-  // );
-
-  const [currentPage, setCurrentPage] = createSignal(1);
-  const pageSize = () => FIXED_PAGE_SIZE;
-
-  const productsQuery = useQuery<ApiResponse, Error>(() => ({
-    queryKey: [
-      PRODUCTS_QUERY_KEY_PREFIX,
-      { page: currentPage(), size: pageSize(), q: searchQuery() }, // Use searchQuery() directly
-    ],
-    queryFn: async ({ queryKey }) => {
-      const [_key, { page, size, q }] = queryKey as [
-        string,
-        { page: number; size: number; q?: string }
-      ];
-
-      // THE FIX: Construct the full URL for the server
-      let baseUrl = "";
-      if (import.meta.env.SSR) {
-        baseUrl =
-          import.meta.env.VITE_INTERNAL_API_ORIGIN ||
-          `http://localhost:${process.env.PORT || 3000}`;
-      }
-
-      const params = new URLSearchParams({
-        page: page.toString(),
-        pageSize: size.toString(),
-      });
-      if (q) params.append("q", q);
-
-      const fetchUrl = `${baseUrl}/api/products?${params.toString()}`;
-      const response = await fetch(fetchUrl);
-      if (!response.ok) throw new Error("Network response was not ok");
-      return response.json();
-    },
-    keepPreviousData: true,
-  }));
-
-  const products = () => productsQuery.data?.data || [];
-  const pagination = () => productsQuery.data?.pagination || null;
+  const products = () => props.productsQuery.data?.data || [];
+  const pagination = () => props.productsQuery.data?.pagination || null;
 
   const deleteProductMutation = useMutation(() => ({
     mutationFn: deleteProductApi,
@@ -160,13 +120,16 @@ export default function ProductListDashboard() {
     selectedProductIds().has(productId);
   const isAllSelected = createMemo(() => {
     const p = products();
-    return p.length > 0 && p.every((prod) => selectedProductIds().has(prod.id));
+    return (
+      p.length > 0 &&
+      p.every((prod: Product) => selectedProductIds().has(prod.id))
+    );
   });
   const toggleSelectAll = () => {
     if (isAllSelected()) {
       setSelectedProductIds(new Set<string>());
     } else {
-      setSelectedProductIds(new Set(products().map((p) => p.id)));
+      setSelectedProductIds(new Set(products().map((p: Product) => p.id)));
     }
   };
   const handleDeleteProduct = (product: Product) => {
@@ -179,7 +142,7 @@ export default function ProductListDashboard() {
       bulkDeleteProductsMutation.mutate(ids);
   };
   const handlePageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    props.setCurrentPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
   const paginationButtonClasses = `h-10 w-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-300 text-neutral-700 hover:bg-neutral-400 disabled:bg-neutral-200 disabled:text-neutral-500`;
@@ -187,7 +150,9 @@ export default function ProductListDashboard() {
   return (
     <div class="p-4">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-2xl font-bold">Products List</h2>
+        <div class="w-full max-w-xs">
+          <h2 class="text-2xl font-bold">Products List</h2>
+        </div>
         <div class="flex items-center space-x-2">
           <A
             href="/dashboard/products/new"
@@ -220,8 +185,8 @@ export default function ProductListDashboard() {
           {deleteError()}
         </div>
       </Show>
-      <Show when={productsQuery.error}>
-        <p class="text-red-500">Error: {productsQuery.error?.message}</p>
+      <Show when={props.productsQuery.error}>
+        <p class="text-red-500">Error: {props.productsQuery.error?.message}</p>
       </Show>
 
       <div class="block md:hidden space-y-3">

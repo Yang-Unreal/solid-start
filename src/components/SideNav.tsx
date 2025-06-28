@@ -61,13 +61,6 @@ export default function SideNav(props: SideNavProps) {
         </button>
       </div>
 
-      <div class="p-4">
-        <SearchInput
-          searchQuery={searchQuery}
-          onSearchChange={onSearchChange}
-        />
-      </div>
-
       <ul class="flex flex-col p-4 space-y-2 flex-1">
         <li>
           <A

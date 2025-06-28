@@ -42,25 +42,6 @@ export function SearchProvider(props: { children: any }) {
     if (typeof window !== "undefined") {
       localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
     }
-
-    const newSearchParams = new URLSearchParams();
-    for (const key in searchParams) {
-      const value = searchParams[key];
-      if (Array.isArray(value)) {
-        value.forEach((v) => newSearchParams.append(key, v));
-      } else if (value !== undefined) {
-        newSearchParams.set(key, value);
-      }
-    }
-
-    if (query) {
-      newSearchParams.set("q", query);
-    } else {
-      newSearchParams.delete("q");
-    }
-
-    const newUrl = `${location.pathname}?${newSearchParams.toString()}`;
-    window.history.replaceState({}, "", newUrl);
   };
 
   const value = {
