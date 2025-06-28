@@ -116,7 +116,7 @@ export default function App() {
                     </Show>
 
                     {/* Main Content Area for Dashboard */}
-                    <main class="flex-1 flex flex-col min-w-0 overflow-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 pt-20 md:pt-6">
+                    <main class="flex-1 flex flex-col min-w-0 overflow-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
                       <Suspense fallback={null}>
                         <Show
                           when={
@@ -133,15 +133,7 @@ export default function App() {
 
                 <Show when={!isDashboardRoute()}>
                   {showNav() && <Nav />}
-                  <main
-                    class={`flex-grow ${
-                      location.pathname === "/products" &&
-                      typeof window !== "undefined" &&
-                      window.innerWidth < 768
-                        ? "pt-32"
-                        : "pt-16"
-                    }`}
-                  >
+                  <main class="flex-grow">
                     <Suspense fallback={null}>
                       <Show
                         when={

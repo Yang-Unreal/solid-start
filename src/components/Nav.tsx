@@ -24,8 +24,13 @@ export default function Nav() {
   const location = useLocation();
   const { searchQuery, onSearchChange } = useSearch(); // Consume from context
   const activeLinkClasses = (path: string) => {
-    const baseActive = "text-white font-semibold";
-    const baseInactive = "text-white/70 hover:text-white font-medium";
+    const isHomePage = location.pathname === "/";
+    const baseActive = isHomePage
+      ? "text-white font-semibold"
+      : "text-black font-semibold";
+    const baseInactive = isHomePage
+      ? "text-white/70 hover:text-white font-medium"
+      : "text-black/70 hover:text-black font-medium";
     return location.pathname === path ? baseActive : baseInactive;
   };
   const toggleMobileMenu = () => {
@@ -38,7 +43,7 @@ export default function Nav() {
 
   return (
     <nav
-      class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-black shadow-lg ${
+      class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-transparent ${
         isMobileMenuOpen() ? "h-screen" : ""
       }`}
     >
@@ -49,7 +54,11 @@ export default function Nav() {
         }`}
       >
         {/* --- LEFT SIDE: Logo --- */}
-        <A href="/" class="text-white" aria-label="Homepage">
+        <A
+          href="/"
+          class={location.pathname === "/" ? "text-white" : "text-black"}
+          aria-label="Homepage"
+        >
           <YourLogo class="h-4 sm:h-5 w-auto" />
         </A>
 
@@ -96,7 +105,11 @@ export default function Nav() {
           <div class="sm:hidden">
             <button
               onClick={toggleMobileMenu}
-              class="p-2 text-white hover:bg-neutral-800 rounded-md"
+              class={`p-2 ${
+                location.pathname === "/"
+                  ? "text-white hover:bg-neutral-800"
+                  : "text-black hover:bg-neutral-200"
+              } rounded-md`}
               aria-label="Toggle mobile menu"
             >
               <AlignJustify size={24} />
@@ -124,12 +137,20 @@ export default function Nav() {
         <div class="h-screen flex flex-col items-center justify-center">
           <button
             onClick={toggleMobileMenu}
-            class="absolute top-3 right-4 p-2 text-white hover:bg-neutral-800 rounded-md"
+            class={`absolute top-3 right-4 p-2 ${
+              location.pathname === "/"
+                ? "text-white hover:bg-neutral-800"
+                : "text-black hover:bg-neutral-200"
+            } rounded-md`}
             aria-label="Close mobile menu"
           >
             <MenuSquare size={24} />
           </button>
-          <ul class="flex flex-col items-center space-y-6 text-xl text-white">
+          <ul
+            class={`flex flex-col items-center space-y-6 text-xl ${
+              location.pathname === "/" ? "text-white" : "text-black"
+            }`}
+          >
             <li>
               <A href="/" onClick={toggleMobileMenu}>
                 Home
