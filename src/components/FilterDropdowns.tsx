@@ -74,20 +74,14 @@ export default function FilterDropdown(props: FilterDropdownProps) {
                   onClick={() => props.onSelect(option)}
                   class="px-4 py-2 text-neutral-700 hover:bg-neutral-100 cursor-pointer flex items-center justify-between"
                 >
-                  <label
-                    for={`filter-${props.title}-${option}`}
-                    class="flex items-center justify-between w-full cursor-pointer"
-                  >
-                    <span>{option}</span>
-                    <input
-                      id={`filter-${props.title}-${option}`}
-                      name={`filter-${props.title}`}
-                      type="checkbox"
-                      class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                      checked={props.selectedOptions.includes(option)}
-                      readOnly
-                    />
-                  </label>
+                  <span>{option}</span>
+                  <input
+                    type="checkbox"
+                    class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black pointer-events-none"
+                    checked={props.selectedOptions.includes(option)}
+                    tabIndex={-1}
+                    aria-hidden="true"
+                  />
                 </li>
               )}
             </For>

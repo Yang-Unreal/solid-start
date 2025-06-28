@@ -80,11 +80,6 @@ export default function Nav() {
           {/* Desktop-only Links */}
           <ul class="hidden sm:flex items-center h-full space-x-3 sm:space-x-4">
             <li>
-              <A href="/" class={`${activeLinkClasses("/")} ${linkBaseClass}`}>
-                HOME
-              </A>
-            </li>
-            <li>
               <A
                 href="/about"
                 class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
