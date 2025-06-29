@@ -1,6 +1,6 @@
 import { createSignal, Show } from "solid-js";
 import { useLocation, A } from "@solidjs/router";
-import { AlignJustify, MenuSquare } from "lucide-solid";
+import { AlignJustify, X } from "lucide-solid";
 import SearchInput from "~/components/SearchInput";
 import { useSearch } from "~/context/SearchContext"; // Correct import path
 
@@ -26,11 +26,11 @@ export default function Nav() {
   const activeLinkClasses = (path: string) => {
     const isHomePage = location.pathname === "/";
     const baseActive = isHomePage
-      ? "text-white font-semibold"
-      : "text-black font-semibold";
+      ? "text-white font-extrabold"
+      : "text-black font-extrabold";
     const baseInactive = isHomePage
-      ? "text-white/70 hover:text-white font-medium"
-      : "text-black/70 hover:text-black font-medium";
+      ? "text-white/70 hover:text-white font-bold"
+      : "text-black/70 hover:text-black font-bold";
     return location.pathname === path ? baseActive : baseInactive;
   };
   const toggleMobileMenu = () => {
@@ -39,109 +39,127 @@ export default function Nav() {
 
   // CHANGE: Increased font size from `text-sm` to `text-base`
   const linkBaseClass =
-    "text-base flex items-center transition-colors duration-150";
+    "text-xl flex items-center transition-colors duration-150";
 
   return (
     <nav
-      class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-transparent ${
-        isMobileMenuOpen() ? "h-screen" : ""
-      }`}
+      class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-transparent`}
     >
-      {/* Main top row */}
+      {/* Mobile-only Menu Button - always visible */}
+      <div class="sm:hidden absolute top-3 right-4 z-50">
+        <button
+          onClick={toggleMobileMenu}
+          class={`p-2 ${
+            location.pathname === "/"
+              ? "text-white hover:bg-neutral-800"
+              : "text-black hover:bg-neutral-200"
+          } rounded-md`}
+          aria-label="Toggle mobile menu"
+        >
+          <Show when={!isMobileMenuOpen()} fallback={<X size={24} />}>
+            <AlignJustify size={24} />
+          </Show>
+        </button>
+      </div>
+
+      {/* Main top row - hidden when mobile menu is open */}
       <div
-        class={`flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8 font-sans ${
+        class={`relative flex items-center h-24 px-4 sm:px-6 lg:px-8 font-sans ${
           isMobileMenuOpen() ? "hidden" : ""
         }`}
       >
-        {/* --- LEFT SIDE: Logo --- */}
-        <A
-          href="/"
-          class={location.pathname === "/" ? "text-white" : "text-black"}
-          aria-label="Homepage"
-        >
-          <YourLogo class="h-4 sm:h-5 w-auto" />
-        </A>
-
-        {/* --- RIGHT SIDE: Desktop Links or Mobile Menu Button --- */}
-        <div class="flex items-center space-x-4 h-full">
-          {" "}
-          {/* Added h-full to align items vertically */}
-          
-          {/* Desktop-only Links */}
-          <ul class="hidden sm:flex items-center h-full space-x-3 sm:space-x-4">
-            <li>
-              <A
-                href="/about"
-                class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
-              >
-                ABOUT
-              </A>
-            </li>
-            <li>
-              <A
-                href="/products"
-                class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
-              >
-                PRODUCTS
-              </A>
-            </li>
-          </ul>
-          {/* Mobile-only Menu Button */}
-          <div class="sm:hidden">
-            <button
-              onClick={toggleMobileMenu}
-              class={`p-2 ${
-                location.pathname === "/"
-                  ? "text-white hover:bg-neutral-800"
-                  : "text-black hover:bg-neutral-200"
-              } rounded-md`}
-              aria-label="Toggle mobile menu"
+        <ul class="hidden sm:flex items-center h-full justify-between w-full">
+          <li>
+            <A
+              href="/about"
+              class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
             >
-              <AlignJustify size={24} />
-            </button>
-          </div>
-        </div>
+              ABOUT
+            </A>
+          </li>
+          <li>
+            <A
+              href="/services"
+              class={`${activeLinkClasses("/services")} ${linkBaseClass}`}
+            >
+              SERVICES
+            </A>
+          </li>
+          <li>
+            <A
+              href="/"
+              class={`${
+                location.pathname === "/" ? "text-white" : "text-black"
+              }`}
+              aria-label="Homepage"
+            >
+              <YourLogo class="h-6 w-auto" />
+            </A>
+          </li>
+
+          <li>
+            <A
+              href="/products"
+              class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
+            >
+              PRODUCTS
+            </A>
+          </li>
+          <li>
+            <A
+              href="/contact"
+              class={`${activeLinkClasses("/contact")} ${linkBaseClass}`}
+            >
+              CONTACT
+            </A>
+          </li>
+        </ul>
       </div>
 
-      
-
       {/* Full-screen Mobile Menu Content */}
-      <Show when={isMobileMenuOpen()}>
-        <div class="h-screen flex flex-col items-center justify-center">
-          <button
-            onClick={toggleMobileMenu}
-            class={`absolute top-3 right-4 p-2 ${
-              location.pathname === "/"
-                ? "text-white hover:bg-neutral-800"
-                : "text-black hover:bg-neutral-200"
-            } rounded-md`}
-            aria-label="Close mobile menu"
-          >
-            <MenuSquare size={24} />
-          </button>
-          <ul
-            class={`flex flex-col items-center space-y-6 text-xl ${
-              location.pathname === "/" ? "text-white" : "text-black"
-            }`}
-          >
-            <li>
-              <A href="/" onClick={toggleMobileMenu}>
-                Home
-              </A>
-            </li>
-            <li>
-              <A href="/about" onClick={toggleMobileMenu}>
-                About
-              </A>
-            </li>
-            <li>
-              <A href="/products" onClick={toggleMobileMenu}>
-                Products
-              </A>
-            </li>
-          </ul>
-        </div>
-      </Show>
+      {/* Full-screen Mobile Menu Content */}
+      <div
+        class={`fixed top-0 left-0 right-0 z-40 h-screen flex flex-col items-center justify-center ${
+          location.pathname === "/" ? "bg-black" : "bg-white"
+        } transform transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen()
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-full opacity-0 pointer-events-none"
+        }`}
+      >
+        <ul
+          class={`flex flex-col items-center space-y-6 text-3xl font-extrabold ${
+            location.pathname === "/" ? "text-white" : "text-black"
+          }`}
+        >
+          <li>
+            <A href="/" onClick={toggleMobileMenu}>
+              HOME
+            </A>
+          </li>
+          <li>
+            <A href="/about" onClick={toggleMobileMenu}>
+              ABOUT
+            </A>
+          </li>
+
+          <li>
+            <A href="/services" onClick={toggleMobileMenu}>
+              SERVICES
+            </A>
+          </li>
+          <li>
+            <A href="/products" onClick={toggleMobileMenu}>
+              PRODUCTS
+            </A>
+          </li>
+          <li>
+            <A href="/contact" onClick={toggleMobileMenu}>
+              CONTACT
+            </A>
+          </li>
+        </ul>
+      </div>
     </nav>
   );
 }

@@ -5,7 +5,7 @@ import Footer from "~/components/Footer";
 export default function Home() {
   return (
     <main>
-      <div class="relative flex h-[60vh] md:min-h-screen items-start justify-start overflow-hidden text-white bg-black">
+      <div class="relative flex h-[60vh] md:min-h-screen items-center justify-start overflow-hidden text-white bg-black">
         <video
           autoplay
           loop
@@ -25,9 +25,8 @@ export default function Home() {
         </video>
 
         <div
-          class="relative z-20 mt-24 mx-4 md:mt-32 lg:mx-[5vw] max-w-md lg:max-w-none
-                 text-left p-4 sm:p-6 bg-black/50 
-                 shadow-xl"
+          class="relative z-20 ml-4 lg:ml-8 max-w-md lg:max-w-none
+                 text-left p-4 sm:p-6 bg-transparent"
         >
           {/* CHANGE 2: Significantly increased the scaling and max size of the fonts. */}
           <h1 class="flex flex-col font-bold tracking-tight text-shadow-md leading-tight">
@@ -35,7 +34,7 @@ export default function Home() {
               LET THE HIDDEN PEARLS
             </span>
             <div class="w-16 h-[0.5px] bg-red-600 my-1.5"></div>
-            <span class="text-[clamp(1.875rem,10vw,7.5rem)]">SHINE</span>
+            <span class="text-[clamp(1.875rem,6vw,4.5rem)]">SHINE</span>
             <span class="text-[clamp(0.875rem,4vw,2.5rem)]">FOR THE WORLD</span>
           </h1>
         </div>

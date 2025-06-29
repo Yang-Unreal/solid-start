@@ -21,7 +21,7 @@ export default function ProductListItem(props: ProductListItemProps) {
       <div class="flex-shrink-0">
         <button
           onClick={() => props.onToggleSelect(props.product.id)}
-          class="p-1 rounded-md text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800"
+          class="p-1 rounded-md text-black hover:bg-neutral-50 hover:text-neutral-800"
           aria-label={`Select ${props.product.name}`}
         >
           <Show when={props.isSelected} fallback={<Square size={20} />}>
@@ -48,19 +48,17 @@ export default function ProductListItem(props: ProductListItemProps) {
         </picture>
       </div>
       <div class="flex-1 min-w-0">
-        <p class="font-bold text-neutral-800 truncate">{props.product.name}</p>
-        <p class="text-sm font-semibold text-neutral-700 mt-1">
+        <p class="font-bold text-black truncate">{props.product.name}</p>
+        <p class="text-sm font-semibold text-black mt-1">
           {formatPrice(props.product.priceInCents)}
         </p>
-        <p class="text-xs text-neutral-500 mt-1">
+        <p class="text-xs text-black mt-1">
           Brand: {props.product.brand || "N/A"}
         </p>
-        <p class="text-xs text-neutral-500">
+        <p class="text-xs text-black">
           Category: {props.product.category || "N/A"}
         </p>
-        <p class="text-xs text-neutral-500">
-          Stock: {props.product.stockQuantity}
-        </p>
+        <p class="text-xs text-black">Stock: {props.product.stockQuantity}</p>
       </div>
       <div class="flex flex-col items-center space-y-2">
         {/* THE FIX IS HERE */}

@@ -21,7 +21,7 @@ export default function ProductTableRow(props: ProductTableRowProps) {
       <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
         <button
           onClick={() => props.onToggleSelect(props.product.id)}
-          class="p-1 rounded-md text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800"
+          class="p-1 rounded-md text-black hover:bg-neutral-50 hover:text-neutral-800"
           aria-label={`Select ${props.product.name}`}
         >
           <Show when={props.isSelected} fallback={<Square size={20} />}>
@@ -46,19 +46,19 @@ export default function ProductTableRow(props: ProductTableRowProps) {
           />
         </picture>
       </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-neutral-900">
+      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
         <div>{props.product.name}</div>
       </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-black">
         {props.product.category || "N/A"}
       </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-black">
         {formatPrice(props.product.priceInCents)}
       </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-black">
         {props.product.stockQuantity}
       </td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-500">
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-black">
         {new Date(props.product.createdAt).toLocaleDateString()}
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">

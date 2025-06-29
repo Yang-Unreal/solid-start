@@ -151,7 +151,7 @@ export default function ProductListDashboard(props: {
     <div class="p-4">
       <div class="flex justify-between items-center mb-4">
         <div class="w-full max-w-xs">
-          <h2 class="text-2xl font-bold">Products List</h2>
+          <h2 class="text-2xl font-bold text-black">Products List</h2>
         </div>
         <div class="flex items-center space-x-2">
           <A
@@ -221,7 +221,7 @@ export default function ProductListDashboard(props: {
             <thead class="bg-neutral-50">
               <tr>
                 <th class="px-6 py-3 text-left">
-                  <button onClick={toggleSelectAll} class="p-1">
+                  <button onClick={toggleSelectAll} class="p-1 text-black">
                     <Show
                       when={isAllSelected()}
                       fallback={<Square size={20} />}

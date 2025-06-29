@@ -74,8 +74,8 @@ export default function DashboardProductsPage() {
   }));
 
   const MemoizedSearchInput = createMemo(() => (
-    <div class="flex justify-between items-center mb-4">
-      <div class="w-full max-w-xs">
+    <div class="flex justify-start items-center mb-4 space-x-4 px-4">
+      <div class="flex-1">
         <SearchInput
           searchQuery={searchQuery}
           onSearchChange={onSearchChange}
@@ -87,7 +87,7 @@ export default function DashboardProductsPage() {
   return (
     <div class="p-4">
       {MemoizedSearchInput()}
-      <Suspense fallback={<div>Loading products...</div>}>
+      <Suspense>
         <ProductListDashboard
           productsQuery={productsQuery}
           currentPage={currentPage}
