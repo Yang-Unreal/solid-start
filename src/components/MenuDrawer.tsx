@@ -1,4 +1,4 @@
-import { createSignal, createEffect } from "solid-js";
+import { createSignal, createEffect, onMount } from "solid-js";
 import { animate } from "animejs";
 import { A } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
@@ -11,45 +11,50 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   let menuButtonRef: HTMLButtonElement | undefined;
   let drawerRef: HTMLDivElement | undefined;
+  const [previousIsVisible, setPreviousIsVisible] = createSignal(props.isVisible);
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen());
   };
 
-  createEffect(() => {
-    if (menuButtonRef) {
-      // Add null check for menuButtonRef
-      if (props.isVisible) {
-        animate(menuButtonRef, {
-          opacity: [0, 1],
-          scale: [0, 1],
-          duration: 500,
-          easing: "easeOutQuad",
-        });
-      } else {
-        animate(menuButtonRef, {
-          opacity: [1, 0],
-          scale: [1, 0],
-          duration: 500,
-          easing: "easeOutQuad",
-        });
-      }
-    }
-  });
+  
 
-  createEffect(() => {
-    if (drawerRef) {
-      if (isOpen()) {
-        animate(drawerRef, {
-          translateX: ["100%", "0%"],
-          duration: 300,
-          easing: "easeOutQuad",
-        });
-      } else {
-        drawerRef.style.transform = "translateX(100%)";
+  if (!import.meta.env.SSR) {
+    createEffect(() => {
+      if (menuButtonRef) {
+        if (props.isVisible) {
+          animate(menuButtonRef, {
+            opacity: [0, 1],
+            scale: [0, 1],
+            duration: 500,
+            easing: "easeOutQuad",
+          });
+        } else if (previousIsVisible()) {
+          animate(menuButtonRef, {
+            opacity: [1, 0],
+            scale: [1, 0],
+            duration: 500,
+            easing: "easeOutQuad",
+          });
+        }
       }
-    }
-  });
+      setPreviousIsVisible(props.isVisible);
+    });
+
+    createEffect(() => {
+      if (drawerRef) {
+        if (isOpen()) {
+          animate(drawerRef, {
+            translateX: ["100%", "0%"],
+            duration: 300,
+            easing: "easeOutQuad",
+          });
+        } else {
+          drawerRef.style.transform = "translateX(100%)";
+        }
+      }
+    });
+  }
 
   return (
     <>
@@ -57,7 +62,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         ref={(el) => (menuButtonRef = el)}
         onClick={toggleDrawer}
         class="fixed top-4 right-8 w-24 h-24 bg-black rounded-full shadow-lg z-50 flex flex-col justify-center items-center"
-        style="opacity: 0;"
+        style="opacity: 0; transform: scale(0);"
       >
         {(tx, ty) => (
           <>

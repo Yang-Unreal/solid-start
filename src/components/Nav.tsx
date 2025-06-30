@@ -42,11 +42,6 @@ export default function Nav() {
   const linkBaseClass =
     "text-xl flex items-center transition-colors duration-150 px-4 py-4";
 
-  onMount(() => {
-    // No longer need the manual mousemove/mouseleave listeners on the nav element
-    // as MagneticLink component handles it for each link.
-  });
-
   return (
     <nav
       class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
@@ -80,56 +75,71 @@ export default function Nav() {
         >
           <li class="mr-auto">
             <MagneticLink>
-              <A
-                href="/"
-                class={`${
-                  location.pathname === "/" ? "text-white" : "text-black"
-                } ${linkBaseClass}`}
-                aria-label="Homepage"
-              >
-                <YourLogo class="h-6 w-auto" />
-              </A>
+              {(tx, ty) => (
+                <A
+                  href="/"
+                  class={`${
+                    location.pathname === "/" ? "text-white" : "text-black"
+                  } ${linkBaseClass}`}
+                  aria-label="Homepage"
+                  style={`transform: translate(${tx}px, ${ty}px);`}
+                >
+                  <YourLogo class="h-6 w-auto" />
+                </A>
+              )}
             </MagneticLink>
           </li>
           <div class="flex items-center space-x-4">
             <li>
               <MagneticLink>
-                <A
-                  href="/about"
-                  class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
-                >
-                  ABOUT
-                </A>
+                {(tx, ty) => (
+                  <A
+                    href="/about"
+                    class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
+                    style={`transform: translate(${tx}px, ${ty}px);`}
+                  >
+                    ABOUT
+                  </A>
+                )}
               </MagneticLink>
             </li>
             <li>
               <MagneticLink>
-                <A
-                  href="/services"
-                  class={`${activeLinkClasses("/services")} ${linkBaseClass}`}
-                >
-                  SERVICES
-                </A>
+                {(tx, ty) => (
+                  <A
+                    href="/services"
+                    class={`${activeLinkClasses("/services")} ${linkBaseClass}`}
+                    style={`transform: translate(${tx}px, ${ty}px);`}
+                  >
+                    SERVICES
+                  </A>
+                )}
               </MagneticLink>
             </li>
             <li>
               <MagneticLink>
-                <A
-                  href="/products"
-                  class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
-                >
-                  PRODUCTS
-                </A>
+                {(tx, ty) => (
+                  <A
+                    href="/products"
+                    class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
+                    style={`transform: translate(${tx}px, ${ty}px);`}
+                  >
+                    PRODUCTS
+                  </A>
+                )}
               </MagneticLink>
             </li>
             <li>
               <MagneticLink>
-                <A
-                  href="/contact"
-                  class={`${activeLinkClasses("/contact")} ${linkBaseClass}`}
-                >
-                  CONTACT
-                </A>
+                {(tx, ty) => (
+                  <A
+                    href="/contact"
+                    class={`${activeLinkClasses("/contact")} ${linkBaseClass}`}
+                    style={`transform: translate(${tx}px, ${ty}px);`}
+                  >
+                    CONTACT
+                  </A>
+                )}
               </MagneticLink>
             </li>
           </div>
