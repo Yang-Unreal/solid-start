@@ -1,5 +1,5 @@
 import { createSignal, Show, onMount, onCleanup } from "solid-js";
-import { useLocation, A } from "@solidjs/router";
+import { useLocation, A, useNavigate } from "@solidjs/router";
 import { AlignJustify, X } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
 
@@ -21,7 +21,7 @@ const YourLogo = (props: { class?: string }) => (
 
 export default function Nav() {
   const location = useLocation();
-
+  const navigate = useNavigate();
   let navLinksRef: HTMLUListElement | undefined;
 
   const activeLinkClasses = (path: string) => {
@@ -74,71 +74,74 @@ export default function Nav() {
           class="hidden sm:flex items-center h-full w-full justify-between"
         >
           <li class="mr-auto">
-            <MagneticLink>
+            <MagneticLink onClick={() => navigate("/")}>
               {(tx, ty) => (
-                <A
-                  href="/"
+                <div
                   class={`${
                     location.pathname === "/" ? "text-white" : "text-black"
-                  } ${linkBaseClass}`}
+                  } ${linkBaseClass} pointer-events-none`}
                   aria-label="Homepage"
                   style={`transform: translate(${tx}px, ${ty}px);`}
                 >
                   <YourLogo class="h-6 w-auto" />
-                </A>
+                </div>
               )}
             </MagneticLink>
           </li>
           <div class="flex items-center space-x-4">
             <li>
-              <MagneticLink>
+              <MagneticLink onClick={() => navigate("/about")}>
                 {(tx, ty) => (
-                  <A
-                    href="/about"
-                    class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
+                  <div
+                    class={`${activeLinkClasses(
+                      "/about"
+                    )} ${linkBaseClass} pointer-events-none`}
                     style={`transform: translate(${tx}px, ${ty}px);`}
                   >
                     ABOUT
-                  </A>
+                  </div>
                 )}
               </MagneticLink>
             </li>
             <li>
-              <MagneticLink>
+              <MagneticLink onClick={() => navigate("/services")}>
                 {(tx, ty) => (
-                  <A
-                    href="/services"
-                    class={`${activeLinkClasses("/services")} ${linkBaseClass}`}
+                  <div
+                    class={`${activeLinkClasses(
+                      "/services"
+                    )} ${linkBaseClass} pointer-events-none`}
                     style={`transform: translate(${tx}px, ${ty}px);`}
                   >
                     SERVICES
-                  </A>
+                  </div>
                 )}
               </MagneticLink>
             </li>
             <li>
-              <MagneticLink>
+              <MagneticLink onClick={() => navigate("/products")}>
                 {(tx, ty) => (
-                  <A
-                    href="/products"
-                    class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
+                  <div
+                    class={`${activeLinkClasses(
+                      "/products"
+                    )} ${linkBaseClass} pointer-events-none`}
                     style={`transform: translate(${tx}px, ${ty}px);`}
                   >
                     PRODUCTS
-                  </A>
+                  </div>
                 )}
               </MagneticLink>
             </li>
             <li>
-              <MagneticLink>
+              <MagneticLink onClick={() => navigate("/contact")}>
                 {(tx, ty) => (
-                  <A
-                    href="/contact"
-                    class={`${activeLinkClasses("/contact")} ${linkBaseClass}`}
+                  <div
+                    class={`${activeLinkClasses(
+                      "/contact"
+                    )} ${linkBaseClass} pointer-events-none`}
                     style={`transform: translate(${tx}px, ${ty}px);`}
                   >
                     CONTACT
-                  </A>
+                  </div>
                 )}
               </MagneticLink>
             </li>
