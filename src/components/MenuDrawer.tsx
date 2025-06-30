@@ -11,13 +11,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   let menuButtonRef: HTMLButtonElement | undefined;
   let drawerRef: HTMLDivElement | undefined;
-  const [previousIsVisible, setPreviousIsVisible] = createSignal(props.isVisible);
+  const [previousIsVisible, setPreviousIsVisible] = createSignal(
+    props.isVisible
+  );
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen());
   };
-
-  
 
   if (!import.meta.env.SSR) {
     createEffect(() => {
@@ -64,8 +64,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         class="fixed top-4 right-8 w-24 h-24 bg-black rounded-full shadow-lg z-50 flex flex-col justify-center items-center"
         style="opacity: 0; transform: scale(0);"
       >
-        {(tx, ty) => (
-          <>
+        {(tx, ty, innerRef) => (
+          <div ref={innerRef}>
             <div
               class="w-10 h-1 bg-white mb-1"
               style={`transform: translate(${tx}px, ${ty}px);`}
@@ -74,7 +74,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               class="w-10 h-1 bg-white"
               style={`transform: translate(${tx}px, ${ty}px);`}
             ></div>
-          </>
+          </div>
         )}
       </MagneticLink>
 

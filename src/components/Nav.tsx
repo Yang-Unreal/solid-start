@@ -75,8 +75,9 @@ export default function Nav() {
         >
           <li class="mr-auto">
             <MagneticLink onClick={() => navigate("/")}>
-              {(tx, ty) => (
+              {(tx, ty, innerRef) => (
                 <div
+                  ref={innerRef}
                   class={`${
                     location.pathname === "/" ? "text-white" : "text-black"
                   } ${linkBaseClass} pointer-events-none`}
@@ -91,8 +92,9 @@ export default function Nav() {
           <div class="flex items-center space-x-4">
             <li>
               <MagneticLink onClick={() => navigate("/about")}>
-                {(tx, ty) => (
+                {(tx, ty, innerRef) => (
                   <div
+                    ref={innerRef}
                     class={`${activeLinkClasses(
                       "/about"
                     )} ${linkBaseClass} pointer-events-none`}
@@ -105,8 +107,9 @@ export default function Nav() {
             </li>
             <li>
               <MagneticLink onClick={() => navigate("/services")}>
-                {(tx, ty) => (
+                {(tx, ty, innerRef) => (
                   <div
+                    ref={innerRef}
                     class={`${activeLinkClasses(
                       "/services"
                     )} ${linkBaseClass} pointer-events-none`}
@@ -119,8 +122,9 @@ export default function Nav() {
             </li>
             <li>
               <MagneticLink onClick={() => navigate("/products")}>
-                {(tx, ty) => (
+                {(tx, ty, innerRef) => (
                   <div
+                    ref={innerRef}
                     class={`${activeLinkClasses(
                       "/products"
                     )} ${linkBaseClass} pointer-events-none`}
@@ -133,8 +137,9 @@ export default function Nav() {
             </li>
             <li>
               <MagneticLink onClick={() => navigate("/contact")}>
-                {(tx, ty) => (
+                {(tx, ty, innerRef) => (
                   <div
+                    ref={innerRef}
                     class={`${activeLinkClasses(
                       "/contact"
                     )} ${linkBaseClass} pointer-events-none`}
