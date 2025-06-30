@@ -7,9 +7,12 @@ import {
   createEffect,
   createSignal,
   createMemo,
+  onMount,
+  onCleanup,
 } from "solid-js";
 import Nav from "~/components/Nav";
 import SideNav from "~/components/SideNav";
+import MenuDrawer from "~/components/MenuDrawer"; // Import MenuDrawer
 import "./app.css";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
@@ -44,6 +47,23 @@ export default function App() {
         const navigate = useNavigate();
         const session = authClient.useSession();
         const [sideNavOpen, setSideNavOpen] = createSignal(false);
+        const [showMenuButton, setShowMenuButton] = createSignal(false); // New signal for menu button visibility
+
+        onMount(() => {
+          const handleScroll = () => {
+            const scrollThreshold = window.innerHeight / 3;
+            if (window.scrollY >= scrollThreshold) {
+              setShowMenuButton(true);
+            } else {
+              setShowMenuButton(false);
+            }
+          };
+
+          window.addEventListener("scroll", handleScroll);
+          onCleanup(() => {
+            window.removeEventListener("scroll", handleScroll);
+          });
+        });
 
         const handleCloseSideNav = () => setSideNavOpen(false);
         const handleLogoutSuccess = () => navigate("/login", { replace: true });
@@ -116,7 +136,7 @@ export default function App() {
                     </Show>
 
                     {/* Main Content Area for Dashboard */}
-                    <main class="flex-1 flex flex-col min-w-0 overflow-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+                    <main class="flex-1 flex flex-col min-w-0 overflow-auto px-4 sm:px-6 lg:px-8">
                       <Suspense fallback={null}>
                         <Show
                           when={
@@ -133,6 +153,8 @@ export default function App() {
 
                 <Show when={!isDashboardRoute()}>
                   {showNav() && <Nav />}
+                  <MenuDrawer isVisible={showMenuButton()} />{" "}
+                  {/* Render MenuDrawer */}
                   <main class="flex-grow">
                     <Suspense fallback={null}>
                       <Show

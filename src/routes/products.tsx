@@ -205,10 +205,13 @@ export default function ProductsPage() {
 
   return (
     <MetaProvider>
-      <main class="bg-white pt-20 px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
+      <main class="pt-24 bg-white px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
           <div class="mb-6">
-            <SearchInput searchQuery={searchQuery} onSearchChange={onSearchChange} />
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearchChange={onSearchChange}
+            />
           </div>
           <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <FilterDropdown

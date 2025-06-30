@@ -39,6 +39,7 @@ export default function Home() {
           </h1>
         </div>
       </div>
+      <div class="h-screen bg-white"></div>
       <Footer />
     </main>
   );

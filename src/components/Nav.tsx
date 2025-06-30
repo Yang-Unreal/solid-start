@@ -1,8 +1,7 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, Show, onMount, onCleanup } from "solid-js";
 import { useLocation, A } from "@solidjs/router";
 import { AlignJustify, X } from "lucide-solid";
-import SearchInput from "~/components/SearchInput";
-import { useSearch } from "~/context/SearchContext"; // Correct import path
+import MagneticLink from "~/components/MagneticLink";
 
 const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false);
 
@@ -22,7 +21,9 @@ const YourLogo = (props: { class?: string }) => (
 
 export default function Nav() {
   const location = useLocation();
-  const { searchQuery, onSearchChange } = useSearch(); // Consume from context
+
+  let navLinksRef: HTMLUListElement | undefined;
+
   const activeLinkClasses = (path: string) => {
     const isHomePage = location.pathname === "/";
     const baseActive = isHomePage
@@ -39,11 +40,16 @@ export default function Nav() {
 
   // CHANGE: Increased font size from `text-sm` to `text-base`
   const linkBaseClass =
-    "text-xl flex items-center transition-colors duration-150";
+    "text-xl flex items-center transition-colors duration-150 px-4 py-4";
+
+  onMount(() => {
+    // No longer need the manual mousemove/mouseleave listeners on the nav element
+    // as MagneticLink component handles it for each link.
+  });
 
   return (
     <nav
-      class={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out bg-transparent`}
+      class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
     >
       {/* Mobile-only Menu Button - always visible */}
       <div class="sm:hidden absolute top-3 right-4 z-50">
@@ -68,51 +74,65 @@ export default function Nav() {
           isMobileMenuOpen() ? "hidden" : ""
         }`}
       >
-        <ul class="hidden sm:flex items-center h-full justify-between w-full">
-          <li>
-            <A
-              href="/about"
-              class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
-            >
-              ABOUT
-            </A>
+        <ul
+          ref={navLinksRef}
+          class="hidden sm:flex items-center h-full w-full justify-between"
+        >
+          <li class="mr-auto">
+            <MagneticLink>
+              <A
+                href="/"
+                class={`${
+                  location.pathname === "/" ? "text-white" : "text-black"
+                } ${linkBaseClass}`}
+                aria-label="Homepage"
+              >
+                <YourLogo class="h-6 w-auto" />
+              </A>
+            </MagneticLink>
           </li>
-          <li>
-            <A
-              href="/services"
-              class={`${activeLinkClasses("/services")} ${linkBaseClass}`}
-            >
-              SERVICES
-            </A>
-          </li>
-          <li>
-            <A
-              href="/"
-              class={`${
-                location.pathname === "/" ? "text-white" : "text-black"
-              }`}
-              aria-label="Homepage"
-            >
-              <YourLogo class="h-6 w-auto" />
-            </A>
-          </li>
-
-          <li>
-            <A
-              href="/products"
-              class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
-            >
-              PRODUCTS
-            </A>
-          </li>
-          <li>
-            <A
-              href="/contact"
-              class={`${activeLinkClasses("/contact")} ${linkBaseClass}`}
-            >
-              CONTACT
-            </A>
-          </li>
+          <div class="flex items-center space-x-4">
+            <li>
+              <MagneticLink>
+                <A
+                  href="/about"
+                  class={`${activeLinkClasses("/about")} ${linkBaseClass}`}
+                >
+                  ABOUT
+                </A>
+              </MagneticLink>
+            </li>
+            <li>
+              <MagneticLink>
+                <A
+                  href="/services"
+                  class={`${activeLinkClasses("/services")} ${linkBaseClass}`}
+                >
+                  SERVICES
+                </A>
+              </MagneticLink>
+            </li>
+            <li>
+              <MagneticLink>
+                <A
+                  href="/products"
+                  class={`${activeLinkClasses("/products")} ${linkBaseClass}`}
+                >
+                  PRODUCTS
+                </A>
+              </MagneticLink>
+            </li>
+            <li>
+              <MagneticLink>
+                <A
+                  href="/contact"
+                  class={`${activeLinkClasses("/contact")} ${linkBaseClass}`}
+                >
+                  CONTACT
+                </A>
+              </MagneticLink>
+            </li>
+          </div>
         </ul>
       </div>
 

@@ -1,0 +1,114 @@
+import { createSignal, createEffect } from "solid-js";
+import { animate } from "animejs";
+import { A } from "@solidjs/router";
+import MagneticLink from "~/components/MagneticLink";
+
+interface MenuDrawerProps {
+  isVisible: boolean;
+}
+
+export default function MenuDrawer(props: MenuDrawerProps) {
+  const [isOpen, setIsOpen] = createSignal(false);
+  let menuButtonRef: HTMLButtonElement | undefined;
+  let drawerRef: HTMLDivElement | undefined;
+
+  const toggleDrawer = () => {
+    setIsOpen(!isOpen());
+  };
+
+  createEffect(() => {
+    if (menuButtonRef) {
+      // Add null check for menuButtonRef
+      if (props.isVisible) {
+        animate(menuButtonRef, {
+          opacity: [0, 1],
+          scale: [0, 1],
+          duration: 500,
+          easing: "easeOutQuad",
+        });
+      } else {
+        animate(menuButtonRef, {
+          opacity: [1, 0],
+          scale: [1, 0],
+          duration: 500,
+          easing: "easeOutQuad",
+        });
+      }
+    }
+  });
+
+  createEffect(() => {
+    if (drawerRef) {
+      if (isOpen()) {
+        animate(drawerRef, {
+          translateX: ["100%", "0%"],
+          duration: 300,
+          easing: "easeOutQuad",
+        });
+      } else {
+        drawerRef.style.transform = "translateX(100%)";
+      }
+    }
+  });
+
+  return (
+    <>
+      <MagneticLink
+        ref={(el) => (menuButtonRef = el)}
+        onClick={toggleDrawer}
+        class="fixed top-4 right-8 w-24 h-24 bg-black rounded-full shadow-lg z-50 flex flex-col justify-center items-center"
+        style="opacity: 0;"
+      >
+        {(tx, ty) => (
+          <>
+            <div
+              class="w-10 h-1 bg-white mb-1"
+              style={`transform: translate(${tx}px, ${ty}px);`}
+            ></div>
+            <div
+              class="w-10 h-1 bg-white"
+              style={`transform: translate(${tx}px, ${ty}px);`}
+            ></div>
+          </>
+        )}
+      </MagneticLink>
+
+      <div
+        ref={drawerRef}
+        class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white shadow-xl z-40"
+        style="transform: translateX(100%);"
+      >
+        <div class="p-4">
+          <h2 class="text-xl font-bold mb-4">Navigation</h2>
+          <ul>
+            <li class="mb-2">
+              <A href="/" class="block hover:text-blue-300">
+                Home
+              </A>
+            </li>
+            <li class="mb-2">
+              <A href="/about" class="block hover:text-blue-300">
+                About
+              </A>
+            </li>
+            <li class="mb-2">
+              <A href="/products" class="block hover:text-blue-300">
+                Products
+              </A>
+            </li>
+            <li class="mb-2">
+              <A href="/services" class="block hover:text-blue-300">
+                Services
+              </A>
+            </li>
+            <li class="mb-2">
+              <A href="/contact" class="block hover:text-blue-300">
+                Contact
+              </A>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </>
+  );
+}
