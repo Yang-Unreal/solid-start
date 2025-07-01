@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup, type JSX } from "solid-js";
+import { createSignal, onMount, onCleanup, type JSX, createEffect } from "solid-js";
 import { createAnimatable, eases, animate } from "animejs";
 
 interface MagneticLinkProps
@@ -18,6 +18,8 @@ export default function MagneticLink(props: MagneticLinkProps) {
   let localElementRef: HTMLButtonElement | undefined;
   let innerElementRef: HTMLElement | undefined; // New ref for inner elements
 
+  const [isMobile, setIsMobile] = createSignal(false); // New signal for mobile detection
+
   const setRef = (el: HTMLButtonElement) => {
     localElementRef = el;
     if (props.ref) {
@@ -28,7 +30,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
   const setInnerRef = (el: HTMLElement) => {
     innerElementRef = el;
     // Initialize innerAnimatableInstance when the innerElementRef is set
-    if (innerElementRef && !innerAnimatableInstance) {
+    if (innerElementRef && !innerAnimatableInstance && !isMobile()) {
       innerAnimatableInstance = createAnimatable(innerElementRef, {
         translateX: 0,
         translateY: 0,
@@ -42,7 +44,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
   let innerAnimatableInstance: any;
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!localElementRef || !buttonAnimatableInstance) return;
+    if (isMobile() || !localElementRef || !buttonAnimatableInstance) return;
 
     const rect = localElementRef.getBoundingClientRect();
     const elementCenterX = rect.left + rect.width / 2;
@@ -68,6 +70,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
   };
 
   const handleMouseLeave = () => {
+    if (isMobile()) return;
     if (buttonAnimatableInstance) {
       buttonAnimatableInstance.translateX(0);
       buttonAnimatableInstance.translateY(0);
@@ -79,16 +82,46 @@ export default function MagneticLink(props: MagneticLinkProps) {
   };
 
   onMount(() => {
-    if (localElementRef) {
-      buttonAnimatableInstance = createAnimatable(localElementRef, {
-        translateX: 0,
-        translateY: 0,
-        ease: eases.outElastic(1, 0.3),
-        duration: 1500,
-      });
+    if (!import.meta.env.SSR) {
+      const mediaQuery = window.matchMedia("(max-width: 767px)"); // Tailwind's 'md' breakpoint is 768px
+      setIsMobile(mediaQuery.matches);
 
-      localElementRef.addEventListener("mousemove", handleMouseMove);
-      localElementRef.addEventListener("mouseleave", handleMouseLeave);
+      const handleMediaQueryChange = (e: MediaQueryListEvent) => {
+        setIsMobile(e.matches);
+      };
+      mediaQuery.addEventListener("change", handleMediaQueryChange);
+      onCleanup(() => {
+        mediaQuery.removeEventListener("change", handleMediaQueryChange);
+      });
+    }
+  });
+
+  createEffect(() => {
+    if (localElementRef) {
+      if (!isMobile()) {
+        buttonAnimatableInstance = createAnimatable(localElementRef, {
+          translateX: 0,
+          translateY: 0,
+          ease: eases.outElastic(1, 0.3),
+          duration: 1500,
+        });
+
+        localElementRef.addEventListener("mousemove", handleMouseMove);
+        localElementRef.addEventListener("mouseleave", handleMouseLeave);
+      } else {
+        // Clean up event listeners if switching to mobile
+        localElementRef.removeEventListener("mousemove", handleMouseMove);
+        localElementRef.removeEventListener("mouseleave", handleMouseLeave);
+        // Reset any active animations
+        if (buttonAnimatableInstance) {
+          buttonAnimatableInstance.translateX(0);
+          buttonAnimatableInstance.translateY(0);
+        }
+        if (innerAnimatableInstance) {
+          innerAnimatableInstance.translateX(0);
+          innerAnimatableInstance.translateY(0);
+        }
+      }
     }
   });
 

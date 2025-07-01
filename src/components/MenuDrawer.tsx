@@ -143,7 +143,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={drawerRef}
-        class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white shadow-xl z-100"
+        class="fixed top-0 right-0 h-full w-full md:w-1/3 bg-gray-800 text-white shadow-xl z-100"
         style="transform: translateX(100%);"
       >
         <div class="p-4">
