@@ -1,9 +1,6 @@
-import { createSignal, Show, onMount, onCleanup } from "solid-js";
+import { createSignal } from "solid-js";
 import { useLocation, A, useNavigate } from "@solidjs/router";
-import { AlignJustify, X } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
-
-const [isMobileMenuOpen, setIsMobileMenuOpen] = createSignal(false);
 
 const YourLogo = (props: { class?: string }) => (
   <svg
@@ -51,10 +48,6 @@ export default function Nav() {
       isActive: isActive,
     };
   };
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen());
-  };
-
   // CHANGE: Increased font size from `text-sm` to `text-base`
   const linkBaseClass =
     "text-xl flex items-center transition-colors duration-150 px-4 py-4";
@@ -63,29 +56,22 @@ export default function Nav() {
     <nav
       class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
     >
-      {/* Mobile-only Menu Button - always visible */}
-      <div class="sm:hidden absolute top-3 right-4 z-50">
-        <button
-          onClick={toggleMobileMenu}
-          class={`p-2 ${
-            location.pathname === "/"
-              ? "text-white hover:bg-neutral-800"
-              : "text-black hover:bg-neutral-200"
-          } rounded-md`}
-          aria-label="Toggle mobile menu"
-        >
-          <Show when={!isMobileMenuOpen()} fallback={<X size={24} />}>
-            <AlignJustify size={24} />
-          </Show>
-        </button>
-      </div>
-
-      {/* Main top row - hidden when mobile menu is open */}
       <div
-        class={`relative flex items-center h-24 px-4 sm:px-6 lg:px-8 font-sans ${
-          isMobileMenuOpen() ? "hidden" : ""
-        }`}
+        class={`relative flex items-center h-24 px-4 sm:px-6 lg:px-8 font-sans`}
       >
+        {/* Logo for mobile devices */}
+        <div class="sm:hidden mr-auto">
+          <A
+            href="/"
+            class={`${
+              location.pathname === "/" ? "text-white" : "text-black"
+            } ${linkBaseClass}`}
+            aria-label="Homepage"
+          >
+            <YourLogo class="h-4 w-auto" /> {/* Changed h-6 to h-4 */}
+          </A>
+        </div>
+
         <ul
           ref={navLinksRef}
           class="hidden sm:flex items-center h-full w-full justify-between space-x-4"
@@ -220,51 +206,6 @@ export default function Nav() {
                 );
               }}
             </MagneticLink>
-          </li>
-        </ul>
-      </div>
-
-      {/* Full-screen Mobile Menu Content */}
-      {/* Full-screen Mobile Menu Content */}
-      <div
-        class={`fixed top-0 left-0 right-0 z-40 h-screen flex flex-col items-center justify-center ${
-          location.pathname === "/" ? "bg-black" : "bg-white"
-        } transform transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen()
-            ? "translate-y-0 opacity-100 pointer-events-auto"
-            : "-translate-y-full opacity-0 pointer-events-none"
-        }`}
-      >
-        <ul
-          class={`flex flex-col items-center space-y-6 text-3xl font-extrabold ${
-            location.pathname === "/" ? "text-white" : "text-black"
-          }`}
-        >
-          <li>
-            <A href="/" onClick={toggleMobileMenu}>
-              HOME
-            </A>
-          </li>
-          <li>
-            <A href="/about" onClick={toggleMobileMenu}>
-              ABOUT
-            </A>
-          </li>
-
-          <li>
-            <A href="/services" onClick={toggleMobileMenu}>
-              SERVICES
-            </A>
-          </li>
-          <li>
-            <A href="/products" onClick={toggleMobileMenu}>
-              PRODUCTS
-            </A>
-          </li>
-          <li>
-            <A href="/contact" onClick={toggleMobileMenu}>
-              CONTACT
-            </A>
           </li>
         </ul>
       </div>

@@ -5,19 +5,27 @@ import MagneticLink from "~/components/MagneticLink";
 
 interface MenuDrawerProps {
   isVisible: boolean;
+  onClose: () => void; // Add onClose prop
 }
 
 export default function MenuDrawer(props: MenuDrawerProps) {
   const [isOpen, setIsOpen] = createSignal(false);
+
+  // Function to close the drawer
+  const closeDrawer = () => {
+    setIsOpen(false);
+    props.onClose(); // Call the onClose prop
+  };
+
+  // Modify toggleDrawer to use closeDrawer if needed, or keep it separate
+  const toggleDrawer = () => {
+    setIsOpen(!isOpen());
+  };
   let menuButtonRef: HTMLButtonElement | undefined;
   let drawerRef: HTMLDivElement | undefined;
   const [previousIsVisible, setPreviousIsVisible] = createSignal(
     props.isVisible
   );
-
-  const toggleDrawer = () => {
-    setIsOpen(!isOpen());
-  };
 
   if (!import.meta.env.SSR) {
     createEffect(() => {
@@ -61,7 +69,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <MagneticLink
         ref={(el) => (menuButtonRef = el)}
         onClick={toggleDrawer}
-        class="fixed top-4 right-8 w-24 h-24 bg-black rounded-full shadow-lg z-50 flex flex-col justify-center items-center"
+        class="fixed top-4 right-8 w-24 h-24 bg-black rounded-full shadow-lg z-101 flex flex-col justify-center items-center"
         style="opacity: 0; transform: scale(0);"
         aria-label="Toggle menu"
       >
@@ -81,34 +89,54 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={drawerRef}
-        class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white shadow-xl z-40"
+        class="fixed top-0 right-0 h-full w-64 bg-gray-800 text-white shadow-xl z-100"
         style="transform: translateX(100%);"
       >
         <div class="p-4">
           <h2 class="text-xl font-bold mb-4">Navigation</h2>
           <ul>
             <li class="mb-2">
-              <A href="/" class="block hover:text-blue-300">
+              <A
+                href="/"
+                class="block hover:text-blue-300"
+                onClick={closeDrawer}
+              >
                 Home
               </A>
             </li>
             <li class="mb-2">
-              <A href="/about" class="block hover:text-blue-300">
+              <A
+                href="/about"
+                class="block hover:text-blue-300"
+                onClick={closeDrawer}
+              >
                 About
               </A>
             </li>
             <li class="mb-2">
-              <A href="/products" class="block hover:text-blue-300">
+              <A
+                href="/products"
+                class="block hover:text-blue-300"
+                onClick={closeDrawer}
+              >
                 Products
               </A>
             </li>
             <li class="mb-2">
-              <A href="/services" class="block hover:text-blue-300">
+              <A
+                href="/services"
+                class="block hover:text-blue-300"
+                onClick={closeDrawer}
+              >
                 Services
               </A>
             </li>
             <li class="mb-2">
-              <A href="/contact" class="block hover:text-blue-300">
+              <A
+                href="/contact"
+                class="block hover:text-blue-300"
+                onClick={closeDrawer}
+              >
                 Contact
               </A>
             </li>

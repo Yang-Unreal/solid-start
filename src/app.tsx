@@ -153,7 +153,10 @@ export default function App() {
 
                 <Show when={!isDashboardRoute()}>
                   {showNav() && <Nav />}
-                  <MenuDrawer isVisible={showMenuButton()} />{" "}
+                  <MenuDrawer
+                    isVisible={showMenuButton()}
+                    onClose={() => setShowMenuButton(false)} // Pass onClose prop
+                  />{" "}
                   {/* Render MenuDrawer */}
                   <main class="flex-grow">
                     <Suspense fallback={null}>
