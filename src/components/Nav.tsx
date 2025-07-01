@@ -23,16 +23,33 @@ export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
   let navLinksRef: HTMLUListElement | undefined;
+  const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
   const activeLinkClasses = (path: string) => {
     const isHomePage = location.pathname === "/";
-    const baseActive = isHomePage
-      ? "text-white font-extrabold"
-      : "text-black font-extrabold";
-    const baseInactive = isHomePage
-      ? "text-white/70 hover:text-white font-bold"
-      : "text-black/70 hover:text-black font-bold";
-    return location.pathname === path ? baseActive : baseInactive;
+    const isActive = location.pathname === path;
+
+    let textColorClass: string;
+    let dotColorClass: string;
+    let linkFontClass: string;
+
+    if (isActive) {
+      textColorClass = isHomePage ? "text-white" : "text-black";
+      dotColorClass = isHomePage ? "bg-white" : "bg-black";
+      linkFontClass = "font-extrabold";
+    } else {
+      textColorClass = isHomePage
+        ? "text-white/70 hover:text-white"
+        : "text-black/70 hover:text-black";
+      dotColorClass = isHomePage ? "bg-white" : "bg-black";
+      linkFontClass = "font-bold";
+    }
+
+    return {
+      linkClasses: `${textColorClass} ${linkFontClass}`,
+      dotClasses: dotColorClass,
+      isActive: isActive,
+    };
   };
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen());
@@ -74,80 +91,135 @@ export default function Nav() {
           class="hidden sm:flex items-center h-full w-full justify-between"
         >
           <li class="mr-auto">
-            <MagneticLink onClick={() => navigate("/")}>
-              {(tx, ty, innerRef) => (
-                <div
-                  ref={innerRef}
-                  class={`${
-                    location.pathname === "/" ? "text-white" : "text-black"
-                  } ${linkBaseClass} pointer-events-none`}
-                  aria-label="Homepage"
-                  style={`transform: translate(${tx}px, ${ty}px);`}
-                >
-                  <YourLogo class="h-6 w-auto" />
-                </div>
-              )}
-            </MagneticLink>
+            <A
+              href="/"
+              class={`${
+                location.pathname === "/" ? "text-white" : "text-black"
+              } ${linkBaseClass}`}
+              aria-label="Homepage"
+            >
+              <YourLogo class="h-6 w-auto" />
+            </A>
           </li>
           <div class="flex items-center space-x-4">
             <li>
               <MagneticLink onClick={() => navigate("/about")}>
-                {(tx, ty, innerRef) => (
-                  <div
-                    ref={innerRef}
-                    class={`${activeLinkClasses(
-                      "/about"
-                    )} ${linkBaseClass} pointer-events-none`}
-                    style={`transform: translate(${tx}px, ${ty}px);`}
-                  >
-                    ABOUT
-                  </div>
-                )}
+                {(tx, ty, innerRef) => {
+                  const { linkClasses, dotClasses, isActive } =
+                    activeLinkClasses("/about");
+                  return (
+                    <div
+                      ref={innerRef}
+                      class={`${linkClasses} ${linkBaseClass} relative group`}
+                      style={`transform: translate(${tx}px, ${ty}px);`}
+                      onMouseEnter={() => setHoveredLink("/about")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      ABOUT
+                      <div
+                        class={`absolute bottom-0 left-1/2 transform -translate-x-1/2 rounded-full transition-transform duration-300 ease-in-out
+                                 w-2 h-2
+                                 ${
+                                   (isActive && hoveredLink() === null) ||
+                                   hoveredLink() === "/about"
+                                     ? "scale-100"
+                                     : "scale-0"
+                                 }
+                                 ${dotClasses}`}
+                      ></div>
+                    </div>
+                  );
+                }}
               </MagneticLink>
             </li>
             <li>
               <MagneticLink onClick={() => navigate("/services")}>
-                {(tx, ty, innerRef) => (
-                  <div
-                    ref={innerRef}
-                    class={`${activeLinkClasses(
-                      "/services"
-                    )} ${linkBaseClass} pointer-events-none`}
-                    style={`transform: translate(${tx}px, ${ty}px);`}
-                  >
-                    SERVICES
-                  </div>
-                )}
+                {(tx, ty, innerRef) => {
+                  const { linkClasses, dotClasses, isActive } =
+                    activeLinkClasses("/services");
+                  return (
+                    <div
+                      ref={innerRef}
+                      class={`${linkClasses} ${linkBaseClass} relative group`}
+                      style={`transform: translate(${tx}px, ${ty}px);`}
+                      onMouseEnter={() => setHoveredLink("/services")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      SERVICES
+                      <div
+                        class={`absolute bottom-0 left-1/2 transform -translate-x-1/2 rounded-full transition-transform duration-300 ease-in-out
+                                 w-2 h-2
+                                 ${
+                                   (isActive && hoveredLink() === null) ||
+                                   hoveredLink() === "/services"
+                                     ? "scale-100"
+                                     : "scale-0"
+                                 }
+                                 ${dotClasses}`}
+                      ></div>
+                    </div>
+                  );
+                }}
               </MagneticLink>
             </li>
             <li>
               <MagneticLink onClick={() => navigate("/products")}>
-                {(tx, ty, innerRef) => (
-                  <div
-                    ref={innerRef}
-                    class={`${activeLinkClasses(
-                      "/products"
-                    )} ${linkBaseClass} pointer-events-none`}
-                    style={`transform: translate(${tx}px, ${ty}px);`}
-                  >
-                    PRODUCTS
-                  </div>
-                )}
+                {(tx, ty, innerRef) => {
+                  const { linkClasses, dotClasses, isActive } =
+                    activeLinkClasses("/products");
+                  return (
+                    <div
+                      ref={innerRef}
+                      class={`${linkClasses} ${linkBaseClass} relative group`}
+                      style={`transform: translate(${tx}px, ${ty}px);`}
+                      onMouseEnter={() => setHoveredLink("/products")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      PRODUCTS
+                      <div
+                        class={`absolute bottom-0 left-1/2 transform -translate-x-1/2 rounded-full transition-transform duration-300 ease-in-out
+                                 w-2 h-2
+                                 ${
+                                   (isActive && hoveredLink() === null) ||
+                                   hoveredLink() === "/products"
+                                     ? "scale-100"
+                                     : "scale-0"
+                                 }
+                                 ${dotClasses}`}
+                      ></div>
+                    </div>
+                  );
+                }}
               </MagneticLink>
             </li>
             <li>
               <MagneticLink onClick={() => navigate("/contact")}>
-                {(tx, ty, innerRef) => (
-                  <div
-                    ref={innerRef}
-                    class={`${activeLinkClasses(
-                      "/contact"
-                    )} ${linkBaseClass} pointer-events-none`}
-                    style={`transform: translate(${tx}px, ${ty}px);`}
-                  >
-                    CONTACT
-                  </div>
-                )}
+                {(tx, ty, innerRef) => {
+                  const { linkClasses, dotClasses, isActive } =
+                    activeLinkClasses("/contact");
+                  return (
+                    <div
+                      ref={innerRef}
+                      class={`${linkClasses} ${linkBaseClass} relative group`}
+                      style={`transform: translate(${tx}px, ${ty}px);`}
+                      onMouseEnter={() => setHoveredLink("/contact")}
+                      onMouseLeave={() => setHoveredLink(null)}
+                    >
+                      CONTACT
+                      <div
+                        class={`absolute bottom-0 left-1/2 transform -translate-x-1/2 rounded-full transition-transform duration-300 ease-in-out
+                                 w-2 h-2
+                                 ${
+                                   (isActive && hoveredLink() === null) ||
+                                   hoveredLink() === "/contact"
+                                     ? "scale-100"
+                                     : "scale-0"
+                                 }
+                                 ${dotClasses}`}
+                      ></div>
+                    </div>
+                  );
+                }}
               </MagneticLink>
             </li>
           </div>
