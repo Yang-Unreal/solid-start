@@ -90,6 +90,27 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         }
       }
     });
+
+    // Effect to disable/enable scroll when drawer is open/closed
+    createEffect(() => {
+      const handleWheel = (event: WheelEvent) => {
+        if (isOpen()) {
+          event.preventDefault();
+        }
+      };
+
+      if (isOpen()) {
+        document.body.addEventListener("wheel", handleWheel, {
+          passive: false,
+        });
+      } else {
+        document.body.removeEventListener("wheel", handleWheel);
+      }
+
+      onCleanup(() => {
+        document.body.removeEventListener("wheel", handleWheel);
+      });
+    });
   }
 
   return (
@@ -126,7 +147,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         style="transform: translateX(100%);"
       >
         <div class="p-4">
-          <h2 class="text-xl font-bold mb-4">Navigation</h2>
           <ul>
             <li class="mb-2">
               <A
