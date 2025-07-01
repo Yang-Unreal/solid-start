@@ -182,20 +182,25 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                     navigate(link.href);
                     closeDrawer();
                   }}
+                  class={`relative ${isMobile() ? "w-full" : ""}`}
                 >
                   {(innerRef) => (
-                    <div
-                      ref={innerRef}
-                      class={`relative text-5xl md:text-6xl font-light transition-colors duration-300 ${
-                        isActive
-                          ? "text-white"
-                          : "text-white/70 hover:text-white"
-                      }`}
-                      onMouseEnter={() => setHoveredLink(link.href)}
-                      onMouseLeave={() => setHoveredLink(null)}
-                    >
+                    <>
+                      <div
+                        ref={innerRef}
+                        class={`text-left text-5xl md:text-6xl font-light transition-colors duration-300 ${
+                          isActive
+                            ? "text-white"
+                            : "text-white/70 hover:text-white"
+                        }`}
+                        onMouseEnter={() => setHoveredLink(link.href)}
+                        onMouseLeave={() => setHoveredLink(null)}
+                      >
+                        {link.label}
+                      </div>
+                      {/* Desktop Dot */}
                       <span
-                        class="absolute -left-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white"
+                        class={`absolute -left-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block`}
                         style={{
                           transform: `scale(${
                             (isActive && hoveredLink() === null) ||
@@ -205,8 +210,19 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           })`,
                         }}
                       ></span>
-                      {link.label}
-                    </div>
+                      {/* Mobile Dot */}
+                      <span
+                        class={`absolute right-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
+                        style={{
+                          transform: `scale(${
+                            (isActive && hoveredLink() === null) ||
+                            hoveredLink() === link.href
+                              ? 1
+                              : 0
+                          })`,
+                        }}
+                      ></span>
+                    </>
                   )}
                 </MagneticLink>
               );
