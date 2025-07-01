@@ -12,6 +12,8 @@ export default function Contact() {
         </h1>
         <p>Contact information and form will go here.</p>
       </div>
+      <div class="h-screen bg-white"></div>
+      <div class="h-screen bg-white"></div>
     </main>
   );
 }

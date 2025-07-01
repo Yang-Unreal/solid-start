@@ -6,6 +6,8 @@ export default function About() {
           About Page
         </h1>
       </div>
+      <div class="h-screen bg-white"></div>
+      <div class="h-screen bg-white"></div>
     </main>
   );
 }

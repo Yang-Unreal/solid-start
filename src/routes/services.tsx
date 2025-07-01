@@ -12,6 +12,8 @@ export default function Services() {
         </h1>
         <p>Details about our services will go here.</p>
       </div>
+      <div class="h-screen bg-white"></div>
+      <div class="h-screen bg-white"></div>
     </main>
   );
 }

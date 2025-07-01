@@ -21,11 +21,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   // Function to toggle the drawer open/close state
   const toggleDrawer = () => {
     setIsOpen(!isOpen());
-    // If opening on desktop, and it's currently hidden, call onClose to make it visible
-    // If closing on desktop, call onClose to hide it
-    if (!isMobile()) {
-      props.onClose(); // This will toggle showMenuButton in app.tsx
-    }
   };
   let menuButtonRef: HTMLButtonElement | undefined;
   let drawerRef: HTMLDivElement | undefined;
