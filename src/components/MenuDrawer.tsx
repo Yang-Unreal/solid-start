@@ -63,6 +63,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         onClick={toggleDrawer}
         class="fixed top-4 right-8 w-24 h-24 bg-black rounded-full shadow-lg z-50 flex flex-col justify-center items-center"
         style="opacity: 0; transform: scale(0);"
+        aria-label="Toggle menu"
       >
         {(tx, ty, innerRef) => (
           <div ref={innerRef}>
