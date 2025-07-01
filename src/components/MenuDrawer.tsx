@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onMount } from "solid-js";
+import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { animate } from "animejs";
 import { A } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
@@ -10,43 +10,76 @@ interface MenuDrawerProps {
 
 export default function MenuDrawer(props: MenuDrawerProps) {
   const [isOpen, setIsOpen] = createSignal(false);
+  const [isMobile, setIsMobile] = createSignal(false); // New signal for mobile detection
 
-  // Function to close the drawer
+  // Function to close the drawer when a link is clicked
   const closeDrawer = () => {
     setIsOpen(false);
-    props.onClose(); // Call the onClose prop
+    // Do NOT call props.onClose here, as it would hide the button on mobile
   };
 
-  // Modify toggleDrawer to use closeDrawer if needed, or keep it separate
+  // Function to toggle the drawer open/close state
   const toggleDrawer = () => {
     setIsOpen(!isOpen());
+    // If opening on desktop, and it's currently hidden, call onClose to make it visible
+    // If closing on desktop, call onClose to hide it
+    if (!isMobile()) {
+      props.onClose(); // This will toggle showMenuButton in app.tsx
+    }
   };
   let menuButtonRef: HTMLButtonElement | undefined;
   let drawerRef: HTMLDivElement | undefined;
-  const [previousIsVisible, setPreviousIsVisible] = createSignal(
+  // previousIsVisibleDesktop is only relevant for desktop scroll animation
+  const [previousIsVisibleDesktop, setPreviousIsVisibleDesktop] = createSignal(
     props.isVisible
   );
+
+  onMount(() => {
+    if (!import.meta.env.SSR) {
+      const mediaQuery = window.matchMedia("(max-width: 767px)"); // Tailwind's 'md' breakpoint is 768px
+      setIsMobile(mediaQuery.matches);
+
+      const handleMediaQueryChange = (e: MediaQueryListEvent) => {
+        setIsMobile(e.matches);
+      };
+      mediaQuery.addEventListener("change", handleMediaQueryChange);
+      onCleanup(() => {
+        mediaQuery.removeEventListener("change", handleMediaQueryChange);
+      });
+    }
+  });
 
   if (!import.meta.env.SSR) {
     createEffect(() => {
       if (menuButtonRef) {
-        if (props.isVisible) {
-          animate(menuButtonRef, {
-            opacity: [0, 1],
-            scale: [0, 1],
-            duration: 500,
-            easing: "easeOutQuad",
-          });
-        } else if (previousIsVisible()) {
-          animate(menuButtonRef, {
-            opacity: [1, 0],
-            scale: [1, 0],
-            duration: 500,
-            easing: "easeOutQuad",
-          });
+        if (isMobile()) {
+          // On mobile, ensure button is always visible. No animation based on props.isVisible.
+          menuButtonRef.style.opacity = "1";
+          menuButtonRef.style.transform = "scale(1)";
+        } else {
+          // On desktop, animate based on props.isVisible (scroll)
+          if (props.isVisible) {
+            animate(menuButtonRef, {
+              opacity: [0, 1],
+              scale: [0, 1],
+              duration: 500,
+              easing: "easeOutQuad",
+            });
+          } else if (previousIsVisibleDesktop()) {
+            // Use desktop-specific previous state
+            animate(menuButtonRef, {
+              opacity: [1, 0],
+              scale: [1, 0],
+              duration: 500,
+              easing: "easeOutQuad",
+            });
+          }
         }
       }
-      setPreviousIsVisible(props.isVisible);
+      // Update desktop-specific previous state only if not mobile
+      if (!isMobile()) {
+        setPreviousIsVisibleDesktop(props.isVisible);
+      }
     });
 
     createEffect(() => {
@@ -69,18 +102,23 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <MagneticLink
         ref={(el) => (menuButtonRef = el)}
         onClick={toggleDrawer}
-        class="fixed top-4 right-8 w-24 h-24 bg-black rounded-full shadow-lg z-101 flex flex-col justify-center items-center"
-        style="opacity: 0; transform: scale(0);"
+        class="fixed top-4 right-8 w-12 h-12 bg-black rounded-full shadow-lg z-101 flex flex-col justify-center items-center md:w-24 md:h-24"
+        // Initial style: visible on mobile, invisible on desktop (to be animated)
+        style={
+          isMobile()
+            ? "opacity: 1; transform: scale(1);"
+            : "opacity: 0; transform: scale(0);"
+        }
         aria-label="Toggle menu"
       >
         {(tx, ty, innerRef) => (
           <div ref={innerRef}>
             <div
-              class="w-10 h-1 bg-white mb-1"
+              class="w-6 h-1 bg-white mb-1 md:w-10"
               style={`transform: translate(${tx}px, ${ty}px);`}
             ></div>
             <div
-              class="w-10 h-1 bg-white"
+              class="w-6 h-1 bg-white md:w-10"
               style={`transform: translate(${tx}px, ${ty}px);`}
             ></div>
           </div>
