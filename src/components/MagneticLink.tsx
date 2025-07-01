@@ -54,8 +54,8 @@ export default function MagneticLink(props: MagneticLinkProps) {
     const distanceX = e.clientX - elementCenterX;
     const distanceY = e.clientY - elementCenterY;
 
-    buttonAnimatableInstance.translateX(distanceX * 0.5);
-    buttonAnimatableInstance.translateY(distanceY * 0.5);
+    buttonAnimatableInstance.translateX(distanceX * 0.35);
+    buttonAnimatableInstance.translateY(distanceY * 0.35);
 
     if (innerAnimatableInstance) {
       innerAnimatableInstance.translateX(distanceX * 0.2);

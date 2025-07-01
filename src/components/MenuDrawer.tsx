@@ -154,11 +154,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           <div ref={innerRef} class="flex flex-col justify-center items-center">
             <div
               ref={(el) => (line1Ref = el)}
-              class="w-6 md:w-10 h-[1px] bg-white mb-1.5"
+              class="w-6 md:w-10 h-[2px] bg-white mb-1.5"
             ></div>
             <div
               ref={(el) => (line2Ref = el)}
-              class="w-6 md:w-10 h-[1px] bg-white"
+              class="w-6 md:w-10 h-[2px] bg-white"
             ></div>
           </div>
         )}
@@ -235,13 +235,20 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           <h2 class="text-sm text-gray-400 tracking-widest mb-4">SOCIALS</h2>
           <div class="flex flex-wrap gap-x-8 gap-y-2">
             {socialLinks.map((link) => (
-              <A
-                href={link.href}
-                class="text-white hover:text-gray-400 transition-colors duration-300"
-                onClick={closeDrawer}
+              <MagneticLink
+                onClick={() => {
+                  navigate(link.href);
+                  closeDrawer();
+                }}
+                class="relative text-white transition-colors duration-300 group"
               >
-                {link.label}
-              </A>
+                {(innerRef) => (
+                  <>
+                    <div ref={innerRef}>{link.label}</div>
+                    <span class="absolute bottom-0 left-1/2 w-full h-[1.5px] bg-white transform -translate-x-1/2 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></span>
+                  </>
+                )}
+              </MagneticLink>
             ))}
           </div>
         </div>
