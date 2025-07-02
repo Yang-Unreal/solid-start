@@ -91,6 +91,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     });
 
     createEffect(() => {
+      if (menuButtonRef) {
+        menuButtonRef.style.backgroundColor = isOpen() ? "#3B82F6" : "black";
+      }
+    });
+
+    createEffect(() => {
       if (drawerRef) {
         animate(drawerRef, {
           translateX: isOpen() ? ["100%", "0%"] : "100%",
