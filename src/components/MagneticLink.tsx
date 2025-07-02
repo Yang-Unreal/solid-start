@@ -1,3 +1,5 @@
+// src/components/MagneticLink.tsx
+
 import {
   createSignal,
   onMount,
@@ -5,7 +7,7 @@ import {
   type JSX,
   createEffect,
 } from "solid-js";
-import { createAnimatable, eases } from "animejs";
+import { createAnimatable, eases, animate } from "animejs";
 
 interface MagneticLinkProps
   extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "children"> {
@@ -14,6 +16,8 @@ interface MagneticLinkProps
   children?:
     | JSX.Element
     | ((innerRef: (el: HTMLElement) => void) => JSX.Element);
+  enableHoverCircle?: boolean;
+  hoverCircleColor?: string;
 }
 
 export default function MagneticLink(props: MagneticLinkProps) {
@@ -22,25 +26,22 @@ export default function MagneticLink(props: MagneticLinkProps) {
 
   const [isMobile, setIsMobile] = createSignal(false);
 
-  const setRef = (el: HTMLButtonElement) => {
-    localElementRef = el;
-    if (props.ref) {
-      props.ref(el);
-    }
-  };
+  // --- Circle Effect Logic ---
+  let circleRef: HTMLDivElement | undefined;
+  let circleAnimation: ReturnType<typeof animate> | undefined;
 
-  const setInnerRef = (el: HTMLElement) => {
-    innerElementRef = el;
-    if (innerElementRef && !innerAnimatableInstance && !isMobile()) {
-      innerAnimatableInstance = createAnimatable(innerElementRef, {
-        translateX: 0,
-        translateY: 0,
-        ease: eases.outElastic(1, 0.3),
-        duration: 1500,
+  const handleMouseEnter = () => {
+    if (props.enableHoverCircle && circleRef) {
+      if (circleAnimation) circleAnimation.pause();
+      circleAnimation = animate(circleRef, {
+        translateY: ["101%", "0%"],
+        duration: 400,
+        easing: "easeOutQuad",
       });
     }
   };
 
+  // --- Magnetic Effect Logic ---
   let buttonAnimatableInstance: any;
   let innerAnimatableInstance: any;
 
@@ -63,8 +64,11 @@ export default function MagneticLink(props: MagneticLinkProps) {
     }
   };
 
+  // --- Combined Mouse Leave Logic ---
   const handleMouseLeave = () => {
     if (isMobile()) return;
+
+    // Trigger magnetic leave effect
     if (buttonAnimatableInstance) {
       buttonAnimatableInstance.translateX(0);
       buttonAnimatableInstance.translateY(0);
@@ -73,20 +77,47 @@ export default function MagneticLink(props: MagneticLinkProps) {
       innerAnimatableInstance.translateX(0);
       innerAnimatableInstance.translateY(0);
     }
+
+    // Trigger circle leave effect
+    if (props.enableHoverCircle && circleRef) {
+      if (circleAnimation) circleAnimation.pause();
+      circleAnimation = animate(circleRef, {
+        translateY: "-101%",
+        duration: 400,
+        easing: "easeInQuad",
+      });
+    }
+  };
+
+  const setRef = (el: HTMLButtonElement) => {
+    localElementRef = el;
+    if (props.ref) {
+      props.ref(el);
+    }
+  };
+
+  const setInnerRef = (el: HTMLElement) => {
+    innerElementRef = el;
+    if (innerElementRef && !innerAnimatableInstance && !isMobile()) {
+      innerAnimatableInstance = createAnimatable(innerElementRef, {
+        translateX: 0,
+        translateY: 0,
+        ease: eases.outElastic(1, 0.3),
+        duration: 1500,
+      });
+    }
   };
 
   onMount(() => {
     if (!import.meta.env.SSR) {
       const mediaQuery = window.matchMedia("(max-width: 767px)");
       setIsMobile(mediaQuery.matches);
-
-      const handleMediaQueryChange = (e: MediaQueryListEvent) => {
+      const handleMediaQueryChange = (e: MediaQueryListEvent) =>
         setIsMobile(e.matches);
-      };
       mediaQuery.addEventListener("change", handleMediaQueryChange);
-      onCleanup(() => {
-        mediaQuery.removeEventListener("change", handleMediaQueryChange);
-      });
+      onCleanup(() =>
+        mediaQuery.removeEventListener("change", handleMediaQueryChange)
+      );
     }
   });
 
@@ -100,35 +131,50 @@ export default function MagneticLink(props: MagneticLinkProps) {
           duration: 1500,
         });
 
+        localElementRef.addEventListener("mouseenter", handleMouseEnter);
         localElementRef.addEventListener("mousemove", handleMouseMove);
         localElementRef.addEventListener("mouseleave", handleMouseLeave);
       } else {
+        localElementRef.removeEventListener("mouseenter", handleMouseEnter);
         localElementRef.removeEventListener("mousemove", handleMouseMove);
         localElementRef.removeEventListener("mouseleave", handleMouseLeave);
-        if (buttonAnimatableInstance) {
-          buttonAnimatableInstance.translateX(0);
-          buttonAnimatableInstance.translateY(0);
-        }
-        if (innerAnimatableInstance) {
-          innerAnimatableInstance.translateX(0);
-          innerAnimatableInstance.translateY(0);
-        }
+        if (buttonAnimatableInstance) buttonAnimatableInstance.translateX(0);
+        if (innerAnimatableInstance) innerAnimatableInstance.translateY(0);
       }
     }
   });
 
   onCleanup(() => {
     if (localElementRef) {
+      localElementRef.removeEventListener("mouseenter", handleMouseEnter);
       localElementRef.removeEventListener("mousemove", handleMouseMove);
       localElementRef.removeEventListener("mouseleave", handleMouseLeave);
     }
   });
 
   return (
-    <button ref={setRef} onClick={props.onClick} {...props}>
-      {typeof props.children === "function"
-        ? props.children(setInnerRef)
-        : props.children}
+    <button
+      ref={setRef}
+      onClick={props.onClick}
+      {...props}
+      class={`${props.class || ""} overflow-hidden`}
+    >
+      <div class="relative z-10">
+        {typeof props.children === "function"
+          ? props.children(setInnerRef)
+          : props.children}
+      </div>
+      {props.enableHoverCircle && (
+        <div
+          ref={(el) => (circleRef = el)}
+          class="absolute w-full aspect-square rounded-full"
+          style={{
+            "background-color": props.hoverCircleColor || "#455CE9",
+            transform: "translateY(101%)",
+            "z-index": "0",
+          }}
+        ></div>
+      )}
     </button>
   );
 }

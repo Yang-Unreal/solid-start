@@ -1,6 +1,7 @@
 // src/routes/index.tsx
-import { Suspense, lazy, createSignal, onMount, Show } from "solid-js";
+
 import Footer from "~/components/Footer";
+import HoverCircleButton from "~/components/HoverCircleButton";
 
 export default function Home() {
   return (
@@ -39,7 +40,11 @@ export default function Home() {
           </h1>
         </div>
       </div>
-      <div class="h-screen bg-white"></div>
+      <div class="flex items-center justify-center h-screen">
+        <HoverCircleButton>
+          <p>Hover Over Me</p>
+        </HoverCircleButton>
+      </div>
       <Footer />
     </main>
   );

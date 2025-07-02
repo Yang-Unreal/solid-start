@@ -1,3 +1,5 @@
+// src/components/MenuDrawer.tsx
+
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { animate } from "animejs";
 import { A, useLocation, useNavigate } from "@solidjs/router";
@@ -58,18 +60,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   });
 
   if (!import.meta.env.SSR) {
-    let prevIsVisible: boolean | undefined; // To track previous state of props.isVisible
+    let prevIsVisible: boolean | undefined;
 
     createEffect(() => {
       if (menuButtonRef) {
         if (isMobile()) {
-          // On mobile, always visible and no animation on initial render
           menuButtonRef.style.opacity = "1";
           menuButtonRef.style.transform = "scale(1)";
-          prevIsVisible = undefined; // Reset for mobile context
+          prevIsVisible = undefined;
         } else {
-          // Desktop
-          // On initial render for desktop, or if state hasn't changed, set directly without animation
           if (
             prevIsVisible === undefined ||
             prevIsVisible === props.isVisible
@@ -79,7 +78,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               ? "scale(1)"
               : "scale(0)";
           } else {
-            // Animate only if props.isVisible has changed on desktop
             animate(menuButtonRef, {
               opacity: props.isVisible ? [0, 1] : [1, 0],
               scale: props.isVisible ? [0, 1] : [1, 0],
@@ -87,7 +85,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               easing: "easeOutQuad",
             });
           }
-          prevIsVisible = props.isVisible; // Update previous state
+          prevIsVisible = props.isVisible;
         }
       }
     });
@@ -142,13 +140,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <MagneticLink
         ref={(el) => (menuButtonRef = el)}
         onClick={toggleDrawer}
-        class="fixed top-4 right-8 w-12 h-12 bg-blue-600 rounded-full shadow-lg z-101 flex flex-col justify-center items-center md:w-24 md:h-24"
+        class="fixed top-4 right-8 w-12 h-12 bg-black rounded-full shadow-lg z-101 flex flex-col justify-center items-center md:w-24 md:h-24"
         style={
           isMobile()
             ? "opacity: 1; transform: scale(1);"
             : "opacity: 0; transform: scale(0);"
         }
         aria-label="Toggle menu"
+        enableHoverCircle={true}
+        hoverCircleColor="#3B82F6" /* A darker blue for the hover effect */
       >
         {(innerRef) => (
           <div ref={innerRef} class="flex flex-col justify-center items-center">
@@ -198,7 +198,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       >
                         {link.label}
                       </div>
-                      {/* Desktop Dot */}
                       <span
                         class={`absolute -left-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block`}
                         style={{
@@ -210,7 +209,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           })`,
                         }}
                       ></span>
-                      {/* Mobile Dot */}
                       <span
                         class={`absolute right-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
                         style={{
