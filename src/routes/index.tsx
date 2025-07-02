@@ -2,6 +2,7 @@
 
 import Footer from "~/components/Footer";
 import HoverCircleButton from "~/components/HoverCircleButton";
+import MagneticLink from "~/components/MagneticLink";
 
 export default function Home() {
   return (
@@ -40,10 +41,20 @@ export default function Home() {
           </h1>
         </div>
       </div>
-      <div class="flex items-center justify-center h-screen">
-        <HoverCircleButton>
-          <p>Hover Over Me</p>
-        </HoverCircleButton>
+      <div id="001" class="flex items-center justify-center h-screen bg-white">
+        <MagneticLink
+          class="w-50 h-24 bg-black rounded-full shadow-lg flex flex-col justify-center items-center"
+          aria-label="Magnetic Button"
+          enableHoverCircle={true}
+          hoverCircleColor="#3B82F6"
+          applyOverflowHidden={true}
+        >
+          {(innerRef) => (
+            <div ref={innerRef} class="flex justify-center items-center">
+              <p>Hover Button</p>
+            </div>
+          )}
+        </MagneticLink>
       </div>
       <Footer />
     </main>
