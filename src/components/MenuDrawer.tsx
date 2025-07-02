@@ -155,6 +155,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         aria-label="Toggle menu"
         enableHoverCircle={true}
         hoverCircleColor="#3B82F6" /* A darker blue for the hover effect */
+        applyOverflowHidden={true}
       >
         {(innerRef) => (
           <div ref={innerRef} class="flex flex-col justify-center items-center">

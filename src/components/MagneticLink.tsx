@@ -18,6 +18,7 @@ interface MagneticLinkProps
     | ((innerRef: (el: HTMLElement) => void) => JSX.Element);
   enableHoverCircle?: boolean;
   hoverCircleColor?: string;
+  applyOverflowHidden?: boolean;
 }
 
 export default function MagneticLink(props: MagneticLinkProps) {
@@ -157,7 +158,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
       ref={setRef}
       onClick={props.onClick}
       {...props}
-      class={`${props.class || ""} overflow-hidden`}
+      class={`${props.class || ""} ${props.applyOverflowHidden ? "overflow-hidden" : ""}`}
     >
       <div class="relative z-10">
         {typeof props.children === "function"
