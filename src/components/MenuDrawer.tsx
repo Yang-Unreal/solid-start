@@ -35,8 +35,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
   // SVG path definitions for the curve animation
-  const pathStraight = "M 40 0 Q 40 500 40 1000";
-  const pathCurve = "M 40 0 Q -40 500 40 1000";
+  const pathStraight = "M 80 0 Q 80 500 80 1000";
+  const pathCurve = "M 80 0 Q -80 500 80 1000";
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -115,13 +115,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       if (drawerRef) {
         if (isOpen()) {
           animate(drawerRef, {
-            translateX: ["100%", "0%"],
+            translateX: ["calc(100% + 5rem)", "0%"],
             duration,
             easing,
           });
         } else if (hasBeenOpened()) {
           animate(drawerRef, {
-            translateX: ["0%", "100%"],
+            translateX: ["0%", "calc(100% + 5rem)"],
             duration,
             easing,
           });
@@ -249,13 +249,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <div
         ref={(el) => (drawerRef = el)}
         class="fixed top-0 right-0 h-full w-full md:w-1/3 bg-[#121212] text-white shadow-xl z-100 p-8 md:p-16 flex flex-col justify-between"
-        style="transform: translateX(100%);"
+        style="transform: translateX(calc(100% + 5rem));"
       >
         {/* SVG Curve Element */}
-        <div class="absolute top-0 left-0 h-full w-10 -translate-x-full pointer-events-none">
+        <div class="absolute top-0 left-0 h-full w-20 pointer-events-none" style="transform: translateX(calc(-100% + 1px))">
           <svg
             class="h-full w-full"
-            viewBox="0 0 40 1000"
+            viewBox="0 0 80 1000"
             preserveAspectRatio="none"
           >
             <path
