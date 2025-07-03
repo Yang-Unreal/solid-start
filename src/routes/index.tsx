@@ -7,7 +7,7 @@ import MagneticLink from "~/components/MagneticLink";
 export default function Home() {
   return (
     <main>
-      <div class="relative flex h-[60vh] md:min-h-screen items-center justify-start overflow-hidden text-white bg-black">
+      <div class="relative flex h-[60vh] md:min-h-screen items-center justify-start overflow-hidden bg-black">
         <video
           autoplay
           loop
@@ -28,16 +28,15 @@ export default function Home() {
 
         <div
           class="relative z-20 ml-4 lg:ml-8 max-w-md lg:max-w-none
-                 text-left p-4 sm:p-6 bg-transparent"
+                 text-left p-4 sm:p-6 mix-blend-difference"
         >
-          {/* CHANGE 2: Significantly increased the scaling and max size of the fonts. */}
-          <h1 class="flex flex-col font-bold tracking-tight text-shadow-md leading-tight">
-            <span class="text-[clamp(0.875rem,4vw,2.5rem)]">
+          <h1 class="flex flex-col font-bold tracking-tight text-shadow-md leading-tight text-white">
+            <span class="text-xl md:text-3xl lg:text-4xl">
               LET THE HIDDEN PEARLS
             </span>
             <div class="w-16 h-[0.5px] bg-red-600 my-1.5"></div>
-            <span class="text-[clamp(1.875rem,6vw,4.5rem)]">SHINE</span>
-            <span class="text-[clamp(0.875rem,4vw,2.5rem)]">FOR THE WORLD</span>
+            <span class="text-4xl md:text-6xl lg:text-7xl">SHINE</span>
+            <span class="text-xl md:text-3xl lg:text-4xl">FOR THE WORLD</span>
           </h1>
         </div>
       </div>
