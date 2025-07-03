@@ -109,7 +109,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       }
 
       const easing = "easeOutQuint";
-      const duration = 800;
+      const duration = 600;
 
       // Animate Drawer
       if (drawerRef) {
@@ -117,13 +117,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           animate(drawerRef, {
             translateX: ["calc(100% + 5rem)", "0%"],
             duration,
-            easing,
+            easing: "easeOutQuint",
           });
         } else if (hasBeenOpened()) {
           animate(drawerRef, {
             translateX: ["0%", "calc(100% + 5rem)"],
             duration,
-            easing,
+            easing: "easeInQuint",
           });
         }
       }
@@ -160,8 +160,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           animate(links, {
             opacity: [0, 1],
             translateX: [40, 0],
-            delay: stagger(80, { start: 300 }),
-            duration: 900,
+            delay: stagger(120, { start: 200 }),
+            duration: 700,
             easing: "easeOutExpo",
           });
         } else if (hasBeenOpened()) {
@@ -252,7 +252,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         style="transform: translateX(calc(100% + 5rem));"
       >
         {/* SVG Curve Element */}
-        <div class="absolute top-0 left-0 h-full w-20 pointer-events-none" style="transform: translateX(calc(-100% + 1px))">
+        <div
+          class="absolute top-0 left-0 h-full w-20 pointer-events-none"
+          style="transform: translateX(calc(-100% + 1px))"
+        >
           <svg
             class="h-full w-full"
             viewBox="0 0 80 1000"
