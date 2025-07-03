@@ -1,7 +1,7 @@
 // src/components/MenuDrawer.tsx
 
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
-import { animate } from "animejs";
+import { animate, stagger } from "animejs";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
 
@@ -28,6 +28,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   let drawerRef: HTMLDivElement | undefined;
   let line1Ref: HTMLDivElement | undefined;
   let line2Ref: HTMLDivElement | undefined;
+  let navLinksListRef: HTMLUListElement | undefined;
 
   const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
@@ -99,10 +100,45 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     createEffect(() => {
       if (drawerRef) {
         animate(drawerRef, {
-          translateX: isOpen() ? ["100%", "0%"] : "100%",
-          duration: 300,
-          easing: "easeOutQuad",
+          translateX: isOpen() ? ["100%", "0%"] : ["0%", "100%"],
+          duration: 500,
+          easing: "easeOutCubic",
         });
+      }
+
+      if (navLinksListRef) {
+        const links = Array.from(navLinksListRef.children);
+        if (isOpen()) {
+          // Set initial state for animation
+          for (const link of links) {
+            if (link instanceof HTMLElement) {
+              link.style.opacity = "0";
+              link.style.transform = "translateX(40px)";
+            }
+          }
+          // Animate links in with stagger
+          animate(links, {
+            opacity: [0, 1],
+            translateX: [40, 0],
+            delay: stagger(80, { start: 200 }),
+            duration: 600,
+            easing: "easeOutExpo",
+          });
+        } else {
+          // Animate links out only if they were visible
+          if (
+            links.length > 0 &&
+            (links[0] as HTMLElement).style.opacity === "1"
+          ) {
+            animate(links, {
+              opacity: 0,
+              translateX: 40,
+              delay: stagger(50),
+              duration: 250,
+              easing: "easeInQuad",
+            });
+          }
+        }
       }
     });
 
@@ -180,7 +216,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <div>
           <h2 class="text-sm text-gray-400 tracking-widest mb-4">NAVIGATION</h2>
           <hr class="border-gray-700" />
-          <ul class="mt-12 space-y-4 flex flex-col items-start">
+          <ul
+            ref={navLinksListRef}
+            class="mt-12 space-y-4 flex flex-col items-start"
+          >
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
