@@ -13,6 +13,7 @@ interface MenuDrawerProps {
 export default function MenuDrawer(props: MenuDrawerProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   const [isMobile, setIsMobile] = createSignal(false);
+  const [hasBeenOpened, setHasBeenOpened] = createSignal(false); // New signal to track if drawer has been opened
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -98,12 +99,25 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     });
 
     createEffect(() => {
+      if (isOpen()) {
+        setHasBeenOpened(true); // Mark as opened once it's true
+      }
+
       if (drawerRef) {
-        animate(drawerRef, {
-          translateX: isOpen() ? ["100%", "0%"] : ["0%", "100%"],
-          duration: 500,
-          easing: "easeOutCubic",
-        });
+        if (isOpen()) {
+          animate(drawerRef, {
+            translateX: ["100%", "0%"],
+            duration: 500,
+            easing: "easeOutCubic",
+          });
+        } else if (hasBeenOpened()) {
+          // Only animate out if it has been opened before
+          animate(drawerRef, {
+            translateX: ["0%", "100%"],
+            duration: 500,
+            easing: "easeOutCubic",
+          });
+        }
       }
 
       if (navLinksListRef) {
@@ -124,8 +138,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             duration: 600,
             easing: "easeOutExpo",
           });
-        } else {
-          // Animate links out only if they were visible
+        } else if (hasBeenOpened()) {
+          // Only animate links out if they were visible and drawer has been opened
           if (
             links.length > 0 &&
             (links[0] as HTMLElement).style.opacity === "1"
