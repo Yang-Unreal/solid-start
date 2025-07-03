@@ -13,7 +13,7 @@ interface MenuDrawerProps {
 export default function MenuDrawer(props: MenuDrawerProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   const [isMobile, setIsMobile] = createSignal(false);
-  const [hasBeenOpened, setHasBeenOpened] = createSignal(false); // New signal to track if drawer has been opened
+  const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -30,8 +30,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   let line1Ref: HTMLDivElement | undefined;
   let line2Ref: HTMLDivElement | undefined;
   let navLinksListRef: HTMLUListElement | undefined;
+  let svgPathRef: SVGPathElement | undefined; // Ref for the SVG path
 
   const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
+
+  // SVG path definitions for the curve animation
+  const pathStraight = "M 40 0 Q 40 500 40 1000";
+  const pathCurve = "M 40 0 Q -40 500 40 1000";
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -100,46 +105,66 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
     createEffect(() => {
       if (isOpen()) {
-        setHasBeenOpened(true); // Mark as opened once it's true
+        setHasBeenOpened(true);
       }
 
+      const easing = "easeOutQuint";
+      const duration = 800;
+
+      // Animate Drawer
       if (drawerRef) {
         if (isOpen()) {
           animate(drawerRef, {
             translateX: ["100%", "0%"],
-            duration: 500,
-            easing: "easeOutCubic",
+            duration,
+            easing,
           });
         } else if (hasBeenOpened()) {
-          // Only animate out if it has been opened before
           animate(drawerRef, {
             translateX: ["0%", "100%"],
-            duration: 500,
-            easing: "easeOutCubic",
+            duration,
+            easing,
           });
         }
       }
 
+      // Animate SVG Path
+      if (svgPathRef) {
+        if (isOpen()) {
+          // Animate from curve to straight when opening
+          animate(svgPathRef, {
+            d: [pathCurve, pathStraight],
+            duration,
+            easing,
+          });
+        } else if (hasBeenOpened()) {
+          // Animate from straight to curve when closing
+          animate(svgPathRef, {
+            d: [pathStraight, pathCurve],
+            duration,
+            easing,
+          });
+        }
+      }
+
+      // Animate Nav Links
       if (navLinksListRef) {
         const links = Array.from(navLinksListRef.children);
         if (isOpen()) {
-          // Set initial state for animation
           for (const link of links) {
             if (link instanceof HTMLElement) {
               link.style.opacity = "0";
               link.style.transform = "translateX(40px)";
             }
           }
-          // Animate links in with stagger
           animate(links, {
             opacity: [0, 1],
             translateX: [40, 0],
-            delay: stagger(80, { start: 200 }),
-            duration: 600,
+            delay: stagger(80, { start: 300 }),
+            duration: 900,
             easing: "easeOutExpo",
           });
         } else if (hasBeenOpened()) {
-          // Only animate links out if they were visible and drawer has been opened
           if (
             links.length > 0 &&
             (links[0] as HTMLElement).style.opacity === "1"
@@ -204,7 +229,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         }
         aria-label="Toggle menu"
         enableHoverCircle={true}
-        hoverCircleColor="#3B82F6" /* A darker blue for the hover effect */
+        hoverCircleColor="#3B82F6"
         applyOverflowHidden={true}
       >
         {(innerRef) => (
@@ -226,6 +251,21 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         class="fixed top-0 right-0 h-full w-full md:w-1/3 bg-[#121212] text-white shadow-xl z-100 p-8 md:p-16 flex flex-col justify-between"
         style="transform: translateX(100%);"
       >
+        {/* SVG Curve Element */}
+        <div class="absolute top-0 left-0 h-full w-10 -translate-x-full pointer-events-none">
+          <svg
+            class="h-full w-full"
+            viewBox="0 0 40 1000"
+            preserveAspectRatio="none"
+          >
+            <path
+              ref={(el) => (svgPathRef = el)}
+              d={pathStraight}
+              fill="#121212"
+            />
+          </svg>
+        </div>
+
         {/* Top Section: Navigation */}
         <div>
           <h2 class="text-sm text-gray-400 tracking-widest mb-4">NAVIGATION</h2>
