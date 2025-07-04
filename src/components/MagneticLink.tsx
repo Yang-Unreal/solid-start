@@ -32,6 +32,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
   let circleAnimation: ReturnType<typeof animate> | undefined;
 
   const handleMouseEnter = () => {
+    if (isMobile()) return;
     if (props.enableHoverCircle && circleRef) {
       if (circleAnimation) circleAnimation.pause();
       circleAnimation = animate(circleRef, {
@@ -165,7 +166,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
           ? props.children(setInnerRef)
           : props.children}
       </div>
-      {props.enableHoverCircle && (
+      {props.enableHoverCircle && !isMobile() && (
         <div
           ref={(el) => (circleRef = el)}
           class="absolute w-full aspect-square rounded-full"
