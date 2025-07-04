@@ -222,11 +222,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         ref={(el) => (menuButtonRef = el)}
         onClick={toggleDrawer}
         class="fixed top-4 right-8 w-12 h-12 bg-black rounded-full shadow-lg z-101 flex flex-col justify-center items-center md:w-24 md:h-24"
-        style={
-          isMobile()
-            ? "opacity: 1; transform: scale(1);"
-            : "opacity: 0; transform: scale(0);"
-        }
+        style={{
+          "opacity": 1,
+          "transform": "scale(1)",
+        }}
         aria-label="Toggle menu"
         enableHoverCircle={true}
         hoverCircleColor="#3B82F6"

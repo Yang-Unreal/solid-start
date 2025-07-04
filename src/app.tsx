@@ -47,23 +47,7 @@ export default function App() {
         const navigate = useNavigate();
         const session = authClient.useSession();
         const [sideNavOpen, setSideNavOpen] = createSignal(false);
-        const [showMenuButton, setShowMenuButton] = createSignal(false); // New signal for menu button visibility
-
-        onMount(() => {
-          const handleScroll = () => {
-            const scrollThreshold = window.innerHeight / 3;
-            if (window.scrollY >= scrollThreshold) {
-              setShowMenuButton(true);
-            } else {
-              setShowMenuButton(false);
-            }
-          };
-
-          window.addEventListener("scroll", handleScroll);
-          onCleanup(() => {
-            window.removeEventListener("scroll", handleScroll);
-          });
-        });
+        const [showMenuButton, setShowMenuButton] = createSignal(true); // New signal for menu button visibility
 
         const handleCloseSideNav = () => setSideNavOpen(false);
         const handleLogoutSuccess = () => navigate("/login", { replace: true });
