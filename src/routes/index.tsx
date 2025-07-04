@@ -1,7 +1,6 @@
 // src/routes/index.tsx
 
 import Footer from "~/components/Footer";
-import HoverCircleButton from "~/components/HoverCircleButton";
 import MagneticLink from "~/components/MagneticLink";
 
 export default function Home() {
