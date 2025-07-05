@@ -35,8 +35,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
   // SVG path definitions for the curve animation
-  const pathStraight = "M 80 0 Q 80 500 80 1000";
-  const pathCurve = "M 80 0 Q -80 500 80 1000";
+  const pathStraight = "M 0 0 Q 0 500 0 1000";
+  const pathCurve = "M 0 0 Q 160 500 0 1000";
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -99,7 +99,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
     createEffect(() => {
       if (menuButtonRef) {
-        menuButtonRef.style.backgroundColor = isOpen() ? "#3B82F6" : "black";
+        menuButtonRef.style.backgroundColor = isOpen()
+          ? "#3B82F6"
+          : "transparent";
       }
     });
 
@@ -115,13 +117,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       if (drawerRef) {
         if (isOpen()) {
           animate(drawerRef, {
-            translateX: ["calc(100% + 5rem)", "0%"],
+            translateX: ["calc(-100% - 5rem)", "0%"],
             duration,
             easing: "easeOutQuint",
           });
         } else if (hasBeenOpened()) {
           animate(drawerRef, {
-            translateX: ["0%", "calc(100% + 5rem)"],
+            translateX: ["0%", "calc(-100% - 5rem)"],
             duration,
             easing: "easeInQuint",
           });
@@ -154,15 +156,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           for (const link of links) {
             if (link instanceof HTMLElement) {
               link.style.opacity = "0";
-              link.style.transform = "translateX(40px)";
+              link.style.transform = "translateY(40px)";
             }
           }
           animate(links, {
             opacity: [0, 1],
-            translateX: [40, 0],
-            delay: stagger(120, { start: 200 }),
-            duration: 700,
-            easing: "easeOutExpo",
+            translateY: [40, 0],
+            delay: stagger(80, { start: 100 }),
+            duration: 500,
+            easing: "easeOutQuart",
           });
         } else if (hasBeenOpened()) {
           if (
@@ -171,10 +173,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           ) {
             animate(links, {
               opacity: 0,
-              translateX: 40,
-              delay: stagger(50),
-              duration: 250,
-              easing: "easeInQuad",
+              translateY: 40,
+              delay: stagger(30),
+              duration: 150,
+              easing: "easeInQuart",
             });
           }
         }
@@ -221,10 +223,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <MagneticLink
         ref={(el) => (menuButtonRef = el)}
         onClick={toggleDrawer}
-        class="fixed top-4 right-8 w-12 h-12 bg-black rounded-full shadow-lg z-101 flex flex-col justify-center items-center md:w-24 md:h-24"
+        class="fixed top-4 left-8 w-12 h-12 bg-transparent rounded-full z-101 flex flex-col justify-center items-center md:w-24 md:h-24"
         style={{
-          "opacity": 1,
-          "transform": "scale(1)",
+          opacity: 1,
+          transform: "scale(1)",
         }}
         aria-label="Toggle menu"
         enableHoverCircle={true}
@@ -247,13 +249,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 right-0 h-full w-full md:w-1/3 bg-[#121212] text-white shadow-xl z-100 p-8 md:p-16 flex flex-col justify-between"
-        style="transform: translateX(calc(100% + 5rem));"
+        class="fixed top-0 left-0 h-full w-full md:w-1/3 bg-[#121212] text-white shadow-xl z-100 px-8 py-20 md:py-40 md:px-16 flex flex-col justify-between "
+        style="transform: translateX(calc(-100% - 5rem));"
       >
         {/* SVG Curve Element */}
         <div
-          class="absolute top-0 left-0 h-full w-20 pointer-events-none"
-          style="transform: translateX(calc(-100% + 1px))"
+          class="absolute top-0 right-0 h-full w-20 pointer-events-none"
+          style="transform: translateX(calc(100% - 1px))"
         >
           <svg
             class="h-full w-full"
