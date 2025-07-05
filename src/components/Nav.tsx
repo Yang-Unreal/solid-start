@@ -1,6 +1,7 @@
 import { createSignal } from "solid-js";
-import { useLocation, A, useNavigate } from "@solidjs/router";
-import MagneticLink from "~/components/MagneticLink";
+import { useLocation, A } from "@solidjs/router";
+import MenuDrawer from "~/components/MenuDrawer";
+import { ShoppingBag } from "lucide-solid";
 
 const YourLogo = (props: { class?: string }) => (
   <svg
@@ -18,57 +19,40 @@ const YourLogo = (props: { class?: string }) => (
 
 export default function Nav() {
   const location = useLocation();
-  const navigate = useNavigate();
-  let navLinksRef: HTMLUListElement | undefined;
-  const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
-  const activeLinkClasses = (path: string) => {
-    const isHomePage = location.pathname === "/";
-    const isActive = location.pathname === path;
+  const [showMenuButton, setShowMenuButton] = createSignal(true); // Initially false, will be true on mobile
 
-    let textColorClass: string;
-    let dotColorClass: string;
-    let linkFontClass: string;
-
-    if (isActive) {
-      textColorClass = isHomePage ? "text-white" : "text-black";
-      dotColorClass = isHomePage ? "bg-white" : "bg-black";
-      linkFontClass = "font-extrabold";
-    } else {
-      textColorClass = isHomePage
-        ? "text-white/70 hover:text-white"
-        : "text-black/70 hover:text-black";
-      dotColorClass = isHomePage ? "bg-white" : "bg-black";
-      linkFontClass = "font-bold";
-    }
-
-    return {
-      linkClasses: `${textColorClass} ${linkFontClass}`,
-      dotClasses: dotColorClass,
-      isActive: isActive,
-    };
-  };
   const linkBaseClass =
-    "text-xl flex items-center transition-colors duration-150 px-4 py-4";
+    "text-xl absolute items-center transition-colors duration-150";
 
   return (
     <nav
       class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
     >
-      <div
-        class={`relative flex items-center h-24 px-4 sm:px-6 lg:px-8 font-sans`}
-      >
-        <div class="flex items-center justify-center w-full">
-          <A
-            href="/"
-            class={`${
-              location.pathname === "/" ? "text-white" : "text-black"
-            } ${linkBaseClass}`}
-            aria-label="Homepage"
-          >
-            <YourLogo class="h-4 md:h-6 w-auto" />
-          </A>
-        </div>
+      <div class="relative flex items-center h-24 px-4 sm:px-6 lg:px-8 font-sans justify-center">
+        <A
+          href="/"
+          class={`${
+            location.pathname === "/" ? "text-white" : "text-black"
+          } ${linkBaseClass}`}
+          aria-label="Homepage"
+        >
+          <YourLogo class="h-4 md:h-6 w-auto" />
+        </A>
+
+        <MenuDrawer
+          isVisible={showMenuButton()}
+          onClose={() => setShowMenuButton(false)}
+        />
+        <A
+          href="/products"
+          class={`${
+            location.pathname === "/" ? "text-white" : "text-black"
+          } absolute right-6 md:right-12 p-4`}
+          aria-label="Products"
+        >
+          <ShoppingBag class="h-5 md:h-6 w-auto" stroke-width="1.5" />
+        </A>
       </div>
     </nav>
   );

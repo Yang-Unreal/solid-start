@@ -12,7 +12,6 @@ import {
 } from "solid-js";
 import Nav from "~/components/Nav";
 import SideNav from "~/components/SideNav";
-import MenuDrawer from "~/components/MenuDrawer"; // Import MenuDrawer
 import "./app.css";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
@@ -47,8 +46,6 @@ export default function App() {
         const navigate = useNavigate();
         const session = authClient.useSession();
         const [sideNavOpen, setSideNavOpen] = createSignal(false);
-        const [showMenuButton, setShowMenuButton] = createSignal(true); // New signal for menu button visibility
-
         const handleCloseSideNav = () => setSideNavOpen(false);
         const handleLogoutSuccess = () => navigate("/login", { replace: true });
 
@@ -137,11 +134,6 @@ export default function App() {
 
                 <Show when={!isDashboardRoute()}>
                   {showNav() && <Nav />}
-                  <MenuDrawer
-                    isVisible={showMenuButton()}
-                    onClose={() => setShowMenuButton(false)} // Pass onClose prop
-                  />{" "}
-                  {/* Render MenuDrawer */}
                   <main class="flex-grow">
                     <Suspense fallback={null}>
                       <Show
