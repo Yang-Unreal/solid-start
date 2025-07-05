@@ -1,7 +1,8 @@
 import { createSignal } from "solid-js";
-import { useLocation, A } from "@solidjs/router";
+import { useLocation, A, useNavigate } from "@solidjs/router";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag } from "lucide-solid";
+import MagneticLink from "~/components/MagneticLink";
 
 const YourLogo = (props: { class?: string }) => (
   <svg
@@ -19,6 +20,7 @@ const YourLogo = (props: { class?: string }) => (
 
 export default function Nav() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [showMenuButton, setShowMenuButton] = createSignal(true); // Initially false, will be true on mobile
 
@@ -44,15 +46,20 @@ export default function Nav() {
           isVisible={showMenuButton()}
           onClose={() => setShowMenuButton(false)}
         />
-        <A
-          href="/products"
-          class={`${
-            location.pathname === "/" ? "text-white" : "text-black"
-          } absolute right-6 md:right-12 p-4`}
+        <MagneticLink
+          onClick={() => navigate("/products")}
+          class={`absolute right-6 md:right-12 w-12 h-12 md:w-16 md:h-16 flex justify-center items-center rounded-full`}
           aria-label="Products"
+          enableHoverCircle={true}
+          hoverCircleColor="#455CE9"
+          applyOverflowHidden={true}
         >
-          <ShoppingBag class="h-5 md:h-6 w-auto" stroke-width="1.5" />
-        </A>
+          {(ref) => (
+            <div ref={ref}>
+              <ShoppingBag class={`h-4 md:h-6 w-auto ${ location.pathname === "/" ? "text-white" : "text-black" }`} stroke-width="1.5" />
+            </div>
+          )}
+        </MagneticLink>
       </div>
     </nav>
   );

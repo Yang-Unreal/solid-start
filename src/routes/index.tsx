@@ -27,7 +27,7 @@ export default function Home() {
 
         <div
           class="relative z-20 ml-4 lg:ml-8 max-w-md lg:max-w-none
-                 text-left p-4 sm:p-6 mix-blend-difference"
+                 text-left p-4 sm:p-6"
         >
           <h1 class="flex flex-col font-bold tracking-tight text-shadow-md leading-tight text-white">
             <span class="text-xl md:text-3xl lg:text-4xl">
