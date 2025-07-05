@@ -66,7 +66,7 @@ export default function Nav() {
             } ${linkBaseClass}`}
             aria-label="Homepage"
           >
-            <YourLogo class="h-6 w-auto" />
+            <YourLogo class="h-4 md:h-6 w-auto" />
           </A>
         </div>
       </div>
