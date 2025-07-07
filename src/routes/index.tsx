@@ -1,12 +1,20 @@
 // src/routes/index.tsx
 
 import Footer from "~/components/Footer";
+import { createSignal } from "solid-js";
 import MagneticLink from "~/components/MagneticLink";
+import SearchInput from "~/components/SearchInput";
 
 export default function Home() {
+  const [searchQuery, setSearchQuery] = createSignal("");
+
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
   return (
     <main>
-      <div class="relative flex h-[60vh] md:min-h-screen items-center justify-start overflow-hidden bg-black">
+      <div class="relative flex h-[60vh] md:min-h-screen items-center justify-center overflow-hidden bg-black">
         <video
           autoplay
           loop
@@ -20,10 +28,16 @@ export default function Home() {
             type="video/webm"
           />
           <source
-            src="https://minio.limingcn.com/solid-start/gt2_pro.mp4"
+            src="https://limingcn.com/solid-start/gt2_pro.mp4"
             type="video/mp4"
           />
         </video>
+        <div class="relative z-10">
+          <SearchInput
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+          />
+        </div>
       </div>
       <div id="001" class="flex items-center justify-center h-screen bg-white">
         <MagneticLink

@@ -24,14 +24,17 @@ export default function Nav() {
 
   const [showMenuButton, setShowMenuButton] = createSignal(true); // Initially false, will be true on mobile
 
-  const linkBaseClass =
-    "text-xl absolute items-center transition-colors duration-150";
+  const linkBaseClass = "text-xl  items-center transition-colors duration-150";
 
   return (
     <nav
       class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
     >
-      <div class="relative flex items-center h-24 px-4 sm:px-6 lg:px-8 font-sans justify-center">
+      <div class="relative flex items-center h-24 px-4 lg:px-12 font-sans justify-between">
+        <MenuDrawer
+          isVisible={showMenuButton()}
+          onClose={() => setShowMenuButton(false)}
+        />
         <A
           href="/"
           class={`${
@@ -42,13 +45,9 @@ export default function Nav() {
           <YourLogo class="h-4 md:h-8 w-auto" />
         </A>
 
-        <MenuDrawer
-          isVisible={showMenuButton()}
-          onClose={() => setShowMenuButton(false)}
-        />
         <MagneticLink
           onClick={() => navigate("/products")}
-          class={`absolute right-6 md:right-12 w-12 h-12 md:w-16 md:h-16 flex justify-center items-center rounded-full`}
+          class={` w-12 h-12 md:w-16 md:h-16 flex justify-center items-center rounded-full`}
           aria-label="Products"
           enableHoverCircle={true}
           hoverCircleColor="#455CE9"

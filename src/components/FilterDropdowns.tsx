@@ -47,7 +47,7 @@ export default function FilterDropdown(props: FilterDropdownProps) {
     <div class="relative font-sans" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        class="w-full h-12 px-4 py-2 text-left bg-white border border-neutral-300 rounded-md shadow-sm flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-black"
+        class="w-full h-12 px-4 py-2 text-left bg-white border border-neutral-300 rounded-full shadow-sm flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-black"
       >
         <span class="flex items-center">
           <span class="text-neutral-800 font-medium">{props.title}</span>
