@@ -18,7 +18,7 @@ export default function Home() {
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}
             isHomepage={true}
-            class=" py-2"
+            class=" py-2 placeholder:text-gray-500 placeholder:font-bold "
           />
         </div>
       </div>

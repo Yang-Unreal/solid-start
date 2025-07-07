@@ -203,6 +203,7 @@ export default function ProductsPage() {
             <SearchInput
               searchQuery={searchQuery}
               onSearchChange={onSearchChange}
+              class="placeholder:text-gray-500  placeholder:font-bold border-gray-300 border shadow-sm"
             />
           </div>
           <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
