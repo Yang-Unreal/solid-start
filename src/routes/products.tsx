@@ -1,12 +1,12 @@
 // src/routes/products/index.tsx
 import { createSignal, onMount, createEffect, on, createMemo } from "solid-js";
 import { MetaProvider } from "@solidjs/meta";
-import { useQuery, type UseQueryResult } from "@tanstack/solid-query"; // Import UseQueryResult
+import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
 import FilterDropdown from "~/components/FilterDropdowns";
 import type { Product } from "~/db/schema";
 import SearchInput from "~/components/SearchInput";
-import { useSearch } from "~/context/SearchContext"; // Import useSearch
+import { useSearch } from "~/context/SearchContext";
 
 interface PaginationInfo {
   currentPage: number;
@@ -33,14 +33,7 @@ const LS_SELECTED_CATEGORIES_KEY = "productSelectedCategories";
 const LS_SELECTED_FUEL_TYPES_KEY = "productSelectedFuelTypes";
 
 export default function ProductsPage() {
-  // const [searchParams, setSearchParams] = useSearchParams(); // Removed
-  const { searchQuery, onSearchChange } = useSearch(); // Get searchQuery from context
-
-  // No longer needed as searchQuery is directly from context
-  // const currentSearchQuery = createMemo(() => {
-  //   const q = searchParams.q;
-  //   return Array.isArray(q) ? q[0] : q || undefined;
-  // });
+  const { searchQuery, onSearchChange } = useSearch();
 
   const [selectedBrands, setSelectedBrands] = createSignal<string[]>([]);
   const [selectedCategories, setSelectedCategories] = createSignal<string[]>(
@@ -137,7 +130,6 @@ export default function ProductsPage() {
     return response.json();
   };
 
-  // --- THE FIX: Explicitly provide all generic types to useQuery ---
   const productsQuery: UseQueryResult<ApiResponse, Error> = useQuery<
     ApiResponse,
     Error,
@@ -152,7 +144,7 @@ export default function ProductsPage() {
       {
         page: currentPage(),
         size: pageSize(),
-        q: searchQuery(), // Use searchQuery() directly
+        q: searchQuery(),
         filter: buildFilterString(),
       },
     ] as const,

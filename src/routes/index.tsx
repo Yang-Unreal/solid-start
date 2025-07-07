@@ -1,16 +1,12 @@
 // src/routes/index.tsx
 
 import Footer from "~/components/Footer";
-import { createSignal } from "solid-js";
 import MagneticLink from "~/components/MagneticLink";
 import SearchInput from "~/components/SearchInput";
+import { useSearch } from "~/context/SearchContext";
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = createSignal("");
-
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
+  const { searchQuery, onSearchChange } = useSearch();
 
   return (
     <main>
@@ -32,10 +28,11 @@ export default function Home() {
             type="video/mp4"
           />
         </video>
-        <div class="relative z-10">
+        <div class="relative z-10 w-1/3 px-4 lg:px-12">
           <SearchInput
             searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
+            onSearchChange={onSearchChange}
+            isHomepage={true}
           />
         </div>
       </div>

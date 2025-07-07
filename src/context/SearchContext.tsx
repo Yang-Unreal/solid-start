@@ -4,9 +4,9 @@ import {
   createContext,
   useContext,
   createSignal,
+  onMount,
   type Accessor,
 } from "solid-js";
-import { useSearchParams, useLocation } from "@solidjs/router";
 
 interface SearchContextType {
   searchQuery: Accessor<string>;
@@ -18,26 +18,16 @@ const SearchContext = createContext<SearchContextType>();
 const LS_SEARCH_QUERY_KEY = "productSearchQuery";
 
 export function SearchProvider(props: { children: any }) {
-  const [searchParams] = useSearchParams();
-  const location = useLocation();
+  const [searchQuery, setSearchQuery] = createSignal("");
 
-  const getSearchParamString = (
-    paramValue: string | string[] | undefined,
-    defaultValue: string
-  ): string => {
-    return Array.isArray(paramValue)
-      ? paramValue[0] || defaultValue
-      : paramValue || defaultValue;
-  };
-
-  const [searchQuery, setSearchQuery] = createSignal(
-    getSearchParamString(searchParams.q, "")
-  );
+  onMount(() => {
+    const storedQuery = localStorage.getItem(LS_SEARCH_QUERY_KEY);
+    if (storedQuery) {
+      setSearchQuery(storedQuery);
+    }
+  });
 
   const onSearchChange = (query: string) => {
-    console.log(
-      `[${Date.now()}] 1. onSearchChange: User typed. New query: '${query}'`
-    );
     setSearchQuery(query);
     if (typeof window !== "undefined") {
       localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
