@@ -39,7 +39,7 @@ export default function Nav() {
           } ${linkBaseClass}`}
           aria-label="Homepage"
         >
-          <YourLogo class="h-4 md:h-6 w-auto" />
+          <YourLogo class="h-4 md:h-8 w-auto" />
         </A>
 
         <MenuDrawer
@@ -56,7 +56,11 @@ export default function Nav() {
         >
           {(ref) => (
             <div ref={ref}>
-              <ShoppingBag class={`h-4 md:h-6 w-auto ${ location.pathname === "/" ? "text-white" : "text-black" }`} stroke-width="1.5" />
+              <ShoppingBag
+                class={`h-4 md:h-8 w-auto`}
+                stroke-width="1.5"
+                stroke={location.pathname === "/" ? "white" : "black"}
+              />
             </div>
           )}
         </MagneticLink>

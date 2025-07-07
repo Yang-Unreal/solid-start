@@ -100,7 +100,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     createEffect(() => {
       if (menuButtonRef) {
         menuButtonRef.style.backgroundColor = isOpen()
-          ? "#3B82F6"
+          ? "#455CE9"
           : "transparent";
       }
     });
@@ -230,20 +230,20 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         }}
         aria-label="Toggle menu"
         enableHoverCircle={true}
-        hoverCircleColor="#3B82F6"
+        hoverCircleColor="#455CE9"
         applyOverflowHidden={true}
       >
         {(innerRef) => (
           <div ref={innerRef} class="flex flex-col justify-center items-center">
             <div
               ref={(el) => (line1Ref = el)}
-              class={`w-6 md:w-8 h-[2px] mb-1.5 ${
+              class={`w-4 md:w-8 h-[2px] mb-1.5 ${
                 location.pathname === "/" ? "bg-white" : "bg-black"
               }`}
             ></div>
             <div
               ref={(el) => (line2Ref = el)}
-              class={`w-6 md:w-8 h-[2px] ${
+              class={`w-4 md:w-8 h-[2px] ${
                 location.pathname === "/" ? "bg-white" : "bg-black"
               }`}
             ></div>

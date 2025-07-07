@@ -24,20 +24,6 @@ export default function Home() {
             type="video/mp4"
           />
         </video>
-
-        <div
-          class="relative z-20 ml-4 lg:ml-8 max-w-md lg:max-w-none
-                 text-left p-4 sm:p-6"
-        >
-          <h1 class="flex flex-col font-bold tracking-tight text-shadow-md leading-tight text-white">
-            <span class="text-xl md:text-3xl lg:text-4xl">
-              LET THE HIDDEN PEARLS
-            </span>
-            <div class="w-16 h-[0.5px] bg-red-600 my-1.5"></div>
-            <span class="text-4xl md:text-6xl lg:text-7xl">SHINE</span>
-            <span class="text-xl md:text-3xl lg:text-4xl">FOR THE WORLD</span>
-          </h1>
-        </div>
       </div>
       <div id="001" class="flex items-center justify-center h-screen bg-white">
         <MagneticLink
