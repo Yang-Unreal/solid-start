@@ -3,7 +3,8 @@
 
 :root {
   --background-hsl: hsl(0, 0%, 100%); /* Changed to pure black */
-  --foreground-rgb: 255, 255, 255;
+  --foreground-rgb: hsl(0, 0%, 100%);
+  --theme-button-background: hsl(75, 99%, 52%);
 
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",

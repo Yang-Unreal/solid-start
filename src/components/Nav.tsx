@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { useLocation, A, useNavigate } from "@solidjs/router";
+import { A, useNavigate } from "@solidjs/router";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
@@ -19,7 +19,6 @@ const YourLogo = (props: { class?: string }) => (
 );
 
 export default function Nav() {
-  const location = useLocation();
   const navigate = useNavigate();
 
   const [showMenuButton, setShowMenuButton] = createSignal(true); // Initially false, will be true on mobile
@@ -37,7 +36,7 @@ export default function Nav() {
           onClose={() => setShowMenuButton(false)}
         />
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
-          <YourLogo class="h-4 md:h-6 w-auto " />
+          <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
 
         <MagneticLink
@@ -50,7 +49,7 @@ export default function Nav() {
         >
           {(ref) => (
             <div ref={ref}>
-              <ShoppingBag class={`h-4 md:h-8 w-auto`} stroke-width="1.5" />
+              <ShoppingBag class={`h-5 md:h-6 w-auto`} stroke-width="1" />
             </div>
           )}
         </MagneticLink>
