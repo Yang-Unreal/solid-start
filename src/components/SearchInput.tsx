@@ -6,6 +6,7 @@ interface SearchInputProps {
   searchQuery: Accessor<string>;
   onSearchChange: (query: string) => void;
   isHomepage?: boolean;
+  class?: string;
 }
 
 const SearchInput = (props: SearchInputProps) => {
@@ -30,8 +31,11 @@ const SearchInput = (props: SearchInputProps) => {
         type="search"
         value={props.searchQuery()}
         onInput={(e) => props.onSearchChange(e.currentTarget.value)}
-        class="w-full pl-10 pr-4 py-1 text-left bg-transparent border border-neutral-300 focus:bg-white  rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out text-black"
+        class={`w-full pl-10 pr-4 py-1 bg-transparent border border-neutral-300 focus:bg-white  rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ease-in-out text-black ${
+          props.class ?? ""
+        }`}
         aria-label="Search products"
+        placeholder="CHINA'S BEST, FOUND FOR YOU"
       />
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <Search size={18} class="text-gray-400" />

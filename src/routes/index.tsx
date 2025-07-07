@@ -10,29 +10,13 @@ export default function Home() {
 
   return (
     <main>
-      <div class="relative flex h-[60vh] md:min-h-screen items-center justify-center overflow-hidden bg-black">
-        <video
-          autoplay
-          loop
-          muted
-          playsinline
-          poster="https://minio.limingcn.com/solid-start/gt2_pro_poster.webp"
-          class="absolute top-0 left-0 z-0 h-full w-full object-cover"
-        >
-          <source
-            src="https://minio.limingcn.com/solid-start/gt2_pro.webm"
-            type="video/webm"
-          />
-          <source
-            src="https://limingcn.com/solid-start/gt2_pro.mp4"
-            type="video/mp4"
-          />
-        </video>
-        <div class="relative z-10 w-1/3 px-4 lg:px-12">
+      <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-white">
+        <div class="relative z-10 w-2/3 px-4 lg:px-12">
           <SearchInput
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}
             isHomepage={true}
+            class=" py-2"
           />
         </div>
       </div>

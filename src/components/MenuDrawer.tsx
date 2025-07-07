@@ -234,18 +234,17 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         applyOverflowHidden={true}
       >
         {(innerRef) => (
-          <div ref={innerRef} class="flex flex-col justify-center items-center">
+          <div
+            ref={innerRef}
+            class="flex flex-col justify-center items-center "
+          >
             <div
               ref={(el) => (line1Ref = el)}
-              class={`w-4 md:w-8 h-[2px] mb-1.5 ${
-                location.pathname === "/" ? "bg-white" : "bg-black"
-              }`}
+              class="w-4 md:w-8 h-[2px] mb-1.5 bg-black"
             ></div>
             <div
               ref={(el) => (line2Ref = el)}
-              class={`w-4 md:w-8 h-[2px] ${
-                location.pathname === "/" ? "bg-white" : "bg-black"
-              }`}
+              class="w-4 md:w-8 h-[2px] bg-black"
             ></div>
           </div>
         )}

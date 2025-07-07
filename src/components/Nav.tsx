@@ -24,25 +24,20 @@ export default function Nav() {
 
   const [showMenuButton, setShowMenuButton] = createSignal(true); // Initially false, will be true on mobile
 
-  const linkBaseClass = "text-xl  items-center transition-colors duration-150";
+  const linkBaseClass =
+    "text-xl color-black items-center transition-colors duration-150";
 
   return (
     <nav
-      class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
+      class={`absolute text-black w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
     >
       <div class="relative flex items-center h-24 px-4 lg:px-12 font-sans justify-between">
         <MenuDrawer
           isVisible={showMenuButton()}
           onClose={() => setShowMenuButton(false)}
         />
-        <A
-          href="/"
-          class={`${
-            location.pathname === "/" ? "text-white" : "text-black"
-          } ${linkBaseClass}`}
-          aria-label="Homepage"
-        >
-          <YourLogo class="h-4 md:h-8 w-auto" />
+        <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
+          <YourLogo class="h-4 md:h-6 w-auto " />
         </A>
 
         <MagneticLink
@@ -55,11 +50,7 @@ export default function Nav() {
         >
           {(ref) => (
             <div ref={ref}>
-              <ShoppingBag
-                class={`h-4 md:h-8 w-auto`}
-                stroke-width="1.5"
-                stroke={location.pathname === "/" ? "white" : "black"}
-              />
+              <ShoppingBag class={`h-4 md:h-8 w-auto`} stroke-width="1.5" />
             </div>
           )}
         </MagneticLink>

@@ -3,9 +3,6 @@
 import { createHandler, StartServer } from "@solidjs/start/server";
 
 export default createHandler((event) => {
-  const url = event.request.url;
-  const isHomePage = new URL(url).pathname === "/";
-
   return (
     <StartServer
       document={({ assets, children, scripts }) => (
@@ -19,7 +16,7 @@ export default createHandler((event) => {
             <link rel="icon" href="/icon.svg" />
             {assets}
           </head>
-          <body style={{ "background-color": isHomePage ? "black" : "white" }}>
+          <body>
             <div id="app">{children}</div>
             {scripts}
           </body>
