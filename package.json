@@ -9,8 +9,8 @@
     "studio": "bunx drizzle-kit studio",
     "db:push": "npx drizzle-kit push",
     "db:sync-meili": "bun run ./src/scripts/sync-meilisearch.ts",
-    "uploadVideos": "./src/scripts/uploadVideos.ts",
-    "uploadImages": "./src/scripts/uploadImages.ts"
+    "uploadVideos": "bun run ./src/scripts/uploadVideos.ts",
+    "uploadImages": "bun run ./src/scripts/uploadImages.ts"
   },
   "dependencies": {
     "@ark-ui/solid": "^5.16.0",

@@ -23,12 +23,11 @@ export default function Nav() {
 
   const [showMenuButton, setShowMenuButton] = createSignal(true); // Initially false, will be true on mobile
 
-  const linkBaseClass =
-    "text-xl color-black items-center transition-colors duration-150";
+  const linkBaseClass = "text-xl  items-center transition-colors duration-150";
 
   return (
     <nav
-      class={`absolute text-black w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
+      class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
     >
       <div class="relative flex items-center h-24 px-4 lg:px-12 font-sans justify-between">
         <MenuDrawer
@@ -44,7 +43,7 @@ export default function Nav() {
           class={` w-12 h-12 md:w-16 md:h-16 flex justify-center items-center rounded-full`}
           aria-label="Products"
           enableHoverCircle={true}
-          hoverCircleColor="#455CE9"
+          hoverCircleColor="hsl(75, 99%, 52%)"
           applyOverflowHidden={true}
         >
           {(ref) => (

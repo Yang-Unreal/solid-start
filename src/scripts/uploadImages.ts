@@ -3,8 +3,8 @@ import * as fs from "fs/promises";
 import * as path from "path";
 
 async function uploadCloudWebp() {
-  const filePath = path.join(process.cwd(), "public", "gt2_pro_poster.webp");
-  const key = "gt2_pro_poster.webp"; // This should match the URL in index.tsx
+  const filePath = path.join(process.cwd(), "public", "heroBackground.webp");
+  const key = "heroBackground.webp"; // This should match the URL in index.tsx
   const contentType = "image/webp";
   const cacheControl = "public, max-age=31536000, immutable"; // 1 year cache
 
@@ -25,7 +25,7 @@ async function uploadCloudWebp() {
       `Successfully uploaded ${key} with Cache-Control: ${cacheControl}`
     );
   } catch (error) {
-    console.error(`Failed to upload cloud.webp:`, error);
+    console.error(`Failed to upload image:`, error);
     process.exit(1);
   }
 }

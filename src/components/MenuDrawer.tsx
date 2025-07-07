@@ -100,7 +100,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     createEffect(() => {
       if (menuButtonRef) {
         menuButtonRef.style.backgroundColor = isOpen()
-          ? "#455CE9"
+          ? "hsl(75, 99%, 52%)"
           : "transparent";
       }
     });
@@ -230,7 +230,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         }}
         aria-label="Toggle menu"
         enableHoverCircle={true}
-        hoverCircleColor="#455CE9"
+        hoverCircleColor="hsl(75, 99%, 52%)"
         applyOverflowHidden={true}
       >
         {(innerRef) => (
