@@ -7,8 +7,6 @@ import {
   createEffect,
   createSignal,
   createMemo,
-  onMount,
-  onCleanup,
 } from "solid-js";
 import Nav from "~/components/Nav";
 import SideNav from "~/components/SideNav";
@@ -135,16 +133,7 @@ export default function App() {
                 <Show when={!isDashboardRoute()}>
                   {showNav() && <Nav />}
                   <main class="flex-grow">
-                    <Suspense fallback={null}>
-                      <Show
-                        when={
-                          !session().isPending &&
-                          (session().data?.user || !isDashboardRoute())
-                        }
-                      >
-                        {props.children}
-                      </Show>
-                    </Suspense>
+                    <Suspense fallback={null}>{props.children}</Suspense>
                   </main>
                 </Show>
               </MetaProvider>

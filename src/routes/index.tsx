@@ -7,10 +7,9 @@ import { useSearch } from "~/context/SearchContext";
 
 export default function Home() {
   const { searchQuery, onSearchChange } = useSearch();
-
   return (
     <main>
-      <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-white">
+      <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white">
         <div class="relative z-10 w-2/3 px-4 lg:px-12">
           <SearchInput
             searchQuery={searchQuery}
@@ -20,6 +19,7 @@ export default function Home() {
           />
         </div>
       </div>
+
       <div id="001" class="flex items-center justify-center h-screen bg-white">
         <MagneticLink
           class="w-50 h-24 bg-black rounded-full shadow-lg flex flex-col justify-center items-center"

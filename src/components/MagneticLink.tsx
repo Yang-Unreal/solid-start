@@ -26,6 +26,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
   let innerElementRef: HTMLElement | undefined;
 
   const [isMobile, setIsMobile] = createSignal(false);
+  const [isReady, setIsReady] = createSignal(false);
 
   // --- Circle Effect Logic ---
   let circleRef: HTMLDivElement | undefined;
@@ -121,6 +122,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
         mediaQuery.removeEventListener("change", handleMediaQueryChange)
       );
     }
+    setIsReady(true);
   });
 
   createEffect(() => {
@@ -159,7 +161,9 @@ export default function MagneticLink(props: MagneticLinkProps) {
       ref={setRef}
       onClick={props.onClick}
       {...props}
-      class={`${props.class || ""} ${props.applyOverflowHidden ? "overflow-hidden" : ""}`}
+      class={`${props.class || ""} ${
+        props.applyOverflowHidden ? "overflow-hidden" : ""
+      }`}
     >
       <div class="relative z-10">
         {typeof props.children === "function"
@@ -174,6 +178,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
             "background-color": props.hoverCircleColor || "#455CE9",
             transform: "translateY(101%)",
             "z-index": "0",
+            visibility: isReady() ? "visible" : "hidden",
           }}
         ></div>
       )}
