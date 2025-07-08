@@ -40,13 +40,17 @@ export default function FilterDropdown(props: FilterDropdownProps) {
       </button>
 
       <Show when={isOpen()}>
-        <div class="mt-2 w-full bg-white  max-h-60 overflow-y-auto">
+        <div class="mt-2 w-full bg-white max-h-60 overflow-y-auto max-w-full overflow-x-hidden">
           <ul>
             <For each={props.options}>
               {(option) => (
                 <li
                   onClick={() => props.onSelect(option)}
-                  class={`px-4 py-2 text-neutral-700 rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between ${props.selectedOptions.includes(option) ? 'bg-primary-accent' : ''}`}
+                  class={`px-2  text-neutral-700 my-1 text-sm rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between ${
+                    props.selectedOptions.includes(option)
+                      ? "bg-primary-accent"
+                      : ""
+                  }`}
                 >
                   <span>{option}</span>
                 </li>

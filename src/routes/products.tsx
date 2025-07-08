@@ -247,9 +247,7 @@ export default function ProductsPage() {
             {/* Filter Sidebar */}
             <Show when={showFilters()}>
               <div
-                class={`transition-all duration-300 ease-in-out overflow-hidden ${
-                  showFilters() ? "w-full md:w-80" : "w-0"
-                }`}
+                class={`transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0 ${showFilters() ? "w-full md:w-80" : "w-0"}`}
               >
                 <div class="flex flex-col space-y-2">
                   <div class="h-[0.5px] bg-gray-300 w-full"></div>
