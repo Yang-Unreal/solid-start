@@ -7,6 +7,8 @@ import FilterDropdown from "~/components/FilterDropdowns";
 import type { Product } from "~/db/schema";
 import SearchInput from "~/components/SearchInput";
 import { useSearch } from "~/context/SearchContext";
+import { SlidersHorizontal, ArrowLeftToLine } from "lucide-solid";
+import MagneticLink from "~/components/MagneticLink";
 
 interface PaginationInfo {
   currentPage: number;
@@ -40,6 +42,7 @@ export default function ProductsPage() {
     []
   );
   const [selectedFuelTypes, setSelectedFuelTypes] = createSignal<string[]>([]);
+  const [showFilters, setShowFilters] = createSignal(false);
 
   onMount(() => {
     setSelectedBrands(
@@ -199,56 +202,94 @@ export default function ProductsPage() {
     <MetaProvider>
       <main class="pt-24 bg-white px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-          <div class="mb-6">
-            <SearchInput
-              searchQuery={searchQuery}
-              onSearchChange={onSearchChange}
-              class="placeholder:text-gray-500  placeholder:font-bold border-gray-300 border shadow-sm"
-            />
+          <div class="mb-6 flex items-center space-x-4">
+            <MagneticLink
+              onClick={() => setShowFilters(!showFilters())}
+              class={`hidden md:flex text-black rounded-full shadow-sm items-center ${
+                showFilters() ? "bg-primary-accent" : ""
+              }`}
+              enableHoverCircle={true}
+              hoverCircleColor="hsl(75, 99%, 52%)"
+              applyOverflowHidden={true}
+            >
+              {(ref) => (
+                <div ref={ref} class="flex items-center px-4 py-1">
+                  {showFilters() ? (
+                    <ArrowLeftToLine class="mr-2" size={20} />
+                  ) : (
+                    <SlidersHorizontal class="mr-2" size={20} />
+                  )}
+                  Filters
+                </div>
+              )}
+            </MagneticLink>
+            <div class="flex-grow">
+              <SearchInput
+                searchQuery={searchQuery}
+                onSearchChange={onSearchChange}
+                class="placeholder:text-gray-500 placeholder:font-bold border-gray-300 border  w-full"
+              />
+            </div>
           </div>
-          <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <FilterDropdown
-              title="Brand"
-              options={availableBrands().map((b) => b.value)}
-              selectedOptions={selectedBrands()}
-              onSelect={(option) =>
-                setSelectedBrands((prev) =>
-                  prev.includes(option)
-                    ? prev.filter((b) => b !== option)
-                    : [...prev, option]
-                )
-              }
-            />
-            <FilterDropdown
-              title="Category"
-              options={availableCategories().map((c) => c.value)}
-              selectedOptions={selectedCategories()}
-              onSelect={(option) =>
-                setSelectedCategories((prev) =>
-                  prev.includes(option)
-                    ? prev.filter((c) => c !== option)
-                    : [...prev, option]
-                )
-              }
-            />
-            <FilterDropdown
-              title="Fuel Type"
-              options={availableFuelTypes().map((f) => f.value)}
-              selectedOptions={selectedFuelTypes()}
-              onSelect={(option) =>
-                setSelectedFuelTypes((prev) =>
-                  prev.includes(option)
-                    ? prev.filter((f) => f !== option)
-                    : [...prev, option]
-                )
-              }
-            />
+
+          <div class={`flex flex-col md:flex-row ${showFilters() ? 'md:gap-8' : ''}`}>
+            {/* Filter Sidebar */}
+            <Show when={showFilters()}>
+              <div
+                class={`transition-all duration-300 ease-in-out overflow-hidden ${showFilters() ? "w-full md:w-80" : "w-0"}`}
+              >
+                <div class="flex flex-col space-y-4">
+                  <h2 class="text-xl font-bold">Filters</h2>
+                  <FilterDropdown
+                    title="Brand"
+                    options={availableBrands().map((b) => b.value)}
+                    selectedOptions={selectedBrands()}
+                    onSelect={(option) =>
+                      setSelectedBrands((prev) =>
+                        prev.includes(option)
+                          ? prev.filter((b) => b !== option)
+                          : [...prev, option]
+                      )
+                    }
+                  />
+                  <FilterDropdown
+                    title="Category"
+                    options={availableCategories().map((c) => c.value)}
+                    selectedOptions={selectedCategories()}
+                    onSelect={(option) =>
+                      setSelectedCategories((prev) =>
+                        prev.includes(option)
+                          ? prev.filter((c) => c !== option)
+                          : [...prev, option]
+                      )
+                    }
+                  />
+                  <FilterDropdown
+                    title="Fuel Type"
+                    options={availableFuelTypes().map((f) => f.value)}
+                    selectedOptions={selectedFuelTypes()}
+                    onSelect={(option) =>
+                      setSelectedFuelTypes((prev) =>
+                        prev.includes(option)
+                          ? prev.filter((f) => f !== option)
+                          : [...prev, option]
+                      )
+                    }
+                  />
+                </div>
+              </div>
+            </Show>
+
+            {/* Main content area */}
+            <div class="flex-grow">
+              <ProductDisplayArea
+                productsQuery={productsQuery}
+                handlePageChange={handlePageChange}
+                pageSize={pageSize}
+                showFilters={showFilters()}
+              />
+            </div>
           </div>
-          <ProductDisplayArea
-            productsQuery={productsQuery}
-            handlePageChange={handlePageChange}
-            pageSize={pageSize}
-          />
         </div>
       </main>
     </MetaProvider>

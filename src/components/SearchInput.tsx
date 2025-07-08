@@ -31,7 +31,7 @@ const SearchInput = (props: SearchInputProps) => {
         type="search"
         value={props.searchQuery()}
         onInput={(e) => props.onSearchChange(e.currentTarget.value)}
-        class={`w-full pl-10 pr-4 py-1 bg-white  rounded-full  focus:outline-none transition-all duration-200 ease-in-out text-black placeholder:text-center ${
+        class={`w-full pl-10 pr-4 py-1 bg-gray-50  rounded-full  focus:outline-none transition-all duration-200 ease-in-out text-black ${
           props.class ?? ""
         }`}
         aria-label="Search products"

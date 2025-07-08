@@ -14,32 +14,6 @@ export default function FilterDropdown(props: FilterDropdownProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   let dropdownRef: HTMLDivElement | undefined;
 
-  // --- THE FIX ---
-  // This entire effect contains browser-only code (document, MouseEvent).
-  // We wrap it in a check to ensure it ONLY runs on the client, not on the server.
-  if (!isServer) {
-    createEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        // If the dropdown is open and the click is not inside the ref, close it.
-        if (
-          isOpen() &&
-          dropdownRef &&
-          !dropdownRef.contains(event.target as Node)
-        ) {
-          setIsOpen(false);
-        }
-      };
-
-      // Add the event listener to the document
-      document.addEventListener("mousedown", handleClickOutside);
-
-      // Important: clean up the event listener when the component is destroyed
-      onCleanup(() => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      });
-    });
-  }
-
   const toggleDropdown = () => setIsOpen(!isOpen());
   const selectedCount = () => props.selectedOptions.length;
 
@@ -47,7 +21,7 @@ export default function FilterDropdown(props: FilterDropdownProps) {
     <div class="relative font-sans" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        class="w-full h-12 px-4 py-2 text-left bg-white border border-neutral-300 rounded-full shadow-sm flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-black"
+        class="w-full h-12 px-4 py-2 text-left bg-white  flex items-center justify-between"
       >
         <span class="flex items-center">
           <span class="text-neutral-800 font-medium">{props.title}</span>
@@ -66,18 +40,18 @@ export default function FilterDropdown(props: FilterDropdownProps) {
       </button>
 
       <Show when={isOpen()}>
-        <div class="absolute top-full mt-2 w-full bg-white border border-neutral-200 rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+        <div class="mt-2 w-full bg-white  max-h-60 overflow-y-auto">
           <ul>
             <For each={props.options}>
               {(option) => (
                 <li
                   onClick={() => props.onSelect(option)}
-                  class="px-4 py-2 text-neutral-700 hover:bg-neutral-100 cursor-pointer flex items-center justify-between"
+                  class="px-4 py-2 text-neutral-700 rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between"
                 >
                   <span>{option}</span>
                   <input
                     type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-black focus:ring-black pointer-events-none"
+                    class="h-4 w-4  text-black focus:ring-black pointer-events-none"
                     checked={props.selectedOptions.includes(option)}
                     tabIndex={-1}
                     aria-hidden="true"

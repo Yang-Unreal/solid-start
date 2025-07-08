@@ -23,6 +23,7 @@ interface ProductDisplayAreaProps {
   productsQuery: QueryObserverResult<ApiResponse, Error>;
   handlePageChange: (newPage: number) => void; // Re-added
   pageSize: () => number;
+  showFilters: boolean; // New prop
 }
 
 // --- Helper Functions (unchanged) ---
@@ -62,7 +63,13 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
 
       <div class="relative">
         {/* --- Product Grid Container (Always rendered for hydration stability) --- */}
-        <div class="product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
+        <div
+          class={`product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 ${
+            props.showFilters
+              ? "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              : "md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+          }`}
+        >
           {/* Only show products if not loading and no error, and products exist */}
           <Show when={!isLoading() && !error() && products().length > 0}>
             <For each={products()}>

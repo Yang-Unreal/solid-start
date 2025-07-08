@@ -21,6 +21,7 @@ import {
 import type { Product } from "~/db/schema";
 import ProductListItem from "./ProductListItem";
 import ProductTableRow from "./ProductTableRow";
+import FilterDropdowns from "./FilterDropdowns";
 
 interface PaginationInfo {
   currentPage: number;
@@ -71,6 +72,7 @@ export default function ProductListDashboard(props: {
   currentPage: Accessor<number>;
   setCurrentPage: Setter<number>;
   pageSize: Accessor<number>;
+  isFilterVisible: Accessor<boolean>;
 }) {
   const tanstackQueryClient = useQueryClient();
   const [selectedProductIds, setSelectedProductIds] = createSignal<Set<string>>(
@@ -189,88 +191,97 @@ export default function ProductListDashboard(props: {
         <p class="text-red-500">Error: {props.productsQuery.error?.message}</p>
       </Show>
 
-      <div class="block md:hidden space-y-3">
-        <Show
-          when={products().length > 0}
-          fallback={
-            <p class="text-center text-neutral-700 py-10">No products found.</p>
-          }
-        >
-          <For each={products()}>
-            {(product) => (
-              <ProductListItem
-                product={product}
-                isSelected={isProductSelected(product.id)}
-                isDeleting={false}
-                onToggleSelect={toggleProductSelection}
-                onDelete={handleDeleteProduct}
-              />
-            )}
-          </For>
+      <div class="flex space-x-4">
+        <Show when={props.isFilterVisible()}>
+          <div class="w-1/4">
+            <FilterDropdowns />
+          </div>
         </Show>
-      </div>
-
-      <div class="hidden md:block overflow-x-auto bg-white shadow-md rounded-lg">
-        <Show
-          when={products().length > 0}
-          fallback={
-            <p class="text-center text-neutral-700 py-10">No products found.</p>
-          }
-        >
-          <table class="min-w-full divide-y divide-neutral-200">
-            <thead class="bg-neutral-50">
-              <tr>
-                <th class="px-6 py-3 text-left">
-                  <button onClick={toggleSelectAll} class="p-1 text-black">
-                    <Show
-                      when={isAllSelected()}
-                      fallback={<Square size={20} />}
-                    >
-                      <CheckSquare size={20} />
-                    </Show>
-                  </button>
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Image
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Product
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Price
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Stock
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Created At
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-neutral-200">
+        <div class="flex-1">
+          <div class="block md:hidden space-y-3">
+            <Show
+              when={products().length > 0}
+              fallback={
+                <p class="text-center text-neutral-700 py-10">No products found.</p>
+              }
+            >
               <For each={products()}>
                 {(product) => (
-                  <ProductTableRow
+                  <ProductListItem
                     product={product}
                     isSelected={isProductSelected(product.id)}
-                    isDeleting={
-                      deleteProductMutation.isPending &&
-                      deleteProductMutation.variables === product.id
-                    }
+                    isDeleting={false}
                     onToggleSelect={toggleProductSelection}
                     onDelete={handleDeleteProduct}
                   />
                 )}
               </For>
-            </tbody>
-          </table>
-        </Show>
+            </Show>
+          </div>
+
+          <div class="hidden md:block overflow-x-auto bg-white shadow-md rounded-lg">
+            <Show
+              when={products().length > 0}
+              fallback={
+                <p class="text-center text-neutral-700 py-10">No products found.</p>
+              }
+            >
+              <table class="min-w-full divide-y divide-neutral-200">
+                <thead class="bg-neutral-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left">
+                      <button onClick={toggleSelectAll} class="p-1 text-black">
+                        <Show
+                          when={isAllSelected()}
+                          fallback={<Square size={20} />}
+                        >
+                          <CheckSquare size={20} />
+                        </Show>
+                      </button>
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Image
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Product
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Price
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Stock
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Created At
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-neutral-200">
+                  <For each={products()}>
+                    {(product) => (
+                      <ProductTableRow
+                        product={product}
+                        isSelected={isProductSelected(product.id)}
+                        isDeleting={
+                          deleteProductMutation.isPending &&
+                          deleteProductMutation.variables === product.id
+                        }
+                        onToggleSelect={toggleProductSelection}
+                        onDelete={handleDeleteProduct}
+                      />
+                    )}
+                  </For>
+                </tbody>
+              </table>
+            </Show>
+          </div>
+        </div>
       </div>
 
       <Show when={pagination() && pagination()!.totalPages > 1}>
