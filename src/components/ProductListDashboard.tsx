@@ -21,7 +21,6 @@ import {
 import type { Product } from "~/db/schema";
 import ProductListItem from "./ProductListItem";
 import ProductTableRow from "./ProductTableRow";
-import FilterDropdowns from "./FilterDropdowns";
 
 interface PaginationInfo {
   currentPage: number;
@@ -72,7 +71,6 @@ export default function ProductListDashboard(props: {
   currentPage: Accessor<number>;
   setCurrentPage: Setter<number>;
   pageSize: Accessor<number>;
-  isFilterVisible: Accessor<boolean>;
 }) {
   const tanstackQueryClient = useQueryClient();
   const [selectedProductIds, setSelectedProductIds] = createSignal<Set<string>>(
@@ -192,11 +190,6 @@ export default function ProductListDashboard(props: {
       </Show>
 
       <div class="flex space-x-4">
-        <Show when={props.isFilterVisible()}>
-          <div class="w-1/4">
-            <FilterDropdowns />
-          </div>
-        </Show>
         <div class="flex-1">
           <div class="block md:hidden space-y-3">
             <Show

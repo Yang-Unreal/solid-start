@@ -284,7 +284,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <li>
+                <li class="relative w-full pr-8">
                   <MagneticLink
                     onClick={() => {
                       navigate(link.href);
@@ -293,7 +293,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                     class={`relative ${isMobile() ? "w-full" : ""}`}
                   >
                     {(innerRef) => (
-                      <>
+                      <div class="items-center">
                         <div
                           ref={innerRef}
                           class={`text-left text-5xl md:text-6xl font-light transition-colors duration-300 ${
@@ -318,7 +318,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           }}
                         ></span>
                         <span
-                          class={`absolute right-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
+                          class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
                           style={{
                             transform: `scale(${
                               (isActive && hoveredLink() === null) ||
@@ -328,7 +328,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             })`,
                           }}
                         ></span>
-                      </>
+                      </div>
                     )}
                   </MagneticLink>
                 </li>
