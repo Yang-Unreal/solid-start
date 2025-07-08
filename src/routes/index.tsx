@@ -23,21 +23,6 @@ export default function Home() {
         </div>
       </div>
 
-      <div id="001" class="flex items-center justify-center h-screen bg-white">
-        <MagneticLink
-          class="w-50 h-24 bg-black rounded-full shadow-lg flex flex-col justify-center items-center"
-          aria-label="Magnetic Button"
-          enableHoverCircle={true}
-          hoverCircleColor="hsl(75, 99%, 52%)"
-          applyOverflowHidden={true}
-        >
-          {(innerRef) => (
-            <div ref={innerRef} class="flex justify-center items-center">
-              <p>Hover Button</p>
-            </div>
-          )}
-        </MagneticLink>
-      </div>
       <Footer />
     </main>
   );

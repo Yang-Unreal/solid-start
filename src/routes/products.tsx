@@ -1,5 +1,12 @@
 // src/routes/products/index.tsx
-import { createSignal, onMount, createEffect, on, createMemo } from "solid-js";
+import {
+  createSignal,
+  onMount,
+  createEffect,
+  on,
+  createMemo,
+  Show,
+} from "solid-js";
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
@@ -232,14 +239,20 @@ export default function ProductsPage() {
             </div>
           </div>
 
-          <div class={`flex flex-col md:flex-row ${showFilters() ? 'md:gap-8' : ''}`}>
+          <div
+            class={`flex flex-col md:flex-row ${
+              showFilters() ? "md:gap-8" : ""
+            }`}
+          >
             {/* Filter Sidebar */}
             <Show when={showFilters()}>
               <div
-                class={`transition-all duration-300 ease-in-out overflow-hidden ${showFilters() ? "w-full md:w-80" : "w-0"}`}
+                class={`transition-all duration-300 ease-in-out overflow-hidden ${
+                  showFilters() ? "w-full md:w-80" : "w-0"
+                }`}
               >
-                <div class="flex flex-col space-y-4">
-                  <h2 class="text-xl font-bold">Filters</h2>
+                <div class="flex flex-col space-y-2">
+                  <div class="h-[0.5px] bg-gray-300 w-full"></div>
                   <FilterDropdown
                     title="Brand"
                     options={availableBrands().map((b) => b.value)}
@@ -252,6 +265,7 @@ export default function ProductsPage() {
                       )
                     }
                   />
+                  <div class="h-[0.5px] bg-gray-300 w-full"></div>
                   <FilterDropdown
                     title="Category"
                     options={availableCategories().map((c) => c.value)}
@@ -264,6 +278,7 @@ export default function ProductsPage() {
                       )
                     }
                   />
+                  <div class="h-[0.5px] bg-gray-300 w-full"></div>{" "}
                   <FilterDropdown
                     title="Fuel Type"
                     options={availableFuelTypes().map((f) => f.value)}

@@ -16,7 +16,7 @@ const Footer: Component = () => {
           <ul class="space-y-2 text-sm">
             <li>
               <a href="#" class="hover:underline">
-                About Us
+                About
               </a>
             </li>
             <li>
@@ -26,12 +26,12 @@ const Footer: Component = () => {
             </li>
             <li>
               <a href="#" class="hover:underline">
-                Contact
+                Products
               </a>
             </li>
             <li>
               <a href="#" class="hover:underline">
-                Privacy Policy
+                Contact
               </a>
             </li>
           </ul>

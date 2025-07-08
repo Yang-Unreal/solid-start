@@ -46,16 +46,9 @@ export default function FilterDropdown(props: FilterDropdownProps) {
               {(option) => (
                 <li
                   onClick={() => props.onSelect(option)}
-                  class="px-4 py-2 text-neutral-700 rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between"
+                  class={`px-4 py-2 text-neutral-700 rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between ${props.selectedOptions.includes(option) ? 'bg-primary-accent' : ''}`}
                 >
                   <span>{option}</span>
-                  <input
-                    type="checkbox"
-                    class="h-4 w-4  text-black focus:ring-black pointer-events-none"
-                    checked={props.selectedOptions.includes(option)}
-                    tabIndex={-1}
-                    aria-hidden="true"
-                  />
                 </li>
               )}
             </For>
