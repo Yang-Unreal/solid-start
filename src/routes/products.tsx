@@ -207,8 +207,8 @@ export default function ProductsPage() {
 
   return (
     <MetaProvider>
-      <main class="pt-24 bg-white px-4 pb-4 sm:px-6 sm:pb-6 lg:px-8 lg:pb-8 min-h-screen">
-        <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
+      <main class="pt-24 bg-white  pb-4 sm:pb-6  lg:pb-8 min-h-screen container-padding">
+        <div class="mx-auto w-full max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
           <div class="mb-6 flex items-center space-x-4">
             <MagneticLink
               onClick={() => setShowFilters(!showFilters())}
@@ -247,7 +247,9 @@ export default function ProductsPage() {
             {/* Filter Sidebar */}
             <Show when={showFilters()}>
               <div
-                class={`transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0 ${showFilters() ? "w-full md:w-80" : "w-0"}`}
+                class={`transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0 ${
+                  showFilters() ? "w-full md:w-80" : "w-0"
+                }`}
               >
                 <div class="flex flex-col space-y-2">
                   <div class="h-[0.5px] bg-gray-300 w-full"></div>

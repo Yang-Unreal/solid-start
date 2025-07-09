@@ -13,7 +13,7 @@ export default function Home() {
         class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center"
         style="background-image: url('/heroBackground.webp');"
       >
-        <div class="relative z-10 w-full md:w-2/3 px-4 lg:px-12">
+        <div class="relative z-10 w-full md:w-2/3 container-padding">
           <SearchInput
             searchQuery={searchQuery}
             onSearchChange={onSearchChange}

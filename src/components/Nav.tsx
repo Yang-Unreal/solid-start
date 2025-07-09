@@ -27,9 +27,9 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent`}
+      class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent nav-padding`}
     >
-      <div class="relative flex items-center h-24 px-4 lg:px-12 font-sans justify-between">
+      <div class="relative flex items-center h-24 font-sans justify-between">
         <MenuDrawer
           onLogoutSuccess={props.onLogoutSuccess}
           session={props.session}
@@ -40,7 +40,7 @@ export default function Nav(props: {
 
         <MagneticLink
           onClick={() => navigate("/products")}
-          class={` w-12 h-12 md:w-16 md:h-16 flex justify-center items-center rounded-full`}
+          class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}
           aria-label="Products"
           enableHoverCircle={true}
           hoverCircleColor="hsl(75, 99%, 52%)"
@@ -48,7 +48,10 @@ export default function Nav(props: {
         >
           {(ref) => (
             <div ref={ref}>
-              <ShoppingBag class={`h-5 md:h-6 w-auto`} stroke-width="1" />
+              <ShoppingBag
+                class={`w-4 md:w-5 lg:w-6 h-auto`}
+                stroke-width="1"
+              />
             </div>
           )}
         </MagneticLink>

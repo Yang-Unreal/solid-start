@@ -234,7 +234,7 @@ export default function DashboardProductsPage() {
   };
 
   return (
-    <div class="p-4 pt-16">
+    <div class="container-padding pt-16">
       <div class="mb-6 flex items-center space-x-4">
         <MagneticLink
           onClick={() => setShowFilters(!showFilters())}

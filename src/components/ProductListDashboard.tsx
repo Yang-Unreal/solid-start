@@ -148,7 +148,7 @@ export default function ProductListDashboard(props: {
   const paginationButtonClasses = `h-10 w-10 flex items-center justify-center rounded-lg text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-300 text-neutral-700 hover:bg-neutral-400 disabled:bg-neutral-200 disabled:text-neutral-500`;
 
   return (
-    <div class="p-4">
+    <div>
       <div class="flex justify-between items-center mb-4">
         <div class="w-full max-w-xs">
           <h2 class="text-2xl font-bold text-black">Products List</h2>
@@ -195,7 +195,9 @@ export default function ProductListDashboard(props: {
             <Show
               when={products().length > 0}
               fallback={
-                <p class="text-center text-neutral-700 py-10">No products found.</p>
+                <p class="text-center text-neutral-700 py-10">
+                  No products found.
+                </p>
               }
             >
               <For each={products()}>
@@ -216,7 +218,9 @@ export default function ProductListDashboard(props: {
             <Show
               when={products().length > 0}
               fallback={
-                <p class="text-center text-neutral-700 py-10">No products found.</p>
+                <p class="text-center text-neutral-700 py-10">
+                  No products found.
+                </p>
               }
             >
               <table class="min-w-full divide-y divide-neutral-200">

@@ -226,7 +226,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <MagneticLink
         ref={(el) => (menuButtonRef = el)}
         onClick={() => setIsOpen(!isOpen())}
-        class=" w-12 h-12 md:w-16 md:h-16 bg-transparent rounded-full z-101 flex flex-col justify-center items-center"
+        class=" w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 bg-transparent rounded-full z-101 flex flex-col justify-center items-center"
         style={{
           opacity: 1,
           transform: "scale(1)",
@@ -243,11 +243,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           >
             <div
               ref={(el) => (line1Ref = el)}
-              class="w-5 md:w-6 h-[2px] mb-1.5 bg-black"
+              class="w-4 md:w-5 lg:w-6 h-[2px] mb-1.5 bg-black"
             ></div>
             <div
               ref={(el) => (line2Ref = el)}
-              class="w-5 md:w-6 h-[2px] bg-black"
+              class="w-4 md:w-5 lg:w-6 h-[2px] bg-black"
             ></div>
           </div>
         )}
@@ -255,7 +255,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 left-0 h-full w-full md:w-1/3 bg-[#121212] text-white shadow-xl z-100 px-8 py-20 md:py-40 md:px-16 flex flex-col justify-between "
+        class="fixed top-0 left-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white shadow-xl z-100 px-8 py-20 md:py-40 md:px-16 flex flex-col justify-between "
         style="transform: translateX(calc(-100% - 5rem));"
       >
         {/* SVG Curve Element */}
