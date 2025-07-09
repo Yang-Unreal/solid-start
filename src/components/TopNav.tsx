@@ -68,20 +68,13 @@ export default function TopNav(props: TopNavProps) {
           </A>
         </div>
         <div class="flex items-center space-x-4">
-          <button
-            onClick={() => setShowMenuDrawer(true)}
-            class="inline-flex items-center justify- RENDERED_CODE_HERE p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-          >
-            <span class="sr-only">Open main menu</span>
-            <Menu class="h-6 w-6" aria-hidden="true" />
-          </button>
-          <button
-            onClick={handleLogout}
-            disabled={logoutMutation.isPending}
-            class="px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-black hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          >
-            {logoutMutation.isPending ? "Logging out..." : "Logout"}
-          </button>
+          <MenuDrawer
+            links={[
+              { href: "/dashboard", label: "Dashboard" },
+              { href: "/dashboard/products", label: "Products" },
+              { href: "/", label: "Homepage" },
+            ]}
+          />
         </div>
       </div>
     </nav>
