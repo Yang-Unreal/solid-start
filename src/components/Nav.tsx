@@ -1,4 +1,3 @@
-import { createSignal } from "solid-js";
 import { A, useNavigate } from "@solidjs/router";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag } from "lucide-solid";
@@ -18,10 +17,11 @@ const YourLogo = (props: { class?: string }) => (
   </svg>
 );
 
-export default function Nav() {
+export default function Nav(props: {
+  onLogoutSuccess: () => void;
+  session: any;
+}) {
   const navigate = useNavigate();
-
-  const [showMenuButton, setShowMenuButton] = createSignal(true); // Initially false, will be true on mobile
 
   const linkBaseClass = "text-xl  items-center transition-colors duration-150";
 
@@ -31,8 +31,8 @@ export default function Nav() {
     >
       <div class="relative flex items-center h-24 px-4 lg:px-12 font-sans justify-between">
         <MenuDrawer
-          isVisible={showMenuButton()}
-          onClose={() => setShowMenuButton(false)}
+          onLogoutSuccess={props.onLogoutSuccess}
+          session={props.session}
         />
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />

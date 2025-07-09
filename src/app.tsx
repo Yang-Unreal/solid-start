@@ -9,7 +9,7 @@ import {
   createMemo,
 } from "solid-js";
 import Nav from "~/components/Nav";
-import TopNav from "~/components/TopNav";
+
 import "./app.css";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
@@ -74,28 +74,10 @@ export default function App() {
                   name="description"
                   content="Let the hidden pears shine for the world"
                 />
-                <Show when={isDashboardRoute()}>
-                  <TopNav onLogoutSuccess={handleLogoutSuccess} />
-                  <main class="flex-1 flex flex-col min-w-0 overflow-auto pt-16">
-                    <Suspense fallback={null}>
-                      <Show
-                        when={
-                          !session().isPending &&
-                          (session().data?.user || !isDashboardRoute())
-                        }
-                      >
-                        {props.children}
-                      </Show>
-                    </Suspense>
-                  </main>
-                </Show>
-
-                <Show when={!isDashboardRoute()}>
-                  {showNav() && <Nav />}
-                  <main class="flex-grow">
-                    <Suspense fallback={null}>{props.children}</Suspense>
-                  </main>
-                </Show>
+                <Nav onLogoutSuccess={handleLogoutSuccess} session={session} />
+                <main class="flex-grow">
+                  <Suspense fallback={null}>{props.children}</Suspense>
+                </main>
               </MetaProvider>
             </QueryClientProvider>
           </SearchProvider>

@@ -1,13 +1,27 @@
 // src/components/MenuDrawer.tsx
 
-import { createSignal, createEffect, onMount, onCleanup, Show, For } from "solid-js";
+import {
+  createSignal,
+  createEffect,
+  onMount,
+  onCleanup,
+  Show,
+  For,
+} from "solid-js";
 import { animate, stagger } from "animejs";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
 
+import { type Session } from "better-auth";
+
 interface MenuDrawerProps {
-  links?: { href: string; label: string }[];
+  links?: { href: string; label: string; onClick?: () => void }[];
+  onLogoutSuccess: () => void;
+  session: () => {
+    data: Session | null;
+    isPending: boolean;
+  };
 }
 
 export default function MenuDrawer(props: MenuDrawerProps) {
@@ -16,8 +30,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const session = authClient.useSession();
-  const user = () => session()?.data?.user;
 
   const closeDrawer = () => {
     setIsOpen(false);
@@ -36,25 +48,36 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const pathStraight = "M 0 0 Q 0 500 0 1000";
   const pathCurve = "M 0 0 Q 160 500 0 1000";
 
-  const baseNavLinks = [
-    { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/services", label: "Services" },
-    { href: "/products", label: "Products" },
-    { href: "/contact", label: "Contact" },
-  ];
+  const baseNavLinks: { href: string; label: string; onClick?: () => void }[] =
+    [
+      { href: "/", label: "Home" },
+      { href: "/about", label: "About" },
+      { href: "/services", label: "Services" },
+      { href: "/products", label: "Products" },
+      { href: "/contact", label: "Contact" },
+    ];
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+    props.onLogoutSuccess();
+    closeDrawer();
+  };
 
   const navLinks = () => {
-    const links = props.links ? [...props.links] : [...baseNavLinks];
-    if (session()?.data?.user) {
-      if (!props.links) {
-        links.push({ href: "/dashboard", label: "Dashboard" });
-      }
+    const links: { href: string; label: string; onClick?: () => void }[] =
+      props.links ? [...props.links] : [...baseNavLinks];
+    if (props.session().data) {
+      links.push({ href: "/dashboard", label: "Dashboard" });
+      links.push({ href: "/dashboard/products", label: "Product List" });
+      links.push({ href: "#", label: "Logout", onClick: handleLogout });
+    } else {
+      links.push({ href: "/login", label: "Login" });
+      links.push({ href: "/signup", label: "Signup" });
     }
     return links;
   };
 
-  const socialLinks = [
+  const socialLinks: { href: string; label: string; onClick?: () => void }[] = [
     { href: "#", label: "Facebook" },
     { href: "#", label: "Instagram" },
     { href: "#", label: "Twitter" },
@@ -76,10 +99,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   if (!import.meta.env.SSR) {
     let prevIsVisible: boolean | undefined;
-
-    
-
-    
 
     createEffect(() => {
       if (menuButtonRef) {
@@ -271,8 +290,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 <li class="relative w-full pr-8">
                   <MagneticLink
                     onClick={() => {
-                      navigate(link.href);
-                      closeDrawer();
+                      if (link.onClick) {
+                        link.onClick();
+                      } else {
+                        navigate(link.href);
+                        closeDrawer();
+                      }
                     }}
                     class={`relative ${isMobile() ? "w-full" : ""}`}
                   >
