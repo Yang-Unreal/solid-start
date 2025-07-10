@@ -255,7 +255,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 left-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white shadow-xl z-100 px-8 py-20 md:py-40 md:px-16 flex flex-col justify-between "
+        class="fixed top-0 left-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white shadow-xl z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
         style="transform: translateX(calc(-100% - 5rem));"
       >
         {/* SVG Curve Element */}
@@ -282,7 +282,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           <hr class="border-gray-700" />
           <ul
             ref={navLinksListRef}
-            class="mt-12 space-y-4 flex flex-col items-start"
+            class="mt-4 space-y-4 flex flex-col items-start"
           >
             {navLinks().map((link) => {
               const isActive = location.pathname === link.href;
@@ -303,7 +303,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       <div class="items-center">
                         <div
                           ref={innerRef}
-                          class={`text-left text-5xl md:text-6xl font-light transition-colors duration-300 ${
+                          class={`text-left text-5xl font-light transition-colors duration-300 ${
                             isActive
                               ? "text-white"
                               : "text-white/70 hover:text-white"
