@@ -1,4 +1,5 @@
 import { A, useNavigate } from "@solidjs/router";
+import { createEffect, onCleanup, createSignal } from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
@@ -22,12 +23,49 @@ export default function Nav(props: {
   session: any;
 }) {
   const navigate = useNavigate();
+  const [isFixed, setIsFixed] = createSignal(false); // Controls position: fixed or absolute
+  const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
+  let lastScrollY = 0;
+  const navHeight = 96; // The height of the nav bar based on h-24 class
+
+  createEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY <= navHeight) {
+        // At the very top or within nav height: always show, absolute position
+        setIsFixed(false);
+        setShowNav(true);
+      } else if (currentScrollY > lastScrollY) {
+        // Scrolling down past nav height: hide instantly, keep fixed for smooth reappearance
+        setIsFixed(true);
+        setShowNav(false);
+      } else if (currentScrollY < lastScrollY) {
+        // Scrolling up: show smoothly, fixed position
+        setIsFixed(true);
+        setShowNav(true);
+      }
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    onCleanup(() => {
+      window.removeEventListener("scroll", handleScroll);
+    });
+  });
 
   const linkBaseClass = "text-xl  items-center transition-colors duration-150";
 
   return (
     <nav
-      class={`absolute w-full z-50 transition-all duration-300 ease-in-out bg-transparent nav-padding`}
+      class={`${
+        isFixed() ? "fixed" : "absolute"
+      } w-full z-50 bg-transparent nav-padding ${
+        isFixed() && showNav()
+          ? "transition-all duration-300 ease-in-out top-0"
+          : "transition-none -top-full"
+      }`}
+      style={{ top: `${showNav() ? 0 : -navHeight}px` }}
     >
       <div class="relative flex items-center h-24 font-sans justify-between">
         <MenuDrawer

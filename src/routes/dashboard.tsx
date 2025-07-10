@@ -16,7 +16,7 @@ export default function DashboardLayout(props: RouteSectionProps) {
   });
 
   return (
-    <div class="pt-16">
+    <div class="pt-16 container-padding">
       {/* The router renders the correct page (index.tsx or products.tsx) here */}
       {props.children}
     </div>

@@ -22,7 +22,8 @@ export default function Home() {
           />
         </div>
       </div>
-
+      <div class="h-screen bg-white"></div>
+      <div class="h-screen bg-white"></div>
       <Footer />
     </main>
   );
