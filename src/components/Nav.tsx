@@ -1,8 +1,10 @@
-import { A, useNavigate } from "@solidjs/router";
-import { createEffect, onCleanup, createSignal } from "solid-js";
+import { A, useLocation, useNavigate } from "@solidjs/router";
+import { createEffect, onCleanup, createSignal, createResource, Show } from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
-import { ShoppingBag } from "lucide-solid";
+import { ShoppingBag, SlidersHorizontal } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
+import SearchInput from "./SearchInput";
+import { useSearch } from "../context/SearchContext";
 
 const YourLogo = (props: { class?: string }) => (
   <svg
@@ -23,7 +25,10 @@ export default function Nav(props: {
   session: any;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
+  const { searchQuery, onSearchChange, showFilters, setShowFilters } = useSearch();
+
   let lastScrollY = 0;
   const navHeight = 72; // The height of the nav bar based on h-24 class
 
@@ -62,6 +67,22 @@ export default function Nav(props: {
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
         <div class="flex items-center">
+          <MagneticLink
+            onClick={() => {
+              if (location.pathname !== "/products") {
+                navigate("/products");
+              }
+              setShowFilters(!showFilters());
+            }}
+            class={`hidden md:flex text-black rounded-full shadow-sm items-center mr-4 ${showFilters() ? "bg-primary-accent" : ""}`}>
+            {(ref) => (
+              <div ref={ref} class="flex items-center px-4 py-1">
+                <SlidersHorizontal class="mr-2" size={20} />
+                Filters
+              </div>
+            )}
+          </MagneticLink>
+          <SearchInput searchQuery={searchQuery} onSearchChange={onSearchChange} />
           <MagneticLink
             onClick={() => navigate("/products")}
             class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}

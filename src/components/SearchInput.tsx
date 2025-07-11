@@ -5,7 +5,6 @@ import { useNavigate } from "@solidjs/router";
 interface SearchInputProps {
   searchQuery: Accessor<string>;
   onSearchChange: (query: string) => void;
-  isHomepage?: boolean;
   class?: string;
 }
 
@@ -15,38 +14,31 @@ const SearchInput = (props: SearchInputProps) => {
 
   const handleSearchSubmit = (e: Event) => {
     e.preventDefault();
-    if (props.isHomepage) {
-      // The query is already in localStorage via onSearchChange
-      navigate(`/products`);
-    }
+    navigate(`/products`);
   };
 
-  const searchInput = (
-    <div class="relative">
-      <label for={uniqueId} class="sr-only">
-        Search Products
-      </label>
-      <input
-        id={uniqueId}
-        type="search"
-        value={props.searchQuery()}
-        onInput={(e) => props.onSearchChange(e.currentTarget.value)}
-        class={`w-full pl-10 pr-4 py-1 bg-gray-50  rounded-full  focus:outline-none transition-all duration-200 ease-in-out text-black ${
-          props.class ?? ""
-        }`}
-        aria-label="Search products"
-        placeholder="CHINA'S BEST, FOUND FOR YOU"
-      />
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <Search size={18} class="text-gray-300" />
-      </div>
-    </div>
-  );
-
-  return props.isHomepage ? (
-    <form onSubmit={handleSearchSubmit}>{searchInput}</form>
-  ) : (
-    searchInput
+  return (
+    <form onSubmit={handleSearchSubmit}>
+        <div class="relative">
+          <label for={uniqueId} class="sr-only">
+            Search Products
+          </label>
+          <input
+            id={uniqueId}
+            type="search"
+            value={props.searchQuery()}
+            onInput={(e) => props.onSearchChange(e.currentTarget.value)}
+            class={`w-full pl-10 pr-4 py-1 bg-gray-50  rounded-full  focus:outline-none transition-all duration-200 ease-in-out text-black ${
+              props.class ?? ""
+            }`}
+            aria-label="Search products"
+            placeholder="CHINA'S BEST, FOUND FOR YOU"
+          />
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search size={18} class="text-gray-300" />
+          </div>
+        </div>
+    </form>
   );
 };
 

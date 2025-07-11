@@ -12,7 +12,6 @@ import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
 import FilterDropdown from "~/components/FilterDropdowns";
 import type { Product } from "~/db/schema";
-import SearchInput from "~/components/SearchInput";
 import { useSearch } from "~/context/SearchContext";
 import { SlidersHorizontal, ArrowLeftToLine } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
@@ -37,56 +36,8 @@ const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const FILTER_OPTIONS_QUERY_KEY = "filterOptions";
 const FIXED_PAGE_SIZE = 30;
 
-const LS_SELECTED_BRANDS_KEY = "productSelectedBrands";
-const LS_SELECTED_CATEGORIES_KEY = "productSelectedCategories";
-const LS_SELECTED_FUEL_TYPES_KEY = "productSelectedFuelTypes";
-
 export default function ProductsPage() {
-  const { searchQuery, onSearchChange } = useSearch();
-
-  const [selectedBrands, setSelectedBrands] = createSignal<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = createSignal<string[]>(
-    []
-  );
-  const [selectedFuelTypes, setSelectedFuelTypes] = createSignal<string[]>([]);
-  const [showFilters, setShowFilters] = createSignal(false);
-
-  onMount(() => {
-    setSelectedBrands(
-      JSON.parse(localStorage.getItem(LS_SELECTED_BRANDS_KEY) || "[]")
-    );
-    setSelectedCategories(
-      JSON.parse(localStorage.getItem(LS_SELECTED_CATEGORIES_KEY) || "[]")
-    );
-    setSelectedFuelTypes(
-      JSON.parse(localStorage.getItem(LS_SELECTED_FUEL_TYPES_KEY) || "[]")
-    );
-  });
-
-  createEffect(
-    on(selectedBrands, (brands) => {
-      if (typeof window !== "undefined")
-        localStorage.setItem(LS_SELECTED_BRANDS_KEY, JSON.stringify(brands));
-    })
-  );
-  createEffect(
-    on(selectedCategories, (categories) => {
-      if (typeof window !== "undefined")
-        localStorage.setItem(
-          LS_SELECTED_CATEGORIES_KEY,
-          JSON.stringify(categories)
-        );
-    })
-  );
-  createEffect(
-    on(selectedFuelTypes, (fuelTypes) => {
-      if (typeof window !== "undefined")
-        localStorage.setItem(
-          LS_SELECTED_FUEL_TYPES_KEY,
-          JSON.stringify(fuelTypes)
-        );
-    })
-  );
+  const { searchQuery, selectedBrands, setSelectedBrands, selectedCategories, setSelectedCategories, selectedFuelTypes, setSelectedFuelTypes, showFilters, setShowFilters } = useSearch();
 
   const [currentPage, setCurrentPage] = createSignal(1);
   const pageSize = () => FIXED_PAGE_SIZE;
@@ -209,48 +160,12 @@ export default function ProductsPage() {
     <MetaProvider>
       <main class="pt-24 bg-white  pb-4 sm:pb-6  lg:pb-8 min-h-screen container-padding">
         <div class="mx-auto w-full max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-          <div class="mb-6 flex items-center space-x-4">
-            <MagneticLink
-              onClick={() => setShowFilters(!showFilters())}
-              class={`hidden md:flex text-black rounded-full shadow-sm items-center ${
-                showFilters() ? "bg-primary-accent" : ""
-              }`}
-              enableHoverCircle={true}
-              hoverCircleColor="hsl(75, 99%, 52%)"
-              applyOverflowHidden={true}
-            >
-              {(ref) => (
-                <div ref={ref} class="flex items-center px-4 py-1">
-                  {showFilters() ? (
-                    <ArrowLeftToLine class="mr-2" size={20} />
-                  ) : (
-                    <SlidersHorizontal class="mr-2" size={20} />
-                  )}
-                  Filters
-                </div>
-              )}
-            </MagneticLink>
-            <div class="flex-grow">
-              <SearchInput
-                searchQuery={searchQuery}
-                onSearchChange={onSearchChange}
-                class="placeholder:text-gray-500 placeholder:font-bold border-gray-300 border  w-full"
-              />
-            </div>
-          </div>
-
           <div
-            class={`flex flex-col md:flex-row ${
-              showFilters() ? "md:gap-8" : ""
-            }`}
-          >
+            class={`flex flex-col md:flex-row ${showFilters() ? "md:gap-8" : ""}`}>
             {/* Filter Sidebar */}
             <Show when={showFilters()}>
               <div
-                class={`transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0 ${
-                  showFilters() ? "w-full md:w-80" : "w-0"
-                }`}
-              >
+                class={`transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0 ${showFilters() ? "w-full md:w-80" : "w-0"}`}>
                 <div class="flex flex-col space-y-2">
                   <div class="h-[0.5px] bg-gray-300 w-full"></div>
                   <FilterDropdown
@@ -258,10 +173,10 @@ export default function ProductsPage() {
                     options={availableBrands().map((b) => b.value)}
                     selectedOptions={selectedBrands()}
                     onSelect={(option) =>
-                      setSelectedBrands((prev) =>
-                        prev.includes(option)
-                          ? prev.filter((b) => b !== option)
-                          : [...prev, option]
+                      setSelectedBrands(
+                        selectedBrands().includes(option)
+                          ? selectedBrands().filter((b) => b !== option)
+                          : [...selectedBrands(), option]
                       )
                     }
                   />
@@ -271,23 +186,23 @@ export default function ProductsPage() {
                     options={availableCategories().map((c) => c.value)}
                     selectedOptions={selectedCategories()}
                     onSelect={(option) =>
-                      setSelectedCategories((prev) =>
-                        prev.includes(option)
-                          ? prev.filter((c) => c !== option)
-                          : [...prev, option]
+                      setSelectedCategories(
+                        selectedCategories().includes(option)
+                          ? selectedCategories().filter((c) => c !== option)
+                          : [...selectedCategories(), option]
                       )
                     }
                   />
-                  <div class="h-[0.5px] bg-gray-300 w-full"></div>{" "}
+                  <div class="h-[0.5px] bg-gray-300 w-full"></div>
                   <FilterDropdown
                     title="Fuel Type"
                     options={availableFuelTypes().map((f) => f.value)}
                     selectedOptions={selectedFuelTypes()}
                     onSelect={(option) =>
-                      setSelectedFuelTypes((prev) =>
-                        prev.includes(option)
-                          ? prev.filter((f) => f !== option)
-                          : [...prev, option]
+                      setSelectedFuelTypes(
+                        selectedFuelTypes().includes(option)
+                          ? selectedFuelTypes().filter((f) => f !== option)
+                          : [...selectedFuelTypes(), option]
                       )
                     }
                   />
