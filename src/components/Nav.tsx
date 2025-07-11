@@ -68,12 +68,7 @@ export default function Nav(props: {
         </A>
         <div class="flex items-center">
           <MagneticLink
-            onClick={() => {
-              if (location.pathname !== "/products") {
-                navigate("/products");
-              }
-              setShowFilters(!showFilters());
-            }}
+            onClick={() => setShowFilters(!showFilters())}
             class={`hidden md:flex text-black rounded-full shadow-sm items-center mr-4 ${showFilters() ? "bg-primary-accent" : ""}`}>
             {(ref) => (
               <div ref={ref} class="flex items-center px-4 py-1">

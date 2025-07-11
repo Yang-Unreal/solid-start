@@ -1,5 +1,5 @@
-// src/components/FilterDropdowns.tsx
 import { createSignal, createEffect, onCleanup, For, Show } from "solid-js";
+import { isServer } from "solid-js/web"; // Import the isServer utility
 import { ChevronDown } from "lucide-solid";
 
 interface FilterDropdownProps {
@@ -45,10 +45,9 @@ export default function FilterDropdown(props: FilterDropdownProps) {
               {(option) => (
                 <li
                   onClick={() => props.onSelect(option)}
-                  class={`px-2  text-neutral-700 my-1 text-sm rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between ${
+                  class={`px-4  text-neutral-700 my-1 text-sm rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between ${
                     props.selectedOptions.includes(option)
-                      ? "bg-primary-accent"
-                      : ""
+                      ? "bg-primary-accent" : ""
                   }`}
                 >
                   <span>{option}</span>

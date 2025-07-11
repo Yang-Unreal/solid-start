@@ -9,12 +9,13 @@ import {
   createMemo,
 } from "solid-js";
 import Nav from "~/components/Nav";
+import FilterSidebar from "~/components/FilterSidebar";
 
 import "./app.css";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
-import { SearchProvider } from "~/context/SearchContext";
+import { SearchProvider, useSearch } from "~/context/SearchContext";
 
 import { Menu } from "lucide-solid";
 
@@ -36,53 +37,51 @@ const queryClient = new QueryClient({
   },
 });
 
+function AppContent(props: any) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const session = authClient.useSession();
+  const handleLogoutSuccess = () => navigate("/login", { replace: true });
+
+  const isDashboardRoute = createMemo(() =>
+    location.pathname.startsWith("/dashboard")
+  );
+
+  createEffect(() => {
+    const currentSession = session();
+    if (!currentSession.isPending) {
+      if (!currentSession.data?.user && isDashboardRoute()) {
+        navigate("/login", { replace: true });
+      }
+    }
+  });
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <MetaProvider>
+        <Title>Liming</Title>
+        <Meta
+          name="description"
+          content="Let the hidden pears shine for the world"
+        />
+        <Nav onLogoutSuccess={handleLogoutSuccess} session={session} />
+        <FilterSidebar />
+        <main class="flex-grow">
+          <Suspense fallback={null}>{props.children}</Suspense>
+        </main>
+      </MetaProvider>
+    </QueryClientProvider>
+  );
+}
+
 export default function App() {
   return (
     <Router
-      root={(props) => {
-        const location = useLocation();
-        const navigate = useNavigate();
-        const session = authClient.useSession();
-        const handleLogoutSuccess = () => navigate("/login", { replace: true });
-
-        const isDashboardRoute = createMemo(() =>
-          location.pathname.startsWith("/dashboard")
-        );
-
-        const showNav = createMemo(
-          () =>
-            !isDashboardRoute() &&
-            location.pathname !== "/products/new" &&
-            !location.pathname.startsWith("/dashboard/products")
-        );
-
-        createEffect(() => {
-          const currentSession = session();
-          if (!currentSession.isPending) {
-            if (!currentSession.data?.user && isDashboardRoute()) {
-              navigate("/login", { replace: true });
-            }
-          }
-        });
-
-        return (
-          <SearchProvider>
-            <QueryClientProvider client={queryClient}>
-              <MetaProvider>
-                <Title>Liming</Title>
-                <Meta
-                  name="description"
-                  content="Let the hidden pears shine for the world"
-                />
-                <Nav onLogoutSuccess={handleLogoutSuccess} session={session} />
-                <main class="flex-grow">
-                  <Suspense fallback={null}>{props.children}</Suspense>
-                </main>
-              </MetaProvider>
-            </QueryClientProvider>
-          </SearchProvider>
-        );
-      }}
+      root={(props) => (
+        <SearchProvider>
+          <AppContent {...props} />
+        </SearchProvider>
+      )}
     >
       <FileRoutes />
     </Router>
