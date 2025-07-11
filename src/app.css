@@ -35,6 +35,7 @@ body {
 
 /* For other browsers that might not support the above, or for a more aggressive hide */
 html {
+  scroll-behavior: smooth; /* Smooth scrolling for the entire page */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
 }
