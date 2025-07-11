@@ -62,22 +62,24 @@ export default function Nav(props: {
       class={` fixed w-full  z-50 bg-white nav-padding transition-all  `}
       style={{ top: `${showNav() ? 0 : -navHeight}px` }}
     >
-      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between">
+      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between gap-4">
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
-        <div class="flex items-center">
-          <MagneticLink
-            onClick={() => setShowFilters(!showFilters())}
-            class={`hidden md:flex text-black rounded-full shadow-sm items-center mr-4 ${showFilters() ? "bg-primary-accent" : ""}`}>
-            {(ref) => (
-              <div ref={ref} class="flex items-center px-4 py-1">
-                <SlidersHorizontal class="mr-2" size={20} />
-                Filters
-              </div>
-            )}
-          </MagneticLink>
-          <SearchInput searchQuery={searchQuery} onSearchChange={onSearchChange} />
+        <MagneticLink
+          onClick={() => setShowFilters(!showFilters())}
+          class={`hidden md:flex text-black rounded-full shadow-sm items-center ${showFilters() ? "bg-primary-accent" : ""}`}>
+          {(ref) => (
+            <div ref={ref} class="flex items-center px-4 py-1">
+              <SlidersHorizontal class="mr-2" size={20} />
+              Filters
+            </div>
+          )}
+        </MagneticLink>
+        <div class="flex items-center flex-grow justify-end">
+          <div class="flex-grow">
+            <SearchInput searchQuery={searchQuery} onSearchChange={onSearchChange} />
+          </div>
           <MagneticLink
             onClick={() => navigate("/products")}
             class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}
