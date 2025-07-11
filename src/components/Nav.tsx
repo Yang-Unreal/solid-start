@@ -54,35 +54,36 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`fixed w-full  z-50 bg-white nav-padding transition-all  `}
+      class={` fixed w-full  z-50 bg-white nav-padding transition-all  `}
       style={{ top: `${showNav() ? 0 : -navHeight}px` }}
     >
-      <div class="relative flex items-center h-18 font-sans justify-between">
-        <MenuDrawer
-          onLogoutSuccess={props.onLogoutSuccess}
-          session={props.session}
-        />
+      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between">
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
-
-        <MagneticLink
-          onClick={() => navigate("/products")}
-          class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}
-          aria-label="Products"
-          enableHoverCircle={true}
-          hoverCircleColor="hsl(75, 99%, 52%)"
-          applyOverflowHidden={true}
-        >
-          {(ref) => (
-            <div ref={ref}>
-              <ShoppingBag
-                class={`w-4 md:w-5 lg:w-6 h-auto`}
-                stroke-width="1"
-              />
-            </div>
-          )}
-        </MagneticLink>
+        <div class="flex items-center">
+          <MagneticLink
+            onClick={() => navigate("/products")}
+            class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}
+            aria-label="Products"
+            enableHoverCircle={true}
+            hoverCircleColor="hsl(75, 99%, 52%)"
+            applyOverflowHidden={true}
+          >
+            {(ref) => (
+              <div ref={ref}>
+                <ShoppingBag
+                  class={`w-4 md:w-5 lg:w-6 h-auto`}
+                  stroke-width="1"
+                />
+              </div>
+            )}
+          </MagneticLink>
+          <MenuDrawer
+            onLogoutSuccess={props.onLogoutSuccess}
+            session={props.session}
+          />
+        </div>
       </div>
     </nav>
   );

@@ -45,8 +45,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
   // SVG path definitions for the curve animation
-  const pathStraight = "M 0 0 Q 0 500 0 1000";
-  const pathCurve = "M 0 0 Q 160 500 0 1000";
+  const pathStraight = "M 80 0 Q 80 500 80 1000";
+  const pathCurve = "M 80 0 Q -80 500 80 1000";
 
   const baseNavLinks: { href: string; label: string; onClick?: () => void }[] =
     [
@@ -98,8 +98,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   });
 
   if (!import.meta.env.SSR) {
-    let prevIsVisible: boolean | undefined;
-
     createEffect(() => {
       if (menuButtonRef) {
         menuButtonRef.style.backgroundColor = isOpen()
@@ -120,13 +118,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       if (drawerRef) {
         if (isOpen()) {
           animate(drawerRef, {
-            translateX: ["calc(-100% - 5rem)", "0%"],
+            translateX: ["calc(100% + 5rem)", "0%"],
             duration,
             easing: "easeOutQuint",
           });
         } else if (hasBeenOpened()) {
           animate(drawerRef, {
-            translateX: ["0%", "calc(-100% - 5rem)"],
+            translateX: ["0%", "calc(100% + 5rem)"],
             duration,
             easing: "easeInQuint",
           });
@@ -255,14 +253,14 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 left-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white shadow-xl z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
-        style="transform: translateX(calc(-100% - 5rem));"
+        class="fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white shadow-xl z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
+        style="transform: translateX(calc(100% + 5rem));"
       >
         {/* SVG Curve Element */}
         <div
-          class="absolute top-0 right-0 h-full w-20 pointer-events-none"
-          style="transform: translateX(calc(100% - 1px))"
-        >
+          class="absolute top-0 left-0 h-full w-20 pointer-events-none"
+          style="transform: translateX(calc(-100% + 1px))"
+>
           <svg
             class="h-full w-full"
             viewBox="0 0 80 1000"
@@ -282,12 +280,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           <hr class="border-gray-700" />
           <ul
             ref={navLinksListRef}
-            class="mt-4 space-y-4 flex flex-col items-start"
+            class="mt-4 space-y-4 flex flex-col items-end"
           >
             {navLinks().map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <li class="relative w-full pr-8">
+                <li class="relative w-full pl-8">
                   <MagneticLink
                     onClick={() => {
                       if (link.onClick) {
@@ -303,7 +301,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       <div class="items-center">
                         <div
                           ref={innerRef}
-                          class={`text-left text-5xl font-light transition-colors duration-300 ${
+                          class={`text-right text-5xl font-light transition-colors duration-300 ${
                             isActive
                               ? "text-white"
                               : "text-white/70 hover:text-white"
@@ -314,7 +312,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           {link.label}
                         </div>
                         <span
-                          class={`absolute -left-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block`}
+                          class={`absolute -right-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block`}
                           style={{
                             transform: `scale(${
                               (isActive && hoveredLink() === null) ||
@@ -325,7 +323,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           }}
                         ></span>
                         <span
-                          class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
+                          class={`absolute left-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
                           style={{
                             transform: `scale(${
                               (isActive && hoveredLink() === null) ||
