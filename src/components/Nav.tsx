@@ -25,7 +25,7 @@ export default function Nav(props: {
   const navigate = useNavigate();
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   let lastScrollY = 0;
-  const navHeight = 96; // The height of the nav bar based on h-24 class
+  const navHeight = 72; // The height of the nav bar based on h-24 class
 
   createEffect(() => {
     const handleScroll = () => {
@@ -50,14 +50,14 @@ export default function Nav(props: {
     });
   });
 
-  const linkBaseClass = "text-xl  items-center transition-colors duration-150";
+  const linkBaseClass = "text-xl  items-center ";
 
   return (
     <nav
-      class={`fixed w-full z-50 bg-transparent nav-padding transition-all duration-300 ease-in-out`}
+      class={`fixed w-full  z-50 bg-white nav-padding transition-all  `}
       style={{ top: `${showNav() ? 0 : -navHeight}px` }}
     >
-      <div class="relative flex items-center h-24 font-sans justify-between">
+      <div class="relative flex items-center h-18 font-sans justify-between">
         <MenuDrawer
           onLogoutSuccess={props.onLogoutSuccess}
           session={props.session}
