@@ -1,8 +1,5 @@
 // src/routes/products/index.tsx
-import {
-  createSignal,
-  createMemo,
-} from "solid-js";
+import { createSignal, createMemo } from "solid-js";
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
@@ -27,7 +24,13 @@ const PRODUCTS_QUERY_KEY_PREFIX = "products";
 const FIXED_PAGE_SIZE = 30;
 
 export default function ProductsPage() {
-  const { searchQuery, selectedBrands, selectedCategories, selectedFuelTypes, showFilters } = useSearch();
+  const {
+    searchQuery,
+    selectedBrands,
+    selectedCategories,
+    selectedFuelTypes,
+    showFilters,
+  } = useSearch();
 
   const [currentPage, setCurrentPage] = createSignal(1);
   const pageSize = () => FIXED_PAGE_SIZE;
@@ -113,15 +116,13 @@ export default function ProductsPage() {
     <MetaProvider>
       <main class="pt-24 bg-white  pb-4 sm:pb-6  lg:pb-8 min-h-screen container-padding">
         <div class="mx-auto w-full max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-          <div
-            class={`flex flex-col md:flex-row ${showFilters() ? "md:gap-8" : ""}`}>
+          <div class="flex flex-col md:flex-row">
             {/* Main content area */}
             <div class="flex-grow">
               <ProductDisplayArea
                 productsQuery={productsQuery}
                 handlePageChange={handlePageChange}
                 pageSize={pageSize}
-                showFilters={showFilters()}
               />
             </div>
           </div>
