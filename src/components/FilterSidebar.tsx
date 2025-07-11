@@ -58,8 +58,10 @@ export default function FilterSidebar() {
 
   return (
     <div
-      class={`fixed top-0 left-0 h-full w-80 bg-white shadow-xl z-40 pt-20 px-4 transition-transform duration-300 ease-in-out ${
-        showFilters() ? "translate-x-0" : "-translate-x-full"
+      class={`absolute top-full left-0 mt-2 w-64 bg-white shadow-lg rounded-md z-40 p-4 transition-all duration-300 ease-in-out origin-top ${
+        showFilters()
+          ? "scale-y-100 opacity-100 visible"
+          : "scale-y-0 opacity-0 invisible"
       }`}
     >
       <div class="flex flex-col space-y-2">

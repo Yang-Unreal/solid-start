@@ -1,10 +1,17 @@
 import { A, useLocation, useNavigate } from "@solidjs/router";
-import { createEffect, onCleanup, createSignal, createResource, Show } from "solid-js";
+import {
+  createEffect,
+  onCleanup,
+  createSignal,
+  createResource,
+  Show,
+} from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag, SlidersHorizontal } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
 import SearchInput from "./SearchInput";
 import { useSearch } from "../context/SearchContext";
+import FilterSidebar from "~/components/FilterSidebar";
 
 const YourLogo = (props: { class?: string }) => (
   <svg
@@ -27,7 +34,8 @@ export default function Nav(props: {
   const navigate = useNavigate();
   const location = useLocation();
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
-  const { searchQuery, onSearchChange, showFilters, setShowFilters } = useSearch();
+  const { searchQuery, onSearchChange, showFilters, setShowFilters } =
+    useSearch();
 
   let lastScrollY = 0;
   const navHeight = 72; // The height of the nav bar based on h-24 class
@@ -66,19 +74,28 @@ export default function Nav(props: {
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
-        <MagneticLink
-          onClick={() => setShowFilters(!showFilters())}
-          class={`hidden md:flex text-black rounded-full shadow-sm items-center ${showFilters() ? "bg-primary-accent" : ""}`}>
-          {(ref) => (
-            <div ref={ref} class="flex items-center px-4 py-1">
-              <SlidersHorizontal class="mr-2" size={20} />
-              Filters
-            </div>
-          )}
-        </MagneticLink>
+        <div class="relative hidden md:flex">
+          <MagneticLink
+            onClick={() => setShowFilters(!showFilters())}
+            class={`text-black rounded-full shadow-sm items-center ${
+              showFilters() ? "bg-primary-accent" : ""
+            }`}
+          >
+            {(ref) => (
+              <div ref={ref} class="flex items-center px-4 py-1">
+                <SlidersHorizontal class="mr-2" size={20} />
+                Filters
+              </div>
+            )}
+          </MagneticLink>
+          <FilterSidebar />
+        </div>
         <div class="flex items-center flex-grow justify-end">
           <div class="flex-grow">
-            <SearchInput searchQuery={searchQuery} onSearchChange={onSearchChange} />
+            <SearchInput
+              searchQuery={searchQuery}
+              onSearchChange={onSearchChange}
+            />
           </div>
           <MagneticLink
             onClick={() => navigate("/products")}
