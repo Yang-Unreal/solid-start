@@ -23,7 +23,6 @@ export default function Nav(props: {
   session: any;
 }) {
   const navigate = useNavigate();
-  const [isFixed, setIsFixed] = createSignal(false); // Controls position: fixed or absolute
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   let lastScrollY = 0;
   const navHeight = 96; // The height of the nav bar based on h-24 class
@@ -32,17 +31,14 @@ export default function Nav(props: {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
-      if (currentScrollY <= navHeight) {
-        // At the very top or within nav height: always show, absolute position
-        setIsFixed(false);
+      if (currentScrollY <= 0) {
+        // At the very top: always show
         setShowNav(true);
       } else if (currentScrollY > lastScrollY) {
-        // Scrolling down past nav height: hide instantly, keep fixed for smooth reappearance
-        setIsFixed(true);
+        // Scrolling down: hide
         setShowNav(false);
       } else if (currentScrollY < lastScrollY) {
-        // Scrolling up: show smoothly, fixed position
-        setIsFixed(true);
+        // Scrolling up: show
         setShowNav(true);
       }
       lastScrollY = currentScrollY;
@@ -58,13 +54,7 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`${
-        isFixed() ? "fixed" : "absolute"
-      } w-full z-50 bg-transparent nav-padding ${
-        isFixed() && showNav()
-          ? "transition-all duration-300 ease-in-out top-0"
-          : "transition-none -top-full"
-      }`}
+      class={`fixed w-full z-50 bg-transparent nav-padding transition-all duration-300 ease-in-out`}
       style={{ top: `${showNav() ? 0 : -navHeight}px` }}
     >
       <div class="relative flex items-center h-24 font-sans justify-between">
