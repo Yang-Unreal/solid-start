@@ -34,8 +34,10 @@ export default function Nav(props: {
   const navigate = useNavigate();
   const location = useLocation();
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
-  const { searchQuery, onSearchChange, showFilters, setShowFilters } =
-    useSearch();
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false); // Controls filter dropdown visibility
+  const [hasMouseLeftButton, setHasMouseLeftButton] = createSignal(false);
+  const [hasMouseLeftSidebar, setHasMouseLeftSidebar] = createSignal(false);
+  const { searchQuery, onSearchChange, setShowFilters } = useSearch(); // Removed showFilters from destructuring
 
   let lastScrollY = 0;
   const navHeight = 72; // The height of the nav bar based on h-24 class
@@ -63,6 +65,12 @@ export default function Nav(props: {
     });
   });
 
+  createEffect(() => {
+    if (hasMouseLeftButton() && hasMouseLeftSidebar()) {
+      setIsFilterDropdownOpen(false);
+    }
+  });
+
   const linkBaseClass = "text-xl  items-center ";
 
   return (
@@ -76,10 +84,17 @@ export default function Nav(props: {
         </A>
         <div class="relative hidden md:flex">
           <MagneticLink
-            onClick={() => setShowFilters(!showFilters())}
-            class={`text-black rounded-full shadow-sm items-center ${
-              showFilters() ? "bg-primary-accent" : ""
+            onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
+            onMouseEnter={() => {
+              setHasMouseLeftButton(false);
+            }}
+            onMouseLeave={() => setHasMouseLeftButton(true)}
+            class={`text-black rounded-full shadow-sm inline-flex justify-center items-center w-auto h-auto ${
+              isFilterDropdownOpen() ? "bg-primary-accent" : ""
             }`}
+            enableHoverCircle={true}
+            hoverCircleColor="hsl(75, 99%, 52%)"
+            applyOverflowHidden={true}
           >
             {(ref) => (
               <div ref={ref} class="flex items-center px-4 py-1">
@@ -88,7 +103,15 @@ export default function Nav(props: {
               </div>
             )}
           </MagneticLink>
-          <FilterSidebar />
+          <FilterSidebar
+            show={isFilterDropdownOpen()}
+            onMouseEnter={() => {
+              setHasMouseLeftSidebar(false);
+            }}
+            onMouseLeave={() => {
+              setHasMouseLeftSidebar(true);
+            }}
+          />
         </div>
         <div class="flex items-center flex-grow justify-end">
           <div class="flex-grow">

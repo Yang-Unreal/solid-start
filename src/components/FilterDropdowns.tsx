@@ -47,7 +47,8 @@ export default function FilterDropdown(props: FilterDropdownProps) {
                   onClick={() => props.onSelect(option)}
                   class={`px-4  text-neutral-700 my-1 text-sm rounded-full hover:bg-primary-accent cursor-pointer flex items-center justify-between ${
                     props.selectedOptions.includes(option)
-                      ? "bg-primary-accent" : ""
+                      ? "bg-primary-accent"
+                      : ""
                   }`}
                 >
                   <span>{option}</span>
