@@ -146,4 +146,9 @@ html::-webkit-scrollbar {
   .container-padding {
     @apply px-7 md:px-11 lg:px-17;
   }
+
+  .nav-container::before {
+    content: "";
+    @apply absolute inset-0 -z-10 backdrop-blur-lg;
+  }
 }

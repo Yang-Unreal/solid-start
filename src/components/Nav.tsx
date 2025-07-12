@@ -69,13 +69,13 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={` fixed w-full  z-50 nav-padding transition-all `}
+      class={`nav-container fixed w-full  z-50 nav-padding transition-all `}
       style={{
         "background-color": "rgba(255, 255, 255, 0.8)",
         top: `${showNav() ? 0 : -navHeight}px`,
       }}
     >
-      <div class="pl-3 md:pl-3 lg:pl-5  relative flex items-center h-18 font-sans justify-between gap-4">
+      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between gap-4">
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
