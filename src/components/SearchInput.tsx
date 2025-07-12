@@ -1,6 +1,6 @@
 import { createUniqueId, type Accessor } from "solid-js";
 import { Search } from "lucide-solid";
-import { useNavigate } from "@solidjs/router";
+import { useNavigate, useLocation } from "@solidjs/router"; // Added useLocation
 
 interface SearchInputProps {
   searchQuery: Accessor<string>;
@@ -11,10 +11,14 @@ interface SearchInputProps {
 const SearchInput = (props: SearchInputProps) => {
   const uniqueId = createUniqueId();
   const navigate = useNavigate();
+  const location = useLocation(); // Get current location
 
   const handleSearchSubmit = (e: Event) => {
     e.preventDefault();
-    navigate(`/products`);
+    const targetPath = location.pathname.startsWith("/dashboard")
+      ? "/dashboard/products"
+      : "/products";
+    navigate(targetPath);
   };
 
   return (
