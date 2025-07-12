@@ -226,37 +226,42 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   return (
     <>
-      <MagneticLink
-        ref={(el) => (menuButtonRef = el)}
-        onClick={() => setIsOpen(!isOpen())}
-        class=" w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 bg-transparent rounded-full z-101 flex flex-col justify-center items-center"
-        style={{
-          opacity: 1,
-          transform: "scale(1)",
-        }}
-        aria-label="Toggle menu"
-        enableHoverCircle={true}
-        hoverCircleColor="hsl(75, 99%, 52%)"
-        applyOverflowHidden={true}
-        triggerLeaveAnimation={shouldTriggerMenuButtonLeaveAnimation}
-        setTriggerLeaveAnimation={setShouldTriggerMenuButtonLeaveAnimation}
+      <div
+        onMouseEnter={() => setShouldTriggerMenuButtonLeaveAnimation(false)}
+        onMouseLeave={() => setShouldTriggerMenuButtonLeaveAnimation(true)}
       >
-        {(innerRef) => (
-          <div
-            ref={innerRef}
-            class="flex flex-col justify-center items-center "
-          >
+        <MagneticLink
+          ref={(el) => (menuButtonRef = el)}
+          onClick={() => setIsOpen(!isOpen())}
+          class=" w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 bg-transparent rounded-full z-101 flex flex-col justify-center items-center"
+          style={{
+            opacity: 1,
+            transform: "scale(1)",
+          }}
+          aria-label="Toggle menu"
+          enableHoverCircle={true}
+          hoverCircleColor="hsl(75, 99%, 52%)"
+          applyOverflowHidden={true}
+          triggerLeaveAnimation={shouldTriggerMenuButtonLeaveAnimation}
+          setTriggerLeaveAnimation={setShouldTriggerMenuButtonLeaveAnimation}
+        >
+          {(innerRef) => (
             <div
-              ref={(el) => (line1Ref = el)}
-              class="w-4 md:w-5 lg:w-6 h-[2px] mb-1.5 bg-black"
-            ></div>
-            <div
-              ref={(el) => (line2Ref = el)}
-              class="w-4 md:w-5 lg:w-6 h-[2px] bg-black"
-            ></div>
-          </div>
-        )}
-      </MagneticLink>
+              ref={innerRef}
+              class="flex flex-col justify-center items-center "
+            >
+              <div
+                ref={(el) => (line1Ref = el)}
+                class="w-4 md:w-5 lg:w-6 h-[2px] mb-1.5 bg-black"
+              ></div>
+              <div
+                ref={(el) => (line2Ref = el)}
+                class="w-4 md:w-5 lg:w-6 h-[2px] bg-black"
+              ></div>
+            </div>
+          )}
+        </MagneticLink>
+      </div>
 
       <div
         ref={(el) => (drawerRef = el)}
