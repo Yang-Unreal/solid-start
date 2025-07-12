@@ -6,8 +6,6 @@ import { useSearch } from "~/context/SearchContext";
 
 interface FilterSidebarProps {
   show: boolean;
-  onMouseLeave?: () => void;
-  onMouseEnter?: () => void;
 }
 
 interface FilterOptionsResponse
@@ -63,13 +61,11 @@ export default function FilterSidebar(props: FilterSidebarProps) {
 
   return (
     <div
-      class={`absolute top-full left-0 mt-2 w-64 bg-white shadow-lg rounded-md z-40 p-4 transition-all duration-300 ease-in-out origin-top ${
+      class={`absolute top-full left-0 w-64 bg-white shadow-lg rounded-md z-40 p-4 transition-all duration-300 ease-in-out origin-top ${
         props.show
           ? "scale-y-100 opacity-100 visible"
           : "scale-y-0 opacity-0 invisible"
       }`}
-      onMouseLeave={props.onMouseLeave}
-      onMouseEnter={props.onMouseEnter}
     >
       <div class="flex flex-col space-y-2">
         <div class="h-[0.5px] bg-gray-300 w-full"></div>

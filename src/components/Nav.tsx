@@ -35,8 +35,6 @@ export default function Nav(props: {
   const location = useLocation();
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false); // Controls filter dropdown visibility
-  const [hasMouseLeftButton, setHasMouseLeftButton] = createSignal(false);
-  const [hasMouseLeftSidebar, setHasMouseLeftSidebar] = createSignal(false);
   const { searchQuery, onSearchChange, setShowFilters } = useSearch(); // Removed showFilters from destructuring
 
   let lastScrollY = 0;
@@ -65,12 +63,6 @@ export default function Nav(props: {
     });
   });
 
-  createEffect(() => {
-    if (hasMouseLeftButton() && hasMouseLeftSidebar()) {
-      setIsFilterDropdownOpen(false);
-    }
-  });
-
   const linkBaseClass = "text-xl  items-center ";
 
   return (
@@ -82,13 +74,12 @@ export default function Nav(props: {
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
-        <div class="relative hidden md:flex">
+        <div
+          class="relative hidden md:flex"
+          onMouseLeave={() => setIsFilterDropdownOpen(false)}
+        >
           <MagneticLink
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
-            onMouseEnter={() => {
-              setHasMouseLeftButton(false);
-            }}
-            onMouseLeave={() => setHasMouseLeftButton(true)}
             class={`text-black rounded-full shadow-sm inline-flex justify-center items-center w-auto h-auto ${
               isFilterDropdownOpen() ? "bg-primary-accent" : ""
             }`}
@@ -103,15 +94,7 @@ export default function Nav(props: {
               </div>
             )}
           </MagneticLink>
-          <FilterSidebar
-            show={isFilterDropdownOpen()}
-            onMouseEnter={() => {
-              setHasMouseLeftSidebar(false);
-            }}
-            onMouseLeave={() => {
-              setHasMouseLeftSidebar(true);
-            }}
-          />
+          <FilterSidebar show={isFilterDropdownOpen()} />
         </div>
         <div class="flex items-center flex-grow justify-end">
           <div class="flex-grow">
