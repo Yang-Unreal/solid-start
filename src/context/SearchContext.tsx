@@ -18,8 +18,8 @@ interface SearchContextType {
   setSelectedCategories: (categories: string[]) => void;
   selectedFuelTypes: Accessor<string[]>;
   setSelectedFuelTypes: (fuelTypes: string[]) => void;
-  showFilters: Accessor<boolean>;
-  setShowFilters: Setter<boolean>;
+  currentPage: Accessor<number>;
+  setCurrentPage: Setter<number>;
 }
 
 const SearchContext = createContext<SearchContextType>();
@@ -36,7 +36,7 @@ export function SearchProvider(props: { children: any }) {
     []
   );
   const [selectedFuelTypes, setSelectedFuelTypes] = createSignal<string[]>([]);
-  const [showFilters, setShowFilters] = createSignal(false);
+  const [currentPage, setCurrentPage] = createSignal(1);
 
   onMount(() => {
     const storedQuery = localStorage.getItem(LS_SEARCH_QUERY_KEY);
@@ -103,8 +103,8 @@ export function SearchProvider(props: { children: any }) {
     setSelectedCategories: updateSelectedCategories,
     selectedFuelTypes,
     setSelectedFuelTypes: updateSelectedFuelTypes,
-    showFilters,
-    setShowFilters,
+    currentPage,
+    setCurrentPage,
   };
 
   return (

@@ -1,5 +1,5 @@
 // src/routes/products/index.tsx
-import { createSignal, createMemo } from "solid-js";
+
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
@@ -29,10 +29,9 @@ export default function ProductsPage() {
     selectedBrands,
     selectedCategories,
     selectedFuelTypes,
-    showFilters,
+    currentPage,
+    setCurrentPage,
   } = useSearch();
-
-  const [currentPage, setCurrentPage] = createSignal(1);
   const pageSize = () => FIXED_PAGE_SIZE;
 
   const buildFilterString = () => {

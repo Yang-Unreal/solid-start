@@ -10,7 +10,6 @@ export default function Contact() {
         <h1 class="text-center text-2xl font-medium text-neutral-800">
           Contact Us
         </h1>
-        <p>Contact information and form will go here.</p>
       </div>
       <div class="h-screen bg-white"></div>
       <div class="h-screen bg-white"></div>

@@ -37,7 +37,7 @@ export default function Nav(props: {
     shouldTriggerProductsButtonLeaveAnimation,
     setShouldTriggerProductsButtonLeaveAnimation,
   ] = createSignal(false);
-  const { searchQuery, onSearchChange, setShowFilters } = useSearch(); // Removed showFilters from destructuring
+  const { searchQuery, onSearchChange } = useSearch(); // Removed showFilters from destructuring
 
   let lastScrollY = 0;
   const navHeight = 72; // The height of the nav bar based on h-24 class
@@ -65,8 +65,6 @@ export default function Nav(props: {
     });
   });
 
-  const linkBaseClass = "text-xl  items-center ";
-
   return (
     <nav
       class={`nav-container fixed w-full  z-50 nav-padding transition-all `}
@@ -75,8 +73,8 @@ export default function Nav(props: {
         top: `${showNav() ? 0 : -navHeight}px`,
       }}
     >
-      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between gap-4">
-        <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
+      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between ">
+        <A href="/" class="text-xl  items-center mr-8" aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>
         <div
@@ -88,7 +86,7 @@ export default function Nav(props: {
         >
           <MagneticLink
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
-            class={`text-black rounded-full inline-flex justify-center items-center w-auto h-auto ${
+            class={`text-black border border-neutral-300 z-10 mr-4 rounded-full inline-flex justify-center items-center w-auto h-auto ${
               isFilterDropdownOpen() ? "bg-primary-accent" : ""
             }`}
             enableHoverCircle={true}
@@ -108,8 +106,8 @@ export default function Nav(props: {
           </MagneticLink>
           <FilterSidebar show={isFilterDropdownOpen()} />
         </div>
-        <div class="flex items-center flex-grow justify-end">
-          <div class="flex-grow">
+        <div class="flex items-center flex-grow justify-end ">
+          <div class="flex-grow ">
             <SearchInput
               searchQuery={searchQuery}
               onSearchChange={onSearchChange}
