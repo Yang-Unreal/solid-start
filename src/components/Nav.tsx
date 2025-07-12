@@ -1,11 +1,5 @@
-import { A, useLocation, useNavigate } from "@solidjs/router";
-import {
-  createEffect,
-  onCleanup,
-  createSignal,
-  createResource,
-  Show,
-} from "solid-js";
+import { A, useNavigate } from "@solidjs/router";
+import { createEffect, onCleanup, createSignal } from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag, SlidersHorizontal } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
@@ -32,7 +26,7 @@ export default function Nav(props: {
   session: any;
 }) {
   const navigate = useNavigate();
-  const location = useLocation();
+
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false); // Controls filter dropdown visibility
   const [
@@ -75,10 +69,13 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={` fixed w-full  z-50 bg-white nav-padding transition-all`}
-      style={{ top: `${showNav() ? 0 : -navHeight}px` }}
+      class={` fixed w-full  z-50 nav-padding transition-all `}
+      style={{
+        "background-color": "rgba(255, 255, 255, 0.8)",
+        top: `${showNav() ? 0 : -navHeight}px`,
+      }}
     >
-      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between gap-4">
+      <div class="pl-3 md:pl-3 lg:pl-5  relative flex items-center h-18 font-sans justify-between gap-4">
         <A href="/" class={`${linkBaseClass}`} aria-label="Homepage">
           <YourLogo class="h-3 md:h-4 w-auto " />
         </A>

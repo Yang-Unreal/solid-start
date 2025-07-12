@@ -1,13 +1,6 @@
 // src/components/MenuDrawer.tsx
 
-import {
-  createSignal,
-  createEffect,
-  onMount,
-  onCleanup,
-  Show,
-  For,
-} from "solid-js";
+import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { animate, stagger } from "animejs";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
