@@ -115,6 +115,9 @@ export default function ProductsPage() {
   return (
     <MetaProvider>
       <main class="pt-24 bg-white  pb-4 sm:pb-6  lg:pb-8 min-h-screen container-padding">
+        <h1 class="items-center justify-center w-full text-center font-extrabold text-5xl pb-12">
+          ALL PRODUCTS
+        </h1>
         <div class="mx-auto w-full max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
           <div class="flex flex-col md:flex-row">
             {/* Main content area */}

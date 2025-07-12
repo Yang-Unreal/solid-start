@@ -71,9 +71,9 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
               {(product) => (
                 <A
                   href={`/products/${product.id}`}
-                  class="card-content-host flex flex-col bg-white shadow-lg rounded-xl overflow-hidden group"
+                  class="card-content-host flex flex-col bg-white   overflow-hidden group"
                 >
-                  <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
+                  <div class="w-full aspect-video bg-neutral-100 rounded-sm overflow-hidden">
                     <picture>
                       <source
                         srcset={product.images.thumbnail.avif}
@@ -93,7 +93,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                       />
                     </picture>
                   </div>
-                  <div class="p-5 flex flex-col flex-grow">
+                  <div class=" flex flex-col flex-grow">
                     <h2
                       class="text-lg font-semibold text-neutral-800 truncate"
                       title={product.name}

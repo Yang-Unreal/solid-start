@@ -88,7 +88,7 @@ export default function Nav(props: {
         >
           <MagneticLink
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
-            class={`text-black rounded-full shadow-sm inline-flex justify-center items-center w-auto h-auto ${
+            class={`text-black rounded-full inline-flex justify-center items-center w-auto h-auto ${
               isFilterDropdownOpen() ? "bg-primary-accent" : ""
             }`}
             enableHoverCircle={true}
