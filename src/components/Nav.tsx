@@ -36,6 +36,7 @@ export default function Nav(props: {
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false); // Controls filter dropdown visibility
   const [shouldTriggerFilterButtonLeaveAnimation, setShouldTriggerFilterButtonLeaveAnimation] = createSignal(false);
+  const [shouldTriggerProductsButtonLeaveAnimation, setShouldTriggerProductsButtonLeaveAnimation] = createSignal(false);
   const { searchQuery, onSearchChange, setShowFilters } = useSearch(); // Removed showFilters from destructuring
 
   let lastScrollY = 0;
@@ -109,23 +110,30 @@ export default function Nav(props: {
               onSearchChange={onSearchChange}
             />
           </div>
-          <MagneticLink
-            onClick={() => navigate("/products")}
-            class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}
-            aria-label="Products"
-            enableHoverCircle={true}
-            hoverCircleColor="hsl(75, 99%, 52%)"
-            applyOverflowHidden={true}
+          <div
+            onMouseEnter={() => setShouldTriggerProductsButtonLeaveAnimation(false)}
+            onMouseLeave={() => setShouldTriggerProductsButtonLeaveAnimation(true)}
           >
-            {(ref) => (
-              <div ref={ref}>
-                <ShoppingBag
-                  class={`w-4 md:w-5 lg:w-6 h-auto`}
-                  stroke-width="1"
-                />
-              </div>
-            )}
-          </MagneticLink>
+            <MagneticLink
+              onClick={() => navigate("/products")}
+              class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}
+              aria-label="Products"
+              enableHoverCircle={true}
+              hoverCircleColor="hsl(75, 99%, 52%)"
+              applyOverflowHidden={true}
+              triggerLeaveAnimation={shouldTriggerProductsButtonLeaveAnimation}
+              setTriggerLeaveAnimation={setShouldTriggerProductsButtonLeaveAnimation}
+            >
+              {(ref) => (
+                <div ref={ref}>
+                  <ShoppingBag
+                    class={`w-4 md:w-5 lg:w-6 h-auto`}
+                    stroke-width="1"
+                  />
+                </div>
+              )}
+            </MagneticLink>
+          </div>
           <MenuDrawer
             onLogoutSuccess={props.onLogoutSuccess}
             session={props.session}

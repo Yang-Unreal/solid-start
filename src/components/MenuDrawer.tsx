@@ -28,11 +28,16 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   const [isMobile, setIsMobile] = createSignal(false);
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
+  const [
+    shouldTriggerMenuButtonLeaveAnimation,
+    setShouldTriggerMenuButtonLeaveAnimation,
+  ] = createSignal(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const closeDrawer = () => {
     setIsOpen(false);
+    setShouldTriggerMenuButtonLeaveAnimation(true);
   };
 
   let menuButtonRef: HTMLButtonElement | undefined;
@@ -233,6 +238,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         enableHoverCircle={true}
         hoverCircleColor="hsl(75, 99%, 52%)"
         applyOverflowHidden={true}
+        triggerLeaveAnimation={shouldTriggerMenuButtonLeaveAnimation}
+        setTriggerLeaveAnimation={setShouldTriggerMenuButtonLeaveAnimation}
       >
         {(innerRef) => (
           <div
@@ -260,7 +267,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <div
           class="absolute top-0 left-0 h-full w-20 pointer-events-none"
           style="transform: translateX(calc(-100% + 1px))"
->
+        >
           <svg
             class="h-full w-full"
             viewBox="0 0 80 1000"
