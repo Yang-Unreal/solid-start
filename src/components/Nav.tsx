@@ -35,6 +35,7 @@ export default function Nav(props: {
   const location = useLocation();
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false); // Controls filter dropdown visibility
+  const [shouldTriggerFilterButtonLeaveAnimation, setShouldTriggerFilterButtonLeaveAnimation] = createSignal(false);
   const { searchQuery, onSearchChange, setShowFilters } = useSearch(); // Removed showFilters from destructuring
 
   let lastScrollY = 0;
@@ -76,7 +77,10 @@ export default function Nav(props: {
         </A>
         <div
           class="relative hidden md:flex"
-          onMouseLeave={() => setIsFilterDropdownOpen(false)}
+          onMouseLeave={() => {
+            setIsFilterDropdownOpen(false);
+            setShouldTriggerFilterButtonLeaveAnimation(true);
+          }}
         >
           <MagneticLink
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
@@ -86,6 +90,8 @@ export default function Nav(props: {
             enableHoverCircle={true}
             hoverCircleColor="hsl(75, 99%, 52%)"
             applyOverflowHidden={true}
+            triggerLeaveAnimation={shouldTriggerFilterButtonLeaveAnimation}
+            setTriggerLeaveAnimation={setShouldTriggerFilterButtonLeaveAnimation}
           >
             {(ref) => (
               <div ref={ref} class="flex items-center px-4 py-1">

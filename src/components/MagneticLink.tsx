@@ -11,7 +11,7 @@ import { createAnimatable, eases, animate } from "animejs";
 
 interface MagneticLinkProps
   extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "children"> {
-  ref?: (el: HTMLButtonElement) => void;
+  ref?: (el: HTMLButtonButtonElement) => void;
   onClick?: (e: MouseEvent) => void;
   children?:
     | JSX.Element
@@ -19,6 +19,8 @@ interface MagneticLinkProps
   enableHoverCircle?: boolean;
   hoverCircleColor?: string;
   applyOverflowHidden?: boolean;
+  triggerLeaveAnimation?: Accessor<boolean>;
+  setTriggerLeaveAnimation?: Setter<boolean>;
 }
 
 export default function MagneticLink(props: MagneticLinkProps) {
@@ -67,7 +69,7 @@ export default function MagneticLink(props: MagneticLinkProps) {
     }
   };
 
-  // --- Combined Mouse Leave Logic ---
+  // --- Magnetic Effect Logic ---
   const handleMouseLeave = () => {
     if (isMobile()) return;
 
@@ -80,8 +82,11 @@ export default function MagneticLink(props: MagneticLinkProps) {
       innerAnimatableInstance.translateX(0);
       innerAnimatableInstance.translateY(0);
     }
+  };
 
-    // Trigger circle leave effect
+  // --- Circle Exit Animation Logic ---
+  const triggerCircleExitAnimation = () => {
+    if (isMobile()) return;
     if (props.enableHoverCircle && circleRef) {
       if (circleAnimation) circleAnimation.pause();
       circleAnimation = animate(circleRef, {
@@ -123,6 +128,15 @@ export default function MagneticLink(props: MagneticLinkProps) {
       );
     }
     setIsReady(true);
+  });
+
+  createEffect(() => {
+    if (props.triggerLeaveAnimation && props.triggerLeaveAnimation()) {
+      triggerCircleExitAnimation();
+      if (props.setTriggerLeaveAnimation) {
+        props.setTriggerLeaveAnimation(false);
+      }
+    }
   });
 
   createEffect(() => {
