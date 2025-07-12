@@ -86,7 +86,7 @@ export default function Nav(props: {
         >
           <MagneticLink
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
-            class={`text-black border border-neutral-300 z-10 mr-4 rounded-full inline-flex justify-center items-center w-auto h-auto ${
+            class={`text-black w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16  z-10  rounded-full inline-flex justify-center items-center  ${
               isFilterDropdownOpen() ? "bg-primary-accent" : ""
             }`}
             enableHoverCircle={true}
@@ -99,8 +99,7 @@ export default function Nav(props: {
           >
             {(ref) => (
               <div ref={ref} class="flex items-center px-4 py-1">
-                <SlidersHorizontal class="mr-2" size={20} />
-                Filters
+                <SlidersHorizontal size={20} />
               </div>
             )}
           </MagneticLink>

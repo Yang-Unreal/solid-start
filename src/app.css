@@ -58,7 +58,6 @@ html::-webkit-scrollbar {
   .card-content-host {
     @apply bg-white
            rounded-lg
-      
            h-full
            overflow-hidden;
   }

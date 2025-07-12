@@ -110,7 +110,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       }
 
       const easing = "easeOutQuint";
-      const duration = 600;
+      const duration = 400;
 
       // Animate Drawer
       if (drawerRef) {
@@ -161,8 +161,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           animate(links, {
             opacity: [0, 1],
             translateY: [40, 0],
-            delay: stagger(80, { start: 100 }),
-            duration: 500,
+            delay: stagger(50, { start: 100 }),
+            duration: 400,
             easing: "easeOutQuart",
           });
         } else if (hasBeenOpened()) {

@@ -63,7 +63,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
       <div class="relative">
         {/* --- Product Grid Container (Always rendered for hydration stability) --- */}
         <div
-          class={`product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5`}
+          class={`product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5`}
         >
           {/* Only show products if not loading and no error, and products exist */}
           <Show when={!isLoading() && !error() && products().length > 0}>
