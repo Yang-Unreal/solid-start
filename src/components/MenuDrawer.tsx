@@ -206,14 +206,31 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       const handleWheel = (event: WheelEvent) => {
         if (isOpen()) event.preventDefault();
       };
+
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          drawerRef &&
+          menuButtonRef &&
+          !drawerRef.contains(event.target as Node) &&
+          !menuButtonRef.contains(event.target as Node)
+        ) {
+          closeDrawer();
+        }
+      };
+
       if (isOpen()) {
         document.body.addEventListener("wheel", handleWheel, {
           passive: false,
         });
+        document.addEventListener("mousedown", handleClickOutside);
       } else {
         document.body.removeEventListener("wheel", handleWheel);
+        document.removeEventListener("mousedown", handleClickOutside);
       }
-      onCleanup(() => document.body.removeEventListener("wheel", handleWheel));
+      onCleanup(() => {
+        document.body.removeEventListener("wheel", handleWheel);
+        document.removeEventListener("mousedown", handleClickOutside);
+      });
     });
   }
 
