@@ -6,12 +6,14 @@ import {
   onCleanup,
   type JSX,
   createEffect,
+  type Accessor,
+  type Setter,
 } from "solid-js";
 import { createAnimatable, eases, animate } from "animejs";
 
 interface MagneticLinkProps
   extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "children"> {
-  ref?: (el: HTMLButtonButtonElement) => void;
+  ref?: (el: HTMLButtonElement) => void;
   onClick?: (e: MouseEvent) => void;
   children?:
     | JSX.Element
