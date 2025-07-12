@@ -1,6 +1,7 @@
 // src/components/FilterSidebar.tsx
 import { createMemo, Show } from "solid-js";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
+import { useNavigate, useLocation } from "@solidjs/router";
 import FilterDropdown from "~/components/FilterDropdowns";
 import { useSearch } from "~/context/SearchContext";
 
@@ -28,6 +29,8 @@ const fetchFilterOptionsQueryFn = async (): Promise<FilterOptionsResponse> => {
 };
 
 export default function FilterSidebar(props: FilterSidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     selectedBrands,
     setSelectedBrands,
@@ -73,39 +76,66 @@ export default function FilterSidebar(props: FilterSidebarProps) {
           title="Brand"
           options={availableBrands().map((b) => b.value)}
           selectedOptions={selectedBrands()}
-          onSelect={(option) =>
+          onSelect={(option) => {
             setSelectedBrands(
               selectedBrands().includes(option)
                 ? selectedBrands().filter((b) => b !== option)
                 : [...selectedBrands(), option]
-            )
-          }
+            );
+            if (location.pathname.startsWith("/dashboard")) {
+              if (location.pathname !== "/dashboard/products") {
+                navigate("/dashboard/products");
+              }
+            } else {
+              if (location.pathname !== "/products") {
+                navigate("/products");
+              }
+            }
+          }}
         />
         <div class="h-[0.5px] bg-gray-300 w-full"></div>
         <FilterDropdown
           title="Category"
           options={availableCategories().map((c) => c.value)}
           selectedOptions={selectedCategories()}
-          onSelect={(option) =>
+          onSelect={(option) => {
             setSelectedCategories(
               selectedCategories().includes(option)
                 ? selectedCategories().filter((c) => c !== option)
                 : [...selectedCategories(), option]
-            )
-          }
+            );
+            if (location.pathname.startsWith("/dashboard")) {
+              if (location.pathname !== "/dashboard/products") {
+                navigate("/dashboard/products");
+              }
+            } else {
+              if (location.pathname !== "/products") {
+                navigate("/products");
+              }
+            }
+          }}
         />
         <div class="h-[0.5px] bg-gray-300 w-full"></div>
         <FilterDropdown
           title="Fuel Type"
           options={availableFuelTypes().map((f) => f.value)}
           selectedOptions={selectedFuelTypes()}
-          onSelect={(option) =>
+          onSelect={(option) => {
             setSelectedFuelTypes(
               selectedFuelTypes().includes(option)
                 ? selectedFuelTypes().filter((f) => f !== option)
                 : [...selectedFuelTypes(), option]
-            )
-          }
+            );
+            if (location.pathname.startsWith("/dashboard")) {
+              if (location.pathname !== "/dashboard/products") {
+                navigate("/dashboard/products");
+              }
+            } else {
+              if (location.pathname !== "/products") {
+                navigate("/products");
+              }
+            }
+          }}
         />
       </div>
     </div>
