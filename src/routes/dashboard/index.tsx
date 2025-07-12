@@ -10,7 +10,7 @@ export default function DashboardIndexPage() {
   return (
     <div class="w-full h-full">
       <Show when={sessionSignal().data?.user}>
-        <div class="p-6 h-full w-full">
+        <div class="container-padding h-full w-full">
           <div class="flex flex-col items-center max-w-md mx-auto">
             <Show
               when={sessionSignal().data?.user?.image}

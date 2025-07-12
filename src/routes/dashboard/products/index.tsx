@@ -18,8 +18,6 @@ interface ApiResponse {
   pagination: PaginationInfo;
   error?: string;
 }
-interface FilterOptionsResponse
-  extends Record<string, Record<string, number>> {}
 
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 
@@ -110,7 +108,7 @@ export default function DashboardProductsPage() {
   }));
 
   return (
-    <div class="container-padding pt-16">
+    <div class=" pt-16">
       <div class="flex flex-col md:flex-row">
         {/* Main content area */}
         <Suspense>
