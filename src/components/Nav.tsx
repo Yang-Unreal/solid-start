@@ -40,7 +40,7 @@ export default function Nav(props: {
   const { searchQuery, onSearchChange } = useSearch(); // Removed showFilters from destructuring
 
   let lastScrollY = 0;
-  const navHeight = 72; // The height of the nav bar based on h-24 class
+  const navHeight = 60; // The height of the nav bar based on h-24 class
 
   createEffect(() => {
     const handleScroll = () => {
@@ -73,9 +73,13 @@ export default function Nav(props: {
         top: `${showNav() ? 0 : -navHeight}px`,
       }}
     >
-      <div class="pl-3 md:pl-3 lg:pl-5 relative flex items-center h-18 font-sans justify-between ">
-        <A href="/" class="text-xl  items-center mr-8" aria-label="Homepage">
-          <YourLogo class="h-3 md:h-4 w-auto " />
+      <div class=" relative flex items-center h-15 font-sans justify-between ">
+        <A
+          href="/"
+          class="text-xl  items-center justify-center mr-8"
+          aria-label="Homepage"
+        >
+          <YourLogo class="h-3 md:h-5 w-auto" />
         </A>
         <div
           class="relative hidden md:flex"
@@ -86,7 +90,7 @@ export default function Nav(props: {
         >
           <MagneticLink
             onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
-            class={`text-black w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16  z-10  rounded-full inline-flex justify-center items-center  ${
+            class={`text-black shadow-md w-10 h-10  z-10  rounded-full inline-flex justify-center items-center  bg-neutral-50 ${
               isFilterDropdownOpen() ? "bg-primary-accent" : ""
             }`}
             enableHoverCircle={true}
@@ -98,7 +102,7 @@ export default function Nav(props: {
             }
           >
             {(ref) => (
-              <div ref={ref} class="flex items-center px-4 py-1">
+              <div ref={ref} class="flex items-center">
                 <SlidersHorizontal size={20} />
               </div>
             )}
@@ -122,7 +126,7 @@ export default function Nav(props: {
           >
             <MagneticLink
               onClick={() => navigate("/products")}
-              class={` w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 flex justify-center items-center rounded-full`}
+              class={` w-10 h-10 shadow-md flex justify-center items-center rounded-full bg-neutral-50`}
               aria-label="Products"
               enableHoverCircle={true}
               hoverCircleColor="hsl(75, 99%, 52%)"
@@ -134,10 +138,7 @@ export default function Nav(props: {
             >
               {(ref) => (
                 <div ref={ref}>
-                  <ShoppingBag
-                    class={`w-4 md:w-5 lg:w-6 h-auto`}
-                    stroke-width="1"
-                  />
+                  <ShoppingBag stroke-width="1" size={20} />
                 </div>
               )}
             </MagneticLink>

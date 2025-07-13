@@ -65,7 +65,7 @@ function AppContent(props: any) {
           content="Let the hidden pears shine for the world"
         />
         <Nav onLogoutSuccess={handleLogoutSuccess} session={session} />
-        <FilterSidebar />
+
         <main class="flex-grow">
           <Suspense fallback={null}>{props.children}</Suspense>
         </main>

@@ -100,7 +100,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       if (menuButtonRef) {
         menuButtonRef.style.backgroundColor = isOpen()
           ? "hsl(75, 99%, 52%)"
-          : "transparent";
+          : "bg-neutral-50";
       }
     });
 
@@ -243,7 +243,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
           onClick={() => setIsOpen(!isOpen())}
-          class="fixed -translate-y-5 md:-translate-y-6 lg:-translate-y-8 w-10 h-10 md:w-11 md:h-11 lg:w-16 lg:h-16 bg-transparent rounded-full z-101 flex flex-col justify-center items-center"
+          class="fixed -translate-y-5 w-10 h-10 shadow-md bg-neutral-50 rounded-full z-101 flex flex-col justify-center items-center"
           style={{
             opacity: 1,
             transform: "scale(1)",
@@ -262,11 +262,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             >
               <div
                 ref={(el) => (line1Ref = el)}
-                class="w-4 md:w-5 lg:w-6 h-[2px] mb-1.5 bg-black"
+                class="w-5 h-[2px] mb-1.5 bg-black"
               ></div>
               <div
                 ref={(el) => (line2Ref = el)}
-                class="w-4 md:w-5 lg:w-6 h-[2px] bg-black"
+                class="w-5 h-[2px] bg-black"
               ></div>
             </div>
           )}

@@ -23,7 +23,7 @@ const SearchInput = (props: SearchInputProps) => {
 
   return (
     <form onSubmit={handleSearchSubmit}>
-      <div class="relative">
+      <div class="relative ">
         <label for={uniqueId} class="sr-only">
           Search Products
         </label>
@@ -32,7 +32,7 @@ const SearchInput = (props: SearchInputProps) => {
           type="search"
           value={props.searchQuery()}
           onInput={(e) => props.onSearchChange(e.currentTarget.value)}
-          class={`w-full pl-10 pr-4 py-1 bg-gray-50 border border-neutral-300 rounded-full  focus:outline-none transition-all duration-200 ease-in-out text-black ${
+          class={`w-full h-10 pl-10 pr-4  shadow-md bg-neutral-50 rounded-full  focus:outline-none transition-all duration-200 ease-in-out text-black ${
             props.class ?? ""
           }`}
           aria-label="Search products"
