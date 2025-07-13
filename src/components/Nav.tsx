@@ -81,7 +81,7 @@ export default function Nav(props: {
           aria-label="Homepage"
         >
           <YourLogo class="h-5 hidden md:block w-auto" />
-          <MobileLogo class="h-10 block md:hidden w-auto" />
+          <MobileLogo class="h-10 w-10 block md:hidden " />
         </A>
         <div
           class="relative hidden md:flex"

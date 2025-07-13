@@ -1,6 +1,6 @@
 const MobileLogo = (props: { class?: string }) => (
   <div
-    class={`w-10 h-10 rounded-full bg-neutral-50 shadow-md flex items-center justify-center ${props.class}`}
+    class={` rounded-full bg-neutral-50 shadow-md flex items-center justify-center ${props.class}`}
   >
     <svg
       id="Layer_2"
