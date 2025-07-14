@@ -25,12 +25,30 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     shouldTriggerMenuButtonLeaveAnimation,
     setShouldTriggerMenuButtonLeaveAnimation,
   ] = createSignal(false);
+  const [isMenuButtonOnTop, setMenuButtonOnTop] = createSignal(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const closeDrawer = () => {
+    if (!isOpen()) return;
     setIsOpen(false);
     setShouldTriggerMenuButtonLeaveAnimation(true);
+    setTimeout(() => {
+      setMenuButtonOnTop(false);
+    }, 500);
+  };
+
+  const openDrawer = () => {
+    setMenuButtonOnTop(true);
+    setIsOpen(true);
+  };
+
+  const toggleDrawer = () => {
+    if (isOpen()) {
+      closeDrawer();
+    } else {
+      openDrawer();
+    }
   };
 
   let menuButtonRef: HTMLButtonElement | undefined;
@@ -229,13 +247,14 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   return (
     <>
       <div
+        class={`relative ${isMenuButtonOnTop() ? "z-101" : ""}`}
         onMouseEnter={() => setShouldTriggerMenuButtonLeaveAnimation(false)}
         onMouseLeave={() => setShouldTriggerMenuButtonLeaveAnimation(true)}
       >
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
-          onClick={() => setIsOpen(!isOpen())}
-          class={` w-10 h-10 shadow-md bg-neutral-50 rounded-full z-101 flex flex-col justify-center items-center ${
+          onClick={toggleDrawer}
+          class={` w-10 h-10 shadow-md bg-neutral-50 rounded-full flex flex-col justify-center items-center ${
             isOpen() ? "bg-primary-accent" : "bg-neutral-50"
           }`}
           style={{
