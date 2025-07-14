@@ -89,40 +89,48 @@ export default function Nav(props: {
           <YourLogo class="h-5 hidden md:block w-auto" />
           <MobileLogo class="h-10 w-10 block md:hidden " />
         </A>
-        <div
-          class="relative hidden md:flex"
-          onMouseLeave={() => {
-            setIsFilterDropdownOpen(false);
-            setShouldTriggerFilterButtonLeaveAnimation(true);
-          }}
-        >
-          <MagneticLink
-            onClick={() => setIsFilterDropdownOpen(!isFilterDropdownOpen())}
-            class={`text-black shadow-md w-10 h-10  z-10  rounded-full inline-flex justify-center items-center  bg-neutral-50 ${
-              isFilterDropdownOpen() ? "bg-primary-accent" : ""
-            }`}
-            enableHoverCircle={true}
-            hoverCircleColor="hsl(75, 99%, 52%)"
-            applyOverflowHidden={true}
-            triggerLeaveAnimation={shouldTriggerFilterButtonLeaveAnimation}
-            setTriggerLeaveAnimation={
-              setShouldTriggerFilterButtonLeaveAnimation
-            }
-          >
-            {(ref) => (
-              <div ref={ref} class="flex items-center">
-                <SlidersHorizontal size={20} />
-              </div>
-            )}
-          </MagneticLink>
-          <FilterSidebar show={isFilterDropdownOpen()} />
-        </div>
-        <div class="flex items-center flex-grow justify-end ">
-          <div class="flex-grow ">
-            <SearchInput
-              searchQuery={searchQuery}
-              onSearchChange={onSearchChange}
-            />
+        <div class="flex items-center justify-end">
+          {/* Filter button and sidebar moved outside SearchInput form */}
+          <div class="flex bg-neutral-50 rounded-full shadow-md">
+            <div
+              class="relative flex items-center" /* Added mr-2 for spacing */
+              onMouseLeave={() => {
+                setIsFilterDropdownOpen(false);
+                setShouldTriggerFilterButtonLeaveAnimation(true);
+              }}
+            >
+              <MagneticLink
+                onClick={(e) => {
+                  e.preventDefault(); // Prevent default button behavior (e.g., form submission)
+                  e.stopPropagation(); // Stop event propagation to parent elements
+                  setIsFilterDropdownOpen(!isFilterDropdownOpen());
+                }}
+                class={`text-black  w-10 h-10 z-10 rounded-full inline-flex justify-center items-center bg-neutral-50 ${
+                  isFilterDropdownOpen() ? "bg-primary-accent" : ""
+                }`}
+                enableHoverCircle={true}
+                hoverCircleColor="hsl(75, 99%, 52%)"
+                applyOverflowHidden={true}
+                triggerLeaveAnimation={shouldTriggerFilterButtonLeaveAnimation}
+                setTriggerLeaveAnimation={
+                  setShouldTriggerFilterButtonLeaveAnimation
+                }
+              >
+                {(ref) => (
+                  <div ref={ref} class="flex items-center">
+                    <SlidersHorizontal size={20} />
+                  </div>
+                )}
+              </MagneticLink>
+              <FilterSidebar show={isFilterDropdownOpen()} />
+            </div>
+
+            <div class="flex-grow">
+              <SearchInput
+                searchQuery={searchQuery}
+                onSearchChange={onSearchChange}
+              />
+            </div>
           </div>
           <div
             onMouseEnter={() =>
@@ -134,7 +142,7 @@ export default function Nav(props: {
           >
             <MagneticLink
               onClick={() => navigate("/products")}
-              class={` w-10 h-10 shadow-md flex justify-center items-center rounded-full bg-neutral-50`}
+              class={`w-10 h-10 shadow-md flex justify-center items-center rounded-full bg-neutral-50`}
               aria-label="Products"
               enableHoverCircle={true}
               hoverCircleColor="hsl(75, 99%, 52%)"

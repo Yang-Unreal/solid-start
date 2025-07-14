@@ -1,5 +1,5 @@
 import { createSignal, createEffect, onCleanup, For, Show } from "solid-js";
-import { isServer } from "solid-js/web"; // Import the isServer utility
+
 import { ChevronDown } from "lucide-solid";
 
 interface FilterDropdownProps {
