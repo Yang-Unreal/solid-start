@@ -32,15 +32,20 @@ const SearchInput = (props: SearchInputProps) => {
           type="search"
           value={props.searchQuery()}
           onInput={(e) => props.onSearchChange(e.currentTarget.value)}
-          class={`w-full h-10 pl-10 pr-4  shadow-md bg-neutral-50 rounded-full  focus:outline-none transition-all duration-200 ease-in-out text-black ${
+          class={`w-full h-10 pl-4 pr-10 shadow-md bg-neutral-50 rounded-full focus:outline-none transition-all duration-200 ease-in-out text-black ${
             props.class ?? ""
           }`}
           aria-label="Search products"
           placeholder="CHINA'S BEST, FOUND FOR YOU"
         />
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <Search size={18} class="text-gray-300" />
-        </div>
+        <button
+          type="submit"
+          class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          aria-label="Submit search"
+          onClick={handleSearchSubmit}
+        >
+          <Search size={18} class="text-black" />
+        </button>
       </div>
     </form>
   );
