@@ -40,7 +40,20 @@ export default function Nav(props: {
     shouldTriggerProductsButtonLeaveAnimation,
     setShouldTriggerProductsButtonLeaveAnimation,
   ] = createSignal(false);
-  const { searchQuery, onSearchChange } = useSearch(); // Removed showFilters from destructuring
+  const {
+    searchQuery,
+    onSearchChange,
+    selectedBrands,
+    selectedCategories,
+    selectedFuelTypes,
+  } = useSearch();
+
+  const hasActiveFilters = createMemo(
+    () =>
+      selectedBrands().length > 0 ||
+      selectedCategories().length > 0 ||
+      selectedFuelTypes().length > 0
+  );
 
   let lastScrollY = 0;
   const navHeight = 60; // The height of the nav bar based on h-24 class
@@ -105,8 +118,10 @@ export default function Nav(props: {
                   e.stopPropagation(); // Stop event propagation to parent elements
                   setIsFilterDropdownOpen(!isFilterDropdownOpen());
                 }}
-                class={`text-black  w-10 h-10 z-10 rounded-full inline-flex justify-center items-center bg-neutral-50 ${
-                  isFilterDropdownOpen() ? "bg-primary-accent" : ""
+                class={`text-black w-10 h-10 z-10 rounded-full inline-flex justify-center items-center ${
+                  isFilterDropdownOpen() || hasActiveFilters()
+                    ? "bg-primary-accent"
+                    : "bg-neutral-50"
                 }`}
                 enableHoverCircle={true}
                 hoverCircleColor="hsl(75, 99%, 52%)"
