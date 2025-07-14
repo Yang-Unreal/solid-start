@@ -296,12 +296,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           <hr class="border-gray-700" />
           <ul
             ref={navLinksListRef}
-            class="mt-4 space-y-4 flex flex-col items-end"
+            class="mt-4 space-y-4 flex flex-col items-start"
           >
             {navLinks().map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <li class="relative w-full pl-8">
+                <li class="relative w-full">
                   <MagneticLink
                     onClick={() => {
                       if (link.onClick) {
@@ -317,7 +317,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       <div class="items-center">
                         <div
                           ref={innerRef}
-                          class={`text-right text-5xl font-light transition-colors duration-300 ${
+                          class={`text-left text-4xl md:text-5xl font-light transition-colors duration-300 ${
                             isActive
                               ? "text-white"
                               : "text-white/70 hover:text-white"
@@ -328,7 +328,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           {link.label}
                         </div>
                         <span
-                          class={`absolute -right-8 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block`}
+                          class={`absolute -left-6 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block`}
                           style={{
                             transform: `scale(${
                               (isActive && hoveredLink() === null) ||
@@ -339,7 +339,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           }}
                         ></span>
                         <span
-                          class={`absolute left-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
+                          class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
                           style={{
                             transform: `scale(${
                               (isActive && hoveredLink() === null) ||
