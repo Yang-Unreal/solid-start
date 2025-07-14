@@ -82,15 +82,6 @@ export default function FilterSidebar(props: FilterSidebarProps) {
                 ? selectedBrands().filter((b) => b !== option)
                 : [...selectedBrands(), option]
             );
-            if (location.pathname.startsWith("/dashboard")) {
-              if (location.pathname !== "/dashboard/products") {
-                navigate("/dashboard/products");
-              }
-            } else {
-              if (location.pathname !== "/products") {
-                navigate("/products");
-              }
-            }
           }}
           parentIsOpen={props.show}
         />
@@ -105,15 +96,6 @@ export default function FilterSidebar(props: FilterSidebarProps) {
                 ? selectedCategories().filter((c) => c !== option)
                 : [...selectedCategories(), option]
             );
-            if (location.pathname.startsWith("/dashboard")) {
-              if (location.pathname !== "/dashboard/products") {
-                navigate("/dashboard/products");
-              }
-            } else {
-              if (location.pathname !== "/products") {
-                navigate("/products");
-              }
-            }
           }}
           parentIsOpen={props.show}
         />
@@ -128,15 +110,6 @@ export default function FilterSidebar(props: FilterSidebarProps) {
                 ? selectedFuelTypes().filter((f) => f !== option)
                 : [...selectedFuelTypes(), option]
             );
-            if (location.pathname.startsWith("/dashboard")) {
-              if (location.pathname !== "/dashboard/products") {
-                navigate("/dashboard/products");
-              }
-            } else {
-              if (location.pathname !== "/products") {
-                navigate("/products");
-              }
-            }
           }}
           parentIsOpen={props.show}
         />
