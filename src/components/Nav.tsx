@@ -209,6 +209,7 @@ export default function Nav(props: {
                     <SearchInput
                       searchQuery={searchQuery}
                       onSearchChange={onSearchChange}
+                      onSearchSubmit={() => setIsMobileSearchOpen(false)}
                     />
                   </div>
                 </div>

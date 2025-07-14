@@ -5,6 +5,7 @@ import { useNavigate, useLocation } from "@solidjs/router"; // Added useLocation
 interface SearchInputProps {
   searchQuery: Accessor<string>;
   onSearchChange: (query: string) => void;
+  onSearchSubmit?: () => void;
   class?: string;
 }
 
@@ -19,6 +20,7 @@ const SearchInput = (props: SearchInputProps) => {
       ? "/dashboard/products"
       : "/products";
     navigate(targetPath);
+    props.onSearchSubmit?.();
   };
 
   return (
