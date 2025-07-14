@@ -92,6 +92,7 @@ export default function FilterSidebar(props: FilterSidebarProps) {
               }
             }
           }}
+          parentIsOpen={props.show}
         />
         <div class="h-[0.5px] bg-gray-300 w-full"></div>
         <FilterDropdown
@@ -114,6 +115,7 @@ export default function FilterSidebar(props: FilterSidebarProps) {
               }
             }
           }}
+          parentIsOpen={props.show}
         />
         <div class="h-[0.5px] bg-gray-300 w-full"></div>
         <FilterDropdown
@@ -136,6 +138,7 @@ export default function FilterSidebar(props: FilterSidebarProps) {
               }
             }
           }}
+          parentIsOpen={props.show}
         />
       </div>
     </div>

@@ -7,11 +7,19 @@ interface FilterDropdownProps {
   options: string[];
   selectedOptions: string[];
   onSelect: (option: string) => void;
+  parentIsOpen: boolean; // New prop to indicate if the parent sidebar is open
 }
 
 export default function FilterDropdown(props: FilterDropdownProps) {
   const [isOpen, setIsOpen] = createSignal(false);
   let dropdownRef: HTMLDivElement | undefined;
+
+  // Close dropdown if parent sidebar closes
+  createEffect(() => {
+    if (!props.parentIsOpen) {
+      setIsOpen(false);
+    }
+  });
 
   const toggleDropdown = () => setIsOpen(!isOpen());
   const selectedCount = () => props.selectedOptions.length;
