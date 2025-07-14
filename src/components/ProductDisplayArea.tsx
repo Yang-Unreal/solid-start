@@ -63,7 +63,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
       <div class="relative">
         {/* --- Product Grid Container (Always rendered for hydration stability) --- */}
         <div
-          class={`product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5`}
+          class={`product-grid-container justify-center grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4`}
         >
           {/* Only show products if not loading and no error, and products exist */}
           <Show when={!isLoading() && !error() && products().length > 0}>
@@ -71,9 +71,9 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
               {(product) => (
                 <A
                   href={`/products/${product.id}`}
-                  class="card-content-host flex flex-col bg-white   overflow-hidden group"
+                  class="card-content-host flex flex-col bg-white overflow-hidden"
                 >
-                  <div class="w-full aspect-video bg-neutral-100 rounded-sm overflow-hidden">
+                  <div class="w-full aspect-video bg-neutral-100  overflow-hidden">
                     <picture>
                       <source
                         srcset={product.images.thumbnail.avif}
@@ -86,7 +86,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                       <img
                         src={product.images.thumbnail.jpeg}
                         alt={product.name}
-                        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        class="w-full h-full object-cover"
                         fetchpriority="high"
                         width="640"
                         height="360"
@@ -103,17 +103,6 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                     <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
                       {formatPrice(product.priceInCents)}
                     </p>
-                    <div class="mt-auto pt-2 border-t border-neutral-100">
-                      <p class="text-xs text-neutral-600">
-                        Brand: {product.brand || "N/A"}
-                      </p>
-                      <p class="text-xs text-neutral-600">
-                        Category: {product.category || "N/A"}
-                      </p>
-                      <p class="text-xs text-neutral-600">
-                        Stock: {product.stockQuantity}
-                      </p>
-                    </div>
                   </div>
                 </A>
               )}
