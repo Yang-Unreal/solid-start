@@ -1,7 +1,7 @@
 import { A, useNavigate, useLocation } from "@solidjs/router";
 import { createEffect, onCleanup, createSignal, createMemo } from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
-import { ShoppingBag, SlidersHorizontal } from "lucide-solid";
+import { ShoppingBag, SlidersHorizontal, Search, X } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
 import SearchInput from "./SearchInput";
 import { useSearch } from "../context/SearchContext";
@@ -32,6 +32,7 @@ export default function Nav(props: {
 
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false); // Controls filter dropdown visibility
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = createSignal(false); // State for mobile search
   const [
     shouldTriggerFilterButtonLeaveAnimation,
     setShouldTriggerFilterButtonLeaveAnimation,
@@ -103,10 +104,10 @@ export default function Nav(props: {
           <MobileLogo class="h-10 w-10 block md:hidden " />
         </A>
         <div class="flex items-center justify-end">
-          {/* Filter button and sidebar moved outside SearchInput form */}
-          <div class="flex bg-neutral-50 rounded-full shadow-md">
+          {/* Desktop search and filter */}
+          <div class="hidden md:flex bg-neutral-50 rounded-full shadow-md">
             <div
-              class="relative flex items-center" /* Added mr-2 for spacing */
+              class="relative flex items-center"
               onMouseLeave={() => {
                 setIsFilterDropdownOpen(false);
                 setShouldTriggerFilterButtonLeaveAnimation(true);
@@ -114,8 +115,8 @@ export default function Nav(props: {
             >
               <MagneticLink
                 onClick={(e) => {
-                  e.preventDefault(); // Prevent default button behavior (e.g., form submission)
-                  e.stopPropagation(); // Stop event propagation to parent elements
+                  e.preventDefault();
+                  e.stopPropagation();
                   setIsFilterDropdownOpen(!isFilterDropdownOpen());
                 }}
                 class={`text-black w-10 h-10 z-10 rounded-full inline-flex justify-center items-center ${
@@ -147,6 +148,65 @@ export default function Nav(props: {
               />
             </div>
           </div>
+
+          {/* Mobile search button */}
+          <div class="md:hidden">
+            <MagneticLink
+              onClick={() => setIsMobileSearchOpen(true)}
+              class="w-10 h-10 shadow-md flex justify-center items-center rounded-full bg-neutral-50"
+              aria-label="Search"
+            >
+              {(ref) => (
+                <div ref={ref}>
+                  <Search stroke-width="1" size={20} />
+                </div>
+              )}
+            </MagneticLink>
+          </div>
+
+          {/* Mobile search and filter view (Full Screen) */}
+          {isMobileSearchOpen() && (
+            <div class="fixed inset-0 bg-white z-50 p-4 md:hidden">
+              <div class="flex justify-end mb-4">
+                <button onClick={() => setIsMobileSearchOpen(false)}>
+                  <X size={24} />
+                </button>
+              </div>
+              <div class="flex flex-col space-y-4">
+                <div class="flex bg-neutral-50 rounded-full shadow-md p-2">
+                  <div
+                    class="relative flex items-center"
+                    onMouseLeave={() => {
+                      setIsFilterDropdownOpen(false);
+                    }}
+                  >
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setIsFilterDropdownOpen(!isFilterDropdownOpen());
+                      }}
+                      class={`text-black w-10 h-10 z-10 rounded-full inline-flex justify-center items-center ${
+                        isFilterDropdownOpen() || hasActiveFilters()
+                          ? "bg-primary-accent"
+                          : "bg-neutral-50"
+                      }`}
+                    >
+                      <SlidersHorizontal size={20} />
+                    </button>
+                    <FilterSidebar show={isFilterDropdownOpen()} />
+                  </div>
+                  <div class="flex-grow">
+                    <SearchInput
+                      searchQuery={searchQuery}
+                      onSearchChange={onSearchChange}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div
             onMouseEnter={() =>
               setShouldTriggerProductsButtonLeaveAnimation(false)

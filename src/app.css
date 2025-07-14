@@ -139,7 +139,7 @@ html::-webkit-scrollbar {
   }
 
   .nav-padding {
-    @apply pl-7 md:pl-11 lg:pl-17 pr-17 md:pr-21 lg:pr-27;
+    @apply pl-7 md:pl-11 lg:pl-17 pr-7 md:pr-11 lg:pr-17;
   }
   .container-padding {
     @apply px-7 md:px-11 lg:px-17;

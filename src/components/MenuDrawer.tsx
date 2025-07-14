@@ -235,7 +235,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
           onClick={() => setIsOpen(!isOpen())}
-          class={`fixed -translate-y-5 w-10 h-10 shadow-md bg-neutral-50 rounded-full z-101 flex flex-col justify-center items-center ${
+          class={` w-10 h-10 shadow-md bg-neutral-50 rounded-full z-101 flex flex-col justify-center items-center ${
             isOpen() ? "bg-primary-accent" : "bg-neutral-50"
           }`}
           style={{
