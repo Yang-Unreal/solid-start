@@ -1,23 +1,18 @@
 // src/app.tsx
 import { Router, useLocation, useNavigate } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
-import {
-  Suspense,
-  Show,
-  createEffect,
-  createSignal,
-  createMemo,
-} from "solid-js";
+import { Suspense, createEffect, createMemo } from "solid-js";
 import Nav from "~/components/Nav";
-import FilterSidebar from "~/components/FilterSidebar";
 
 import "./app.css";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
-import { SearchProvider, useSearch } from "~/context/SearchContext";
-
-import { Menu } from "lucide-solid";
+import { SearchProvider } from "~/context/SearchContext";
+import {
+  HeroVisibilityProvider,
+  useHeroVisibility,
+} from "~/context/HeroVisibilityContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +51,9 @@ function AppContent(props: any) {
     }
   });
 
+  const { isHeroVisible } = useHeroVisibility();
+  const isCurrentPageHome = createMemo(() => location.pathname === "/");
+
   return (
     <QueryClientProvider client={queryClient}>
       <MetaProvider>
@@ -64,7 +62,12 @@ function AppContent(props: any) {
           name="description"
           content="Let the hidden pears shine for the world"
         />
-        <Nav onLogoutSuccess={handleLogoutSuccess} session={session} />
+        <Nav
+          onLogoutSuccess={handleLogoutSuccess}
+          session={session}
+          transparent={isCurrentPageHome() && isHeroVisible()}
+          removeNavContainerClass={isCurrentPageHome() && isHeroVisible()}
+        />
 
         <main class="flex-grow">
           <Suspense fallback={null}>{props.children}</Suspense>
@@ -79,7 +82,9 @@ export default function App() {
     <Router
       root={(props) => (
         <SearchProvider>
-          <AppContent {...props} />
+          <HeroVisibilityProvider>
+            <AppContent {...props} />
+          </HeroVisibilityProvider>
         </SearchProvider>
       )}
     >

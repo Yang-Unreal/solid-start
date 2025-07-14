@@ -1,5 +1,5 @@
-import { A, useNavigate } from "@solidjs/router";
-import { createEffect, onCleanup, createSignal } from "solid-js";
+import { A, useNavigate, useLocation } from "@solidjs/router";
+import { createEffect, onCleanup, createSignal, createMemo } from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag, SlidersHorizontal } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
@@ -25,6 +25,8 @@ const YourLogo = (props: { class?: string }) => (
 export default function Nav(props: {
   onLogoutSuccess: () => void;
   session: any;
+  transparent?: boolean;
+  removeNavContainerClass?: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -68,9 +70,13 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`nav-container fixed w-full  z-50 nav-padding transition-all `}
+      class={`fixed w-full z-50 nav-padding transition-all ${
+        props.removeNavContainerClass ? "" : "nav-container"
+      } ${props.transparent ? "bg-transparent" : ""}`}
       style={{
-        "background-color": "rgba(255, 255, 255, 0.8)",
+        "background-color": props.transparent
+          ? "transparent"
+          : "rgba(255, 255, 255, 0.8)",
         top: `${showNav() ? 0 : -navHeight}px`,
       }}
     >
