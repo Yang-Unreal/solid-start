@@ -34,11 +34,11 @@ const SearchInput = (props: SearchInputProps) => {
           type="search"
           value={props.searchQuery()}
           onInput={(e) => props.onSearchChange(e.currentTarget.value)}
-          class={`w-75 h-10 pl-4 pr-10  bg-neutral-50 rounded-full focus:outline-none transition-all duration-200 ease-in-out text-black ${
+          class={`w-60 h-10 pl-2 pr-2 bg-neutral-50 rounded-full focus:outline-none transition-all duration-200 ease-in-out text-black ${
             props.class ?? ""
           }`}
           aria-label="Search products"
-          placeholder="CHINA'S BEST, FOUND FOR YOU"
+          placeholder="China's best, found for you"
         />
         <button
           type="submit"

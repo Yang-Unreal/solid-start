@@ -166,8 +166,8 @@ export default function Nav(props: {
 
           {/* Mobile search and filter view (Full Screen) */}
           {isMobileSearchOpen() && (
-            <div class="fixed inset-0 bg-white z-50 nav-padding md:hidden py-5">
-              <div class="flex justify-center items-center mb-10">
+            <div class="fixed inset-0 bg-white z-50 nav-padding md:hidden">
+              <div class="flex justify-center items-center mb-10 mt-10">
                 <A
                   href="/"
                   class="text-xl  items-center justify-center"
@@ -175,7 +175,7 @@ export default function Nav(props: {
                 >
                   <YourLogo class="h-5 w-auto" />
                 </A>
-                <div class="absolute top-2 right-5">
+                <div class="absolute top-2 right-7">
                   <button onClick={() => setIsMobileSearchOpen(false)}>
                     <X size={24} />
                   </button>
