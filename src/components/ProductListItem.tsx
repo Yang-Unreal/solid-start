@@ -42,26 +42,50 @@ export default function ProductListItem(props: ProductListItemProps) {
           <img
             src={props.product.images.thumbnail.jpeg}
             alt={props.product.name}
-            class="w-24 h-16 rounded-md object-cover"
+            class="w-24 h-16  object-cover"
             fetchpriority="high"
           />
         </picture>
       </div>
-      <div class="flex-1 min-w-0">
-        <p class="font-bold text-black truncate">{props.product.name}</p>
-        <p class="text-sm font-semibold text-black mt-1">
-          {formatPrice(props.product.priceInCents)}
-        </p>
-        <p class="text-xs text-black mt-1">
-          Brand: {props.product.brand || "N/A"}
-        </p>
-        <p class="text-xs text-black">
-          Category: {props.product.category || "N/A"}
-        </p>
-        <p class="text-xs text-black">Stock: {props.product.stockQuantity}</p>
-      </div>
+      <A
+        href={`/products/${props.product.id}`}
+        class="flex-1 min-w-0 flex items-center space-x-4 group"
+      >
+        <div class="flex-shrink-0 w-24">
+          <picture>
+            <source
+              srcset={props.product.images.thumbnail.avif}
+              type="image/avif"
+            />
+            <source
+              srcset={props.product.images.thumbnail.webp}
+              type="image/webp"
+            />
+            <img
+              src={props.product.images.thumbnail.jpeg}
+              alt={props.product.name}
+              class="w-24 h-16 rounded-md object-cover group-hover:scale-105 transition-transform duration-200"
+              fetchpriority="high"
+            />
+          </picture>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-black truncate group-hover:text-indigo-600 transition-colors duration-200">
+            {props.product.name}
+          </p>
+          <p class="text-sm font-semibold text-black mt-1">
+            {formatPrice(props.product.priceInCents)}
+          </p>
+          <p class="text-xs text-black mt-1">
+            Brand: {props.product.brand || "N/A"}
+          </p>
+          <p class="text-xs text-black">
+            Category: {props.product.category || "N/A"}
+          </p>
+          <p class="text-xs text-black">Stock: {props.product.stockQuantity}</p>
+        </div>
+      </A>
       <div class="flex flex-col items-center space-y-2">
-        {/* THE FIX IS HERE */}
         <A
           href={`/dashboard/products/${props.product.id}/edit`}
           class="p-1 rounded-md text-neutral-600 hover:bg-neutral-50 hover:text-neutral-800"
