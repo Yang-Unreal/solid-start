@@ -182,7 +182,7 @@ export default function Nav(props: {
                 </div>
               </div>
               <div class="flex flex-col space-y-4">
-                <div class="flex bg-neutral-50 rounded-full shadow-md p-2">
+                <div class="flex bg-neutral-50 rounded-full shadow-md">
                   <div
                     class="relative flex items-center"
                     onMouseLeave={() => {
