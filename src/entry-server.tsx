@@ -13,7 +13,18 @@ export default createHandler((event) => {
               name="viewport"
               content="width=device-width, initial-scale=1"
             />
-            <link rel="icon" href="/icon.svg" />
+
+            <link
+              rel="icon"
+              href="/icon.svg"
+              media="(prefers-color-scheme: light)"
+            />
+            <link
+              rel="icon"
+              href="/icon-dark.svg"
+              media="(prefers-color-scheme: dark)"
+            />
+
             {assets}
           </head>
           <body>
