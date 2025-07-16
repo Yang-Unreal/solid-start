@@ -217,6 +217,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         if (isOpen()) event.preventDefault();
       };
 
+      const handleTouchMove = (event: TouchEvent) => {
+        if (isOpen()) event.preventDefault();
+      };
+
       const handleClickOutside = (event: MouseEvent) => {
         if (
           drawerRef &&
@@ -229,16 +233,24 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       };
 
       if (isOpen()) {
+        document.body.style.overflow = "hidden";
         document.body.addEventListener("wheel", handleWheel, {
+          passive: false,
+        });
+        document.body.addEventListener("touchmove", handleTouchMove, {
           passive: false,
         });
         document.addEventListener("mousedown", handleClickOutside);
       } else {
+        document.body.style.overflow = "";
         document.body.removeEventListener("wheel", handleWheel);
+        document.body.removeEventListener("touchmove", handleTouchMove);
         document.removeEventListener("mousedown", handleClickOutside);
       }
       onCleanup(() => {
+        document.body.style.overflow = "";
         document.body.removeEventListener("wheel", handleWheel);
+        document.body.removeEventListener("touchmove", handleTouchMove);
         document.removeEventListener("mousedown", handleClickOutside);
       });
     });
