@@ -1,7 +1,7 @@
 // src/components/FilterSidebar.tsx
-import { createMemo, Show } from "solid-js";
-import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
-import { useNavigate, useLocation } from "@solidjs/router";
+import { createMemo } from "solid-js";
+import { useQuery } from "@tanstack/solid-query";
+
 import FilterDropdown from "~/components/FilterDropdowns";
 import { useSearch } from "~/context/SearchContext";
 
@@ -29,8 +29,6 @@ const fetchFilterOptionsQueryFn = async (): Promise<FilterOptionsResponse> => {
 };
 
 export default function FilterSidebar(props: FilterSidebarProps) {
-  const navigate = useNavigate();
-  const location = useLocation();
   const {
     selectedBrands,
     setSelectedBrands,
@@ -64,7 +62,7 @@ export default function FilterSidebar(props: FilterSidebarProps) {
 
   return (
     <div
-      class={`absolute top-full left-0 w-76 md:w-70 bg-white shadow-lg rounded-md z-40 p-4 transition-all duration-300 ease-in-out origin-top ${
+      class={`absolute top-full  left-0 w-[calc(100vw-56px)] md:w-70 bg-white shadow-lg rounded-md z-40 p-4 transition-all duration-300 ease-in-out origin-top ${
         props.show
           ? "scale-y-100 opacity-100 visible"
           : "scale-y-0 opacity-0 invisible"

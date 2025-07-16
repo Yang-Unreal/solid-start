@@ -32,28 +32,14 @@ const queryClient = new QueryClient({
   },
 });
 
-function AppContent(props: any) {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const session = authClient.useSession();
-  const handleLogoutSuccess = () => navigate("/login", { replace: true });
-
-  const isDashboardRoute = createMemo(() =>
-    location.pathname.startsWith("/dashboard")
-  );
-
-  createEffect(() => {
-    const currentSession = session();
-    if (!currentSession.isPending) {
-      if (!currentSession.data?.user && isDashboardRoute()) {
-        navigate("/login", { replace: true });
-      }
-    }
-  });
-
-  const { isHeroVisible } = useHeroVisibility();
-  const isCurrentPageHome = createMemo(() => location.pathname === "/");
-
+function AppContent(props: {
+  children: any;
+  session: any;
+  handleLogoutSuccess: () => void;
+  isDashboardRoute: () => boolean;
+  isCurrentPageHome: () => boolean;
+  isHeroVisible: () => boolean;
+}) {
   return (
     <QueryClientProvider client={queryClient}>
       <MetaProvider>
@@ -63,10 +49,12 @@ function AppContent(props: any) {
           content="Let the hidden pears shine for the world"
         />
         <Nav
-          onLogoutSuccess={handleLogoutSuccess}
-          session={session}
-          transparent={isCurrentPageHome() && isHeroVisible()}
-          removeNavContainerClass={isCurrentPageHome() && isHeroVisible()}
+          onLogoutSuccess={props.handleLogoutSuccess}
+          session={props.session}
+          transparent={props.isCurrentPageHome() && props.isHeroVisible()}
+          removeNavContainerClass={
+            props.isCurrentPageHome() && props.isHeroVisible()
+          }
         />
 
         <main class="flex-grow">
@@ -80,13 +68,48 @@ function AppContent(props: any) {
 export default function App() {
   return (
     <Router
-      root={(props) => (
-        <SearchProvider>
-          <HeroVisibilityProvider>
-            <AppContent {...props} />
-          </HeroVisibilityProvider>
-        </SearchProvider>
-      )}
+      root={(props) => {
+        const location = useLocation();
+        const navigate = useNavigate();
+        const session = authClient.useSession();
+        const handleLogoutSuccess = () => navigate("/login", { replace: true });
+
+        const isDashboardRoute = createMemo(() =>
+          location.pathname.startsWith("/dashboard")
+        );
+
+        createEffect(() => {
+          const currentSession = session();
+          if (!currentSession.isPending) {
+            if (!currentSession.data?.user && isDashboardRoute()) {
+              navigate("/login", { replace: true });
+            }
+          }
+        });
+
+        return (
+          <SearchProvider>
+            <HeroVisibilityProvider>
+              {(() => {
+                const { isHeroVisible } = useHeroVisibility();
+                const isCurrentPageHome = createMemo(
+                  () => location.pathname === "/"
+                );
+                return (
+                  <AppContent
+                    children={props.children}
+                    session={session}
+                    handleLogoutSuccess={handleLogoutSuccess}
+                    isDashboardRoute={isDashboardRoute}
+                    isCurrentPageHome={isCurrentPageHome}
+                    isHeroVisible={isHeroVisible}
+                  />
+                );
+              })()}
+            </HeroVisibilityProvider>
+          </SearchProvider>
+        );
+      }}
     >
       <FileRoutes />
     </Router>
