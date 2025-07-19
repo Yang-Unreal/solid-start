@@ -38,18 +38,20 @@ async function seedProducts() {
         10
       ),
       // Replaced imageUrl with images (JSONB)
-      images: {
-        thumbnail: {
-          avif: faker.image.urlPicsumPhotos({ width: 100, height: 75 }),
-          webp: faker.image.urlPicsumPhotos({ width: 100, height: 75 }),
-          jpeg: faker.image.urlPicsumPhotos({ width: 100, height: 75 }),
-        },
-        detail: {
-          avif: faker.image.urlPicsumPhotos({ width: 640, height: 480 }),
-          webp: faker.image.urlPicsumPhotos({ width: 640, height: 480 }),
-          jpeg: faker.image.urlPicsumPhotos({ width: 640, height: 480 }),
-        },
-      },
+      images: Array.from({ length: 6 }).map((_, idx) => ({
+        avif: faker.image.urlPicsumPhotos({
+          width: idx === 0 ? 100 : 640,
+          height: idx === 0 ? 75 : 480,
+        }),
+        webp: faker.image.urlPicsumPhotos({
+          width: idx === 0 ? 100 : 640,
+          height: idx === 0 ? 75 : 480,
+        }),
+        jpeg: faker.image.urlPicsumPhotos({
+          width: idx === 0 ? 100 : 640,
+          height: idx === 0 ? 75 : 480,
+        }),
+      })),
       category: faker.commerce.department(),
       stockQuantity: faker.number.int({ min: 0, max: 100 }),
       // Added new fields

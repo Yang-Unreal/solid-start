@@ -15,6 +15,17 @@ interface ProductListItemProps {
 const formatPrice = (priceInCents: number) =>
   `$${(priceInCents / 100).toLocaleString("en-US")}`;
 
+const getOptimizedImageUrl = (image: {
+  avif?: string;
+  webp?: string;
+  jpeg?: string;
+}) => {
+  if (image.avif) return image.avif;
+  if (image.webp) return image.webp;
+  if (image.jpeg) return image.jpeg;
+  return "https://via.placeholder.com/96x64"; // Fallback placeholder for thumbnail size
+};
+
 export default function ProductListItem(props: ProductListItemProps) {
   return (
     <div class="bg-white rounded-lg shadow p-3 flex items-center space-x-4">
@@ -30,44 +41,24 @@ export default function ProductListItem(props: ProductListItemProps) {
         </button>
       </div>
       <div class="flex-shrink-0 w-24">
-        <picture>
-          <source
-            srcset={props.product.images.thumbnail.avif}
-            type="image/avif"
-          />
-          <source
-            srcset={props.product.images.thumbnail.webp}
-            type="image/webp"
-          />
-          <img
-            src={props.product.images.thumbnail.jpeg}
-            alt={props.product.name}
-            class="w-24 h-16  object-cover"
-            fetchpriority="high"
-          />
-        </picture>
+        <img
+          src={getOptimizedImageUrl(props.product.images[0] || {})}
+          alt={props.product.name}
+          class="w-24 h-16 object-cover"
+          fetchpriority="high"
+        />
       </div>
       <A
         href={`/products/${props.product.id}`}
         class="flex-1 min-w-0 flex items-center space-x-4 group"
       >
         <div class="flex-shrink-0 w-24">
-          <picture>
-            <source
-              srcset={props.product.images.thumbnail.avif}
-              type="image/avif"
-            />
-            <source
-              srcset={props.product.images.thumbnail.webp}
-              type="image/webp"
-            />
-            <img
-              src={props.product.images.thumbnail.jpeg}
-              alt={props.product.name}
-              class="w-24 h-16 rounded-md object-cover group-hover:scale-105 transition-transform duration-200"
-              fetchpriority="high"
-            />
-          </picture>
+          <img
+            src={getOptimizedImageUrl(props.product.images[0] || {})}
+            alt={props.product.name}
+            class="w-24 h-16 rounded-md object-cover group-hover:scale-105 transition-transform duration-200"
+            fetchpriority="high"
+          />
         </div>
         <div class="flex-1 min-w-0">
           <p class="font-bold text-black truncate group-hover:text-indigo-600 transition-colors duration-200">

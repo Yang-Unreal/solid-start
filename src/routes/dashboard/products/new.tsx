@@ -80,11 +80,11 @@ export default function AddProductPage() {
   const [brand, setBrand] = createSignal("");
   const [model, setModel] = createSignal("");
   const [fuelType, setFuelType] = createSignal("");
-  const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = createSignal<File[]>([]);
 
   const [formErrors, setFormErrors] =
     createSignal<z.ZodFormattedError<ProductFormValues> | null>(null);
-  const [fileUploadError, setFileUploadError] = createSignal<string | null>(
+  const [filesUploadError, setFilesUploadError] = createSignal<string | null>(
     null
   );
   const [isUploadingImage, setIsUploadingImage] = createSignal(false);
@@ -105,17 +105,19 @@ export default function AddProductPage() {
   }));
 
   const handleFileChange = (e: Event) => {
-    const file = (e.currentTarget as HTMLInputElement).files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setFileUploadError(null);
+    const files = Array.from((e.currentTarget as HTMLInputElement).files || []);
+    if (files.length > 0) {
+      setSelectedFiles(files);
+      setFilesUploadError(null);
+    } else {
+      setSelectedFiles([]);
     }
   };
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setFormErrors(null);
-    setFileUploadError(null);
+    setFilesUploadError(null);
 
     const validationResult = NewProductFormSchema.safeParse({
       name: name(),
@@ -132,16 +134,23 @@ export default function AddProductPage() {
       setFormErrors(validationResult.error.format());
       return;
     }
-    if (!selectedFile()) {
-      setFileUploadError("A product image is required.");
+    if (selectedFiles().length === 0) {
+      setFilesUploadError(
+        "At least one product image is required (1-6 images)."
+      );
       return;
     }
-
+    if (selectedFiles().length > 6) {
+      setFilesUploadError("You can upload a maximum of 6 product images.");
+      return;
+    }
     setIsUploadingImage(true);
     let uploadedImages: ProductImages;
     try {
       const imageFormData = new FormData();
-      imageFormData.append("file", selectedFile()!);
+      selectedFiles().forEach((file) => {
+        imageFormData.append("files[]", file);
+      });
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
         body: imageFormData,
@@ -155,7 +164,7 @@ export default function AddProductPage() {
       };
       uploadedImages = uploadResult.images;
     } catch (uploadError: any) {
-      setFileUploadError(uploadError.message);
+      setFilesUploadError(uploadError.message);
       setIsUploadingImage(false);
       return;
     }
@@ -290,24 +299,33 @@ export default function AddProductPage() {
           </div>
           <div>
             <label for="productImage" class={labelBaseClasses}>
-              Product Image <span class="text-red-500">*</span>
+              Product Images (1-6) <span class="text-red-500">*</span>
             </label>
             <input
               id="productImage"
               type="file"
               accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+              multiple // Allow multiple file selection
               class={fileInputClasses}
               onChange={handleFileChange}
               disabled={isUploadingImage() || productCreationMutation.isPending}
             />
-            <Show when={selectedFile() && !fileUploadError()}>
+            <Show when={selectedFiles().length > 0 && !filesUploadError()}>
               <p class="mt-1 text-xs text-neutral-700">
-                Selected: {selectedFile()!.name} (
-                {(selectedFile()!.size / 1024).toFixed(2)} KB)
+                Selected:{" "}
+                {selectedFiles()
+                  .map((file) => file.name)
+                  .join(", ")}{" "}
+                (
+                {(
+                  selectedFiles().reduce((sum, file) => sum + file.size, 0) /
+                  1024
+                ).toFixed(2)}{" "}
+                KB)
               </p>
             </Show>
-            <Show when={fileUploadError()}>
-              <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
+            <Show when={filesUploadError()}>
+              <p class="mt-1 text-xs text-red-500">{filesUploadError()}</p>
             </Show>
           </div>
           <div>

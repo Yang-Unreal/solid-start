@@ -10,7 +10,15 @@ export default function ProductDetailPage() {
     if (!id) {
       return null;
     }
-    const response = await fetch(`/api/products?id=${id}`);
+
+    let baseUrl = "";
+    if (import.meta.env.SSR) {
+      baseUrl =
+        import.meta.env.VITE_INTERNAL_API_ORIGIN ||
+        `http://localhost:${process.env.PORT || 3000}`;
+    }
+    const fetchUrl = `${baseUrl}/api/products?id=${id}`;
+    const response = await fetch(fetchUrl);
     if (!response.ok) {
       throw new Error("Failed to fetch product");
     }
@@ -18,19 +26,42 @@ export default function ProductDetailPage() {
     return result.data[0] as Product;
   });
 
+  const getOptimizedImageUrl = (image: {
+    avif?: string;
+    webp?: string;
+    jpeg?: string;
+  }) => {
+    if (image.avif) return image.avif;
+    if (image.webp) return image.webp;
+    if (image.jpeg) return image.jpeg;
+    return "https://via.placeholder.com/384"; // Fallback placeholder
+  };
+
   return (
     <main class="h-screen container-padding pt-15">
       <Show when={productData()} fallback={<p>Product not found.</p>}>
         {(p) => (
           <div class="bg-white overflow-hidden md:flex">
-            <div class="w-full md:w-1/2">
-              <img
-                class="w-full aspect-video object-cover "
-                src={
-                  p().images?.detail?.jpeg || "https://via.placeholder.com/384"
-                }
-                alt={p().name}
-              />
+            <div class="w-full md:w-1/2 flex flex-col items-center">
+              <Show when={p().images && p().images.length > 0}>
+                <img
+                  class="w-full aspect-video object-cover mb-4"
+                  src={getOptimizedImageUrl(p().images[0] || {})}
+                  alt={p().name}
+                />
+                <div class="flex space-x-2 overflow-x-auto pb-2">
+                  <For each={p().images}>
+                    {(image, index) => (
+                      <img
+                        src={getOptimizedImageUrl(image)}
+                        alt={`${p().name} - Image ${index() + 1}`}
+                        class="w-24 h-24 object-cover cursor-pointer rounded-md border border-neutral-200 hover:border-neutral-400"
+                        // You might add a click handler here to change the main image
+                      />
+                    )}
+                  </For>
+                </div>
+              </Show>
             </div>
             <div class="w-full md:w-1/2 lg:px-30">
               <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">

@@ -82,18 +82,13 @@ export const verification = pgTable("verification", {
  * Defines the expected structure for the 'images' JSONB column in the product table.
  * This provides type safety when interacting with the data in your application.
  */
-export type ProductImages = {
-  thumbnail: {
-    avif: string;
-    webp: string;
-    jpeg: string;
-  };
-  detail: {
-    avif: string;
-    webp: string;
-    jpeg: string;
-  };
+export type ImageFormats = {
+  avif: string;
+  webp: string;
+  jpeg: string;
 };
+
+export type ProductImages = ImageFormats[];
 
 export const product = pgTable("product", {
   id: uuid("id").defaultRandom().primaryKey(),

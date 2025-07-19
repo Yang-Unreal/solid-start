@@ -353,7 +353,7 @@ export default function EditProductPage() {
                 <div class="mt-2">
                   <p class="text-xs">Current:</p>
                   <img
-                    src={existingProduct()!.images.thumbnail.jpeg}
+                    src={existingProduct()!.images[0]?.jpeg}
                     class="w-24 h-auto rounded-md mt-1"
                   />
                 </div>

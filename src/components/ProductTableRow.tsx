@@ -15,6 +15,17 @@ interface ProductTableRowProps {
 const formatPrice = (priceInCents: number) =>
   `$${(priceInCents / 100).toLocaleString("en-US")}`;
 
+const getOptimizedImageUrl = (image: {
+  avif?: string;
+  webp?: string;
+  jpeg?: string;
+}) => {
+  if (image.avif) return image.avif;
+  if (image.webp) return image.webp;
+  if (image.jpeg) return image.jpeg;
+  return "https://via.placeholder.com/64x40"; // Fallback placeholder for table row thumbnail size
+};
+
 export default function ProductTableRow(props: ProductTableRowProps) {
   return (
     <tr>
@@ -30,21 +41,11 @@ export default function ProductTableRow(props: ProductTableRowProps) {
         </button>
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-        <picture>
-          <source
-            srcset={props.product.images.thumbnail.avif}
-            type="image/avif"
-          />
-          <source
-            srcset={props.product.images.thumbnail.webp}
-            type="image/webp"
-          />
-          <img
-            src={props.product.images.thumbnail.jpeg}
-            alt={props.product.name}
-            class="h-10 w-16 rounded-md object-cover"
-          />
-        </picture>
+        <img
+          src={getOptimizedImageUrl(props.product.images[0] || {})}
+          alt={props.product.name}
+          class="h-10 w-16 rounded-md object-cover"
+        />
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
         <div>{props.product.name}</div>

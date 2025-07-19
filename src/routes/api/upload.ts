@@ -37,7 +37,6 @@ function createSuccessResponse(data: any) {
 async function processAndUploadVariant(
   sharpInstance: sharp.Sharp,
   fileNameBase: string,
-  suffix: string,
   format: "avif" | "webp" | "jpeg",
   mimeType: string
 ): Promise<string> {
@@ -59,7 +58,7 @@ async function processAndUploadVariant(
       break;
   }
 
-  const objectKey = `products/${fileNameBase}-${suffix}.${format}`;
+  const objectKey = `products/${fileNameBase}.${format}`;
   // NOTE: Your `uploadFile` function needs to accept and use the cacheControl parameter.
   await uploadFile(objectKey, buffer, mimeType, {}, LONG_CACHE_CONTROL);
   return getPublicUrl(objectKey);
@@ -68,106 +67,59 @@ async function processAndUploadVariant(
 export async function POST(event: APIEvent) {
   try {
     const formData = await event.request.formData();
-    // Your `new.tsx` sends the file with the key "file"
-    const masterFile = formData.get("file") as File | null;
+    const files = formData.getAll("files[]") as File[]; // Expecting multiple files
 
-    if (!masterFile || masterFile.size === 0) {
-      return createErrorResponse("No file provided or file is empty", 400);
+    if (files.length === 0) {
+      return createErrorResponse("No files provided.", 400);
     }
-    if (masterFile.size > MAX_FILE_SIZE) {
-      return createErrorResponse("Master image is too large.", 400);
-    }
-    if (!ALLOWED_MIME_TYPES.includes(masterFile.type)) {
-      return createErrorResponse(
-        `File type ${masterFile.type} is not allowed.`,
-        400
-      );
+    if (files.length > 6) {
+      return createErrorResponse("Maximum 6 images allowed.", 400);
     }
 
-    const masterBuffer = Buffer.from(await masterFile.arrayBuffer());
-    const sharpInstance = sharp(masterBuffer);
-    const fileNameBase = randomUUID();
+    const uploadedImages: ProductImages = [];
 
-    // --- Create Detail and Thumbnail Sharp Instances ---
-    // Using .clone() is efficient as it avoids re-decoding the master image
-    const detailInstance = sharpInstance
-      .clone()
-      .resize(1280, 720, { fit: "cover" });
-    const thumbnailInstance = sharpInstance
-      .clone()
-      .resize(640, 360, { fit: "cover" });
+    for (const masterFile of files) {
+      if (!masterFile || masterFile.size === 0) {
+        return createErrorResponse("Empty file provided.", 400);
+      }
+      if (masterFile.size > MAX_FILE_SIZE) {
+        return createErrorResponse("Master image is too large.", 400);
+      }
+      if (!ALLOWED_MIME_TYPES.includes(masterFile.type)) {
+        return createErrorResponse(
+          `File type ${masterFile.type} is not allowed.`,
+          400
+        );
+      }
 
-    // --- Process and Upload All 6 Variants in Parallel ---
-    const [
-      detailAvifUrl,
-      detailWebpUrl,
-      detailJpegUrl,
-      thumbAvifUrl,
-      thumbWebpUrl,
-      thumbJpegUrl,
-    ] = await Promise.all([
-      processAndUploadVariant(
-        detailInstance,
-        fileNameBase,
-        "detail",
-        "avif",
-        "image/avif"
-      ),
-      processAndUploadVariant(
-        detailInstance,
-        fileNameBase,
-        "detail",
-        "webp",
-        "image/webp"
-      ),
-      processAndUploadVariant(
-        detailInstance,
-        fileNameBase,
-        "detail",
-        "jpeg",
-        "image/jpeg"
-      ),
-      processAndUploadVariant(
-        thumbnailInstance,
-        fileNameBase,
-        "thumb",
-        "avif",
-        "image/avif"
-      ),
-      processAndUploadVariant(
-        thumbnailInstance,
-        fileNameBase,
-        "thumb",
-        "webp",
-        "image/webp"
-      ),
-      processAndUploadVariant(
-        thumbnailInstance,
-        fileNameBase,
-        "thumb",
-        "jpeg",
-        "image/jpeg"
-      ),
-    ]);
+      const masterBuffer = Buffer.from(await masterFile.arrayBuffer());
+      const sharpInstance = sharp(masterBuffer);
+      const fileNameBase = randomUUID();
 
-    // --- Construct the Final JSON Object ---
-    const images: ProductImages = {
-      detail: {
-        avif: detailAvifUrl,
-        webp: detailWebpUrl,
-        jpeg: detailJpegUrl,
-      },
-      thumbnail: {
-        avif: thumbAvifUrl,
-        webp: thumbWebpUrl,
-        jpeg: thumbJpegUrl,
-      },
-    };
+      // Generate a single "display" size for each uploaded image
+      const displayInstance = sharpInstance
+        .clone()
+        .resize(1280, 720, { fit: "inside", withoutEnlargement: true });
+
+      const [avifUrl, webpUrl, jpegUrl] = await Promise.all([
+        processAndUploadVariant(displayInstance, fileNameBase, "avif", "image/avif"),
+        processAndUploadVariant(displayInstance, fileNameBase, "webp", "image/webp"),
+        processAndUploadVariant(displayInstance, fileNameBase, "jpeg", "image/jpeg"),
+      ]);
+
+      uploadedImages.push({
+        avif: avifUrl,
+        webp: webpUrl,
+        jpeg: jpegUrl,
+      });
+    }
+
+    const images: ProductImages = uploadedImages;
 
     return createSuccessResponse({
       success: true,
       images, // Return the structured object
-      message: `Successfully processed and uploaded 6 image variants.`,
+      message: `Successfully processed and uploaded ${uploadedImages.length} image(s).`,
     });
   } catch (error: any) {
     console.error("=== Upload API Error ===", error);

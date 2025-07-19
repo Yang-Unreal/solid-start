@@ -76,15 +76,15 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                   <div class="w-full aspect-video bg-neutral-100  overflow-hidden">
                     <picture>
                       <source
-                        srcset={product.images.thumbnail.avif}
+                        srcset={product.images[0]?.avif}
                         type="image/avif"
                       />
                       <source
-                        srcset={product.images.thumbnail.webp}
+                        srcset={product.images[0]?.webp}
                         type="image/webp"
                       />
                       <img
-                        src={product.images.thumbnail.jpeg}
+                        src={product.images[0]?.jpeg}
                         alt={product.name}
                         class="w-full h-full object-cover"
                         fetchpriority="high"

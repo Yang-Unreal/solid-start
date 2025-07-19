@@ -15,18 +15,13 @@ const CACHE_DURATION_SECONDS = 300;
 const FILTER_OPTIONS_CACHE_KEY = "filter-options"; // Define the cache key for filter options
 
 // --- Schemas ---
-const ProductImagesSchema = z.object({
-  thumbnail: z.object({
-    avif: z.string().url(),
-    webp: z.string().url(),
-    jpeg: z.string().url(),
-  }),
-  detail: z.object({
-    avif: z.string().url(),
-    webp: z.string().url(),
-    jpeg: z.string().url(),
-  }),
+const ImageFormatsSchema = z.object({
+  avif: z.string().url(),
+  webp: z.string().url(),
+  jpeg: z.string().url(),
 });
+
+const ProductImagesSchema = z.array(ImageFormatsSchema);
 
 const NewProductPayloadSchema = z.object({
   name: z.string().trim().min(1),
@@ -337,33 +332,20 @@ export async function DELETE({ request }: APIEvent) {
 
     if (bucketName && productImages) {
       const imagePaths: string[] = [];
-      // Collect all image paths from the ProductImages object, ensuring properties exist at each level
-      if (productImages.thumbnail) {
-        const getMinioKey = (url: string | undefined) => {
-          if (!url) return null;
-          const parts = url.split("products/");
-          return parts.length > 1 ? `products/${parts[1]}` : null;
-        };
+      const getMinioKey = (url: string | undefined) => {
+        if (!url) return null;
+        const parts = url.split("products/");
+        return parts.length > 1 ? `products/${parts[1]}` : null;
+      };
 
-        const thumbnailAvif = getMinioKey(productImages.thumbnail?.avif);
-        if (thumbnailAvif) imagePaths.push(thumbnailAvif);
-        const thumbnailWebp = getMinioKey(productImages.thumbnail?.webp);
-        if (thumbnailWebp) imagePaths.push(thumbnailWebp);
-        const thumbnailJpeg = getMinioKey(productImages.thumbnail?.jpeg);
-        if (thumbnailJpeg) imagePaths.push(thumbnailJpeg);
-      }
-      if (productImages.detail) {
-        const getMinioKey = (url: string | undefined) => {
-          if (!url) return null;
-          const parts = url.split("products/");
-          return parts.length > 1 ? `products/${parts[1]}` : null;
-        };
-        const detailAvif = getMinioKey(productImages.detail?.avif);
-        if (detailAvif) imagePaths.push(detailAvif);
-        const detailWebp = getMinioKey(productImages.detail?.webp);
-        if (detailWebp) imagePaths.push(detailWebp);
-        const detailJpeg = getMinioKey(productImages.detail?.jpeg);
-        if (detailJpeg) imagePaths.push(detailJpeg);
+      // Iterate over the array of images and collect all paths
+      for (const image of productImages) {
+        const avif = getMinioKey(image.avif);
+        if (avif) imagePaths.push(avif);
+        const webp = getMinioKey(image.webp);
+        if (webp) imagePaths.push(webp);
+        const jpeg = getMinioKey(image.jpeg);
+        if (jpeg) imagePaths.push(jpeg);
       }
 
       // Attempt to delete images from MinIO
