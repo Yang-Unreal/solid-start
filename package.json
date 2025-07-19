@@ -9,6 +9,7 @@
     "studio": "bunx drizzle-kit studio",
     "db:push": "npx drizzle-kit push",
     "db:sync-meili": "bun run ./src/scripts/sync-meilisearch.ts",
+    "db:flush-redis": "bun run ./src/scripts/flush-redis.ts",
     "uploadVideos": "bun run ./src/scripts/uploadVideos.ts",
     "uploadImages": "bun run ./src/scripts/uploadImages.ts"
   },
