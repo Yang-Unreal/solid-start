@@ -227,7 +227,7 @@ export default function Nav(props: {
           >
             <MagneticLink
               onClick={() => navigate("/products")}
-              class={`w-10 h-10  flex justify-center items-center rounded-full bg-neutral-50`}
+              class={`w-10 h-10  flex justify-center items-center rounded-full `}
               aria-label="Products"
               enableHoverCircle={true}
               hoverCircleColor="hsl(75, 99%, 52%)"
