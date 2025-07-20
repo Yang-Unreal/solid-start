@@ -96,19 +96,19 @@ export default function ProductDetailPage() {
                     </li>
                   </Show>
                   <Show when={p().fuelType}>
-                    <li>
-                      <strong>Fuel Type:</strong> {p().fuelType}
-                    </li>
-                  </Show>
-                  <Show when={!p().brand && !p().model && !p().fuelType}>
-                    <li>No additional details available.</li>
-                  </Show>
-                </ul>
+                      <li>
+                        <strong>Fuel Type:</strong> {p().fuelType}
+                      </li>
+                    </Show>
+                    <Show when={!p().brand && !p().model && !p().fuelType}>
+                      <li>No additional details available.</li>
+                    </Show>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-      </Show>
-    </main>
+          )}
+        </Show>
+      </main>
   );
 }
