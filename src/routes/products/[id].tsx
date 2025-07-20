@@ -1,4 +1,10 @@
-import { For, Show, createResource } from "solid-js";
+import {
+  For,
+  Show,
+  createResource,
+  createSignal,
+  createEffect,
+} from "solid-js";
 import { useParams } from "@solidjs/router";
 import { type Product } from "~/db/schema";
 
@@ -26,6 +32,18 @@ export default function ProductDetailPage() {
     return result.data[0] as Product;
   });
 
+  const [activeImage, setActiveImage] = createSignal<string>();
+
+  createEffect(() => {
+    const p = productData();
+    if (p && p.images && p.images.length > 0) {
+      const firstImage = p.images[0];
+      if (firstImage) {
+        setActiveImage(getOptimizedImageUrl(firstImage));
+      }
+    }
+  });
+
   const getOptimizedImageUrl = (image: {
     avif?: string;
     webp?: string;
@@ -42,19 +60,31 @@ export default function ProductDetailPage() {
       <Show when={productData()} fallback={<p>Product not found.</p>}>
         {(p) => (
           <div class="bg-white overflow-hidden md:flex">
-            <div class="w-full md:w-1/2 flex flex-col items-center">
+            <div class="w-full md:w-1/2 flex">
               <Show when={p().images && p().images.length > 0}>
-                <div class="w-full flex flex-col items-center">
-                  <For each={p().images}>
-                    {(image, index) => (
-                      <img
-                        src={getOptimizedImageUrl(image)}
-                        alt={`${p().name} - Image ${index() + 1}`}
-                        class="w-full aspect-video object-cover"
-                      />
-                    )}
-                  </For>
-                </div>
+                <>
+                  <div class="w-1/5 flex flex-col gap-2 p-2">
+                    <For each={p().images}>
+                      {(image) => (
+                        <img
+                          src={getOptimizedImageUrl(image)}
+                          alt="thumbnail"
+                          class="w-full cursor-pointer aspect-square object-cover"
+                          onMouseEnter={() =>
+                            setActiveImage(getOptimizedImageUrl(image))
+                          }
+                        />
+                      )}
+                    </For>
+                  </div>
+                  <div class="w-4/5 p-2">
+                    <img
+                      src={activeImage()}
+                      alt={p().name}
+                      class="w-full aspect-square object-cover"
+                    />
+                  </div>
+                </>
               </Show>
             </div>
             <div class="w-full md:w-1/2 lg:px-30">
@@ -96,19 +126,19 @@ export default function ProductDetailPage() {
                     </li>
                   </Show>
                   <Show when={p().fuelType}>
-                      <li>
-                        <strong>Fuel Type:</strong> {p().fuelType}
-                      </li>
-                    </Show>
-                    <Show when={!p().brand && !p().model && !p().fuelType}>
-                      <li>No additional details available.</li>
-                    </Show>
-                  </ul>
-                </div>
+                    <li>
+                      <strong>Fuel Type:</strong> {p().fuelType}
+                    </li>
+                  </Show>
+                  <Show when={!p().brand && !p().model && !p().fuelType}>
+                    <li>No additional details available.</li>
+                  </Show>
+                </ul>
               </div>
             </div>
-          )}
-        </Show>
-      </main>
+          </div>
+        )}
+      </Show>
+    </main>
   );
 }
