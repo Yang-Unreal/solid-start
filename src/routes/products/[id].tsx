@@ -38,25 +38,19 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <main class="h-screen">
+    <main class="min-h-screen">
       <Show when={productData()} fallback={<p>Product not found.</p>}>
         {(p) => (
           <div class="bg-white overflow-hidden md:flex">
             <div class="w-full md:w-1/2 flex flex-col items-center">
               <Show when={p().images && p().images.length > 0}>
-                <img
-                  class="w-full aspect-video object-cover mb-4"
-                  src={getOptimizedImageUrl(p().images[0] || {})}
-                  alt={p().name}
-                />
-                <div class="flex space-x-2 overflow-x-auto pb-2">
+                <div class="w-full flex flex-col items-center">
                   <For each={p().images}>
                     {(image, index) => (
                       <img
                         src={getOptimizedImageUrl(image)}
                         alt={`${p().name} - Image ${index() + 1}`}
-                        class="w-24 h-24 object-cover cursor-pointer rounded-md border border-neutral-200 hover:border-neutral-400"
-                        // You might add a click handler here to change the main image
+                        class="w-full aspect-video object-cover"
                       />
                     )}
                   </For>
