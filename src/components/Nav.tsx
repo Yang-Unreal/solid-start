@@ -141,7 +141,7 @@ export default function Nav(props: {
               <FilterSidebar show={isFilterDropdownOpen()} />
             </div>
 
-            <div class="flex-grow">
+            <div class="w-70">
               <SearchInput
                 searchQuery={searchQuery}
                 onSearchChange={onSearchChange}
