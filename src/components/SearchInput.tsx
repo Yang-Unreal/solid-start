@@ -1,7 +1,12 @@
-import { createUniqueId, type Accessor, type ParentProps } from "solid-js";
+import {
+  createUniqueId,
+  type Accessor,
+  type ParentProps,
+  createSignal,
+} from "solid-js";
 import { Search } from "lucide-solid";
 import { useNavigate, useLocation } from "@solidjs/router"; // Added useLocation
-
+import MagneticLink from "./MagneticLink";
 interface SearchInputProps {
   searchQuery: Accessor<string>;
   onSearchChange: (query: string) => void;
@@ -13,6 +18,10 @@ const SearchInput = (props: SearchInputProps) => {
   const uniqueId = createUniqueId();
   const navigate = useNavigate();
   const location = useLocation(); // Get current location
+  const [
+    shouldTriggerSearchButtonLeaveAnimation,
+    setShouldTriggerSearchButtonLeaveAnimation,
+  ] = createSignal(false);
 
   const handleSearchSubmit = (e: Event) => {
     e.preventDefault();
@@ -42,11 +51,35 @@ const SearchInput = (props: SearchInputProps) => {
         />
         <button
           type="submit"
-          class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          class="absolute inset-y-0 right-0 flex items-center cursor-pointer"
           aria-label="Submit search"
           onClick={handleSearchSubmit}
         >
-          <Search size={18} class="text-black" />
+          <div
+            onMouseEnter={() =>
+              setShouldTriggerSearchButtonLeaveAnimation(false)
+            }
+            onMouseLeave={() =>
+              setShouldTriggerSearchButtonLeaveAnimation(true)
+            }
+          >
+            <MagneticLink
+              class={`w-10 h-10  flex justify-center items-center rounded-full `}
+              enableHoverCircle={true}
+              applyOverflowHidden={true}
+              hoverCircleColor="hsl(75, 99%, 52%)"
+              triggerLeaveAnimation={shouldTriggerSearchButtonLeaveAnimation}
+              setTriggerLeaveAnimation={
+                setShouldTriggerSearchButtonLeaveAnimation
+              }
+            >
+              {(ref) => (
+                <div ref={ref}>
+                  <Search size={20} />
+                </div>
+              )}
+            </MagneticLink>
+          </div>
         </button>
       </div>
     </form>
