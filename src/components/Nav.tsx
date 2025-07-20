@@ -105,7 +105,7 @@ export default function Nav(props: {
         </A>
         <div class="flex items-center justify-end">
           {/* Desktop search and filter */}
-          <div class="hidden md:flex bg-neutral-50 rounded-full">
+          <div class="hidden md:flex bg-neutral-50 rounded-full mr-2.5">
             <div
               class="relative flex items-center"
               onMouseLeave={() => {
@@ -153,7 +153,7 @@ export default function Nav(props: {
           <div class="md:hidden">
             <MagneticLink
               onClick={() => setIsMobileSearchOpen(true)}
-              class="w-10 h-10 flex justify-center items-center rounded-full bg-neutral-50"
+              class="w-10 h-10 flex justify-center items-center rounded-full "
               aria-label="Search"
             >
               {(ref) => (
