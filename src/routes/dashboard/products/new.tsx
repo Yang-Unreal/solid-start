@@ -1,5 +1,5 @@
 // src/routes/dashboard/products/new.tsx
-import { createSignal, Show, createEffect } from "solid-js";
+import { createSignal, Show, createEffect, For } from "solid-js";
 import { useNavigate, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -80,7 +80,15 @@ export default function AddProductPage() {
   const [brand, setBrand] = createSignal("");
   const [model, setModel] = createSignal("");
   const [fuelType, setFuelType] = createSignal("");
-  const [selectedFiles, setSelectedFiles] = createSignal<File[]>([]);
+
+  type ImageWithPreview = {
+    id: string; // Unique ID for the image in the form
+    file: File;
+    previewUrl: string;
+  };
+  const [imagesToUpload, setImagesToUpload] = createSignal<ImageWithPreview[]>(
+    []
+  );
 
   const [formErrors, setFormErrors] =
     createSignal<z.ZodFormattedError<ProductFormValues> | null>(null);
@@ -106,13 +114,64 @@ export default function AddProductPage() {
 
   const handleFileChange = (e: Event) => {
     const files = Array.from((e.currentTarget as HTMLInputElement).files || []);
-    if (files.length > 0) {
-      setSelectedFiles(files);
-      setFilesUploadError(null);
-    } else {
-      setSelectedFiles([]);
+    const currentImages = imagesToUpload();
+    const newImages: ImageWithPreview[] = [];
+
+    if (currentImages.length + files.length > 6) {
+      setFilesUploadError("You can upload a maximum of 6 product images.");
+      return;
     }
+
+    files.forEach((file) => {
+      const id = crypto.randomUUID(); // Generate a unique ID for each image
+      const previewUrl = URL.createObjectURL(file);
+      newImages.push({ id, file, previewUrl });
+    });
+
+    setImagesToUpload([...currentImages, ...newImages]);
+    setFilesUploadError(null); // Clear any previous file upload errors
   };
+
+  const handleDeleteImage = (id: string) => {
+    setImagesToUpload((prev) => {
+      const imageToDelete = prev.find((img) => img.id === id);
+      if (imageToDelete) {
+        URL.revokeObjectURL(imageToDelete.previewUrl); // Clean up the object URL
+      }
+      return prev.filter((img) => img.id !== id);
+    });
+    setFilesUploadError(null); // Clear error if images are now valid count
+  };
+
+  const handleReplaceImage = (idToReplace: string, e: Event) => {
+    const files = Array.from((e.currentTarget as HTMLInputElement).files || []);
+    if (files.length === 0) return;
+
+    const newFile = files[0];
+    if (!newFile) return; // Ensure newFile is not undefined
+
+    setImagesToUpload((prev) => {
+      return prev.map((img) => {
+        if (img.id === idToReplace) {
+          URL.revokeObjectURL(img.previewUrl); // Clean up old object URL
+          return {
+            id: img.id,
+            file: newFile,
+            previewUrl: URL.createObjectURL(newFile),
+          };
+        }
+        return img;
+      });
+    });
+    setFilesUploadError(null);
+  };
+
+  // Clean up object URLs when component unmounts
+  createEffect(() => {
+    return () => {
+      imagesToUpload().forEach((img) => URL.revokeObjectURL(img.previewUrl));
+    };
+  });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -134,13 +193,13 @@ export default function AddProductPage() {
       setFormErrors(validationResult.error.format());
       return;
     }
-    if (selectedFiles().length === 0) {
+    if (imagesToUpload().length === 0) {
       setFilesUploadError(
         "At least one product image is required (1-6 images)."
       );
       return;
     }
-    if (selectedFiles().length > 6) {
+    if (imagesToUpload().length > 6) {
       setFilesUploadError("You can upload a maximum of 6 product images.");
       return;
     }
@@ -148,8 +207,8 @@ export default function AddProductPage() {
     let uploadedImages: ProductImages;
     try {
       const imageFormData = new FormData();
-      selectedFiles().forEach((file) => {
-        imageFormData.append("files[]", file);
+      imagesToUpload().forEach((img) => {
+        imageFormData.append("files[]", img.file);
       });
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
@@ -298,34 +357,127 @@ export default function AddProductPage() {
             </Show>
           </div>
           <div>
-            <label for="productImage" class={labelBaseClasses}>
+            <label class={labelBaseClasses}>
               Product Images (1-6) <span class="text-red-500">*</span>
             </label>
-            <input
-              id="productImage"
-              type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
-              multiple // Allow multiple file selection
-              class={fileInputClasses}
-              onChange={handleFileChange}
-              disabled={isUploadingImage() || productCreationMutation.isPending}
-            />
-            <Show when={selectedFiles().length > 0 && !filesUploadError()}>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
+              <For each={imagesToUpload()}>
+                {(image) => (
+                  <div class="relative group">
+                    <img
+                      src={image.previewUrl}
+                      alt="Product Preview"
+                      class="w-full h-32 object-cover rounded-md border border-neutral-300"
+                    />
+                    <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-md">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteImage(image.id)}
+                        class="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors mr-2"
+                        aria-label="Delete image"
+                        disabled={
+                          isUploadingImage() ||
+                          productCreationMutation.isPending
+                        }
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fill-rule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 01-2 0v6a1 1 0 112 0V8z"
+                            clip-rule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                      <label
+                        for={`replace-image-${image.id}`}
+                        class={`p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors cursor-pointer ${
+                          isUploadingImage() ||
+                          productCreationMutation.isPending
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }`}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-5 w-5"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.38-2.828-2.829z" />
+                        </svg>
+                        <input
+                          id={`replace-image-${image.id}`}
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                          class="hidden"
+                          onChange={(e) => handleReplaceImage(image.id, e)}
+                          disabled={
+                            isUploadingImage() ||
+                            productCreationMutation.isPending
+                          }
+                        />
+                      </label>
+                    </div>
+                  </div>
+                )}
+              </For>
+              <Show when={imagesToUpload().length < 6}>
+                <label
+                  for="productImage"
+                  class={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer bg-neutral-50 hover:bg-neutral-100 transition-colors duration-150 ease-in-out ${
+                    isUploadingImage() || productCreationMutation.isPending
+                      ? "opacity-50 cursor-not-allowed"
+                      : "border-neutral-300"
+                  }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-8 w-8 text-neutral-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    />
+                  </svg>
+                  <span class="mt-2 text-sm text-neutral-600">Add Image</span>
+                  <input
+                    id="productImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                    multiple
+                    class="hidden"
+                    onChange={handleFileChange}
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                </label>
+              </Show>
+            </div>
+            <Show when={filesUploadError()}>
+              <p class="mt-1 text-xs text-red-500">{filesUploadError()}</p>
+            </Show>
+            <Show when={imagesToUpload().length > 0}>
               <p class="mt-1 text-xs text-neutral-700">
-                Selected:{" "}
-                {selectedFiles()
-                  .map((file) => file.name)
-                  .join(", ")}{" "}
-                (
+                Total selected: {imagesToUpload().length} image(s) (
                 {(
-                  selectedFiles().reduce((sum, file) => sum + file.size, 0) /
-                  1024
+                  imagesToUpload().reduce(
+                    (sum, img) => sum + img.file.size,
+                    0
+                  ) / 1024
                 ).toFixed(2)}{" "}
                 KB)
               </p>
-            </Show>
-            <Show when={filesUploadError()}>
-              <p class="mt-1 text-xs text-red-500">{filesUploadError()}</p>
             </Show>
           </div>
           <div>
