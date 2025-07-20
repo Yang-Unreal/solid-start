@@ -37,7 +37,7 @@ function AppContent(props: {
   session: any;
   handleLogoutSuccess: () => void;
   isDashboardRoute: () => boolean;
-  isCurrentPageHome: () => boolean;
+  isTransparentNavPage: () => boolean;
   isHeroVisible: () => boolean;
 }) {
   return (
@@ -51,9 +51,9 @@ function AppContent(props: {
         <Nav
           onLogoutSuccess={props.handleLogoutSuccess}
           session={props.session}
-          transparent={props.isCurrentPageHome() && props.isHeroVisible()}
+          transparent={props.isTransparentNavPage() && props.isHeroVisible()}
           removeNavContainerClass={
-            props.isCurrentPageHome() && props.isHeroVisible()
+            props.isTransparentNavPage() && props.isHeroVisible()
           }
         />
 
@@ -92,8 +92,10 @@ export default function App() {
             <HeroVisibilityProvider>
               {(() => {
                 const { isHeroVisible } = useHeroVisibility();
-                const isCurrentPageHome = createMemo(
-                  () => location.pathname === "/"
+                const isTransparentNavPage = createMemo(
+                  () =>
+                    location.pathname === "/" ||
+                    location.pathname.startsWith("/products/")
                 );
                 return (
                   <AppContent
@@ -101,7 +103,7 @@ export default function App() {
                     session={session}
                     handleLogoutSuccess={handleLogoutSuccess}
                     isDashboardRoute={isDashboardRoute}
-                    isCurrentPageHome={isCurrentPageHome}
+                    isTransparentNavPage={isTransparentNavPage}
                     isHeroVisible={isHeroVisible}
                   />
                 );
