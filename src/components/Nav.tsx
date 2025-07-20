@@ -105,7 +105,7 @@ export default function Nav(props: {
         </A>
         <div class="flex items-center justify-end">
           {/* Desktop search and filter */}
-          <div class="hidden md:flex bg-neutral-50 rounded-full shadow-md">
+          <div class="hidden md:flex bg-neutral-50 rounded-full">
             <div
               class="relative flex items-center"
               onMouseLeave={() => {
@@ -153,7 +153,7 @@ export default function Nav(props: {
           <div class="md:hidden">
             <MagneticLink
               onClick={() => setIsMobileSearchOpen(true)}
-              class="w-10 h-10 shadow-md flex justify-center items-center rounded-full bg-neutral-50"
+              class="w-10 h-10 flex justify-center items-center rounded-full bg-neutral-50"
               aria-label="Search"
             >
               {(ref) => (
@@ -182,7 +182,7 @@ export default function Nav(props: {
                 </div>
               </div>
               <div class="flex flex-col space-y-4">
-                <div class="flex bg-neutral-50 rounded-full shadow-md">
+                <div class="flex bg-neutral-50 rounded-full ">
                   <div
                     class="relative flex items-center"
                     onMouseLeave={() => {
@@ -227,7 +227,7 @@ export default function Nav(props: {
           >
             <MagneticLink
               onClick={() => navigate("/products")}
-              class={`w-10 h-10 shadow-md flex justify-center items-center rounded-full bg-neutral-50`}
+              class={`w-10 h-10  flex justify-center items-center rounded-full bg-neutral-50`}
               aria-label="Products"
               enableHoverCircle={true}
               hoverCircleColor="hsl(75, 99%, 52%)"

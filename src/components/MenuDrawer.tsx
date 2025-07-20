@@ -266,7 +266,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
           onClick={toggleDrawer}
-          class={` w-10 h-10 shadow-md bg-neutral-50 rounded-full flex flex-col justify-center items-center ${
+          class={` w-10 h-10  bg-neutral-50 rounded-full flex flex-col justify-center items-center ${
             isOpen() ? "bg-primary-accent" : "bg-neutral-50"
           }`}
           style={{
@@ -300,7 +300,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white shadow-xl z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
+        class="fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
         style="transform: translateX(calc(100% + 5rem));"
       >
         {/* SVG Curve Element */}
