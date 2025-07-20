@@ -3,8 +3,6 @@ import {
   useContext,
   createSignal,
   type Accessor,
-  createEffect,
-  onCleanup,
 } from "solid-js";
 
 interface HeroVisibilityContextType {
@@ -18,17 +16,6 @@ const HeroVisibilityContext = createContext<
 
 export function HeroVisibilityProvider(props: any) {
   const [isHeroVisible, setHeroVisible] = createSignal(true);
-
-  createEffect(() => {
-    const handleScroll = () => {
-      setHeroVisible(window.scrollY < window.innerHeight);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    onCleanup(() => {
-      window.removeEventListener("scroll", handleScroll);
-    });
-  });
 
   const value = {
     isHeroVisible,
