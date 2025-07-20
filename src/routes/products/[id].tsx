@@ -59,17 +59,17 @@ export default function ProductDetailPage() {
     <main class="min-h-screen">
       <Show when={productData()} fallback={<p>Product not found.</p>}>
         {(p) => (
-          <div class="bg-white overflow-hidden md:flex">
-            <div class="w-full md:w-1/2 flex">
+          <div class="bg-white overflow-hidden md:flex pt-15">
+            <div class="w-full md:w-2/3 flex">
               <Show when={p().images && p().images.length > 0}>
                 <>
-                  <div class="w-1/5 flex flex-col gap-2 p-2">
+                  <div class="w-1/5 flex flex-col ">
                     <For each={p().images}>
                       {(image) => (
                         <img
                           src={getOptimizedImageUrl(image)}
                           alt="thumbnail"
-                          class="w-full cursor-pointer aspect-square object-cover"
+                          class="w-full cursor-pointer aspect-video object-cover"
                           onMouseEnter={() =>
                             setActiveImage(getOptimizedImageUrl(image))
                           }
@@ -77,17 +77,17 @@ export default function ProductDetailPage() {
                       )}
                     </For>
                   </div>
-                  <div class="w-4/5 p-2">
+                  <div class="w-4/5">
                     <img
                       src={activeImage()}
                       alt={p().name}
-                      class="w-full aspect-square object-cover"
+                      class="w-full aspect-video object-cover"
                     />
                   </div>
                 </>
               </Show>
             </div>
-            <div class="w-full md:w-1/2 lg:px-30">
+            <div class="w-full md:w-1/3 lg:px-30">
               <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
                 {p().category}
               </div>
