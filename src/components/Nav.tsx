@@ -158,7 +158,7 @@ export default function Nav(props: {
             >
               {(ref) => (
                 <div ref={ref}>
-                  <Search stroke-width="1" size={20} />
+                  <Search stroke-width="2" size={20} />
                 </div>
               )}
             </MagneticLink>
