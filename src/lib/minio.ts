@@ -153,6 +153,37 @@ export async function getPresignedUrl(
   }
 }
 
+import { Readable } from "stream"; // Import Readable from Node.js stream module
+
+export async function getFileStream(
+  objectKey: string,
+  bucketName: string = bucket
+): Promise<Readable | null> {
+  // Change return type to Node.js Readable
+  const command = new GetObjectCommand({ Bucket: bucketName, Key: objectKey });
+  try {
+    const response = await minio.send(command);
+    // The Body can be a ReadableStream (Web Streams API) or an AsyncIterable.
+    // Convert it to a Node.js Readable stream for Sharp.
+    if (response.Body) {
+      // Check if it's a Web ReadableStream
+      if (typeof (response.Body as any).getReader === "function") {
+        return Readable.fromWeb(response.Body as any);
+      }
+      // Otherwise, assume it's an AsyncIterable and use Readable.from
+      return Readable.from(response.Body as AsyncIterable<any>);
+    }
+    return null;
+  } catch (error: any) {
+    if (error.name === "NoSuchKey" || error.$metadata?.httpStatusCode === 404) {
+      console.warn(`File not found in MinIO: ${objectKey}`);
+      return null;
+    }
+    console.error(`Failed to get file stream for ${objectKey}:`, error);
+    throw error;
+  }
+}
+
 export function getPublicUrl(objectKey: string): string {
   const url = `${endpoint}/${bucket}/${objectKey}`;
   return url;

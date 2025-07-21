@@ -8,6 +8,18 @@ import {
 import { useParams } from "@solidjs/router";
 import { type Product } from "~/db/schema";
 
+const getTransformedImageUrl = (
+  originalUrl: string | undefined,
+  width: number,
+  height: number,
+  format: string
+) => {
+  if (!originalUrl) return `https://via.placeholder.com/${width}x${height}`;
+  return `/api/images/transform?url=${encodeURIComponent(
+    originalUrl
+  )}&w=${width}&h=${height}&f=${format}`;
+};
+
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = () => params.id;
@@ -39,11 +51,9 @@ export default function ProductDetailPage() {
   createEffect(() => {
     const p = productData();
     if (p?.images && p.images.length > 0) {
-      const firstImage = p.images[0];
-      if (firstImage) {
-        setActiveImage(getOptimizedImageUrl(firstImage));
-        setCurrentImageIndex(0);
-      }
+      // Set initial active image to a transformed version (e.g., large webp)
+      setActiveImage(getTransformedImageUrl(p.images[0], 1280, 720, "webp"));
+      setCurrentImageIndex(0);
     }
   });
 
@@ -72,10 +82,10 @@ export default function ProductDetailPage() {
         // Swiped right, go to previous image
         newIndex = (newIndex - 1 + p.images.length) % p.images.length;
       }
-      const newImage = p.images[newIndex];
-      if (newImage) {
-        setActiveImage(getOptimizedImageUrl(newImage));
-      }
+      // Update active image to a transformed version
+      setActiveImage(
+        getTransformedImageUrl(p.images[newIndex], 1280, 720, "webp")
+      );
       setCurrentImageIndex(newIndex);
       setTouchStartX(0); // Reset touch start to prevent multiple swipes
     }
@@ -83,22 +93,6 @@ export default function ProductDetailPage() {
 
   const handleTouchEnd = () => {
     setTouchStartX(0);
-  };
-
-  const getOptimizedImageUrl = (
-    image:
-      | {
-          avif?: string;
-          webp?: string;
-          jpeg?: string;
-        }
-      | undefined
-  ) => {
-    if (!image) return "https://via.placeholder.com/384"; // Handle undefined input
-    if (image.avif) return image.avif;
-    if (image.webp) return image.webp;
-    if (image.jpeg) return image.jpeg;
-    return "https://via.placeholder.com/384"; // Fallback placeholder
   };
 
   const [showThumbnails, setShowThumbnails] = createSignal(false);
@@ -115,14 +109,34 @@ export default function ProductDetailPage() {
             <div class="md:w-3/5 flex flex-col">
               {/* Main Image */}
               <div class="relative aspect-video overflow-hidden">
-                <img
-                  src={activeImage()}
-                  alt={p().name}
-                  class="w-full h-full object-cover"
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                />
+                <picture>
+                  <source
+                    srcset={getTransformedImageUrl(
+                      p().images[currentImageIndex()],
+                      1280,
+                      720,
+                      "avif"
+                    )}
+                    type="image/avif"
+                  />
+                  <source
+                    srcset={getTransformedImageUrl(
+                      p().images[currentImageIndex()],
+                      1280,
+                      720,
+                      "webp"
+                    )}
+                    type="image/webp"
+                  />
+                  <img
+                    src={activeImage()} // activeImage is already a transformed URL
+                    alt={p().name}
+                    class="w-full h-full object-cover"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                  />
+                </picture>
                 {/* Image Index for Mobile */}
                 <Show when={p().images && p().images.length > 0}>
                   <div class="absolute top-2 right-3 bg-black bg-opacity-30 text-white text-xs px-2 py-0.5 rounded-full md:hidden">
@@ -139,21 +153,52 @@ export default function ProductDetailPage() {
                   <Show when={showThumbnails()}>
                     <div class="mb-2 flex space-x-2 overflow-x-auto pb-2">
                       <For each={p().images}>
-                        {(image) => (
-                          <img
-                            src={getOptimizedImageUrl(image)}
-                            alt="thumbnail"
-                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200 hover:opacity-100"
-                            classList={{
-                              "opacity-50":
-                                activeImage() !== getOptimizedImageUrl(image),
-                              "opacity-100":
-                                activeImage() === getOptimizedImageUrl(image),
-                            }}
-                            onClick={() =>
-                              setActiveImage(getOptimizedImageUrl(image))
-                            }
-                          />
+                        {(image, index) => (
+                          <picture>
+                            <source
+                              srcset={getTransformedImageUrl(
+                                image,
+                                80,
+                                45,
+                                "avif"
+                              )}
+                              type="image/avif"
+                            />
+                            <source
+                              srcset={getTransformedImageUrl(
+                                image,
+                                80,
+                                45,
+                                "webp"
+                              )}
+                              type="image/webp"
+                            />
+                            <img
+                              src={getTransformedImageUrl(
+                                image,
+                                80,
+                                45,
+                                "jpeg"
+                              )}
+                              alt={`thumbnail ${index() + 1}`}
+                              class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200 hover:opacity-100"
+                              classList={{
+                                "opacity-50": index() !== currentImageIndex(),
+                                "opacity-100": index() === currentImageIndex(),
+                              }}
+                              onClick={() => {
+                                setActiveImage(
+                                  getTransformedImageUrl(
+                                    image,
+                                    1280,
+                                    720,
+                                    "webp"
+                                  )
+                                );
+                                setCurrentImageIndex(index());
+                              }}
+                            />
+                          </picture>
                         )}
                       </For>
                     </div>
@@ -166,10 +211,12 @@ export default function ProductDetailPage() {
                           class="w-2 h-2 bg-gray-400 rounded-full cursor-pointer"
                           classList={{
                             "bg-primary-accent":
-                              getOptimizedImageUrl(image) === activeImage(),
+                              index() === currentImageIndex(),
                           }}
                           onClick={() => {
-                            setActiveImage(getOptimizedImageUrl(image));
+                            setActiveImage(
+                              getTransformedImageUrl(image, 1280, 720, "webp")
+                            );
                             setCurrentImageIndex(index());
                           }}
                         ></span>

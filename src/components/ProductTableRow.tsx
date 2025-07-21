@@ -15,18 +15,21 @@ interface ProductTableRowProps {
 const formatPrice = (priceInCents: number) =>
   `$${(priceInCents / 100).toLocaleString("en-US")}`;
 
-const getOptimizedImageUrl = (image: {
-  avif?: string;
-  webp?: string;
-  jpeg?: string;
-}) => {
-  if (image.avif) return image.avif;
-  if (image.webp) return image.webp;
-  if (image.jpeg) return image.jpeg;
-  return "https://via.placeholder.com/64x40"; // Fallback placeholder for table row thumbnail size
+const getTransformedImageUrl = (
+  originalUrl: string | undefined,
+  width: number,
+  height: number,
+  format: string
+) => {
+  if (!originalUrl) return `https://via.placeholder.com/${width}x${height}`;
+  return `/api/images/transform?url=${encodeURIComponent(
+    originalUrl
+  )}&w=${width}&h=${height}&f=${format}`;
 };
 
 export default function ProductTableRow(props: ProductTableRowProps) {
+  const imageUrl = () => props.product.images[0]; // Get the first original image URL
+
   return (
     <tr>
       <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
@@ -41,11 +44,21 @@ export default function ProductTableRow(props: ProductTableRowProps) {
         </button>
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-        <img
-          src={getOptimizedImageUrl(props.product.images[0] || {})}
-          alt={props.product.name}
-          class="h-10 w-16 rounded-md object-cover"
-        />
+        <picture>
+          <source
+            srcset={getTransformedImageUrl(imageUrl(), 96, 64, "avif")}
+            type="image/avif"
+          />
+          <source
+            srcset={getTransformedImageUrl(imageUrl(), 96, 64, "webp")}
+            type="image/webp"
+          />
+          <img
+            src={getTransformedImageUrl(imageUrl(), 96, 64, "jpeg")}
+            alt={props.product.name}
+            class="w-24 h-16 rounded-md object-cover"
+          />
+        </picture>
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-black">
         <div>{props.product.name}</div>
