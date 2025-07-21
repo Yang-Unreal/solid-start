@@ -33,22 +33,68 @@ export default function ProductDetailPage() {
   });
 
   const [activeImage, setActiveImage] = createSignal<string>();
+  const [currentImageIndex, setCurrentImageIndex] = createSignal(0);
+  const [touchStartX, setTouchStartX] = createSignal(0);
 
   createEffect(() => {
     const p = productData();
-    if (p && p.images && p.images.length > 0) {
+    if (p?.images && p.images.length > 0) {
       const firstImage = p.images[0];
       if (firstImage) {
         setActiveImage(getOptimizedImageUrl(firstImage));
+        setCurrentImageIndex(0);
       }
     }
   });
 
-  const getOptimizedImageUrl = (image: {
-    avif?: string;
-    webp?: string;
-    jpeg?: string;
-  }) => {
+  const handleTouchStart = (e: TouchEvent) => {
+    if (e.touches[0]) {
+      setTouchStartX(e.touches[0].clientX);
+    }
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (!touchStartX() || !e.touches[0]) return;
+
+    const currentTouchX = e.touches[0].clientX;
+    const diff = touchStartX() - currentTouchX;
+
+    if (Math.abs(diff) > 50) {
+      // Threshold for a swipe
+      const p = productData();
+      if (!p?.images || p.images.length === 0) return;
+
+      let newIndex = currentImageIndex();
+      if (diff > 0) {
+        // Swiped left, go to next image
+        newIndex = (newIndex + 1) % p.images.length;
+      } else {
+        // Swiped right, go to previous image
+        newIndex = (newIndex - 1 + p.images.length) % p.images.length;
+      }
+      const newImage = p.images[newIndex];
+      if (newImage) {
+        setActiveImage(getOptimizedImageUrl(newImage));
+      }
+      setCurrentImageIndex(newIndex);
+      setTouchStartX(0); // Reset touch start to prevent multiple swipes
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setTouchStartX(0);
+  };
+
+  const getOptimizedImageUrl = (
+    image:
+      | {
+          avif?: string;
+          webp?: string;
+          jpeg?: string;
+        }
+      | undefined
+  ) => {
+    if (!image) return "https://via.placeholder.com/384"; // Handle undefined input
     if (image.avif) return image.avif;
     if (image.webp) return image.webp;
     if (image.jpeg) return image.jpeg;
@@ -68,12 +114,21 @@ export default function ProductDetailPage() {
           <div class="md:flex md:space-x-8">
             <div class="md:w-3/5 flex flex-col">
               {/* Main Image */}
-              <div class="relative aspect-video overflow-hidden rounded-2xl">
+              <div class="relative aspect-video overflow-hidden">
                 <img
                   src={activeImage()}
                   alt={p().name}
                   class="w-full h-full object-cover"
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                 />
+                {/* Image Index for Mobile */}
+                <Show when={p().images && p().images.length > 0}>
+                  <div class="absolute top-2 right-3 bg-black bg-opacity-30 text-white text-xs px-2 py-0.5 rounded-full md:hidden">
+                    {currentImageIndex() + 1} / {p().images.length}
+                  </div>
+                </Show>
                 {/* Dots and Thumbnails for image navigation */}
                 <div
                   class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center w-full"
@@ -104,18 +159,19 @@ export default function ProductDetailPage() {
                     </div>
                   </Show>
                   {/* Dots */}
-                  <div class="flex justify-center space-x-2">
+                  <div class="hidden md:flex justify-center space-x-2">
                     <For each={p().images}>
-                      {(image) => (
+                      {(image, index) => (
                         <span
                           class="w-2 h-2 bg-gray-400 rounded-full cursor-pointer"
                           classList={{
                             "bg-primary-accent":
                               getOptimizedImageUrl(image) === activeImage(),
                           }}
-                          onClick={() =>
-                            setActiveImage(getOptimizedImageUrl(image))
-                          }
+                          onClick={() => {
+                            setActiveImage(getOptimizedImageUrl(image));
+                            setCurrentImageIndex(index());
+                          }}
                         ></span>
                       )}
                     </For>

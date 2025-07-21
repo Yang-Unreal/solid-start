@@ -239,7 +239,7 @@ export default function Nav(props: {
             >
               {(ref) => (
                 <div ref={ref}>
-                  <ShoppingBag stroke-width="1" size={20} />
+                  <ShoppingBag stroke-width="2" size={20} />
                 </div>
               )}
             </MagneticLink>
