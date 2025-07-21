@@ -56,7 +56,7 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <main class="min-h-screen">
+    <main class="min-h-screen container-padding">
       <Show when={productData()} fallback={<p>Product not found.</p>}>
         {(p) => (
           <div class="bg-white overflow-hidden md:flex pt-15">
