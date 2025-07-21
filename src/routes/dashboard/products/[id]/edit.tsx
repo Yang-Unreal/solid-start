@@ -1,5 +1,5 @@
 // src/routes/dashboard/products/[id]/edit.tsx
-import { createSignal, Show, createEffect, For } from "solid-js";
+import { createSignal, Show, createEffect } from "solid-js";
 import { useNavigate, A, useParams } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -11,18 +11,6 @@ import {
 import type { Product, ProductImages } from "~/db/schema";
 import { authClient } from "~/lib/auth-client";
 import { z } from "zod/v4";
-
-const getTransformedImageUrl = (
-  originalUrl: string | undefined,
-  width: number,
-  height: number,
-  format: string
-) => {
-  if (!originalUrl) return `https://via.placeholder.com/${width}x${height}`;
-  return `/api/images/transform?url=${encodeURIComponent(
-    originalUrl
-  )}&w=${width}&h=${height}&f=${format}`;
-};
 
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
 type CreateProductDBData = Omit<Product, "id" | "createdAt" | "updatedAt">;
@@ -113,15 +101,7 @@ export default function EditProductPage() {
   const [brand, setBrand] = createSignal("");
   const [model, setModel] = createSignal("");
   const [fuelType, setFuelType] = createSignal("");
-
-  type ImageInForm = {
-    id: string; // Unique ID for the image in the form
-    file?: File; // File object if newly selected/replaced
-    previewUrl: string; // URL for display (object URL for new, MinIO URL for existing)
-    isExisting: boolean; // True if this image came from the database
-    originalMinioUrl?: string; // The original MinIO URL if it's an existing image
-  };
-  const [imagesInForm, setImagesInForm] = createSignal<ImageInForm[]>([]);
+  const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
 
   const [formErrors, setFormErrors] =
     createSignal<z.ZodFormattedError<ProductFormValues> | null>(null);
@@ -141,17 +121,6 @@ export default function EditProductPage() {
       setBrand(product.brand ?? "");
       setModel(product.model ?? "");
       setFuelType(product.fuelType ?? "");
-
-      // Populate imagesInForm with existing product images
-      if (product.images && product.images.length > 0) {
-        const existingImages: ImageInForm[] = product.images.map((url) => ({
-          id: crypto.randomUUID(), // Assign a unique ID for form management
-          previewUrl: getTransformedImageUrl(url, 96, 64, "jpeg"), // Use transformed URL for preview
-          isExisting: true,
-          originalMinioUrl: url, // Store original URL for submission
-        }));
-        setImagesInForm(existingImages);
-      }
     }
   });
 
@@ -174,69 +143,12 @@ export default function EditProductPage() {
   }));
 
   const handleFileChange = (e: Event) => {
-    const files = Array.from((e.currentTarget as HTMLInputElement).files || []);
-    const currentImages = imagesInForm();
-    const newImages: ImageInForm[] = [];
-
-    if (currentImages.length + files.length > 6) {
-      setFileUploadError("You can upload a maximum of 6 product images.");
-      return;
+    const file = (e.currentTarget as HTMLInputElement).files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setFileUploadError(null);
     }
-
-    files.forEach((file) => {
-      const id = crypto.randomUUID(); // Generate a unique ID for each image
-      const previewUrl = URL.createObjectURL(file);
-      newImages.push({ id, file, previewUrl, isExisting: false });
-    });
-
-    setImagesInForm([...currentImages, ...newImages]);
-    setFileUploadError(null); // Clear any previous file upload errors
   };
-
-  const handleDeleteImage = (id: string) => {
-    setImagesInForm((prev) => {
-      const imageToDelete = prev.find((img) => img.id === id);
-      if (imageToDelete && imageToDelete.file) {
-        URL.revokeObjectURL(imageToDelete.previewUrl); // Clean up the object URL for new files
-      }
-      return prev.filter((img) => img.id !== id);
-    });
-    setFileUploadError(null); // Clear error if images are now valid count
-  };
-
-  const handleReplaceImage = (idToReplace: string, e: Event) => {
-    const files = Array.from((e.currentTarget as HTMLInputElement).files || []);
-    if (files.length === 0) return;
-
-    const newFile = files[0];
-    if (!newFile) return; // Ensure newFile is not undefined
-
-    setImagesInForm((prev) => {
-      return prev.map((img) => {
-        if (img.id === idToReplace) {
-          if (img.file) URL.revokeObjectURL(img.previewUrl); // Clean up old object URL if it was a new file
-          return {
-            id: img.id,
-            file: newFile,
-            previewUrl: URL.createObjectURL(newFile),
-            isExisting: false, // This is now a new file
-            originalMinioUrl: undefined,
-          };
-        }
-        return img;
-      });
-    });
-    setFileUploadError(null);
-  };
-
-  // Clean up object URLs when component unmounts
-  createEffect(() => {
-    return () => {
-      imagesInForm().forEach((img) => {
-        if (img.file) URL.revokeObjectURL(img.previewUrl);
-      });
-    };
-  });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -258,34 +170,13 @@ export default function EditProductPage() {
       setFormErrors(validationResult.error.format());
       return;
     }
-    if (imagesInForm().length === 0) {
-      setFileUploadError(
-        "At least one product image is required (1-6 images)."
-      );
-      return;
-    }
-    if (imagesInForm().length > 6) {
-      setFileUploadError("You can upload a maximum of 6 product images.");
-      return;
-    }
 
-    setIsUploadingImage(true);
-    let finalImageUrls: ProductImages = [];
-
-    try {
-      const filesToUpload = imagesInForm().filter(
-        (img) => !img.isExisting || img.file
-      );
-      const existingUrls = imagesInForm()
-        .filter((img) => img.isExisting && !img.file)
-        .map((img) => img.originalMinioUrl!);
-
-      if (filesToUpload.length > 0) {
+    let imagesToSave: ProductImages | undefined = existingProduct()?.images;
+    if (selectedFile()) {
+      setIsUploadingImage(true);
+      try {
         const imageFormData = new FormData();
-        filesToUpload.forEach((img) => {
-          if (img.file) imageFormData.append("files[]", img.file);
-        });
-
+        imageFormData.append("file", selectedFile()!);
         const uploadResponse = await fetch("/api/upload", {
           method: "POST",
           body: imageFormData,
@@ -294,21 +185,16 @@ export default function EditProductPage() {
           throw new Error(
             (await uploadResponse.json()).error || "Image upload failed"
           );
-        const uploadResult = (await uploadResponse.json()) as {
-          images: ProductImages;
-        };
-        finalImageUrls = [...existingUrls, ...uploadResult.images];
-      } else {
-        finalImageUrls = existingUrls;
+        imagesToSave = (await uploadResponse.json()).images;
+      } catch (uploadError: any) {
+        setFileUploadError(uploadError.message);
+        return;
+      } finally {
+        setIsUploadingImage(false);
       }
-    } catch (uploadError: any) {
-      setFileUploadError(uploadError.message);
-      return;
-    } finally {
-      setIsUploadingImage(false);
     }
 
-    if (finalImageUrls.length === 0) {
+    if (!imagesToSave) {
       setFileUploadError("Product image is required.");
       return;
     }
@@ -316,7 +202,7 @@ export default function EditProductPage() {
     productUpdateMutation.mutate({
       id: productId()!,
       ...validationResult.data,
-      images: finalImageUrls,
+      images: imagesToSave,
       description: validationResult.data.description || null,
       category: validationResult.data.category || null,
     });
@@ -452,152 +338,31 @@ export default function EditProductPage() {
               </Show>
             </div>
             <div>
-              <label class={labelBaseClasses}>
-                Product Images (1-6) <span class="text-red-500">*</span>
+              <label for="productImage" class={labelBaseClasses}>
+                Product Image
               </label>
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-2">
-                <For each={imagesInForm()}>
-                  {(image) => (
-                    <div class="relative group">
-                      <picture>
-                        <source
-                          srcset={getTransformedImageUrl(
-                            image.originalMinioUrl || image.previewUrl,
-                            96,
-                            64,
-                            "avif"
-                          )}
-                          type="image/avif"
-                        />
-                        <source
-                          srcset={getTransformedImageUrl(
-                            image.originalMinioUrl || image.previewUrl,
-                            96,
-                            64,
-                            "webp"
-                          )}
-                          type="image/webp"
-                        />
-                        <img
-                          src={getTransformedImageUrl(
-                            image.originalMinioUrl || image.previewUrl,
-                            96,
-                            64,
-                            "jpeg"
-                          )}
-                          alt="Product Preview"
-                          class="w-full h-32 object-cover rounded-md border border-neutral-300"
-                        />
-                      </picture>
-                      <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-md">
-                        <button
-                          type="button"
-                          onClick={() => handleDeleteImage(image.id)}
-                          class="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors mr-2"
-                          aria-label="Delete image"
-                          disabled={
-                            isUploadingImage() ||
-                            productUpdateMutation.isPending
-                          }
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fill-rule="evenodd"
-                              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 01-2 0v6a1 1 0 112 0V8z"
-                              clip-rule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                        <label
-                          for={`replace-image-${image.id}`}
-                          class={`p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors cursor-pointer ${
-                            isUploadingImage() ||
-                            productUpdateMutation.isPending
-                              ? "opacity-50 cursor-not-allowed"
-                              : ""
-                          }`}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.38-2.828-2.829z" />
-                          </svg>
-                          <input
-                            id={`replace-image-${image.id}`}
-                            type="file"
-                            accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
-                            class="hidden"
-                            onChange={(e) => handleReplaceImage(image.id, e)}
-                            disabled={
-                              isUploadingImage() ||
-                              productUpdateMutation.isPending
-                            }
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  )}
-                </For>
-                <Show when={imagesInForm().length < 6}>
-                  <label
-                    for="productImage"
-                    class={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-md cursor-pointer bg-neutral-50 hover:bg-neutral-100 transition-colors duration-150 ease-in-out ${
-                      isUploadingImage() || productUpdateMutation.isPending
-                        ? "opacity-50 cursor-not-allowed"
-                        : "border-neutral-300"
-                    }`}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      class="h-8 w-8 text-neutral-400"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      />
-                    </svg>
-                    <span class="mt-2 text-sm text-neutral-600">Add Image</span>
-                    <input
-                      id="productImage"
-                      type="file"
-                      accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
-                      multiple
-                      class="hidden"
-                      onChange={handleFileChange}
-                      disabled={
-                        isUploadingImage() || productUpdateMutation.isPending
-                      }
-                    />
-                  </label>
-                </Show>
-              </div>
+              <input
+                id="productImage"
+                type="file"
+                accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                class={fileInputClasses}
+                onChange={handleFileChange}
+                disabled={isUploadingImage() || productUpdateMutation.isPending}
+              />
+              <Show when={existingProduct()?.images}>
+                <div class="mt-2">
+                  <p class="text-xs">Current:</p>
+                  <img
+                    src={existingProduct()!.images[0]?.jpeg}
+                    class="w-24 h-auto rounded-md mt-1"
+                  />
+                </div>
+              </Show>
+              <Show when={selectedFile() && !fileUploadError()}>
+                <p class="mt-1 text-xs">New: {selectedFile()!.name}</p>
+              </Show>
               <Show when={fileUploadError()}>
                 <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
-              </Show>
-              <Show when={imagesInForm().length > 0}>
-                <p class="mt-1 text-xs text-neutral-700">
-                  Total selected: {imagesInForm().length} image(s) (
-                  {(
-                    imagesInForm().reduce(
-                      (sum, img) => sum + (img.file?.size || 0),
-                      0
-                    ) / 1024
-                  ).toFixed(2)}{" "}
-                  KB)
-                </p>
               </Show>
             </div>
             <div>

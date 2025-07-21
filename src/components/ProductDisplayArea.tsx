@@ -25,21 +25,9 @@ interface ProductDisplayAreaProps {
   pageSize: () => number;
 }
 
-// --- Helper Functions ---
+// --- Helper Functions (unchanged) ---
 const formatPrice = (priceInCents: number) =>
   `$${(priceInCents / 100).toLocaleString("en-US")}`;
-
-const getTransformedImageUrl = (
-  originalUrl: string | undefined,
-  width: number,
-  height: number,
-  format: string
-) => {
-  if (!originalUrl) return `https://via.placeholder.com/${width}x${height}`;
-  return `/api/images/transform?url=${encodeURIComponent(
-    originalUrl
-  )}&w=${width}&h=${height}&f=${format}`;
-};
 
 const paginationButtonClasses = `w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed sm:min-w-[100px] sm:px-4 sm:py-2`;
 
@@ -88,30 +76,15 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                   <div class="w-full aspect-video bg-neutral-100  overflow-hidden">
                     <picture>
                       <source
-                        srcset={getTransformedImageUrl(
-                          product.images[0],
-                          640,
-                          360,
-                          "avif"
-                        )}
+                        srcset={product.images[0]?.avif}
                         type="image/avif"
                       />
                       <source
-                        srcset={getTransformedImageUrl(
-                          product.images[0],
-                          640,
-                          360,
-                          "webp"
-                        )}
+                        srcset={product.images[0]?.webp}
                         type="image/webp"
                       />
                       <img
-                        src={getTransformedImageUrl(
-                          product.images[0],
-                          640,
-                          360,
-                          "jpeg"
-                        )}
+                        src={product.images[0]?.jpeg}
                         alt={product.name}
                         class="w-full h-full object-cover"
                         fetchpriority="high"

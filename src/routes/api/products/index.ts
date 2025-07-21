@@ -15,7 +15,13 @@ const CACHE_DURATION_SECONDS = 300;
 const FILTER_OPTIONS_CACHE_KEY = "filter-options"; // Define the cache key for filter options
 
 // --- Schemas ---
-const ProductImagesSchema = z.array(z.string().url());
+const ImageFormatsSchema = z.object({
+  avif: z.string().url(),
+  webp: z.string().url(),
+  jpeg: z.string().url(),
+});
+
+const ProductImagesSchema = z.array(ImageFormatsSchema);
 
 const NewProductPayloadSchema = z.object({
   name: z.string().trim().min(1),
@@ -334,9 +340,13 @@ export async function DELETE({ request }: APIEvent) {
 
     if (productImages && Array.isArray(productImages)) {
       const imageKeysToDelete: string[] = [];
-      for (const imageUrl of productImages) {
-        const imageKey = getMinioObjectKey(imageUrl);
-        if (imageKey) imageKeysToDelete.push(imageKey);
+      for (const image of productImages) {
+        const avifKey = getMinioObjectKey(image.avif);
+        if (avifKey) imageKeysToDelete.push(avifKey);
+        const webpKey = getMinioObjectKey(image.webp);
+        if (webpKey) imageKeysToDelete.push(webpKey);
+        const jpegKey = getMinioObjectKey(image.jpeg);
+        if (jpegKey) imageKeysToDelete.push(jpegKey);
       }
 
       // Attempt to delete images from MinIO

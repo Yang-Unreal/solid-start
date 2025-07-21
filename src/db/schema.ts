@@ -79,10 +79,16 @@ export const verification = pgTable("verification", {
 // --- Product Schema (Updated) ---
 
 /**
- * Defines the expected structure for the 'images' column in the product table.
- * This will now store an array of string URLs.
+ * Defines the expected structure for the 'images' JSONB column in the product table.
+ * This provides type safety when interacting with the data in your application.
  */
-export type ProductImages = string[];
+export type ImageFormats = {
+  avif?: string;
+  webp?: string;
+  jpeg?: string;
+};
+
+export type ProductImages = ImageFormats[];
 
 export const product = pgTable("product", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -92,7 +98,13 @@ export const product = pgTable("product", {
   priceInCents: integer("price_in_cents").notNull(),
 
   /**
-   * CHANGE: `images` now stores an array of string URLs.
+   * CHANGE: Replaced `imageUrl` with a flexible `images` JSONB column.
+   * This stores structured data for all required image formats and sizes.
+   * Example data:
+   * {
+   *   thumbnail: { avif: '...', webp: '...', jpeg: '...' },
+   *   detail: { avif: '...', webp: '...', jpeg: '...' }
+   * }
    */
   images: jsonb("images").$type<ProductImages>().notNull(),
 

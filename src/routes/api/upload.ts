@@ -2,6 +2,7 @@
 import type { APIEvent } from "@solidjs/start/server";
 import { uploadFile, getPublicUrl } from "../../lib/minio";
 import { randomUUID } from "crypto";
+import sharp from "sharp"; // Import the sharp library
 import type { ProductImages } from "~/db/schema";
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // Increased to 15MB for high-res masters
@@ -32,14 +33,33 @@ function createSuccessResponse(data: any) {
   });
 }
 
-// A helper to upload the original image format
-async function processAndUploadImage(
-  buffer: Buffer,
+// A helper to process and upload a single image variant
+async function processAndUploadVariant(
+  sharpInstance: sharp.Sharp,
   fileNameBase: string,
-  mimeType: string,
-  originalExtension: string
+  format: "avif" | "webp" | "jpeg",
+  mimeType: string
 ): Promise<string> {
-  const objectKey = `products/${fileNameBase}.${originalExtension}`;
+  let buffer: Buffer;
+  let quality: number;
+
+  switch (format) {
+    case "avif":
+      quality = 80; // Good quality for AVIF
+      buffer = await sharpInstance.avif({ quality }).toBuffer();
+      break;
+    case "webp":
+      quality = 85; // Good quality for WebP
+      buffer = await sharpInstance.webp({ quality }).toBuffer();
+      break;
+    case "jpeg":
+      quality = 90; // High quality for JPEG fallback
+      buffer = await sharpInstance.jpeg({ quality }).toBuffer();
+      break;
+  }
+
+  const objectKey = `products/${fileNameBase}.${format}`;
+  // NOTE: Your `uploadFile` function needs to accept and use the cacheControl parameter.
   await uploadFile(objectKey, buffer, mimeType, {}, LONG_CACHE_CONTROL);
   return getPublicUrl(objectKey);
 }
@@ -73,24 +93,32 @@ export async function POST(event: APIEvent) {
       }
 
       const masterBuffer = Buffer.from(await masterFile.arrayBuffer());
+      const sharpInstance = sharp(masterBuffer);
       const fileNameBase = randomUUID();
-      const originalExtension = masterFile.name.split(".").pop() || "bin"; // Get original extension
 
-      const imageUrl = await processAndUploadImage(
-        masterBuffer,
-        fileNameBase,
-        masterFile.type,
-        originalExtension
-      );
+      // Generate a single "display" size for each uploaded image
+      const displayInstance = sharpInstance
+        .clone()
+        .resize(1280, 720, { fit: "inside", withoutEnlargement: true });
 
-      uploadedImages.push(imageUrl);
+      const [avifUrl, webpUrl, jpegUrl] = await Promise.all([
+        processAndUploadVariant(displayInstance, fileNameBase, "avif", "image/avif"),
+        processAndUploadVariant(displayInstance, fileNameBase, "webp", "image/webp"),
+        processAndUploadVariant(displayInstance, fileNameBase, "jpeg", "image/jpeg"),
+      ]);
+
+      uploadedImages.push({
+        avif: avifUrl,
+        webp: webpUrl,
+        jpeg: jpegUrl,
+      });
     }
 
     const images: ProductImages = uploadedImages;
 
     return createSuccessResponse({
       success: true,
-      images, // Return the array of URLs
+      images, // Return the structured object
       message: `Successfully processed and uploaded ${uploadedImages.length} image(s).`,
     });
   } catch (error: any) {

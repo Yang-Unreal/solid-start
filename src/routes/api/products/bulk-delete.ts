@@ -50,9 +50,13 @@ export async function POST({ request }: APIEvent) {
     const imageKeysToDelete: string[] = [];
     for (const product of productsWithImages) {
       if (product.images && Array.isArray(product.images)) {
-        for (const imageUrl of product.images) {
-          const imageKey = getMinioObjectKey(imageUrl);
-          if (imageKey) imageKeysToDelete.push(imageKey);
+        for (const image of product.images) {
+          const avifKey = getMinioObjectKey(image.avif);
+          if (avifKey) imageKeysToDelete.push(avifKey);
+          const webpKey = getMinioObjectKey(image.webp);
+          if (webpKey) imageKeysToDelete.push(webpKey);
+          const jpegKey = getMinioObjectKey(image.jpeg);
+          if (jpegKey) imageKeysToDelete.push(jpegKey);
         }
       }
     }
