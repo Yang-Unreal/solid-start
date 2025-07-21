@@ -93,9 +93,7 @@ export default function App() {
               {(() => {
                 const { isHeroVisible } = useHeroVisibility();
                 const isTransparentNavPage = createMemo(
-                  () =>
-                    location.pathname === "/" ||
-                    location.pathname.startsWith("/products/")
+                  () => location.pathname === "/"
                 );
                 return (
                   <AppContent

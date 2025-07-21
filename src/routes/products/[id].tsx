@@ -60,7 +60,7 @@ export default function ProductDetailPage() {
   return (
     <main class="min-h-screen container-padding pt-25">
       <h1 class="items-center justify-center w-full text-center font-extrabold text-3xl md:text-5xl pb-12">
-        PRODUCTS
+        PRODUCT DETAIL
       </h1>
       <div class="h-[1px] bg-gray-300 w-full mb-5"></div>
       <Show when={productData()} fallback={<p>Product not found.</p>}>
@@ -68,7 +68,7 @@ export default function ProductDetailPage() {
           <div class="md:flex md:space-x-8">
             <div class="md:w-3/5 flex flex-col">
               {/* Main Image */}
-              <div class="relative aspect-video overflow-hidden ">
+              <div class="relative aspect-video overflow-hidden rounded-2xl">
                 <img
                   src={activeImage()}
                   alt={p().name}
@@ -178,7 +178,7 @@ export default function ProductDetailPage() {
         )}
       </Show>
       <div
-        class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center"
+        class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center mt-20"
         style="background-image: url('/heroBackground.webp');"
       ></div>{" "}
       <div
