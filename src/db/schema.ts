@@ -83,9 +83,9 @@ export const verification = pgTable("verification", {
  * This provides type safety when interacting with the data in your application.
  */
 export type ImageFormats = {
-  avif: string;
-  webp: string;
-  jpeg: string;
+  avif?: string;
+  webp?: string;
+  jpeg?: string;
 };
 
 export type ProductImages = ImageFormats[];

@@ -55,79 +55,111 @@ export default function ProductDetailPage() {
     return "https://via.placeholder.com/384"; // Fallback placeholder
   };
 
+  const [showThumbnails, setShowThumbnails] = createSignal(false);
+
   return (
-    <main class="min-h-screen container-padding">
+    <main class="min-h-screen container-padding pt-25">
       <Show when={productData()} fallback={<p>Product not found.</p>}>
         {(p) => (
-          <div class="bg-white overflow-hidden md:flex pt-15">
-            <div class="w-full md:w-2/3 flex">
-              <Show when={p().images && p().images.length > 0}>
-                <>
-                  <div class="w-1/5 flex flex-col ">
+          <div class="md:flex md:space-x-8">
+            <div class="md:w-3/5 flex flex-col">
+              {/* Main Image */}
+              <div class="relative aspect-video overflow-hidden ">
+                <img
+                  src={activeImage()}
+                  alt={p().name}
+                  class="w-full h-full object-cover"
+                />
+                {/* Dots and Thumbnails for image navigation */}
+                <div
+                  class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center w-full"
+                  onMouseEnter={() => setShowThumbnails(true)}
+                  onMouseLeave={() => setShowThumbnails(false)}
+                >
+                  {/* Thumbnails row */}
+                  <Show when={showThumbnails()}>
+                    <div class="mb-2 flex space-x-2 overflow-x-auto pb-2">
+                      <For each={p().images}>
+                        {(image) => (
+                          <img
+                            src={getOptimizedImageUrl(image)}
+                            alt="thumbnail"
+                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-indigo-500 transition-all duration-200"
+                            classList={{
+                              "border-indigo-500":
+                                activeImage() === getOptimizedImageUrl(image),
+                            }}
+                            onMouseEnter={() =>
+                              setActiveImage(getOptimizedImageUrl(image))
+                            }
+                          />
+                        )}
+                      </For>
+                    </div>
+                  </Show>
+                  {/* Dots */}
+                  <div class="flex justify-center space-x-2">
                     <For each={p().images}>
                       {(image) => (
-                        <img
-                          src={getOptimizedImageUrl(image)}
-                          alt="thumbnail"
-                          class="w-full cursor-pointer aspect-video object-cover"
-                          onMouseEnter={() =>
+                        <span
+                          class="w-2 h-2 bg-gray-400 rounded-full cursor-pointer"
+                          classList={{
+                            "bg-indigo-500":
+                              getOptimizedImageUrl(image) === activeImage(),
+                          }}
+                          onClick={() =>
                             setActiveImage(getOptimizedImageUrl(image))
                           }
-                        />
+                        ></span>
                       )}
                     </For>
                   </div>
-                  <div class="w-4/5">
-                    <img
-                      src={activeImage()}
-                      alt={p().name}
-                      class="w-full aspect-video object-cover"
-                    />
-                  </div>
-                </>
-              </Show>
+                </div>
+              </div>
+              {/* The original "Thumbnails" div (mt-4 relative) is now removed as its content has been moved. */}
             </div>
-            <div class="w-full md:w-1/3 lg:px-30">
-              <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
-                {p().category}
-              </div>
-              <h1 class="block mt-1 text-lg leading-tight font-medium text-black">
-                {p().name}
-              </h1>
 
+            {/* Product Details (Right Column) */}
+            <div class="w-full md:w-2/5 mt-8 md:mt-0">
+              <h1 class="text-3xl font-bold text-gray-900">{p().name}</h1>
+              <p class="mt-2 text-xl text-gray-700">
+                ${(p().priceInCents / 100).toFixed(2)}
+              </p>
               <div class="mt-4">
-                <span class="text-xl font-bold text-gray-900">
-                  ${(p().priceInCents / 100).toFixed(2)}
-                </span>
-                <span class="ml-2 text-sm text-gray-500">
-                  (In Stock: {p().stockQuantity})
+                <span class="text-sm text-gray-600">
+                  In Stock: {p().stockQuantity}
                 </span>
               </div>
-              <div class="mt-6">
-                <button class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+
+              <p class="mt-6 text-gray-700 leading-relaxed">
+                {p().description}
+              </p>
+
+              <div class="mt-8">
+                <button class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-200 text-lg font-semibold">
                   Add to Cart
                 </button>
               </div>
 
-              <p class="mt-2 text-gray-600">{p().description}</p>
-              <div class="mt-8">
-                <h2 class="text-lg font-semibold text-gray-800">
+              <div class="mt-10 border-t border-gray-200 pt-8">
+                <h2 class="text-xl font-semibold text-gray-800">
                   Product Details
                 </h2>
-                <ul class="mt-2 text-gray-600 list-disc list-inside">
+                <ul class="mt-4 text-gray-700 space-y-2">
                   <Show when={p().brand}>
                     <li>
-                      <strong>Brand:</strong> {p().brand}
+                      <strong class="font-medium">Brand:</strong> {p().brand}
                     </li>
                   </Show>
                   <Show when={p().model}>
                     <li>
-                      <strong>Model:</strong> {p().model}
+                      <strong class="font-medium">Model:</strong> {p().model}
                     </li>
                   </Show>
                   <Show when={p().fuelType}>
                     <li>
-                      <strong>Fuel Type:</strong> {p().fuelType}
+                      <strong class="font-medium">Fuel Type:</strong>{" "}
+                      {p().fuelType}
                     </li>
                   </Show>
                   <Show when={!p().brand && !p().model && !p().fuelType}>
@@ -139,6 +171,18 @@ export default function ProductDetailPage() {
           </div>
         )}
       </Show>
+      <div
+        class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center"
+        style="background-image: url('/heroBackground.webp');"
+      ></div>{" "}
+      <div
+        class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center"
+        style="background-image: url('/heroBackground.webp');"
+      ></div>{" "}
+      <div
+        class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center"
+        style="background-image: url('/heroBackground.webp');"
+      ></div>
     </main>
   );
 }
