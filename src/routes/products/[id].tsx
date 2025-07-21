@@ -59,6 +59,10 @@ export default function ProductDetailPage() {
 
   return (
     <main class="min-h-screen container-padding pt-25">
+      <h1 class="items-center justify-center w-full text-center font-extrabold text-3xl md:text-5xl pb-12">
+        PRODUCTS
+      </h1>
+      <div class="h-[1px] bg-gray-300 w-full mb-5"></div>
       <Show when={productData()} fallback={<p>Product not found.</p>}>
         {(p) => (
           <div class="md:flex md:space-x-8">
@@ -84,9 +88,11 @@ export default function ProductDetailPage() {
                           <img
                             src={getOptimizedImageUrl(image)}
                             alt="thumbnail"
-                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-indigo-500 transition-all duration-200"
+                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200"
                             classList={{
-                              "border-indigo-500":
+                              "opacity-50":
+                                activeImage() !== getOptimizedImageUrl(image),
+                              "opacity-100":
                                 activeImage() === getOptimizedImageUrl(image),
                             }}
                             onMouseEnter={() =>
@@ -104,7 +110,7 @@ export default function ProductDetailPage() {
                         <span
                           class="w-2 h-2 bg-gray-400 rounded-full cursor-pointer"
                           classList={{
-                            "bg-indigo-500":
+                            "bg-primary-accent":
                               getOptimizedImageUrl(image) === activeImage(),
                           }}
                           onClick={() =>
