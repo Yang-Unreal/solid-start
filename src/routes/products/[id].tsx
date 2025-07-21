@@ -88,14 +88,14 @@ export default function ProductDetailPage() {
                           <img
                             src={getOptimizedImageUrl(image)}
                             alt="thumbnail"
-                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200"
+                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200 hover:opacity-100"
                             classList={{
                               "opacity-50":
                                 activeImage() !== getOptimizedImageUrl(image),
                               "opacity-100":
                                 activeImage() === getOptimizedImageUrl(image),
                             }}
-                            onMouseEnter={() =>
+                            onClick={() =>
                               setActiveImage(getOptimizedImageUrl(image))
                             }
                           />
