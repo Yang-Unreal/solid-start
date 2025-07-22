@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm"; // Corrected Drizzle imports
 import { z } from "zod"; // Corrected Zod import
 import { kv } from "~/lib/redis";
 import { minio, bucket, endpoint } from "~/lib/minio"; // Import endpoint and bucket
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { productsIndex, pollTask } from "~/lib/meilisearch";
 
 const DEFAULT_PAGE_SIZE = 12;
@@ -15,19 +15,13 @@ const CACHE_DURATION_SECONDS = 300;
 const FILTER_OPTIONS_CACHE_KEY = "filter-options"; // Define the cache key for filter options
 
 // --- Schemas ---
-const ImageFormatsSchema = z.object({
-  avif: z.string().url(),
-  webp: z.string().url(),
-  jpeg: z.string().url(),
-});
 
-const ProductImagesSchema = z.array(ImageFormatsSchema);
 
 const NewProductPayloadSchema = z.object({
   name: z.string().trim().min(1),
   description: z.string().trim().nullable().optional(),
   priceInCents: z.number().int().positive(),
-  images: ProductImagesSchema,
+  imageBaseUrl: z.string().trim().min(1), // Updated to imageBaseUrl
   category: z.string().trim().nullable().optional(),
   stockQuantity: z.number().int().min(0),
   brand: z.string().trim().min(1),
@@ -199,7 +193,7 @@ export async function POST({ request }: APIEvent) {
 
     const insertedProducts = await db
       .insert(productTable)
-      .values(validationResult.data)
+      .values({ ...validationResult.data, imageBaseUrl: validationResult.data.imageBaseUrl })
       .returning();
 
     if (insertedProducts.length > 0) {
@@ -317,7 +311,6 @@ export async function DELETE({ request }: APIEvent) {
 
     const product = productToDelete[0];
     if (!product) {
-      // This case should ideally be caught by productToDelete.length === 0, but as a safeguard
       return new Response(
         JSON.stringify({ error: "Product data is corrupt." }),
         {
@@ -326,55 +319,46 @@ export async function DELETE({ request }: APIEvent) {
       );
     }
 
-    const productImages = product.images;
+    const imageBaseUrl = product.imageBaseUrl;
 
-    // Helper function to extract MinIO object key from a full URL
-    const getMinioObjectKey = (url: string | undefined): string | null => {
-      if (!url || !endpoint || !bucket) return null;
-      const baseUrl = `${endpoint}/${bucket}/`;
-      if (url.startsWith(baseUrl)) {
-        return url.substring(baseUrl.length);
-      }
-      return null;
-    };
+    if (imageBaseUrl) {
+      try {
+        // List all objects with the given imageBaseUrl prefix
+        const listObjectsCommand = new ListObjectsV2Command({
+          Bucket: bucket,
+          Prefix: `products/${imageBaseUrl}`,
+        });
+        const listedObjects = await minio.send(listObjectsCommand);
 
-    if (productImages && Array.isArray(productImages)) {
-      const imageKeysToDelete: string[] = [];
-      for (const image of productImages) {
-        const avifKey = getMinioObjectKey(image.avif);
-        if (avifKey) imageKeysToDelete.push(avifKey);
-        const webpKey = getMinioObjectKey(image.webp);
-        if (webpKey) imageKeysToDelete.push(webpKey);
-        const jpegKey = getMinioObjectKey(image.jpeg);
-        if (jpegKey) imageKeysToDelete.push(jpegKey);
-      }
+        if (listedObjects.Contents && listedObjects.Contents.length > 0) {
+          const objectsToDelete = listedObjects.Contents.map((obj) => ({
+            Key: obj.Key,
+          }));
 
-      // Attempt to delete images from MinIO
-      if (imageKeysToDelete.length > 0) {
-        try {
-          await Promise.all(
-            imageKeysToDelete.map((key) =>
-              minio.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
-            )
+          // Delete all listed objects
+          await minio.send(
+            new DeleteObjectsCommand({
+              Bucket: bucket,
+              Delete: { Objects: objectsToDelete },
+            })
           );
           console.log(
-            `Successfully deleted all associated images for product ID: ${idValidationResult.data}`
+            `Successfully deleted all associated images for product ID: ${idValidationResult.data} with base URL ${imageBaseUrl}`
           );
-        } catch (minioError) {
-          console.error(
-            `Failed to delete one or more images from MinIO for product ID ${idValidationResult.data}:`,
-            minioError
+        } else {
+          console.warn(
+            `No images found for base URL: ${imageBaseUrl}. Skipping image deletion.`
           );
-          // Log the error but continue with database deletion to avoid orphaned records
         }
-      } else {
-        console.warn(
-          `No image keys found for product ID: ${idValidationResult.data}. Skipping image deletion.`
+      } catch (minioError) {
+        console.error(
+          `Failed to delete one or more images from MinIO for product ID ${idValidationResult.data}:`,
+          minioError
         );
       }
     } else {
       console.warn(
-        `Product images not found or not in expected array format for product ID: ${idValidationResult.data}. Skipping image deletion.`
+        `Product imageBaseUrl not found for product ID: ${idValidationResult.data}. Skipping image deletion.`
       );
     }
 

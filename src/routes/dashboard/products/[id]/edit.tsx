@@ -1,29 +1,41 @@
 // src/routes/dashboard/products/[id]/edit.tsx
 import { createSignal, Show, createEffect } from "solid-js";
-import { useNavigate, A, useParams } from "@solidjs/router";
+import { useNavigate, useParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
   useMutation,
-  useQueryClient,
   useQuery,
+  useQueryClient,
   type UseMutationResult,
 } from "@tanstack/solid-query";
-import type { Product, ProductImages } from "~/db/schema";
+import type { Product } from "~/db/schema";
 import { authClient } from "~/lib/auth-client";
 import { z } from "zod/v4";
 
 const PRODUCTS_QUERY_KEY_PREFIX = "products";
-type CreateProductDBData = Omit<Product, "id" | "createdAt" | "updatedAt">;
+type UpdateProductDBData = Partial<
+  Omit<Product, "id" | "createdAt" | "updatedAt" | "images">
+> & { imageBaseUrl?: string };
 
 const EditProductFormSchema = z.object({
   name: z.string().trim().min(1, { message: "Product name is required." }),
-  description: z.string().trim().optional(),
-  priceInCents: z.coerce.number().int().positive(),
-  category: z.string().trim().optional(),
-  stockQuantity: z.coerce.number().int().min(0),
+  description: z.string().trim().nullable().optional(),
+  priceInCents: z.coerce
+    .number({ message: "Price must be a number." })
+    .int({ message: "Price must be a whole number (cents)." })
+    .positive({ message: "Price must be a positive number." }),
+  category: z.string().trim().nullable().optional(),
+  stockQuantity: z.coerce
+    .number({ message: "Stock quantity must be a number." })
+    .int({ message: "Stock quantity must be an integer." })
+    .min(0, { message: "Stock quantity cannot be negative." }),
   brand: z.string().trim().min(1, { message: "Brand is required." }),
   model: z.string().trim().min(1, { message: "Model is required." }),
   fuelType: z.string().trim().min(1, { message: "Fuel type is required." }),
+  imageBaseUrl: z
+    .string()
+    .trim()
+    .min(1, { message: "Product image is required." }),
 });
 
 type ProductFormValues = z.infer<typeof EditProductFormSchema>;
@@ -33,7 +45,7 @@ interface ApiResponse {
 }
 
 async function updateProductInDB(
-  updatedProduct: Partial<CreateProductDBData> & { id: string }
+  updatedProduct: Partial<UpdateProductDBData> & { id: string }
 ): Promise<Product> {
   const fetchUrl = `/api/products?id=${updatedProduct.id}`;
   const response = await fetch(fetchUrl, {
@@ -101,7 +113,11 @@ export default function EditProductPage() {
   const [brand, setBrand] = createSignal("");
   const [model, setModel] = createSignal("");
   const [fuelType, setFuelType] = createSignal("");
-  const [selectedFile, setSelectedFile] = createSignal<File | null>(null);
+  const [imageFile, setImageFile] = createSignal<File | null>(null);
+
+  const [imagePreviewUrl, setImagePreviewUrl] = createSignal<string | null>(
+    null
+  );
 
   const [formErrors, setFormErrors] =
     createSignal<z.ZodFormattedError<ProductFormValues> | null>(null);
@@ -121,13 +137,14 @@ export default function EditProductPage() {
       setBrand(product.brand ?? "");
       setModel(product.model ?? "");
       setFuelType(product.fuelType ?? "");
+      setImagePreviewUrl(product.imageBaseUrl || null);
     }
   });
 
   const productUpdateMutation: UseMutationResult<
     Product,
     Error,
-    Partial<CreateProductDBData> & { id: string }
+    Partial<UpdateProductDBData> & { id: string }
   > = useMutation(() => ({
     mutationFn: updateProductInDB,
     onSuccess: (updatedProduct) => {
@@ -145,15 +162,56 @@ export default function EditProductPage() {
   const handleFileChange = (e: Event) => {
     const file = (e.currentTarget as HTMLInputElement).files?.[0];
     if (file) {
-      setSelectedFile(file);
-      setFileUploadError(null);
+      setImageFile(file);
+      setImagePreviewUrl(URL.createObjectURL(file));
+      setFileUploadError(null); // Clear any previous file upload errors
+    } else {
+      setImageFile(null);
+      setImagePreviewUrl(null);
     }
   };
+
+  // Clean up object URL when component unmounts
+  createEffect(() => {
+    return () => {
+      if (imagePreviewUrl()) {
+        URL.revokeObjectURL(imagePreviewUrl()!); // Clean up the object URL
+      }
+    };
+  });
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
     setFormErrors(null);
     setFileUploadError(null);
+
+    let finalImageBaseUrl: string | undefined = existingProduct()?.imageBaseUrl;
+
+    if (imageFile()) {
+      setIsUploadingImage(true);
+      try {
+        const imageFormData = new FormData();
+        imageFormData.append("files[]", imageFile()!); // Append the single file
+
+        const uploadResponse = await fetch("/api/upload", {
+          method: "POST",
+          body: imageFormData,
+        });
+        if (!uploadResponse.ok)
+          throw new Error(
+            (await uploadResponse.json()).error || "Image upload failed"
+          );
+        const uploadResult = (await uploadResponse.json()) as {
+          imageBaseUrls: string[];
+        };
+        finalImageBaseUrl = uploadResult.imageBaseUrls[0]; // Get the single imageBaseUrl
+      } catch (uploadError: any) {
+        setFileUploadError(uploadError.message);
+        setIsUploadingImage(false);
+        return;
+      }
+      setIsUploadingImage(false);
+    }
 
     const validationResult = EditProductFormSchema.safeParse({
       name: name(),
@@ -164,6 +222,7 @@ export default function EditProductPage() {
       brand: brand(),
       model: model(),
       fuelType: fuelType(),
+      imageBaseUrl: finalImageBaseUrl, // Use the uploaded or existing imageBaseUrl
     });
 
     if (!validationResult.success) {
@@ -171,40 +230,20 @@ export default function EditProductPage() {
       return;
     }
 
-    let imagesToSave: ProductImages | undefined = existingProduct()?.images;
-    if (selectedFile()) {
-      setIsUploadingImage(true);
-      try {
-        const imageFormData = new FormData();
-        imageFormData.append("file", selectedFile()!);
-        const uploadResponse = await fetch("/api/upload", {
-          method: "POST",
-          body: imageFormData,
-        });
-        if (!uploadResponse.ok)
-          throw new Error(
-            (await uploadResponse.json()).error || "Image upload failed"
-          );
-        imagesToSave = (await uploadResponse.json()).images;
-      } catch (uploadError: any) {
-        setFileUploadError(uploadError.message);
-        return;
-      } finally {
-        setIsUploadingImage(false);
-      }
-    }
-
-    if (!imagesToSave) {
+    if (!finalImageBaseUrl) {
       setFileUploadError("Product image is required.");
       return;
     }
 
-    productUpdateMutation.mutate({
-      id: productId()!,
+    const productDataForDB: UpdateProductDBData = {
       ...validationResult.data,
-      images: imagesToSave,
       description: validationResult.data.description || null,
       category: validationResult.data.category || null,
+    };
+
+    productUpdateMutation.mutate({
+      id: productId()!,
+      ...productDataForDB,
     });
   };
 
@@ -338,29 +377,73 @@ export default function EditProductPage() {
               </Show>
             </div>
             <div>
-              <label for="productImage" class={labelBaseClasses}>
-                Product Image
+              <label class={labelBaseClasses}>
+                Product Image <span class="text-red-500">*</span>
               </label>
-              <input
-                id="productImage"
-                type="file"
-                accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
-                class={fileInputClasses}
-                onChange={handleFileChange}
-                disabled={isUploadingImage() || productUpdateMutation.isPending}
-              />
-              <Show when={existingProduct()?.images}>
-                <div class="mt-2">
-                  <p class="text-xs">Current:</p>
+              <div class="mt-2 flex items-center space-x-4">
+                <Show
+                  when={imagePreviewUrl()}
+                  fallback={
+                    <div class="w-32 h-32 border-2 border-dashed border-neutral-300 rounded-md flex items-center justify-center text-neutral-500">
+                      No Image
+                    </div>
+                  }
+                >
                   <img
-                    src={existingProduct()!.images[0]?.jpeg}
-                    class="w-24 h-auto rounded-md mt-1"
+                    src={imagePreviewUrl()!}
+                    alt="Product Preview"
+                    class="w-32 h-32 object-cover rounded-md border border-neutral-300"
                   />
-                </div>
-              </Show>
-              <Show when={selectedFile() && !fileUploadError()}>
-                <p class="mt-1 text-xs">New: {selectedFile()!.name}</p>
-              </Show>
+                </Show>
+                <label
+                  for="productImage"
+                  class={`flex-1 text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 ${
+                    isUploadingImage() || productUpdateMutation.isPending
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  {imageFile() ? "Change Image" : "Upload Image"}
+                  <input
+                    id="productImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                    class="hidden"
+                    onChange={handleFileChange}
+                    disabled={
+                      isUploadingImage() || productUpdateMutation.isPending
+                    }
+                  />
+                </label>
+                <Show when={imageFile()}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreviewUrl(null);
+                      setFileUploadError(null);
+                    }}
+                    class="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                    aria-label="Remove image"
+                    disabled={
+                      isUploadingImage() || productUpdateMutation.isPending
+                    }
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 01-2 0v6a1 1 0 112 0V8z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </Show>
+              </div>
               <Show when={fileUploadError()}>
                 <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
               </Show>

@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import { A } from "@solidjs/router";
 import { Pencil, Trash2, Square, CheckSquare } from "lucide-solid";
 import type { Product } from "~/db/schema";
+import ProductImage from "./ProductImage";
 
 interface ProductListItemProps {
   product: Product;
@@ -13,18 +14,7 @@ interface ProductListItemProps {
 }
 
 const formatPrice = (priceInCents: number) =>
-  `$${(priceInCents / 100).toLocaleString("en-US")}`;
-
-const getOptimizedImageUrl = (image: {
-  avif?: string;
-  webp?: string;
-  jpeg?: string;
-}) => {
-  if (image.avif) return image.avif;
-  if (image.webp) return image.webp;
-  if (image.jpeg) return image.jpeg;
-  return "https://via.placeholder.com/96x64"; // Fallback placeholder for thumbnail size
-};
+  `${(priceInCents / 100).toLocaleString("en-US")}`;
 
 export default function ProductListItem(props: ProductListItemProps) {
   return (
@@ -41,11 +31,12 @@ export default function ProductListItem(props: ProductListItemProps) {
         </button>
       </div>
       <div class="flex-shrink-0 w-24">
-        <img
-          src={getOptimizedImageUrl(props.product.images[0] || {})}
+        <ProductImage
+          imageBaseUrl={props.product.imageBaseUrl}
+          index={0}
+          size="thumbnail"
           alt={props.product.name}
           class="w-24 h-16 object-cover"
-          fetchpriority="high"
         />
       </div>
       <A
@@ -53,11 +44,12 @@ export default function ProductListItem(props: ProductListItemProps) {
         class="flex-1 min-w-0 flex items-center space-x-4 group"
       >
         <div class="flex-shrink-0 w-24">
-          <img
-            src={getOptimizedImageUrl(props.product.images[0] || {})}
+          <ProductImage
+            imageBaseUrl={props.product.imageBaseUrl}
+            index={0}
+            size="thumbnail"
             alt={props.product.name}
             class="w-24 h-16 rounded-md object-cover group-hover:scale-105 transition-transform duration-200"
-            fetchpriority="high"
           />
         </div>
         <div class="flex-1 min-w-0">

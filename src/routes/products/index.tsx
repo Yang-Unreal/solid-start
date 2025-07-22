@@ -3,8 +3,9 @@
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
-import type { Product } from "~/db/schema";
+
 import { useSearch } from "~/context/SearchContext";
+import type { Product } from "~/db/schema";
 
 interface PaginationInfo {
   currentPage: number;

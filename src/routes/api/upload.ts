@@ -3,7 +3,7 @@ import type { APIEvent } from "@solidjs/start/server";
 import { uploadFile, getPublicUrl } from "../../lib/minio";
 import { randomUUID } from "crypto";
 import sharp from "sharp"; // Import the sharp library
-import type { ProductImages } from "~/db/schema";
+
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024; // Increased to 15MB for high-res masters
 // Only allow image types that Sharp can process
@@ -76,9 +76,10 @@ export async function POST(event: APIEvent) {
       return createErrorResponse("Maximum 6 images allowed.", 400);
     }
 
-    const uploadedImages: ProductImages = [];
+    const uploadedImageBaseUrls: string[] = [];
 
-    for (const masterFile of files) {
+    for (let i = 0; i < files.length; i++) {
+      const masterFile = files[i];
       if (!masterFile || masterFile.size === 0) {
         return createErrorResponse("Empty file provided.", 400);
       }
@@ -94,32 +95,41 @@ export async function POST(event: APIEvent) {
 
       const masterBuffer = Buffer.from(await masterFile.arrayBuffer());
       const sharpInstance = sharp(masterBuffer);
-      const fileNameBase = randomUUID();
+      const imageBaseUrl = randomUUID(); // This will be the base for all variants of this image
 
-      // Generate a single "display" size for each uploaded image
-      const displayInstance = sharpInstance
-        .clone()
-        .resize(1280, 720, { fit: "inside", withoutEnlargement: true });
+      const sizes = {
+        thumbnail: { width: 96, height: 64 },
+        card: { width: 400, height: 225 },
+        detail: { width: 1280, height: 720 },
+      };
+      const formats = ["avif", "webp", "jpeg"] as const;
 
-      const [avifUrl, webpUrl, jpegUrl] = await Promise.all([
-        processAndUploadVariant(displayInstance, fileNameBase, "avif", "image/avif"),
-        processAndUploadVariant(displayInstance, fileNameBase, "webp", "image/webp"),
-        processAndUploadVariant(displayInstance, fileNameBase, "jpeg", "image/jpeg"),
-      ]);
+      const uploadPromises: Promise<any>[] = [];
 
-      uploadedImages.push({
-        avif: avifUrl,
-        webp: webpUrl,
-        jpeg: jpegUrl,
-      });
+      for (const sizeName in sizes) {
+        const { width, height } = sizes[sizeName as keyof typeof sizes];
+        for (const format of formats) {
+          const fileNameBase = `${imageBaseUrl}-${i}-${sizeName}`;
+          const mimeType = `image/${format}`;
+          const resizedInstance = sharpInstance
+            .clone()
+            .resize(width, height, { fit: "inside", withoutEnlargement: true });
+
+          uploadPromises.push(
+            processAndUploadVariant(resizedInstance, fileNameBase, format, mimeType)
+          );
+        }
+      }
+      await Promise.all(uploadPromises);
+      uploadedImageBaseUrls.push(imageBaseUrl);
     }
 
-    const images: ProductImages = uploadedImages;
+    const imageBaseUrls: string[] = uploadedImageBaseUrls;
 
     return createSuccessResponse({
       success: true,
-      images, // Return the structured object
-      message: `Successfully processed and uploaded ${uploadedImages.length} image(s).`,
+      imageBaseUrls, // Return the structured object
+      message: `Successfully processed and uploaded ${uploadedImageBaseUrls.length} image(s).`,
     });
   } catch (error: any) {
     console.error("=== Upload API Error ===", error);

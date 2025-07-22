@@ -7,6 +7,7 @@ import {
 } from "solid-js";
 import { useParams } from "@solidjs/router";
 import { type Product } from "~/db/schema";
+import ProductImage from "~/components/ProductImage";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -32,20 +33,8 @@ export default function ProductDetailPage() {
     return result.data[0] as Product;
   });
 
-  const [activeImage, setActiveImage] = createSignal<string>();
   const [currentImageIndex, setCurrentImageIndex] = createSignal(0);
   const [touchStartX, setTouchStartX] = createSignal(0);
-
-  createEffect(() => {
-    const p = productData();
-    if (p?.images && p.images.length > 0) {
-      const firstImage = p.images[0];
-      if (firstImage) {
-        setActiveImage(getOptimizedImageUrl(firstImage));
-        setCurrentImageIndex(0);
-      }
-    }
-  });
 
   const handleTouchStart = (e: TouchEvent) => {
     if (e.touches[0]) {
@@ -62,19 +51,16 @@ export default function ProductDetailPage() {
     if (Math.abs(diff) > 50) {
       // Threshold for a swipe
       const p = productData();
-      if (!p?.images || p.images.length === 0) return;
+      if (!p?.imageBaseUrl) return;
 
       let newIndex = currentImageIndex();
+      const totalImages = 6; // Assuming 6 images per product (0-5)
       if (diff > 0) {
         // Swiped left, go to next image
-        newIndex = (newIndex + 1) % p.images.length;
+        newIndex = (newIndex + 1) % totalImages;
       } else {
         // Swiped right, go to previous image
-        newIndex = (newIndex - 1 + p.images.length) % p.images.length;
-      }
-      const newImage = p.images[newIndex];
-      if (newImage) {
-        setActiveImage(getOptimizedImageUrl(newImage));
+        newIndex = (newIndex - 1 + totalImages) % totalImages;
       }
       setCurrentImageIndex(newIndex);
       setTouchStartX(0); // Reset touch start to prevent multiple swipes
@@ -83,22 +69,6 @@ export default function ProductDetailPage() {
 
   const handleTouchEnd = () => {
     setTouchStartX(0);
-  };
-
-  const getOptimizedImageUrl = (
-    image:
-      | {
-          avif?: string;
-          webp?: string;
-          jpeg?: string;
-        }
-      | undefined
-  ) => {
-    if (!image) return "https://via.placeholder.com/384"; // Handle undefined input
-    if (image.avif) return image.avif;
-    if (image.webp) return image.webp;
-    if (image.jpeg) return image.jpeg;
-    return "https://via.placeholder.com/384"; // Fallback placeholder
   };
 
   const [showThumbnails, setShowThumbnails] = createSignal(false);
@@ -115,8 +85,10 @@ export default function ProductDetailPage() {
             <div class="md:w-3/5 flex flex-col">
               {/* Main Image */}
               <div class="relative aspect-video overflow-hidden">
-                <img
-                  src={activeImage()}
+                <ProductImage
+                  imageBaseUrl={p().imageBaseUrl}
+                  index={currentImageIndex()}
+                  size="detail"
                   alt={p().name}
                   class="w-full h-full object-cover"
                   onTouchStart={handleTouchStart}
@@ -124,9 +96,9 @@ export default function ProductDetailPage() {
                   onTouchEnd={handleTouchEnd}
                 />
                 {/* Image Index for Mobile */}
-                <Show when={p().images && p().images.length > 0}>
+                <Show when={p().imageBaseUrl}>
                   <div class="absolute top-2 right-3 bg-black bg-opacity-30 text-white text-xs px-2 py-0.5 rounded-full md:hidden">
-                    {currentImageIndex() + 1} / {p().images.length}
+                    {currentImageIndex() + 1} / 6
                   </div>
                 </Show>
                 {/* Dots and Thumbnails for image navigation */}
@@ -138,21 +110,19 @@ export default function ProductDetailPage() {
                   {/* Thumbnails row */}
                   <Show when={showThumbnails()}>
                     <div class="mb-2 flex space-x-2 overflow-x-auto pb-2">
-                      <For each={p().images}>
-                        {(image) => (
-                          <img
-                            src={getOptimizedImageUrl(image)}
-                            alt="thumbnail"
+                      <For each={Array.from({ length: 6 })}>
+                        {(_, index) => (
+                          <ProductImage
+                            imageBaseUrl={p().imageBaseUrl}
+                            index={index()}
+                            size="thumbnail"
+                            alt={`Product thumbnail ${index() + 1}`}
                             class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200 hover:opacity-100"
                             classList={{
-                              "opacity-50":
-                                activeImage() !== getOptimizedImageUrl(image),
-                              "opacity-100":
-                                activeImage() === getOptimizedImageUrl(image),
+                              "opacity-50": currentImageIndex() !== index(),
+                              "opacity-100": currentImageIndex() === index(),
                             }}
-                            onClick={() =>
-                              setActiveImage(getOptimizedImageUrl(image))
-                            }
+                            onClick={() => setCurrentImageIndex(index())}
                           />
                         )}
                       </For>
@@ -160,16 +130,15 @@ export default function ProductDetailPage() {
                   </Show>
                   {/* Dots */}
                   <div class="hidden md:flex justify-center space-x-2">
-                    <For each={p().images}>
-                      {(image, index) => (
+                    <For each={Array.from({ length: 6 })}>
+                      {(_, index) => (
                         <span
                           class="w-2 h-2 bg-gray-400 rounded-full cursor-pointer"
                           classList={{
                             "bg-primary-accent":
-                              getOptimizedImageUrl(image) === activeImage(),
+                              currentImageIndex() === index(),
                           }}
                           onClick={() => {
-                            setActiveImage(getOptimizedImageUrl(image));
                             setCurrentImageIndex(index());
                           }}
                         ></span>
@@ -178,7 +147,6 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
               </div>
-              {/* The original "Thumbnails" div (mt-4 relative) is now removed as its content has been moved. */}
             </div>
 
             {/* Product Details (Right Column) */}

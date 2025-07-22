@@ -5,7 +5,6 @@ import {
   boolean,
   integer,
   uuid,
-  jsonb, // Import the jsonb type
 } from "drizzle-orm/pg-core";
 
 import type { InferSelectModel } from "drizzle-orm";
@@ -78,18 +77,6 @@ export const verification = pgTable("verification", {
 
 // --- Product Schema (Updated) ---
 
-/**
- * Defines the expected structure for the 'images' JSONB column in the product table.
- * This provides type safety when interacting with the data in your application.
- */
-export type ImageFormats = {
-  avif?: string;
-  webp?: string;
-  jpeg?: string;
-};
-
-export type ProductImages = ImageFormats[];
-
 export const product = pgTable("product", {
   id: uuid("id").defaultRandom().primaryKey(),
 
@@ -98,15 +85,10 @@ export const product = pgTable("product", {
   priceInCents: integer("price_in_cents").notNull(),
 
   /**
-   * CHANGE: Replaced `imageUrl` with a flexible `images` JSONB column.
-   * This stores structured data for all required image formats and sizes.
-   * Example data:
-   * {
-   *   thumbnail: { avif: '...', webp: '...', jpeg: '...' },
-   *   detail: { avif: '...', webp: '...', jpeg: '...' }
-   * }
+   * New field to store the base URL for product images.
+   * Images will be named as {imageBaseUrl}-{index}-{size}.{format}
    */
-  images: jsonb("images").$type<ProductImages>().notNull(),
+  imageBaseUrl: text("image_base_url").notNull(),
 
   category: text("category"),
   stockQuantity: integer("stock_quantity").default(0).notNull(),

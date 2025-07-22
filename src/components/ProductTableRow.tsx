@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 import { A } from "@solidjs/router";
 import { Pencil, Trash2, Square, CheckSquare } from "lucide-solid";
 import type { Product } from "~/db/schema";
+import ProductImage from "./ProductImage";
 
 interface ProductTableRowProps {
   product: Product;
@@ -13,18 +14,7 @@ interface ProductTableRowProps {
 }
 
 const formatPrice = (priceInCents: number) =>
-  `$${(priceInCents / 100).toLocaleString("en-US")}`;
-
-const getOptimizedImageUrl = (image: {
-  avif?: string;
-  webp?: string;
-  jpeg?: string;
-}) => {
-  if (image.avif) return image.avif;
-  if (image.webp) return image.webp;
-  if (image.jpeg) return image.jpeg;
-  return "https://via.placeholder.com/64x40"; // Fallback placeholder for table row thumbnail size
-};
+  `${(priceInCents / 100).toLocaleString("en-US")}`;
 
 export default function ProductTableRow(props: ProductTableRowProps) {
   return (
@@ -41,8 +31,10 @@ export default function ProductTableRow(props: ProductTableRowProps) {
         </button>
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm text-neutral-900">
-        <img
-          src={getOptimizedImageUrl(props.product.images[0] || {})}
+        <ProductImage
+          imageBaseUrl={props.product.imageBaseUrl}
+          index={0}
+          size="thumbnail"
           alt={props.product.name}
           class="h-10 w-16 rounded-md object-cover"
         />
@@ -63,7 +55,6 @@ export default function ProductTableRow(props: ProductTableRowProps) {
         {new Date(props.product.createdAt).toLocaleDateString()}
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
-        {/* THE FIX IS HERE */}
         <A
           href={`/dashboard/products/${props.product.id}/edit`}
           class="text-sky-600 hover:text-sky-900 mr-4"
@@ -83,3 +74,4 @@ export default function ProductTableRow(props: ProductTableRowProps) {
     </tr>
   );
 }
+

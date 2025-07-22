@@ -2,6 +2,7 @@ import { For, Show } from "solid-js";
 import { A } from "@solidjs/router";
 import type { Product } from "~/db/schema";
 import type { QueryObserverResult } from "@tanstack/solid-query";
+import ProductImage from "~/components/ProductImage";
 
 // --- Interface Definitions (reverted to include full pagination info) ---
 interface PaginationInfo {
@@ -73,25 +74,14 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                   href={`/products/${product.id}`}
                   class="card-content-host flex flex-col bg-white overflow-hidden"
                 >
-                  <div class="w-full aspect-video bg-neutral-100  overflow-hidden">
-                    <picture>
-                      <source
-                        srcset={product.images[0]?.avif}
-                        type="image/avif"
-                      />
-                      <source
-                        srcset={product.images[0]?.webp}
-                        type="image/webp"
-                      />
-                      <img
-                        src={product.images[0]?.jpeg}
-                        alt={product.name}
-                        class="w-full h-full object-cover"
-                        fetchpriority="high"
-                        width="640"
-                        height="360"
-                      />
-                    </picture>
+                  <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
+                    <ProductImage
+                      imageBaseUrl={product.imageBaseUrl}
+                      index={0}
+                      size="card"
+                      alt={product.name}
+                      class="w-full h-full object-cover"
+                    />
                   </div>
                   <div class=" flex flex-col flex-grow">
                     <h2
