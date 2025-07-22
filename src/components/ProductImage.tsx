@@ -28,39 +28,61 @@ export default function ProductImage(props: ProductImageProps) {
   };
 
   return (
-    <picture>
-      <source
-        type="image/avif"
-        srcset={getImageUrl(
-          props.imageBaseUrl,
-          props.index,
-          props.size,
-          "avif"
-        )}
-        sizes={sizes[props.size]}
-      />
-      <source
-        type="image/webp"
-        srcset={getImageUrl(
-          props.imageBaseUrl,
-          props.index,
-          props.size,
-          "webp"
-        )}
-        sizes={sizes[props.size]}
-      />
-      <img
-        src={getImageUrl(props.imageBaseUrl, props.index, props.size, "jpeg")}
-        alt={props.alt}
-        class={props.class}
-        classList={props.classList}
-        onTouchStart={props.onTouchStart}
-        onTouchMove={props.onTouchMove}
-        onTouchEnd={props.onTouchEnd}
-        onClick={props.onClick}
-        loading="lazy"
-        decoding="async"
-      />
-    </picture>
+    <>
+      {props.size === "thumbnail" ? (
+        <img
+          src={getImageUrl(props.imageBaseUrl, props.index, props.size, "jpeg")}
+          alt={props.alt}
+          class={props.class}
+          classList={props.classList}
+          onTouchStart={props.onTouchStart}
+          onTouchMove={props.onTouchMove}
+          onTouchEnd={props.onTouchEnd}
+          onClick={props.onClick}
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <picture>
+          <source
+            type="image/avif"
+            srcset={getImageUrl(
+              props.imageBaseUrl,
+              props.index,
+              props.size,
+              "avif"
+            )}
+            sizes={sizes[props.size]}
+          />
+          <source
+            type="image/webp"
+            srcset={getImageUrl(
+              props.imageBaseUrl,
+              props.index,
+              props.size,
+              "webp"
+            )}
+            sizes={sizes[props.size]}
+          />
+          <img
+            src={getImageUrl(
+              props.imageBaseUrl,
+              props.index,
+              props.size,
+              "jpeg"
+            )}
+            alt={props.alt}
+            class={props.class}
+            classList={props.classList}
+            onTouchStart={props.onTouchStart}
+            onTouchMove={props.onTouchMove}
+            onTouchEnd={props.onTouchEnd}
+            onClick={props.onClick}
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      )}
+    </>
   );
 }

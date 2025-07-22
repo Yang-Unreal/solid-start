@@ -84,7 +84,11 @@ export default function ProductDetailPage() {
           <div class="md:flex md:space-x-8">
             <div class="md:w-3/5 flex flex-col">
               {/* Main Image */}
-              <div class="relative aspect-video overflow-hidden">
+              <div
+                class="relative aspect-video overflow-hidden"
+                onMouseEnter={() => setShowThumbnails(true)}
+                onMouseLeave={() => setShowThumbnails(false)}
+              >
                 <ProductImage
                   imageBaseUrl={p().imageBaseUrl}
                   index={currentImageIndex()}
@@ -102,32 +106,32 @@ export default function ProductDetailPage() {
                   </div>
                 </Show>
                 {/* Dots and Thumbnails for image navigation */}
-                <div
-                  class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center w-full"
-                  onMouseEnter={() => setShowThumbnails(true)}
-                  onMouseLeave={() => setShowThumbnails(false)}
-                >
+                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex flex-col items-center w-full">
                   {/* Thumbnails row */}
-                  <Show when={showThumbnails()}>
-                    <div class="mb-2 flex space-x-2 overflow-x-auto pb-2">
-                      <For each={Array.from({ length: 6 })}>
-                        {(_, index) => (
-                          <ProductImage
-                            imageBaseUrl={p().imageBaseUrl}
-                            index={index()}
-                            size="thumbnail"
-                            alt={`Product thumbnail ${index() + 1}`}
-                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200 hover:opacity-100"
-                            classList={{
-                              "opacity-50": currentImageIndex() !== index(),
-                              "opacity-100": currentImageIndex() === index(),
-                            }}
-                            onClick={() => setCurrentImageIndex(index())}
-                          />
-                        )}
-                      </For>
-                    </div>
-                  </Show>
+                  <div
+                    class="mb-2 flex space-x-2 overflow-x-auto pb-2 transition-opacity duration-300"
+                    classList={{
+                      "opacity-0 pointer-events-none": !showThumbnails(),
+                      "opacity-100": showThumbnails(),
+                    }}
+                  >
+                    <For each={Array.from({ length: 6 })}>
+                      {(_, index) => (
+                        <ProductImage
+                          imageBaseUrl={p().imageBaseUrl}
+                          index={index()}
+                          size="thumbnail"
+                          alt={`Product thumbnail ${index() + 1}`}
+                          class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200 hover:opacity-100"
+                          classList={{
+                            "opacity-50": currentImageIndex() !== index(),
+                            "opacity-100": currentImageIndex() === index(),
+                          }}
+                          onClick={() => setCurrentImageIndex(index())}
+                        />
+                      )}
+                    </For>
+                  </div>
                   {/* Dots */}
                   <div class="hidden md:flex justify-center space-x-2">
                     <For each={Array.from({ length: 6 })}>

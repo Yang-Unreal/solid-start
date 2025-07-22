@@ -23,6 +23,21 @@ const getMinioObjectKey = (url: string | undefined): string | null => {
   return null;
 };
 
+// Helper function to generate MinIO object keys for a given imageBaseUrl
+const generateImageKeys = (imageBaseUrl: string): string[] => {
+  const keys: string[] = [];
+  const sizes = ["thumbnail", "card", "detail"];
+  const formats = ["avif", "webp", "jpeg"];
+  const index = 0; // Assuming index 0 for the primary image based on current schema limitations
+
+  for (const size of sizes) {
+    for (const format of formats) {
+      keys.push(`products/${imageBaseUrl}-${index}-${size}.${format}`);
+    }
+  }
+  return keys;
+};
+
 export async function POST({ request }: APIEvent) {
   try {
     const body = await request.json();
@@ -40,24 +55,17 @@ export async function POST({ request }: APIEvent) {
 
     const productIdsToDelete = validationResult.data.ids;
 
-    // Fetch product image URLs before deleting from the database
+    // Fetch product imageBaseUrls before deleting from the database
     const productsWithImages = await db
-      .select({ images: productTable.images })
+      .select({ imageBaseUrl: productTable.imageBaseUrl })
       .from(productTable)
       .where(inArray(productTable.id, productIdsToDelete));
 
     // Collect all image keys to delete from MinIO
     const imageKeysToDelete: string[] = [];
     for (const product of productsWithImages) {
-      if (product.images && Array.isArray(product.images)) {
-        for (const image of product.images) {
-          const avifKey = getMinioObjectKey(image.avif);
-          if (avifKey) imageKeysToDelete.push(avifKey);
-          const webpKey = getMinioObjectKey(image.webp);
-          if (webpKey) imageKeysToDelete.push(webpKey);
-          const jpegKey = getMinioObjectKey(image.jpeg);
-          if (jpegKey) imageKeysToDelete.push(jpegKey);
-        }
+      if (product.imageBaseUrl) {
+        imageKeysToDelete.push(...generateImageKeys(product.imageBaseUrl));
       }
     }
 

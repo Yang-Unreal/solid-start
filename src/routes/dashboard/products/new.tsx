@@ -1,5 +1,5 @@
 // src/routes/dashboard/products/new.tsx
-import { createSignal, Show, createEffect } from "solid-js";
+import { createSignal, Show, createEffect, For } from "solid-js";
 import { useNavigate, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -88,11 +88,8 @@ export default function AddProductPage() {
   const [model, setModel] = createSignal("");
   const [fuelType, setFuelType] = createSignal("");
 
-  const [imageFile, setImageFile] = createSignal<File | null>(null);
-  const [imagePreviewUrl, setImagePreviewUrl] = createSignal<string | null>(
-    null
-  );
-
+  const [imageFiles, setImageFiles] = createSignal<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = createSignal<string[]>([]);
   const [formErrors, setFormErrors] =
     createSignal<z.ZodFormattedError<ProductFormValues> | null>(null);
   const [fileUploadError, setFileUploadError] = createSignal<string | null>(
@@ -116,23 +113,21 @@ export default function AddProductPage() {
   }));
 
   const handleFileChange = (e: Event) => {
-    const file = (e.currentTarget as HTMLInputElement).files?.[0];
-    if (file) {
-      setImageFile(file);
-      setImagePreviewUrl(URL.createObjectURL(file));
-      setFileUploadError(null); // Clear any previous file upload errors
-    } else {
-      setImageFile(null);
-      setImagePreviewUrl(null);
+    const files = Array.from((e.currentTarget as HTMLInputElement).files || []);
+    if (files.length > 6) {
+      setFileUploadError("You can upload a maximum of 6 images.");
+      return;
     }
+    setImageFiles(files);
+    setImagePreviewUrls(files.map((file) => URL.createObjectURL(file)));
+    setFileUploadError(null); // Clear any previous file upload errors
   };
 
-  // Clean up object URL when component unmounts
+  // Clean up object URLs when component unmounts or imageFiles change
   createEffect(() => {
+    const currentUrls = imagePreviewUrls();
     return () => {
-      if (imagePreviewUrl()) {
-        URL.revokeObjectURL(imagePreviewUrl()!); // Clean up the object URL
-      }
+      currentUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   });
 
@@ -141,8 +136,8 @@ export default function AddProductPage() {
     setFormErrors(null);
     setFileUploadError(null);
 
-    if (!imageFile()) {
-      setFileUploadError("Product image is required.");
+    if (imageFiles().length === 0) {
+      setFileUploadError("At least one product image is required.");
       return;
     }
 
@@ -150,7 +145,9 @@ export default function AddProductPage() {
     let imageBaseUrl: string;
     try {
       const imageFormData = new FormData();
-      imageFormData.append("files[]", imageFile()!); // Append the single file
+      imageFiles().forEach((file) => {
+        imageFormData.append("files[]", file);
+      });
 
       const uploadResponse = await fetch("/api/upload", {
         method: "POST",
@@ -327,69 +324,114 @@ export default function AddProductPage() {
             <label class={labelBaseClasses}>
               Product Image <span class="text-red-500">*</span>
             </label>
-            <div class="mt-2 flex items-center space-x-4">
-              <Show
-                when={imagePreviewUrl()}
-                fallback={
-                  <div class="w-32 h-32 border-2 border-dashed border-neutral-300 rounded-md flex items-center justify-center text-neutral-500">
-                    No Image
-                  </div>
-                }
-              >
-                <img
-                  src={imagePreviewUrl()!}
-                  alt="Product Preview"
-                  class="w-32 h-32 object-cover rounded-md border border-neutral-300"
-                />
-              </Show>
-              <label
-                for="productImage"
-                class={`flex-1 text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 ${
-                  isUploadingImage() || productCreationMutation.isPending
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-              >
-                {imageFile() ? "Change Image" : "Upload Image"}
-                <input
-                  id="productImage"
-                  type="file"
-                  accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
-                  class="hidden"
-                  onChange={handleFileChange}
-                  disabled={
-                    isUploadingImage() || productCreationMutation.isPending
-                  }
-                />
-              </label>
-              <Show when={imageFile()}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setImageFile(null);
-                    setImagePreviewUrl(null);
-                    setFileUploadError(null);
-                  }}
-                  class="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-                  aria-label="Remove image"
-                  disabled={
-                    isUploadingImage() || productCreationMutation.isPending
+            <div class="mt-2 space-y-4">
+              <div class="grid grid-cols-3 gap-4">
+                <Show
+                  when={imagePreviewUrls().length > 0}
+                  fallback={
+                    <div class="col-span-3 w-full h-32 border-2 border-dashed border-neutral-300 rounded-md flex items-center justify-center text-neutral-500">
+                      No Images
+                    </div>
                   }
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="h-5 w-5"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
+                  <For each={imagePreviewUrls()}>
+                    {(url, i) => (
+                      <div class="relative w-full h-32">
+                        <img
+                          src={url}
+                          alt={`Product Preview ${i() + 1}`}
+                          class="w-full h-full object-cover rounded-md border border-neutral-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newFiles = imageFiles().filter(
+                              (_, idx) => idx !== i()
+                            );
+                            setImageFiles(newFiles);
+                            setImagePreviewUrls(
+                              newFiles.map((file) => URL.createObjectURL(file))
+                            );
+                            setFileUploadError(null);
+                          }}
+                          class="absolute top-1 right-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                          aria-label={`Remove image ${i() + 1}`}
+                          disabled={
+                            isUploadingImage() ||
+                            productCreationMutation.isPending
+                          }
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 01-2 0v6a1 1 0 112 0V8z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
+                  </For>
+                </Show>
+              </div>
+              <div class="flex items-center space-x-4">
+                <label
+                  for="productImage"
+                  class={`flex-1 text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 ${
+                    isUploadingImage() || productCreationMutation.isPending
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  {imageFiles().length > 0
+                    ? "Add/Change Images"
+                    : "Upload Images"}
+                  <input
+                    id="productImage"
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,image/avif"
+                    multiple
+                    class="hidden"
+                    onChange={handleFileChange}
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
+                  />
+                </label>
+                <Show when={imageFiles().length > 0}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setImageFiles([]);
+                      setImagePreviewUrls([]);
+                      setFileUploadError(null);
+                    }}
+                    class="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                    aria-label="Remove all images"
+                    disabled={
+                      isUploadingImage() || productCreationMutation.isPending
+                    }
                   >
-                    <path
-                      fill-rule="evenodd"
-                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 01-2 0v6a1 1 0 112 0V8z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </Show>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-5 w-5"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 01-2 0v6a1 1 0 112 0V8z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </Show>
+              </div>
             </div>
             <Show when={fileUploadError()}>
               <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
