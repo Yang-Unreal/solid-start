@@ -30,15 +30,6 @@ export default function ProductListItem(props: ProductListItemProps) {
           </Show>
         </button>
       </div>
-      <div class="flex-shrink-0 w-24">
-        <ProductImage
-          imageBaseUrl={props.product.imageBaseUrl}
-          index={0}
-          size="thumbnail"
-          alt={props.product.name}
-          class="w-24 h-16 object-cover"
-        />
-      </div>
       <A
         href={`/products/${props.product.id}`}
         class="flex-1 min-w-0 flex items-center space-x-4 group"
