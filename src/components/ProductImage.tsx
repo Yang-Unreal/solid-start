@@ -21,12 +21,6 @@ const getImageUrl = (
 };
 
 export default function ProductImage(props: ProductImageProps) {
-  const sizes = {
-    thumbnail: "96w",
-    card: "400w",
-    detail: "1280w",
-  };
-
   return (
     <>
       <picture>
@@ -38,7 +32,6 @@ export default function ProductImage(props: ProductImageProps) {
             props.size,
             "avif"
           )}
-          sizes={sizes[props.size]}
         />
         <source
           type="image/webp"
@@ -48,7 +41,6 @@ export default function ProductImage(props: ProductImageProps) {
             props.size,
             "webp"
           )}
-          sizes={sizes[props.size]}
         />
         <img
           src={getImageUrl(props.imageBaseUrl, props.index, props.size, "jpeg")}
