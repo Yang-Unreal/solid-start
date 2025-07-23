@@ -6,7 +6,11 @@ import { eq } from "drizzle-orm"; // Corrected Drizzle imports
 import { z } from "zod"; // Corrected Zod import
 import { kv } from "~/lib/redis";
 import { minio, bucket, endpoint } from "~/lib/minio"; // Import endpoint and bucket
-import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  ListObjectsV2Command,
+} from "@aws-sdk/client-s3";
 import { productsIndex, pollTask } from "~/lib/meilisearch";
 
 const DEFAULT_PAGE_SIZE = 12;
@@ -15,7 +19,6 @@ const CACHE_DURATION_SECONDS = 300;
 const FILTER_OPTIONS_CACHE_KEY = "filter-options"; // Define the cache key for filter options
 
 // --- Schemas ---
-
 
 const NewProductPayloadSchema = z.object({
   name: z.string().trim().min(1),
@@ -193,7 +196,10 @@ export async function POST({ request }: APIEvent) {
 
     const insertedProducts = await db
       .insert(productTable)
-      .values({ ...validationResult.data, imageBaseUrl: validationResult.data.imageBaseUrl })
+      .values({
+        ...validationResult.data,
+        imageBaseUrl: validationResult.data.imageBaseUrl,
+      })
       .returning();
 
     if (insertedProducts.length > 0) {

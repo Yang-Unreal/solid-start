@@ -1,5 +1,6 @@
 // src/routes/dashboard/products/[id]/edit.tsx
 import { createSignal, Show, createEffect } from "solid-js";
+import ProductImage from "~/components/ProductImage";
 import { useNavigate, useParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -173,9 +174,11 @@ export default function EditProductPage() {
 
   // Clean up object URL when component unmounts
   createEffect(() => {
+    const url = imagePreviewUrl();
     return () => {
-      if (imagePreviewUrl()) {
-        URL.revokeObjectURL(imagePreviewUrl()!); // Clean up the object URL
+      // Only revoke if it's a blob URL
+      if (url && url.startsWith("blob:")) {
+        URL.revokeObjectURL(url);
       }
     };
   });
@@ -389,10 +392,12 @@ export default function EditProductPage() {
                     </div>
                   }
                 >
-                  <img
-                    src={imagePreviewUrl()!}
+                  <ProductImage
+                    imageBaseUrl={imagePreviewUrl()!}
                     alt="Product Preview"
                     class="w-32 h-32 object-cover rounded-md border border-neutral-300"
+                    index={0}
+                    size="thumbnail"
                   />
                 </Show>
                 <label
@@ -420,7 +425,10 @@ export default function EditProductPage() {
                     type="button"
                     onClick={() => {
                       setImageFile(null);
-                      setImagePreviewUrl(null);
+                      // Restore the original image URL from the product data
+                      setImagePreviewUrl(
+                        existingProduct()?.imageBaseUrl || null
+                      );
                       setFileUploadError(null);
                     }}
                     class="p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
