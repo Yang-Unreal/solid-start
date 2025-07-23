@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js";
+import { For, Show, createMemo } from "solid-js";
 import { A } from "@solidjs/router";
 import type { Product } from "~/db/schema";
 import type { QueryObserverResult } from "@tanstack/solid-query";
@@ -34,7 +34,9 @@ const paginationButtonClasses = `w-10 h-10 flex items-center justify-center roun
 
 // --- Main Component (Updated Logic) ---
 const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
-  const products = () => props.productsQuery.data?.data || [];
+  const memoizedProducts = createMemo(
+    () => props.productsQuery.data?.data || []
+  );
   const pagination = () => props.productsQuery.data?.pagination || null;
   const error = () => props.productsQuery.error;
 
@@ -67,8 +69,10 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
           class={`product-grid-container justify-center gap-2 grid grid-cols-1 sm:grid-cols-2  md:grid-cols-3 lg:grid-cols-4`}
         >
           {/* Only show products if not loading and no error, and products exist */}
-          <Show when={!isLoading() && !error() && products().length > 0}>
-            <For each={products()}>
+          <Show
+            when={!isLoading() && !error() && memoizedProducts().length > 0}
+          >
+            <For each={memoizedProducts()}>
               {(product) => (
                 <A
                   href={`/products/${product.id}`}
