@@ -124,6 +124,7 @@ export default function Nav(props: {
                     ? "bg-primary-accent"
                     : "bg-neutral-50"
                 }`}
+                aria-label="Toggle filters"
                 enableHoverCircle={true}
                 hoverCircleColor="hsl(75, 99%, 52%)"
                 applyOverflowHidden={true}
@@ -200,6 +201,7 @@ export default function Nav(props: {
                           ? "bg-primary-accent"
                           : "bg-neutral-50"
                       }`}
+                      aria-label="Toggle filters"
                     >
                       <SlidersHorizontal size={20} />
                     </button>
