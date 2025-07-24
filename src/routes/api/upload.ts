@@ -1,6 +1,11 @@
 // src/routes/api/upload.ts
 import type { APIEvent } from "@solidjs/start/server";
-import { uploadFile, getPublicUrl } from "../../lib/minio";
+import {
+  uploadFile,
+  getPublicUrl,
+  listFiles,
+  deleteFile,
+} from "../../lib/minio";
 import { randomUUID } from "crypto";
 import sharp from "sharp"; // Import the sharp library
 
@@ -66,7 +71,8 @@ async function processAndUploadVariant(
 export async function POST(event: APIEvent) {
   try {
     const formData = await event.request.formData();
-    const files = formData.getAll("files[]") as File[]; // Expecting multiple files
+    const files = formData.getAll("files[]") as File[];
+    const oldImageBaseUrl = formData.get("oldImageBaseUrl") as string | null;
 
     if (files.length === 0) {
       return createErrorResponse("No files provided.", 400);
@@ -127,6 +133,29 @@ export async function POST(event: APIEvent) {
         }
       }
       await Promise.all(uploadPromises);
+    }
+
+    // If new images were uploaded successfully and an old base URL was provided, delete the old image set
+    if (oldImageBaseUrl) {
+      try {
+        console.log(`Deleting old image set for base URL: ${oldImageBaseUrl}`);
+        const objectsToDelete = await listFiles(`products/${oldImageBaseUrl}`);
+        if (objectsToDelete.Contents) {
+          const deletePromises = objectsToDelete.Contents.map((obj) =>
+            deleteFile(obj.Key!)
+          );
+          await Promise.all(deletePromises);
+          console.log(
+            `Successfully deleted ${objectsToDelete.Contents.length} old image files.`
+          );
+        }
+      } catch (deleteError) {
+        // Log the error but don't fail the whole request, since the new images are already uploaded.
+        console.error(
+          `Failed to delete old image set for base URL ${oldImageBaseUrl}:`,
+          deleteError
+        );
+      }
     }
 
     // Return the single base URL for the product's images

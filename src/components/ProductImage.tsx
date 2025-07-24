@@ -9,6 +9,7 @@ interface ProductImageProps {
   onTouchEnd?: () => void;
   onClick?: () => void;
   classList?: Record<string, boolean>;
+  isBlob?: boolean;
 }
 
 const getImageUrl = (
@@ -21,6 +22,20 @@ const getImageUrl = (
 };
 
 export default function ProductImage(props: ProductImageProps) {
+  if (props.isBlob) {
+    return (
+      <img
+        src={props.imageBaseUrl}
+        alt={props.alt}
+        class={props.class}
+        classList={props.classList}
+        onClick={props.onClick}
+        loading="lazy"
+        decoding="async"
+      />
+    );
+  }
+
   return (
     <>
       <picture>
@@ -58,3 +73,4 @@ export default function ProductImage(props: ProductImageProps) {
     </>
   );
 }
+export {};
