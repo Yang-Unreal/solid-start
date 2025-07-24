@@ -30,7 +30,6 @@ export default function ProductImage(props: ProductImageProps) {
         class={props.class}
         classList={props.classList}
         onClick={props.onClick}
-        loading="lazy"
         decoding="async"
       />
     );
@@ -66,7 +65,6 @@ export default function ProductImage(props: ProductImageProps) {
           onTouchMove={props.onTouchMove}
           onTouchEnd={props.onTouchEnd}
           onClick={props.onClick}
-          loading="lazy"
           decoding="async"
         />
       </picture>
