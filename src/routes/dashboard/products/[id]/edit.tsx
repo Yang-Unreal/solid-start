@@ -429,7 +429,7 @@ export default function EditProductPage() {
                             : existingProduct()?.imageBaseUrl!
                         }
                         index={previewUrl.startsWith("blob:") ? 0 : index()}
-                        size="thumbnail"
+                        size="card"
                         alt={`Product image ${index() + 1}`}
                         class="w-full aspect-video object-cover rounded-md border"
                         isBlob={previewUrl.startsWith("blob:")}

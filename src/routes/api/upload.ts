@@ -104,7 +104,7 @@ export async function POST(event: APIEvent) {
       const sharpInstance = sharp(masterBuffer);
 
       const sizes = {
-        thumbnail: { width: 96, height: 64 },
+        thumbnail: { width: 96, height: 54 },
         card: { width: 400, height: 225 },
         detail: { width: 1280, height: 720 },
       };
