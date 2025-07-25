@@ -195,7 +195,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     createEffect(() => {
       if (line1Ref && line2Ref) {
         const isDrawerOpen = isOpen();
-        const yTranslate = isDrawerOpen ? 4 : 0;
+        const yTranslate = isDrawerOpen ? 3.5 : 0;
         const rotate = isDrawerOpen ? 45 : 0;
         animate(line1Ref, {
           translateY: yTranslate,
@@ -287,11 +287,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             >
               <div
                 ref={(el) => (line1Ref = el)}
-                class="w-5 h-[2px] mb-1.5 bg-black"
+                class="w-5 h-[1px] mb-1.5 bg-black"
               ></div>
               <div
                 ref={(el) => (line2Ref = el)}
-                class="w-5 h-[2px] bg-black"
+                class="w-5 h-[1px] bg-black"
               ></div>
             </div>
           )}
