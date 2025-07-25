@@ -18,7 +18,9 @@ const getImageUrl = (
   size: "thumbnail" | "card" | "detail",
   format: "avif" | "webp" | "jpeg"
 ) => {
-  return `https://minio.limingcn.com/solid-start/products/${imageBaseUrl}-${index}-${size}.${format}`;
+  const baseUrl =
+    import.meta.env.VITE_MINIO_PUBLIC_URL || "https://minio.limingcn.com";
+  return `${baseUrl}/solid-start/products/${imageBaseUrl}-${index}-${size}.${format}`;
 };
 
 export default function ProductImage(props: ProductImageProps) {
