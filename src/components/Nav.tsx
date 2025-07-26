@@ -58,7 +58,7 @@ export default function Nav(props: {
   );
 
   let lastScrollY = 0;
-  const navHeight = 60; // The height of the nav bar based on h-24 class
+  const navHeight = 104; // The height of the nav bar based on h-24 class
 
   createEffect(() => {
     const handleScroll = () => {
@@ -95,7 +95,7 @@ export default function Nav(props: {
         top: `${showNav() ? 0 : -navHeight}px`,
       }}
     >
-      <div class=" relative flex items-center h-15 font-sans justify-between ">
+      <div class=" relative flex items-center h-26 font-sans justify-between ">
         <div class="flex items-center justify-center ">
           {/* menu */}
           <MenuDrawer
@@ -191,7 +191,7 @@ export default function Nav(props: {
           class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
           aria-label="Homepage"
         >
-          <YourLogo class="h-5 hidden md:block w-auto" />
+          <YourLogo class="h-6 hidden md:block w-auto" />
           <MobileLogo class="h-10 w-auto md:hidden " />
         </A>
         {/* store */}
