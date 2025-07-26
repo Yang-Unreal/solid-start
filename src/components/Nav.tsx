@@ -33,13 +33,14 @@ export default function Nav(props: {
   const [showNav, setShowNav] = createSignal(true); // Controls visibility (top-0 or -top-full)
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false); // Controls filter dropdown visibility
   const [isMobileSearchOpen, setIsMobileSearchOpen] = createSignal(false); // State for mobile search
-  const [
-    shouldTriggerFilterButtonLeaveAnimation,
-    setShouldTriggerFilterButtonLeaveAnimation,
-  ] = createSignal(false);
+
   const [
     shouldTriggerProductsButtonLeaveAnimation,
     setShouldTriggerProductsButtonLeaveAnimation,
+  ] = createSignal(false);
+  const [
+    shouldTriggerSearchButtonLeaveAnimation,
+    setShouldTriggerSearchButtonLeaveAnimation,
   ] = createSignal(false);
   const {
     searchQuery,
@@ -102,18 +103,34 @@ export default function Nav(props: {
             session={props.session}
           />
           {/* search button */}
-          <MagneticLink
-            onClick={() => setIsMobileSearchOpen(true)}
-            class="w-auto h-8 px-3 flex justify-center items-center rounded-full "
-            aria-label="Search"
+          <div
+            onMouseEnter={() =>
+              setShouldTriggerSearchButtonLeaveAnimation(false)
+            }
+            onMouseLeave={() =>
+              setShouldTriggerSearchButtonLeaveAnimation(true)
+            }
           >
-            {(ref) => (
-              <div class="flex justify-center items-center gap-2" ref={ref}>
-                <Search stroke-width="1" size={20} />
-                <p>SEARCH</p>
-              </div>
-            )}
-          </MagneticLink>
+            <MagneticLink
+              onClick={() => setIsMobileSearchOpen(true)}
+              class="w-auto h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full "
+              aria-label="Search"
+              enableHoverCircle={true}
+              hoverCircleColor="hsl(75, 99%, 52%)"
+              applyOverflowHidden={true}
+              triggerLeaveAnimation={shouldTriggerSearchButtonLeaveAnimation}
+              setTriggerLeaveAnimation={
+                setShouldTriggerSearchButtonLeaveAnimation
+              }
+            >
+              {(ref) => (
+                <div class="flex justify-center items-center gap-2" ref={ref}>
+                  <Search stroke-width="1" size={20} />
+                  <p class="hidden md:block">SEARCH</p>
+                </div>
+              )}
+            </MagneticLink>
+          </div>
           {/* search menu */}
           {isMobileSearchOpen() && (
             <div class="fixed inset-0 bg-white z-50 nav-padding ">
@@ -188,7 +205,7 @@ export default function Nav(props: {
         >
           <MagneticLink
             onClick={() => navigate("/products")}
-            class={`w-full h-8 px-3 flex justify-center items-center rounded-full `}
+            class={`w-full h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full `}
             aria-label="Products"
             enableHoverCircle={true}
             hoverCircleColor="hsl(75, 99%, 52%)"
