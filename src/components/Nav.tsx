@@ -95,83 +95,30 @@ export default function Nav(props: {
       }}
     >
       <div class=" relative flex items-center h-15 font-sans justify-between ">
-        <MenuDrawer
-          onLogoutSuccess={props.onLogoutSuccess}
-          session={props.session}
-        />
-        <A
-          href="/"
-          class="text-xl  items-center justify-center"
-          aria-label="Homepage"
-        >
-          <YourLogo class="h-5 hidden md:block w-auto" />
-          <MobileLogo class="h-10 w-auto md:hidden " />
-        </A>
-        <div class="flex items-center justify-end">
-          {/* Desktop search and filter */}
-          {/* <div class="hidden md:flex bg-neutral-50 rounded-full mr-2.5">
-            <div
-              class="relative flex items-center"
-              onMouseLeave={() => {
-                setIsFilterDropdownOpen(false);
-                setShouldTriggerFilterButtonLeaveAnimation(true);
-              }}
-            >
-              <MagneticLink
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsFilterDropdownOpen(!isFilterDropdownOpen());
-                }}
-                class={`text-black w-10 h-10 z-10 rounded-full inline-flex justify-center items-center ${
-                  isFilterDropdownOpen() || hasActiveFilters()
-                    ? "bg-primary-accent"
-                    : "bg-neutral-50"
-                }`}
-                aria-label="Toggle filters"
-                enableHoverCircle={true}
-                hoverCircleColor="hsl(75, 99%, 52%)"
-                applyOverflowHidden={true}
-                triggerLeaveAnimation={shouldTriggerFilterButtonLeaveAnimation}
-                setTriggerLeaveAnimation={
-                  setShouldTriggerFilterButtonLeaveAnimation
-                }
-              >
-                {(ref) => (
-                  <div ref={ref} class="flex items-center">
-                    <SlidersHorizontal stroke-width="1" size={20} />
-                  </div>
-                )}
-              </MagneticLink>
-              <FilterSidebar show={isFilterDropdownOpen()} />
-            </div>
-
-            <div class="w-70">
-              <SearchInput
-                searchQuery={searchQuery}
-                onSearchChange={onSearchChange}
-              />
-            </div>
-          </div> */}
+        <div class="flex items-center justify-center ">
+          <MenuDrawer
+            onLogoutSuccess={props.onLogoutSuccess}
+            session={props.session}
+          />
 
           {/* Mobile search button */}
-          {/* <div class="md:hidden">
-            <MagneticLink
-              onClick={() => setIsMobileSearchOpen(true)}
-              class="w-10 h-10 flex justify-center items-center rounded-full "
-              aria-label="Search"
-            >
-              {(ref) => (
-                <div ref={ref}>
-                  <Search stroke-width="1" size={20} />
-                </div>
-              )}
-            </MagneticLink>
-          </div> */}
+
+          <MagneticLink
+            onClick={() => setIsMobileSearchOpen(true)}
+            class="w-auto h-8 px-3 flex justify-center items-center rounded-full "
+            aria-label="Search"
+          >
+            {(ref) => (
+              <div class="flex justify-center items-center gap-2" ref={ref}>
+                <Search stroke-width="1" size={20} />
+                <p>SEARCH</p>
+              </div>
+            )}
+          </MagneticLink>
 
           {/* Mobile search and filter view (Full Screen) */}
-          {/* {isMobileSearchOpen() && (
-            <div class="fixed inset-0 bg-white z-50 nav-padding md:hidden">
+          {isMobileSearchOpen() && (
+            <div class="fixed inset-0 bg-white z-50 nav-padding ">
               <div class="flex justify-center items-center mb-10 mt-10">
                 <A
                   href="/"
@@ -221,36 +168,90 @@ export default function Nav(props: {
                 </div>
               </div>
             </div>
-          )} */}
+          )}
+        </div>
+        <A
+          href="/"
+          class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
+          aria-label="Homepage"
+        >
+          <YourLogo class="h-5 hidden md:block w-auto" />
+          <MobileLogo class="h-10 w-auto md:hidden " />
+        </A>
 
-          <div
-            onMouseEnter={() =>
-              setShouldTriggerProductsButtonLeaveAnimation(false)
-            }
-            onMouseLeave={() =>
-              setShouldTriggerProductsButtonLeaveAnimation(true)
+        {/* Desktop search and filter */}
+        {/* <div class="hidden md:flex bg-neutral-50 rounded-full mr-2.5">
+            <div
+              class="relative flex items-center"
+              onMouseLeave={() => {
+                setIsFilterDropdownOpen(false);
+                setShouldTriggerFilterButtonLeaveAnimation(true);
+              }}
+            >
+              <MagneticLink
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsFilterDropdownOpen(!isFilterDropdownOpen());
+                }}
+                class={`text-black w-10 h-10 z-10 rounded-full inline-flex justify-center items-center ${
+                  isFilterDropdownOpen() || hasActiveFilters()
+                    ? "bg-primary-accent"
+                    : "bg-neutral-50"
+                }`}
+                aria-label="Toggle filters"
+                enableHoverCircle={true}
+                hoverCircleColor="hsl(75, 99%, 52%)"
+                applyOverflowHidden={true}
+                triggerLeaveAnimation={shouldTriggerFilterButtonLeaveAnimation}
+                setTriggerLeaveAnimation={
+                  setShouldTriggerFilterButtonLeaveAnimation
+                }
+              >
+                {(ref) => (
+                  <div ref={ref} class="flex items-center">
+                    <SlidersHorizontal stroke-width="1" size={20} />
+                  </div>
+                )}
+              </MagneticLink>
+              <FilterSidebar show={isFilterDropdownOpen()} />
+            </div>
+
+            <div class="w-70">
+              <SearchInput
+                searchQuery={searchQuery}
+                onSearchChange={onSearchChange}
+              />
+            </div>
+          </div> */}
+
+        <div
+          onMouseEnter={() =>
+            setShouldTriggerProductsButtonLeaveAnimation(false)
+          }
+          onMouseLeave={() =>
+            setShouldTriggerProductsButtonLeaveAnimation(true)
+          }
+        >
+          <MagneticLink
+            onClick={() => navigate("/products")}
+            class={`w-full h-8 px-3 flex justify-center items-center rounded-full `}
+            aria-label="Products"
+            enableHoverCircle={true}
+            hoverCircleColor="hsl(75, 99%, 52%)"
+            applyOverflowHidden={true}
+            triggerLeaveAnimation={shouldTriggerProductsButtonLeaveAnimation}
+            setTriggerLeaveAnimation={
+              setShouldTriggerProductsButtonLeaveAnimation
             }
           >
-            <MagneticLink
-              onClick={() => navigate("/products")}
-              class={`w-full h-10 px-2 flex justify-center items-center rounded-full `}
-              aria-label="Products"
-              enableHoverCircle={true}
-              hoverCircleColor="hsl(75, 99%, 52%)"
-              applyOverflowHidden={true}
-              triggerLeaveAnimation={shouldTriggerProductsButtonLeaveAnimation}
-              setTriggerLeaveAnimation={
-                setShouldTriggerProductsButtonLeaveAnimation
-              }
-            >
-              {(ref) => (
-                <div ref={ref} class="flex gap-2 justify-center items-center">
-                  <p class="hidden md:block">STORE</p>
-                  <ShoppingBag stroke-width="1" size={20} />
-                </div>
-              )}
-            </MagneticLink>
-          </div>
+            {(ref) => (
+              <div ref={ref} class="flex gap-2 justify-center items-center">
+                <p class="hidden md:block">STORE</p>
+                <ShoppingBag stroke-width="1" size={20} />
+              </div>
+            )}
+          </MagneticLink>
         </div>
       </div>
     </nav>
