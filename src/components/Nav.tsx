@@ -95,9 +95,13 @@ export default function Nav(props: {
       }}
     >
       <div class=" relative flex items-center h-15 font-sans justify-between ">
+        <MenuDrawer
+          onLogoutSuccess={props.onLogoutSuccess}
+          session={props.session}
+        />
         <A
           href="/"
-          class="text-xl  items-center justify-center mr-8"
+          class="text-xl  items-center justify-center"
           aria-label="Homepage"
         >
           <YourLogo class="h-5 hidden md:block w-auto" />
@@ -105,7 +109,7 @@ export default function Nav(props: {
         </A>
         <div class="flex items-center justify-end">
           {/* Desktop search and filter */}
-          <div class="hidden md:flex bg-neutral-50 rounded-full mr-2.5">
+          {/* <div class="hidden md:flex bg-neutral-50 rounded-full mr-2.5">
             <div
               class="relative flex items-center"
               onMouseLeave={() => {
@@ -148,10 +152,10 @@ export default function Nav(props: {
                 onSearchChange={onSearchChange}
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Mobile search button */}
-          <div class="md:hidden">
+          {/* <div class="md:hidden">
             <MagneticLink
               onClick={() => setIsMobileSearchOpen(true)}
               class="w-10 h-10 flex justify-center items-center rounded-full "
@@ -163,10 +167,10 @@ export default function Nav(props: {
                 </div>
               )}
             </MagneticLink>
-          </div>
+          </div> */}
 
           {/* Mobile search and filter view (Full Screen) */}
-          {isMobileSearchOpen() && (
+          {/* {isMobileSearchOpen() && (
             <div class="fixed inset-0 bg-white z-50 nav-padding md:hidden">
               <div class="flex justify-center items-center mb-10 mt-10">
                 <A
@@ -217,7 +221,7 @@ export default function Nav(props: {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
 
           <div
             onMouseEnter={() =>
@@ -229,7 +233,7 @@ export default function Nav(props: {
           >
             <MagneticLink
               onClick={() => navigate("/products")}
-              class={`w-10 h-10  flex justify-center items-center rounded-full `}
+              class={`w-full h-10 px-2 flex justify-center items-center rounded-full `}
               aria-label="Products"
               enableHoverCircle={true}
               hoverCircleColor="hsl(75, 99%, 52%)"
@@ -240,16 +244,13 @@ export default function Nav(props: {
               }
             >
               {(ref) => (
-                <div ref={ref}>
+                <div ref={ref} class="flex gap-2 justify-center items-center">
+                  <p>STORE</p>
                   <ShoppingBag stroke-width="1" size={20} />
                 </div>
               )}
             </MagneticLink>
           </div>
-          <MenuDrawer
-            onLogoutSuccess={props.onLogoutSuccess}
-            session={props.session}
-          />
         </div>
       </div>
     </nav>

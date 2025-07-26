@@ -266,7 +266,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
           onClick={toggleDrawer}
-          class={` w-10 h-10   rounded-full flex flex-col justify-center items-center ${
+          class={` w-full h-10 px-2 rounded-full flex flex-col justify-center items-center ${
             isOpen() ? "bg-primary-accent" : ""
           }`}
           style={{
@@ -283,16 +283,19 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           {(innerRef) => (
             <div
               ref={innerRef}
-              class="flex flex-col justify-center items-center "
+              class="flex flex-row gap-2 justify-center items-center "
             >
-              <div
-                ref={(el) => (line1Ref = el)}
-                class="w-5 h-[1px] mb-1.5 bg-black"
-              ></div>
-              <div
-                ref={(el) => (line2Ref = el)}
-                class="w-5 h-[1px] bg-black"
-              ></div>
+              <div>
+                <div
+                  ref={(el) => (line1Ref = el)}
+                  class="w-5 h-[1px] mb-1.5 bg-black"
+                ></div>
+                <div
+                  ref={(el) => (line2Ref = el)}
+                  class="w-5 h-[1px] bg-black"
+                ></div>
+              </div>
+              <p>MENU</p>
             </div>
           )}
         </MagneticLink>
