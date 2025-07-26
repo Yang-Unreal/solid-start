@@ -96,13 +96,12 @@ export default function Nav(props: {
     >
       <div class=" relative flex items-center h-15 font-sans justify-between ">
         <div class="flex items-center justify-center ">
+          {/* menu */}
           <MenuDrawer
             onLogoutSuccess={props.onLogoutSuccess}
             session={props.session}
           />
-
-          {/* Mobile search button */}
-
+          {/* search button */}
           <MagneticLink
             onClick={() => setIsMobileSearchOpen(true)}
             class="w-auto h-8 px-3 flex justify-center items-center rounded-full "
@@ -115,8 +114,7 @@ export default function Nav(props: {
               </div>
             )}
           </MagneticLink>
-
-          {/* Mobile search and filter view (Full Screen) */}
+          {/* search menu */}
           {isMobileSearchOpen() && (
             <div class="fixed inset-0 bg-white z-50 nav-padding ">
               <div class="flex justify-center items-center mb-10 mt-10">
@@ -170,6 +168,7 @@ export default function Nav(props: {
             </div>
           )}
         </div>
+        {/* logo */}
         <A
           href="/"
           class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
@@ -178,53 +177,7 @@ export default function Nav(props: {
           <YourLogo class="h-5 hidden md:block w-auto" />
           <MobileLogo class="h-10 w-auto md:hidden " />
         </A>
-
-        {/* Desktop search and filter */}
-        {/* <div class="hidden md:flex bg-neutral-50 rounded-full mr-2.5">
-            <div
-              class="relative flex items-center"
-              onMouseLeave={() => {
-                setIsFilterDropdownOpen(false);
-                setShouldTriggerFilterButtonLeaveAnimation(true);
-              }}
-            >
-              <MagneticLink
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsFilterDropdownOpen(!isFilterDropdownOpen());
-                }}
-                class={`text-black w-10 h-10 z-10 rounded-full inline-flex justify-center items-center ${
-                  isFilterDropdownOpen() || hasActiveFilters()
-                    ? "bg-primary-accent"
-                    : "bg-neutral-50"
-                }`}
-                aria-label="Toggle filters"
-                enableHoverCircle={true}
-                hoverCircleColor="hsl(75, 99%, 52%)"
-                applyOverflowHidden={true}
-                triggerLeaveAnimation={shouldTriggerFilterButtonLeaveAnimation}
-                setTriggerLeaveAnimation={
-                  setShouldTriggerFilterButtonLeaveAnimation
-                }
-              >
-                {(ref) => (
-                  <div ref={ref} class="flex items-center">
-                    <SlidersHorizontal stroke-width="1" size={20} />
-                  </div>
-                )}
-              </MagneticLink>
-              <FilterSidebar show={isFilterDropdownOpen()} />
-            </div>
-
-            <div class="w-70">
-              <SearchInput
-                searchQuery={searchQuery}
-                onSearchChange={onSearchChange}
-              />
-            </div>
-          </div> */}
-
+        {/* store */}
         <div
           onMouseEnter={() =>
             setShouldTriggerProductsButtonLeaveAnimation(false)
