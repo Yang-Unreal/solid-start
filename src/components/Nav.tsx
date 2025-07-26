@@ -105,7 +105,7 @@ export default function Nav(props: {
           aria-label="Homepage"
         >
           <YourLogo class="h-5 hidden md:block w-auto" />
-          <MobileLogo class="h-10 w-auto block md:hidden " />
+          <MobileLogo class="h-10 w-auto md:hidden " />
         </A>
         <div class="flex items-center justify-end">
           {/* Desktop search and filter */}
@@ -245,7 +245,7 @@ export default function Nav(props: {
             >
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
-                  <p>STORE</p>
+                  <p class="hidden md:block">STORE</p>
                   <ShoppingBag stroke-width="1" size={20} />
                 </div>
               )}

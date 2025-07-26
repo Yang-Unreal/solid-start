@@ -295,7 +295,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   class="w-5 h-[1px] bg-black"
                 ></div>
               </div>
-              <p>MENU</p>
+              <p class="hidden md:block">MENU</p>
             </div>
           )}
         </MagneticLink>
