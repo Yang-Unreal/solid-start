@@ -61,8 +61,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
   // SVG path definitions for the curve animation
-  const pathStraight = "M 80 0 Q 80 500 80 1000";
-  const pathCurve = "M 80 0 Q -80 500 80 1000";
+  const pathStraight = "M 0 0 Q 0 500 0 1000";
+  const pathCurve = "M 0 0 Q 160 500 0 1000";
 
   const baseNavLinks: { href: string; label: string; onClick?: () => void }[] =
     [
@@ -126,13 +126,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       if (drawerRef) {
         if (isOpen()) {
           animate(drawerRef, {
-            translateX: ["calc(100% + 5rem)", "0%"],
+            translateX: ["calc(-100% - 5rem)", "0%"],
             duration,
             easing: "easeOutQuint",
           });
         } else if (hasBeenOpened()) {
           animate(drawerRef, {
-            translateX: ["0%", "calc(100% + 5rem)"],
+            translateX: ["0%", "calc(-100% - 5rem)"],
             duration,
             easing: "easeInQuint",
           });
@@ -303,13 +303,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 right-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
-        style="transform: translateX(calc(100% + 5rem));"
+        class="fixed top-0 left-0 h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
+        style="transform: translateX(calc(-100% - 5rem));"
       >
         {/* SVG Curve Element */}
         <div
-          class="absolute top-0 left-0 h-full w-20 pointer-events-none"
-          style="transform: translateX(calc(-100% + 1px))"
+          class="absolute top-0 right-0 h-full w-20 pointer-events-none"
+          style="transform: translateX(calc(100% - 1px))"
         >
           <svg
             class="h-full w-full"
