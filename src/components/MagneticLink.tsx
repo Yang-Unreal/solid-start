@@ -1,18 +1,17 @@
-// src/components/MagneticLink.tsx
-
 import {
   createSignal,
   onMount,
   onCleanup,
   type JSX,
   createEffect,
+  type Component,
   type Accessor,
   type Setter,
 } from "solid-js";
-import { createAnimatable, eases, animate } from "animejs";
+import { createAnimatable, eases } from "animejs";
+import Hoverable from "./Hoverable";
 
-interface MagneticLinkProps
-  extends Omit<JSX.HTMLAttributes<HTMLButtonElement>, "children"> {
+interface MagneticLinkProps {
   ref?: (el: HTMLButtonElement) => void;
   onClick?: (e: MouseEvent) => void;
   children?:
@@ -23,32 +22,16 @@ interface MagneticLinkProps
   applyOverflowHidden?: boolean;
   triggerLeaveAnimation?: Accessor<boolean>;
   setTriggerLeaveAnimation?: Setter<boolean>;
+  class?: string;
+  style?: JSX.CSSProperties;
 }
 
-export default function MagneticLink(props: MagneticLinkProps) {
+const MagneticLink: Component<MagneticLinkProps> = (props) => {
   let localElementRef: HTMLButtonElement | undefined;
   let innerElementRef: HTMLElement | undefined;
 
   const [isMobile, setIsMobile] = createSignal(false);
-  const [isReady, setIsReady] = createSignal(false);
 
-  // --- Circle Effect Logic ---
-  let circleRef: HTMLDivElement | undefined;
-  let circleAnimation: ReturnType<typeof animate> | undefined;
-
-  const handleMouseEnter = () => {
-    if (isMobile()) return;
-    if (props.enableHoverCircle && circleRef) {
-      if (circleAnimation) circleAnimation.pause();
-      circleAnimation = animate(circleRef, {
-        translateY: ["101%", "0%"],
-        duration: 400,
-        easing: "easeOutQuad",
-      });
-    }
-  };
-
-  // --- Magnetic Effect Logic ---
   let buttonAnimatableInstance: any;
   let innerAnimatableInstance: any;
 
@@ -71,11 +54,9 @@ export default function MagneticLink(props: MagneticLinkProps) {
     }
   };
 
-  // --- Magnetic Effect Logic ---
   const handleMouseLeave = () => {
     if (isMobile()) return;
 
-    // Trigger magnetic leave effect
     if (buttonAnimatableInstance) {
       buttonAnimatableInstance.translateX(0);
       buttonAnimatableInstance.translateY(0);
@@ -83,19 +64,6 @@ export default function MagneticLink(props: MagneticLinkProps) {
     if (innerAnimatableInstance) {
       innerAnimatableInstance.translateX(0);
       innerAnimatableInstance.translateY(0);
-    }
-  };
-
-  // --- Circle Exit Animation Logic ---
-  const triggerCircleExitAnimation = () => {
-    if (isMobile()) return;
-    if (props.enableHoverCircle && circleRef) {
-      if (circleAnimation) circleAnimation.pause();
-      circleAnimation = animate(circleRef, {
-        translateY: "-101%",
-        duration: 400,
-        easing: "easeInQuad",
-      });
     }
   };
 
@@ -129,16 +97,6 @@ export default function MagneticLink(props: MagneticLinkProps) {
         mediaQuery.removeEventListener("change", handleMediaQueryChange)
       );
     }
-    setIsReady(true);
-  });
-
-  createEffect(() => {
-    if (props.triggerLeaveAnimation && props.triggerLeaveAnimation()) {
-      triggerCircleExitAnimation();
-      if (props.setTriggerLeaveAnimation) {
-        props.setTriggerLeaveAnimation(false);
-      }
-    }
   });
 
   createEffect(() => {
@@ -151,11 +109,9 @@ export default function MagneticLink(props: MagneticLinkProps) {
           duration: 1500,
         });
 
-        localElementRef.addEventListener("mouseenter", handleMouseEnter);
         localElementRef.addEventListener("mousemove", handleMouseMove);
         localElementRef.addEventListener("mouseleave", handleMouseLeave);
       } else {
-        localElementRef.removeEventListener("mouseenter", handleMouseEnter);
         localElementRef.removeEventListener("mousemove", handleMouseMove);
         localElementRef.removeEventListener("mouseleave", handleMouseLeave);
         if (buttonAnimatableInstance) buttonAnimatableInstance.translateX(0);
@@ -166,38 +122,29 @@ export default function MagneticLink(props: MagneticLinkProps) {
 
   onCleanup(() => {
     if (localElementRef) {
-      localElementRef.removeEventListener("mouseenter", handleMouseEnter);
       localElementRef.removeEventListener("mousemove", handleMouseMove);
       localElementRef.removeEventListener("mouseleave", handleMouseLeave);
     }
   });
 
   return (
-    <button
+    <Hoverable<HTMLButtonElement>
+      as="button"
+      enableHoverCircle={props.enableHoverCircle}
+      hoverCircleColor={props.hoverCircleColor}
+      applyOverflowHidden={props.applyOverflowHidden}
+      triggerLeaveAnimation={props.triggerLeaveAnimation}
+      setTriggerLeaveAnimation={props.setTriggerLeaveAnimation}
       ref={setRef}
       onClick={props.onClick}
-      {...props}
-      class={`${props.class || ""} ${
-        props.applyOverflowHidden ? "overflow-hidden" : ""
-      }`}
+      class={props.class}
+      style={props.style}
     >
-      <div class="relative z-10">
-        {typeof props.children === "function"
-          ? props.children(setInnerRef)
-          : props.children}
-      </div>
-      {props.enableHoverCircle && !isMobile() && (
-        <div
-          ref={(el) => (circleRef = el)}
-          class="absolute w-full aspect-square rounded-full"
-          style={{
-            "background-color": props.hoverCircleColor || "#455CE9",
-            transform: "translateY(101%)",
-            "z-index": "0",
-            visibility: isReady() ? "visible" : "hidden",
-          }}
-        ></div>
-      )}
-    </button>
+      {typeof props.children === "function"
+        ? props.children(setInnerRef)
+        : props.children}
+    </Hoverable>
   );
-}
+};
+
+export default MagneticLink;
