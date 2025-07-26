@@ -105,7 +105,7 @@ export default function Nav(props: {
           aria-label="Homepage"
         >
           <YourLogo class="h-5 hidden md:block w-auto" />
-          <MobileLogo class="h-10 w-10 block md:hidden " />
+          <MobileLogo class="h-10 w-auto block md:hidden " />
         </A>
         <div class="flex items-center justify-end">
           {/* Desktop search and filter */}
