@@ -269,10 +269,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           class={` w-full h-8 px-1.5 md:px-3 rounded-full flex flex-col justify-center items-center ${
             isOpen() ? "bg-primary-accent" : ""
           }`}
-          style={{
-            opacity: 1,
-            transform: "scale(1)",
-          }}
           aria-label="Toggle menu"
           enableHoverCircle={true}
           hoverCircleColor="hsl(75, 99%, 52%)"
@@ -307,10 +303,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         style="transform: translateX(calc(-100% - 5rem));"
       >
         {/* SVG Curve Element */}
-        <div
-          class="absolute top-0 right-0 h-full w-20 pointer-events-none"
-          style="transform: translateX(calc(100% - 1px))"
-        >
+        <div class="absolute top-0 right-0 h-full w-20 pointer-events-none translate-x-[calc(100%-1px)]">
           <svg
             class="h-full w-full"
             viewBox="0 0 80 1000"
@@ -362,26 +355,20 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                           {link.label}
                         </div>
                         <span
-                          class={`absolute -left-6 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block`}
-                          style={{
-                            transform: `scale(${
-                              (isActive && hoveredLink() === null) ||
-                              hoveredLink() === link.href
-                                ? 1
-                                : 0
-                            })`,
-                          }}
+                          class={`absolute -left-6 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block ${
+                            (isActive && hoveredLink() === null) ||
+                            hoveredLink() === link.href
+                              ? "scale-100"
+                              : "scale-0"
+                          }`}
                         ></span>
                         <span
-                          class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden`}
-                          style={{
-                            transform: `scale(${
-                              (isActive && hoveredLink() === null) ||
-                              hoveredLink() === link.href
-                                ? 1
-                                : 0
-                            })`,
-                          }}
+                          class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden ${
+                            (isActive && hoveredLink() === null) ||
+                            hoveredLink() === link.href
+                              ? "scale-100"
+                              : "scale-0"
+                          }`}
                         ></span>
                       </div>
                     )}
