@@ -62,7 +62,6 @@ export default function Nav(props: {
   );
 
   let lastScrollY = 0;
-  const navHeight = 104; // The height of the nav bar based on h-24 class
 
   createEffect(() => {
     const handleScroll = () => {
@@ -91,15 +90,11 @@ export default function Nav(props: {
     <nav
       class={`fixed w-full z-50 nav-padding transition-all ${
         props.removeNavContainerClass ? "" : "nav-container"
-      } ${props.transparent ? "bg-transparent" : ""}`}
-      style={{
-        "background-color": props.transparent
-          ? "transparent"
-          : "rgba(255, 255, 255, 0.8)",
-        top: `${showNav() ? 0 : -navHeight}px`,
-      }}
+      } ${props.transparent ? "bg-transparent" : "bg-white/80"} ${
+        showNav() ? "top-0" : "top-[-104px]"
+      }`}
     >
-      <div class=" relative flex items-center h-26 font-sans justify-between ">
+      <div class=" relative flex items-center h-18 md:h-26 font-sans justify-between ">
         <div class="flex items-center justify-center ">
           {/* menu */}
           <MenuDrawer
