@@ -30,8 +30,6 @@ interface ProductDisplayAreaProps {
 const formatPrice = (priceInCents: number) =>
   `$${(priceInCents / 100).toLocaleString("en-US")}`;
 
-const paginationButtonClasses = `w-10 h-10 flex items-center justify-center rounded-full text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-50 disabled:cursor-not-allowed sm:min-w-[100px] sm:px-4 sm:py-2`;
-
 // --- Main Component (Updated Logic) ---
 const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
   const memoizedProducts = createMemo(
@@ -117,7 +115,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
             <button
               onClick={() => props.handlePageChange(1)}
               disabled={!pagination()!.hasPreviousPage}
-              class={paginationButtonClasses}
+              class="pagination-button"
               aria-label="First page"
             >
               <span class="hidden sm:inline">First</span>
@@ -130,7 +128,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                 props.handlePageChange(pagination()!.currentPage - 1)
               }
               disabled={!pagination()!.hasPreviousPage}
-              class={paginationButtonClasses}
+              class="pagination-button"
               aria-label="Previous page"
             >
               <span class="hidden sm:inline">Previous</span>
@@ -146,7 +144,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                 props.handlePageChange(pagination()!.currentPage + 1)
               }
               disabled={!pagination()!.hasNextPage}
-              class={paginationButtonClasses}
+              class="pagination-button"
               aria-label="Next page"
             >
               <span class="hidden sm:inline">Next</span>
@@ -157,7 +155,7 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
             <button
               onClick={() => props.handlePageChange(pagination()!.totalPages)}
               disabled={!pagination()!.hasNextPage}
-              class={paginationButtonClasses}
+              class="pagination-button"
               aria-label="Last page"
             >
               <span class="hidden sm:inline">Last</span>
