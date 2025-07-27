@@ -9,7 +9,7 @@ import {
   type Component,
   splitProps,
 } from "solid-js";
-import { animate } from "animejs";
+import { animate, utils } from "animejs";
 import { Dynamic } from "solid-js/web";
 
 interface HoverableProps<E extends HTMLElement = HTMLElement>
@@ -87,6 +87,9 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
       onCleanup(() =>
         mediaQuery.removeEventListener("change", handleMediaQueryChange)
       );
+      if (circleRef) {
+        utils.set(circleRef, { translateY: "101%" });
+      }
     }
     setIsReady(true);
   });
@@ -140,12 +143,11 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
       {local.enableHoverCircle && !isMobile() && (
         <div
           ref={(el) => (circleRef = el)}
-          class="absolute w-full aspect-square rounded-full"
+          class={`absolute w-full aspect-square rounded-full z-0 bg-[var(--hover-bg)] ${
+            isReady() ? "visible" : "invisible"
+          }`}
           style={{
-            "background-color": local.hoverCircleColor || "#455CE9",
-            transform: "translateY(101%)",
-            "z-index": "0",
-            visibility: isReady() ? "visible" : "hidden",
+            "--hover-bg": local.hoverCircleColor || "#455CE9",
           }}
         ></div>
       )}
