@@ -1,7 +1,7 @@
 import { A, useNavigate, useLocation } from "@solidjs/router";
 import { createEffect, onCleanup, createSignal, createMemo } from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
-import { ShoppingBag, SlidersHorizontal, Search, X } from "lucide-solid";
+import { ShoppingBag, SlidersHorizontal, Search, X, User } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
 import SearchInput from "./SearchInput";
 import { useSearch } from "../context/SearchContext";
@@ -41,6 +41,10 @@ export default function Nav(props: {
   const [
     shouldTriggerSearchButtonLeaveAnimation,
     setShouldTriggerSearchButtonLeaveAnimation,
+  ] = createSignal(false);
+  const [
+    shouldTriggerUserButtonLeaveAnimation,
+    setShouldTriggerUserButtonLeaveAnimation,
   ] = createSignal(false);
   const {
     searchQuery,
@@ -191,37 +195,63 @@ export default function Nav(props: {
           class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
           aria-label="Homepage"
         >
-          <YourLogo class="h-6 hidden md:block w-auto" />
-          <MobileLogo class="h-10 w-auto md:hidden " />
+          <YourLogo class="h-4 md:h-6  w-auto" />
+          {/* <MobileLogo class="h-13 w-auto md:hidden " /> */}
         </A>
         {/* store */}
-        <div
-          onMouseEnter={() =>
-            setShouldTriggerProductsButtonLeaveAnimation(false)
-          }
-          onMouseLeave={() =>
-            setShouldTriggerProductsButtonLeaveAnimation(true)
-          }
-        >
-          <MagneticLink
-            onClick={() => navigate("/products")}
-            class={`w-full h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full `}
-            aria-label="Products"
-            enableHoverCircle={true}
-            hoverCircleColor="hsl(75, 99%, 52%)"
-            applyOverflowHidden={true}
-            triggerLeaveAnimation={shouldTriggerProductsButtonLeaveAnimation}
-            setTriggerLeaveAnimation={
-              setShouldTriggerProductsButtonLeaveAnimation
+        <div class="flex items-center">
+          <div
+            onMouseEnter={() => setShouldTriggerUserButtonLeaveAnimation(false)}
+            onMouseLeave={() => setShouldTriggerUserButtonLeaveAnimation(true)}
+          >
+            <MagneticLink
+              onClick={() => navigate("/login")}
+              class={`w-full h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full `}
+              aria-label="User"
+              enableHoverCircle={true}
+              hoverCircleColor="hsl(75, 99%, 52%)"
+              applyOverflowHidden={true}
+              triggerLeaveAnimation={shouldTriggerUserButtonLeaveAnimation}
+              setTriggerLeaveAnimation={
+                setShouldTriggerUserButtonLeaveAnimation
+              }
+            >
+              {(ref) => (
+                <div ref={ref} class="flex gap-2 justify-center items-center">
+                  <p class="hidden md:block">USER</p>
+                  <User stroke-width="1" size={20} />
+                </div>
+              )}
+            </MagneticLink>
+          </div>
+          <div
+            onMouseEnter={() =>
+              setShouldTriggerProductsButtonLeaveAnimation(false)
+            }
+            onMouseLeave={() =>
+              setShouldTriggerProductsButtonLeaveAnimation(true)
             }
           >
-            {(ref) => (
-              <div ref={ref} class="flex gap-2 justify-center items-center">
-                <p class="hidden md:block">STORE</p>
-                <ShoppingBag stroke-width="1" size={20} />
-              </div>
-            )}
-          </MagneticLink>
+            <MagneticLink
+              onClick={() => navigate("/products")}
+              class={`w-full h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full `}
+              aria-label="Products"
+              enableHoverCircle={true}
+              hoverCircleColor="hsl(75, 99%, 52%)"
+              applyOverflowHidden={true}
+              triggerLeaveAnimation={shouldTriggerProductsButtonLeaveAnimation}
+              setTriggerLeaveAnimation={
+                setShouldTriggerProductsButtonLeaveAnimation
+              }
+            >
+              {(ref) => (
+                <div ref={ref} class="flex gap-2 justify-center items-center">
+                  <p class="hidden md:block">STORE</p>
+                  <ShoppingBag stroke-width="1" size={20} />
+                </div>
+              )}
+            </MagneticLink>
+          </div>
         </div>
       </div>
     </nav>
