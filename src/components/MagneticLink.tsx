@@ -23,7 +23,6 @@ interface MagneticLinkProps {
   triggerLeaveAnimation?: Accessor<boolean>;
   setTriggerLeaveAnimation?: Setter<boolean>;
   class?: string;
-  style?: JSX.CSSProperties;
 }
 
 const MagneticLink: Component<MagneticLinkProps> = (props) => {
@@ -138,7 +137,6 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
       ref={setRef}
       onClick={props.onClick}
       class={props.class}
-      style={props.style}
     >
       {typeof props.children === "function"
         ? props.children(setInnerRef)
