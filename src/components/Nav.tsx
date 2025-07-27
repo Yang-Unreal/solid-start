@@ -6,7 +6,6 @@ import MagneticLink from "~/components/MagneticLink";
 import SearchInput from "./SearchInput";
 import { useSearch } from "../context/SearchContext";
 import FilterSidebar from "~/components/FilterSidebar";
-import MobileLogo from "./MobileLogo";
 
 const YourLogo = (props: { class?: string }) => (
   <svg
@@ -191,7 +190,6 @@ export default function Nav(props: {
           aria-label="Homepage"
         >
           <YourLogo class="h-4 md:h-6  w-auto" />
-          {/* <MobileLogo class="h-13 w-auto md:hidden " /> */}
         </A>
         {/* store */}
         <div class="flex items-center">
