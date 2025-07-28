@@ -4,6 +4,7 @@ import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag, SlidersHorizontal, Search, X, User } from "lucide-solid";
 import MagneticLink from "~/components/MagneticLink";
 import SearchInput from "./SearchInput";
+import Hoverable from "~/components/Hoverable";
 import { useSearch } from "../context/SearchContext";
 import FilterSidebar from "~/components/FilterSidebar";
 
@@ -154,7 +155,8 @@ export default function Nav(props: {
                       setIsFilterDropdownOpen(false);
                     }}
                   >
-                    <button
+                    <Hoverable
+                      as="button"
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -166,9 +168,12 @@ export default function Nav(props: {
                           : "bg-neutral-50"
                       }`}
                       aria-label="Toggle filters"
+                      enableHoverCircle={true}
+                      hoverCircleColor="hsl(75, 99%, 52%)"
+                      applyOverflowHidden={true}
                     >
                       <SlidersHorizontal size={20} />
-                    </button>
+                    </Hoverable>
                     <FilterSidebar show={isFilterDropdownOpen()} />
                   </div>
                   <div class="flex-grow">

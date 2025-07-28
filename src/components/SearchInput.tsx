@@ -1,6 +1,7 @@
 import { createUniqueId, type Accessor, type ParentProps } from "solid-js";
 import { Search } from "lucide-solid";
 import { useNavigate, useLocation } from "@solidjs/router"; // Added useLocation
+import Hoverable from "~/components/Hoverable";
 
 interface SearchInputProps {
   searchQuery: Accessor<string>;
@@ -40,14 +41,18 @@ const SearchInput = (props: SearchInputProps) => {
           aria-label="Search products"
           placeholder="China's best, found for you"
         />
-        <button
+        <Hoverable
+          as="button"
           type="submit"
-          class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
+          class="absolute inset-y-0 right-0 w-10 h-10 flex items-center justify-center cursor-pointer rounded-full"
           aria-label="Submit search"
           onClick={handleSearchSubmit}
+          enableHoverCircle={true}
+          hoverCircleColor="hsl(75, 99%, 52%)"
+          applyOverflowHidden={true}
         >
           <Search size={18} class="text-black" />
-        </button>
+        </Hoverable>
       </div>
     </form>
   );

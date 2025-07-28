@@ -21,6 +21,7 @@ interface HoverableProps<E extends HTMLElement = HTMLElement>
   triggerLeaveAnimation?: Accessor<boolean>;
   setTriggerLeaveAnimation?: Setter<boolean>;
   children: JSX.Element;
+  [key: string]: any;
 }
 
 const Hoverable = <E extends HTMLElement = HTMLElement>(
