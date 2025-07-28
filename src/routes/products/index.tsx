@@ -3,7 +3,6 @@
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import ProductDisplayArea from "~/components/ProductDisplayArea";
-
 import { useSearch } from "~/context/SearchContext";
 import type { Product } from "~/db/schema";
 
@@ -27,6 +26,7 @@ const FIXED_PAGE_SIZE = 30;
 export default function ProductsPage() {
   const {
     searchQuery,
+
     selectedBrands,
     selectedCategories,
     selectedFuelTypes,
@@ -114,21 +114,20 @@ export default function ProductsPage() {
 
   return (
     <MetaProvider>
-      <main class="pt-24 bg-white  pb-4 sm:pb-6  lg:pb-8 min-h-screen container-padding">
-        <div class="px-1.5 md:px-3">
-          <h1 class="items-center justify-center w-full text-center font-extrabold text-3xl md:text-5xl pb-12">
-            PRODUCTS
-          </h1>
-          <div class="h-[1px] bg-gray-300 w-full mb-5"></div>
-          <div class="mx-auto w-full max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none">
-            <div class="flex flex-col md:flex-row">
-              {/* Main content area */}
-              <div class="flex-grow">
-                <ProductDisplayArea
-                  productsQuery={productsQuery}
-                  handlePageChange={handlePageChange}
-                  pageSize={pageSize}
-                />
+      <main class="pt-18 md:pt-26 bg-white pb-4 sm:pb-6 lg:pb-8 min-h-screen ">
+        <div class="px-1.5 md:px-3 z-10">
+          <div class="container-padding">
+            <div class="h-[1px] bg-gray-300 w-full mb-5 "></div>
+            <div class="mx-auto w-full max-w-7xl xl:max-w-screen-2xl 2xl:max-w-none ">
+              <div class="flex flex-col md:flex-row">
+                {/* Main content area */}
+                <div class="flex-grow">
+                  <ProductDisplayArea
+                    productsQuery={productsQuery}
+                    handlePageChange={handlePageChange}
+                    pageSize={pageSize}
+                  />
+                </div>
               </div>
             </div>
           </div>
