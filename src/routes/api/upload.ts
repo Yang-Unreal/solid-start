@@ -105,7 +105,7 @@ export async function POST(event: APIEvent) {
 
       const sizes = {
         thumbnail: { width: 96, height: 54 },
-        card: { width: 400, height: 225 },
+        card: { width: 608, height: 342 },
         detail: { width: 1280, height: 720 },
       };
       const formats = ["avif", "webp", "jpeg"] as const;
