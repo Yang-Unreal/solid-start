@@ -2,7 +2,7 @@
 import db from "~/db/index";
 import { product, user as userTable } from "~/db/schema";
 import { faker } from "@faker-js/faker";
-import { sql, eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 
 const NUM_PRODUCTS_TO_SEED = 200;
 const ADMIN_EMAIL = "1@gmail.com";
@@ -10,11 +10,11 @@ const ADMIN_EMAIL = "1@gmail.com";
 async function seedProducts() {
   console.log("Seeding products...");
 
+  // Use a simpler count method
   const countResult = await db
-    .select({ count: sql<number>`cast(count(*) as integer)` })
+    .select({ count: sql<number>`count(*)` })
     .from(product);
-
-  const existingProductCount = countResult[0]?.count || 0;
+  const existingProductCount = Number(countResult[0]?.count) || 0;
 
   if (existingProductCount >= NUM_PRODUCTS_TO_SEED) {
     console.log(
@@ -37,25 +37,11 @@ async function seedProducts() {
         faker.commerce.price({ min: 1000, max: 30000, dec: 0 }),
         10
       ),
-      // Replaced imageUrl with images (JSONB)
-      images: Array.from({ length: 6 }).map((_, idx) => ({
-        avif: faker.image.urlPicsumPhotos({
-          width: idx === 0 ? 100 : 640,
-          height: idx === 0 ? 75 : 480,
-        }),
-        webp: faker.image.urlPicsumPhotos({
-          width: idx === 0 ? 100 : 640,
-          height: idx === 0 ? 75 : 480,
-        }),
-        jpeg: faker.image.urlPicsumPhotos({
-          width: idx === 0 ? 100 : 640,
-          height: idx === 0 ? 75 : 480,
-        }),
-      })),
+      imageBaseUrl: faker.image.url(),
       category: faker.commerce.department(),
       stockQuantity: faker.number.int({ min: 0, max: 100 }),
       // Added new fields
-      brand: faker.company.name(),
+      brand: faker.vehicle.manufacturer(),
       model:
         faker.commerce.productAdjective() +
         " " +
