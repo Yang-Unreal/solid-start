@@ -1,7 +1,15 @@
 // src/app.tsx
 import { Router, useLocation, useNavigate } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
-import { Suspense, createEffect, createMemo } from "solid-js";
+import {
+  Suspense,
+  createEffect,
+  createMemo,
+  createSignal,
+  onCleanup,
+  onMount,
+} from "solid-js";
+import { isServer } from "solid-js/web";
 import Nav from "~/components/Nav";
 
 import "./app.css";
@@ -9,10 +17,6 @@ import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
-import {
-  HeroVisibilityProvider,
-  useHeroVisibility,
-} from "~/context/HeroVisibilityContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,7 +42,7 @@ function AppContent(props: {
   handleLogoutSuccess: () => void;
   isDashboardRoute: () => boolean;
   isTransparentNavPage: () => boolean;
-  isHeroVisible: () => boolean;
+  isScrolled: () => boolean;
 }) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -51,9 +55,9 @@ function AppContent(props: {
         <Nav
           onLogoutSuccess={props.handleLogoutSuccess}
           session={props.session}
-          transparent={props.isTransparentNavPage() && props.isHeroVisible()}
+          transparent={props.isTransparentNavPage() && !props.isScrolled()}
           removeNavContainerClass={
-            props.isTransparentNavPage() && props.isHeroVisible()
+            props.isTransparentNavPage() && !props.isScrolled()
           }
         />
 
@@ -87,26 +91,34 @@ export default function App() {
           }
         });
 
+        const [isScrolled, setIsScrolled] = createSignal(false);
+
+        const handleScroll = () => {
+          setIsScrolled(window.scrollY > 0);
+        };
+
+        if (!isServer) {
+          onMount(() => {
+            window.addEventListener("scroll", handleScroll);
+          });
+
+          onCleanup(() => {
+            window.removeEventListener("scroll", handleScroll);
+          });
+        }
+        const isTransparentNavPage = createMemo(
+          () => location.pathname === "/"
+        );
         return (
           <SearchProvider>
-            <HeroVisibilityProvider>
-              {(() => {
-                const { isHeroVisible } = useHeroVisibility();
-                const isTransparentNavPage = createMemo(
-                  () => location.pathname === "/"
-                );
-                return (
-                  <AppContent
-                    children={props.children}
-                    session={session}
-                    handleLogoutSuccess={handleLogoutSuccess}
-                    isDashboardRoute={isDashboardRoute}
-                    isTransparentNavPage={isTransparentNavPage}
-                    isHeroVisible={isHeroVisible}
-                  />
-                );
-              })()}
-            </HeroVisibilityProvider>
+            <AppContent
+              children={props.children}
+              session={session}
+              handleLogoutSuccess={handleLogoutSuccess}
+              isDashboardRoute={isDashboardRoute}
+              isTransparentNavPage={isTransparentNavPage}
+              isScrolled={isScrolled}
+            />
           </SearchProvider>
         );
       }}
