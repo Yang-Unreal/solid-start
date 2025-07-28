@@ -87,12 +87,12 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
                   </div>
                   <div class=" flex flex-col flex-grow">
                     <h2
-                      class="text-lg font-semibold text-neutral-800 truncate"
+                      class="text-md font-semibold text-neutral-800 truncate mb-4"
                       title={product.name}
                     >
                       {product.name}
                     </h2>
-                    <p class="text-xl mt-2 mb-4 text-neutral-700 flex-grow">
+                    <p class="text-sm mt-2 mb-4 text-neutral-700 flex-grow">
                       {formatPrice(product.priceInCents)}
                     </p>
                   </div>
