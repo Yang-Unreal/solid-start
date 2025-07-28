@@ -139,9 +139,9 @@ export default function Nav(props: {
                   class="text-xl  items-center justify-center"
                   aria-label="Homepage"
                 >
-                  <YourLogo class="h-5 w-auto" />
+                  <YourLogo class="h-4 md:h-6 w-auto" />
                 </A>
-                <div class="absolute top-2 right-7">
+                <div class="absolute top-2 right-3 md:right-11 lg:right-17">
                   <button onClick={() => setIsMobileSearchOpen(false)}>
                     <X size={24} />
                   </button>
