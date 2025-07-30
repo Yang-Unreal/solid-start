@@ -84,7 +84,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       props.links ? [...props.links] : [...baseNavLinks];
     if (props.session().data) {
       links.push({ href: "/dashboard", label: "Dashboard" });
-      links.push({ href: "/dashboard/products", label: "Manage Products" });
       links.push({ href: "#", label: "Logout", onClick: handleLogout });
     } else {
       links.push({ href: "/login", label: "Login" });
