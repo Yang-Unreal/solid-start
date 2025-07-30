@@ -15,8 +15,8 @@
 }
 
 body {
-  background-color: rgb(var(--background-hsl));
-  color: rgb(var(--foreground-rgb));
+  background-color: hsl(var(--background-hsl));
+  color: hsl(var(--foreground-rgb));
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

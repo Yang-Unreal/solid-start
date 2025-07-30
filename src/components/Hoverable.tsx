@@ -88,11 +88,14 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
       onCleanup(() =>
         mediaQuery.removeEventListener("change", handleMediaQueryChange)
       );
-      if (circleRef) {
-        utils.set(circleRef, { translateY: "101%" });
-      }
     }
     setIsReady(true);
+  });
+
+  createEffect(() => {
+    if (local.enableHoverCircle && !isMobile() && circleRef) {
+      utils.set(circleRef, { translateY: "101%" });
+    }
   });
 
   createEffect(() => {
