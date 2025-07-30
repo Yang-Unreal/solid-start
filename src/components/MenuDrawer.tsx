@@ -347,7 +347,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       <div class="items-center">
                         <div
                           ref={innerRef}
-                          class={`text-left text-4xl md:text-5xl font-light transition-colors duration-300 ${
+                          class={`text-left text-4xl  font-light transition-colors duration-300 ${
                             isActive
                               ? "text-white"
                               : "text-white/70 hover:text-white"
