@@ -139,7 +139,7 @@ export default function Nav(props: {
                   class="text-xl  items-center justify-center"
                   aria-label="Homepage"
                 >
-                  <YourLogo class="h-4 md:h-6 w-auto" />
+                  <YourLogo class="h-4 md:h-5 w-auto" />
                 </A>
                 <div class="absolute top-2 right-3 md:right-11 lg:right-17">
                   <button onClick={() => setIsMobileSearchOpen(false)}>
@@ -194,7 +194,7 @@ export default function Nav(props: {
           class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
           aria-label="Homepage"
         >
-          <YourLogo class="h-4 md:h-6  w-auto" />
+          <YourLogo class="h-4 md:h-5  w-auto" />
         </A>
         {/* store */}
         <div class="flex items-center">
@@ -203,7 +203,11 @@ export default function Nav(props: {
             onMouseLeave={() => setShouldTriggerUserButtonLeaveAnimation(true)}
           >
             <MagneticLink
-              onClick={() => navigate("/login")}
+              onClick={() =>
+                props.session().data
+                  ? navigate("/dashboard")
+                  : navigate("/login")
+              }
               class={`w-full h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full `}
               aria-label="User"
               enableHoverCircle={true}
