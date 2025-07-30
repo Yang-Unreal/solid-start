@@ -8,7 +8,7 @@ export default function DashboardIndexPage() {
   const handleViewProfile = () => alert("Profile page placeholder");
 
   return (
-    <div class="w-full h-full pt-16">
+    <div class="w-full h-full">
       <Show when={sessionSignal().data?.user}>
         <div class="container-padding h-full w-full">
           <div class="flex flex-col items-center max-w-md mx-auto">

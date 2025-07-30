@@ -108,7 +108,7 @@ export default function DashboardProductsPage() {
   }));
 
   return (
-    <div class=" pt-16">
+    <div class="">
       <div class="flex flex-col md:flex-row">
         {/* Main content area */}
         <Suspense>
