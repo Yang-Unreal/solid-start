@@ -112,7 +112,7 @@ export default function DashboardProductsPage() {
       <div class="flex flex-col md:flex-row">
         {/* Main content area */}
         <Suspense>
-          <div class="flex-grow">
+          <div class="flex-grow px-1.5 md:px-3">
             <ProductListDashboard
               productsQuery={productsQuery}
               currentPage={currentPage}

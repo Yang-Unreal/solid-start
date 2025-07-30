@@ -44,7 +44,7 @@ export default function ProductListItem(props: ProductListItemProps) {
           />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="font-bold text-black truncate group-hover:text-indigo-600 transition-colors duration-200">
+          <p class="text-xs font-semibold text-black truncate group-hover:text-indigo-600 transition-colors duration-200">
             {props.product.name}
           </p>
           <p class="text-sm font-semibold text-black mt-1">
