@@ -64,15 +64,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const pathStraight = "M 0 0 Q 0 500 0 1000";
   const pathCurve = "M 0 0 Q 160 500 0 1000";
 
-  const baseNavLinks: { href: string; label: string; onClick?: () => void }[] =
-    [
-      { href: "/", label: "Home" },
-      { href: "/about", label: "About" },
-      { href: "/services", label: "Services" },
-      { href: "/products", label: "Products" },
-      { href: "/contact", label: "Contact" },
-    ];
-
   const handleLogout = async () => {
     await authClient.signOut();
     props.onLogoutSuccess();
@@ -80,8 +71,21 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   };
 
   const navLinks = () => {
+    const isDashboard = location.pathname.startsWith("/dashboard");
+    const baseNavLinks = [
+      { href: "/", label: "Home" },
+      { href: "/about", label: "About" },
+      { href: "/services", label: "Services" },
+      {
+        href: isDashboard ? "/dashboard/products" : "/products",
+        label: "Products",
+      },
+      { href: "/contact", label: "Contact" },
+    ];
+
     const links: { href: string; label: string; onClick?: () => void }[] =
-      props.links ? [...props.links] : [...baseNavLinks];
+      props.links ? [...props.links] : baseNavLinks;
+
     if (props.session().data) {
       links.push({ href: "/dashboard", label: "Dashboard" });
       links.push({ href: "#", label: "Logout", onClick: handleLogout });
