@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: "FormulaCondensed-Bold";
-  src: url("/fonts/FormulaCondensed-Bold.woff2") format("woff2");
+  src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Bold.woff2") format("woff2");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -12,7 +12,7 @@
 
 @font-face {
   font-family: "FormulaCondensed-Light";
-  src: url("/fonts/FormulaCondensed-Light.woff2") format("woff2");
+  src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Light.woff2") format("woff2");
   font-weight: 300;
   font-style: normal;
   font-display: swap;

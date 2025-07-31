@@ -11,7 +11,8 @@
     "db:sync-meili": "bun run ./src/scripts/sync-meilisearch.ts",
     "db:flush-redis": "bun run ./src/scripts/flush-redis.ts",
     "uploadVideos": "bun run ./src/scripts/uploadVideos.ts",
-    "uploadImages": "bun run ./src/scripts/uploadImages.ts"
+    "uploadImages": "bun run ./src/scripts/uploadImages.ts",
+    "uploadFonts": "bun run ./src/scripts/uploadFonts.ts"
   },
   "dependencies": {
     "@ark-ui/solid": "^5.17.0",
