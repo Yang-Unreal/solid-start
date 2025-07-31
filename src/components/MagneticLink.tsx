@@ -44,12 +44,12 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
     const distanceX = e.clientX - elementCenterX;
     const distanceY = e.clientY - elementCenterY;
 
-    buttonAnimatableInstance.translateX(distanceX * 0.3);
-    buttonAnimatableInstance.translateY(distanceY * 0.3);
+    buttonAnimatableInstance.translateX(distanceX * 0.2);
+    buttonAnimatableInstance.translateY(distanceY * 0.2);
 
     if (innerAnimatableInstance) {
-      innerAnimatableInstance.translateX(distanceX * 0.2);
-      innerAnimatableInstance.translateY(distanceY * 0.2);
+      innerAnimatableInstance.translateX(distanceX * 0.15);
+      innerAnimatableInstance.translateY(distanceY * 0.15);
     }
   };
 

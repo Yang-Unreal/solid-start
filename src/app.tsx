@@ -43,6 +43,7 @@ function AppContent(props: {
   isDashboardRoute: () => boolean;
   isTransparentNavPage: () => boolean;
   isScrolled: () => boolean;
+  isHomepage: () => boolean;
 }) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -59,6 +60,7 @@ function AppContent(props: {
           removeNavContainerClass={
             props.isTransparentNavPage() && !props.isScrolled()
           }
+          isHomepage={props.isHomepage()}
         />
 
         <main class="flex-grow">
@@ -109,6 +111,7 @@ export default function App() {
         const isTransparentNavPage = createMemo(
           () => location.pathname === "/"
         );
+        const isHomepage = createMemo(() => location.pathname === "/");
         return (
           <SearchProvider>
             <AppContent
@@ -118,6 +121,7 @@ export default function App() {
               isDashboardRoute={isDashboardRoute}
               isTransparentNavPage={isTransparentNavPage}
               isScrolled={isScrolled}
+              isHomepage={isHomepage}
             />
           </SearchProvider>
         );

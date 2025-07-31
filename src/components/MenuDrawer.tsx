@@ -15,6 +15,7 @@ interface MenuDrawerProps {
     data: Session | null;
     isPending: boolean;
   };
+  isHomepage?: boolean;
 }
 
 export default function MenuDrawer(props: MenuDrawerProps) {
@@ -287,14 +288,20 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <div>
                 <div
                   ref={(el) => (line1Ref = el)}
-                  class="w-5 h-[1px] mb-1.5 bg-black"
+                  class={`w-5 h-[1px] mb-1.5 ${
+                    props.isHomepage ? "bg-white" : "bg-black"
+                  }`}
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
-                  class="w-5 h-[1px] bg-black"
+                  class={`w-5 h-[1px] ${
+                    props.isHomepage ? "bg-white" : "bg-black"
+                  }`}
                 ></div>
               </div>
-              <p class="hidden md:block">MENU</p>
+              <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+                MENU
+              </p>
             </div>
           )}
         </MagneticLink>

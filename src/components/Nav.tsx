@@ -27,6 +27,7 @@ export default function Nav(props: {
   session: any;
   transparent?: boolean;
   removeNavContainerClass?: boolean;
+  isHomepage?: boolean;
 }) {
   const navigate = useNavigate();
 
@@ -90,9 +91,9 @@ export default function Nav(props: {
     <nav
       class={`fixed w-full z-50 nav-padding transition-all ${
         props.removeNavContainerClass ? "" : "nav-container"
-      } ${props.transparent ? "bg-transparent" : "bg-white/80"} ${
+      } ${props.transparent ? "bg-transparent" : "bg-black/50"} ${
         showNav() ? "top-0" : "top-[-104px]"
-      }`}
+      } ${props.isHomepage ? "text-light" : "bg-white/50"}`}
     >
       <div class=" relative flex items-center h-18 md:h-26 font-sans justify-between ">
         <div class="flex items-center justify-center ">
@@ -100,6 +101,7 @@ export default function Nav(props: {
           <MenuDrawer
             onLogoutSuccess={props.onLogoutSuccess}
             session={props.session}
+            isHomepage={props.isHomepage}
           />
           {/* search button */}
           <div
@@ -125,7 +127,9 @@ export default function Nav(props: {
               {(ref) => (
                 <div class="flex justify-center items-center gap-2" ref={ref}>
                   <Search stroke-width="1" size={20} />
-                  <p class="hidden md:block">SEARCH</p>
+                  <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+                    SEARCH
+                  </p>
                 </div>
               )}
             </MagneticLink>
@@ -197,7 +201,7 @@ export default function Nav(props: {
           <YourLogo class="h-4 md:h-5  w-auto" />
         </A>
         {/* store */}
-        <div class="flex items-center">
+        <div class="flex items-center justify-center">
           <div
             onMouseEnter={() => setShouldTriggerUserButtonLeaveAnimation(false)}
             onMouseLeave={() => setShouldTriggerUserButtonLeaveAnimation(true)}
@@ -220,7 +224,9 @@ export default function Nav(props: {
             >
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
-                  <p class="hidden md:block">USER</p>
+                  <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+                    USER
+                  </p>
                   <User stroke-width="1" size={20} />
                 </div>
               )}
@@ -236,7 +242,7 @@ export default function Nav(props: {
           >
             <MagneticLink
               onClick={() => navigate("/products")}
-              class={`w-full h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full `}
+              class={`w-full h-auto px-1.5 md:px-3 flex justify-center items-center rounded-full `}
               aria-label="Products"
               enableHoverCircle={true}
               hoverCircleColor="hsl(75, 99%, 52%)"
@@ -248,7 +254,9 @@ export default function Nav(props: {
             >
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
-                  <p class="hidden md:block">STORE</p>
+                  <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+                    STORE
+                  </p>
                   <ShoppingBag stroke-width="1" size={20} />
                 </div>
               )}
