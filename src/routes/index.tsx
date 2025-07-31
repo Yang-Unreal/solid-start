@@ -12,16 +12,30 @@ export default function Home() {
           SIMPLIFIED
         </h1>
         <div class="absolute flex h-auto w-full bottom-20 container-padding gap-10 ">
-          <div class="w-1/3 items-center justify-center text-center text-white"></div>
+          <div class="w-1/3 items-center justify-center text-center text-white">
+            <h1 class="text-lg md:text-3xl font-formula-bold">
+              BESPOKE SOURCING
+            </h1>
+            <button class="border rounded-full px-5 py-2 text-sm mt-2">
+              Start Your Sourcing Brief
+            </button>
+          </div>
           <div class="w-1/3 text-white text-center">
             <h1 class="text-lg md:text-3xl font-formula-bold">
-              PRE-VETTED PRODUCTS
+              THE APEX COLLECTION
             </h1>
             <button class="border rounded-full px-5 py-2 text-sm mt-2">
               Browse Our Store
             </button>
           </div>
-          <div class="w-1/3 "></div>
+          <div class="w-1/3 text-white text-center ">
+            <h1 class="text-lg md:text-3xl font-formula-bold">
+              ELIMINATE RISK
+            </h1>
+            <button class="border rounded-full px-5 py-2 text-sm mt-2">
+              Learn How We Protect You
+            </button>
+          </div>
         </div>
       </div>
 
