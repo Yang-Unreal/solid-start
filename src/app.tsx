@@ -96,7 +96,7 @@ export default function App() {
         const [isScrolled, setIsScrolled] = createSignal(false);
 
         const handleScroll = () => {
-          setIsScrolled(window.scrollY > 0);
+          setIsScrolled(window.scrollY > 100);
         };
 
         if (!isServer) {

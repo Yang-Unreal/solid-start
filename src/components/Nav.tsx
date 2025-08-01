@@ -89,7 +89,7 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`fixed w-full z-50 nav-padding transition-all ${
+      class={`fixed w-full z-50 nav-padding transition-all duration-200 ${
         props.removeNavContainerClass ? "" : "nav-container"
       } ${props.transparent ? "bg-transparent" : "bg-black/50"} ${
         showNav() ? "top-0" : "top-[-104px]"

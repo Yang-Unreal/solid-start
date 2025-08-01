@@ -1,10 +1,13 @@
 /* src/app.css */
+
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap");
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 @font-face {
   font-family: "FormulaCondensed-Bold";
-  src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Bold.woff2") format("woff2");
+  src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Bold.woff2")
+    format("woff2");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -12,7 +15,8 @@
 
 @font-face {
   font-family: "FormulaCondensed-Light";
-  src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Light.woff2") format("woff2");
+  src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Light.woff2")
+    format("woff2");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
