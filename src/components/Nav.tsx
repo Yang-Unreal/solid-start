@@ -55,11 +55,22 @@ export default function Nav(props: {
           <NavButton
             onClick={() => setIsMobileSearchOpen(true)}
             aria-label="Search"
+            isHomepage={props.isHomepage}
           >
             {(ref) => (
               <div class="flex justify-center items-center gap-2" ref={ref}>
-                <Search stroke-width="1" size={20} />
-                <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+                <Search
+                  stroke-width="1"
+                  size={20}
+                  class={`group-hover:text-black ${
+                    props.isHomepage ? "text-light" : ""
+                  }`}
+                />
+                <p
+                  class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] group-hover:text-black ${
+                    props.isHomepage ? "text-light" : ""
+                  }`}
+                >
                   SEARCH
                 </p>
               </div>
@@ -84,26 +95,48 @@ export default function Nav(props: {
               props.session().data ? navigate("/dashboard") : navigate("/login")
             }
             aria-label="User"
+            isHomepage={props.isHomepage}
           >
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
-                <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+                <p
+                  class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] group-hover:text-black ${
+                    props.isHomepage ? "text-light" : ""
+                  }`}
+                >
                   USER
                 </p>
-                <User stroke-width="1" size={20} />
+                <User
+                  stroke-width="1"
+                  size={20}
+                  class={`group-hover:text-black ${
+                    props.isHomepage ? "text-light" : ""
+                  }`}
+                />
               </div>
             )}
           </NavButton>
           <NavButton
             onClick={() => navigate("/products")}
             aria-label="Products"
+            isHomepage={props.isHomepage}
           >
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
-                <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+                <p
+                  class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] group-hover:text-black ${
+                    props.isHomepage ? "text-light" : ""
+                  }`}
+                >
                   STORE
                 </p>
-                <ShoppingBag stroke-width="1" size={20} />
+                <ShoppingBag
+                  stroke-width="1"
+                  size={20}
+                  class={`group-hover:text-black ${
+                    props.isHomepage ? "text-light" : ""
+                  }`}
+                />
               </div>
             )}
           </NavButton>

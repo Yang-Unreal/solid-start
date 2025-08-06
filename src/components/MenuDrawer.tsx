@@ -262,11 +262,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   return (
     <>
-      <div
-        class={`relative ${isMenuButtonOnTop() ? "z-101" : ""}`}
-        onMouseEnter={() => setShouldTriggerMenuButtonLeaveAnimation(false)}
-        onMouseLeave={() => setShouldTriggerMenuButtonLeaveAnimation(true)}
-      >
+      <div class={`relative ${isMenuButtonOnTop() ? "z-101" : ""}`}>
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
           onClick={toggleDrawer}
@@ -279,6 +275,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           applyOverflowHidden={true}
           triggerLeaveAnimation={shouldTriggerMenuButtonLeaveAnimation}
           setTriggerLeaveAnimation={setShouldTriggerMenuButtonLeaveAnimation}
+          isLocked={isOpen}
         >
           {(innerRef) => (
             <div

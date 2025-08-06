@@ -23,6 +23,7 @@ interface MagneticLinkProps {
   triggerLeaveAnimation?: Accessor<boolean>;
   setTriggerLeaveAnimation?: Setter<boolean>;
   class?: string;
+  isLocked?: Accessor<boolean>;
 }
 
 const MagneticLink: Component<MagneticLinkProps> = (props) => {
@@ -134,6 +135,7 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
       applyOverflowHidden={props.applyOverflowHidden}
       triggerLeaveAnimation={props.triggerLeaveAnimation}
       setTriggerLeaveAnimation={props.setTriggerLeaveAnimation}
+      isLocked={props.isLocked}
       ref={setRef}
       onClick={props.onClick}
       class={props.class}

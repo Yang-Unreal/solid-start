@@ -4,6 +4,7 @@ import MagneticLink from "~/components/MagneticLink";
 interface NavButtonProps {
   onClick: () => void;
   "aria-label": string;
+  isHomepage?: boolean;
   children: (ref: (el: HTMLElement) => void) => JSX.Element;
 }
 
@@ -15,6 +16,7 @@ const NavButton: Component<NavButtonProps> = (props) => {
     <div
       onMouseEnter={() => setShouldTriggerLeaveAnimation(false)}
       onMouseLeave={() => setShouldTriggerLeaveAnimation(true)}
+      class={`group ${props.isHomepage ? "text-light" : ""}`}
     >
       <MagneticLink
         onClick={props.onClick}

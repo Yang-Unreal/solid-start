@@ -21,6 +21,7 @@ interface HoverableProps<E extends HTMLElement = HTMLElement>
   triggerLeaveAnimation?: Accessor<boolean>;
   setTriggerLeaveAnimation?: Setter<boolean>;
   children: JSX.Element;
+  isLocked?: Accessor<boolean>;
   [key: string]: any;
 }
 
@@ -37,6 +38,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
     "children",
     "class",
     "ref",
+    "isLocked",
   ]);
 
   let containerRef: E | undefined;
@@ -59,7 +61,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
   };
 
   const triggerCircleExitAnimation = () => {
-    if (isMobile()) return;
+    if (isMobile() || (local.isLocked && local.isLocked())) return;
     if (local.enableHoverCircle && circleRef) {
       if (circleAnimation) circleAnimation.pause();
       circleAnimation = animate(circleRef, {
