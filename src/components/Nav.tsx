@@ -41,7 +41,7 @@ export default function Nav(props: {
     <nav
       class={`fixed w-full z-50 nav-padding transition-all duration-200 ${
         props.removeNavContainerClass ? "" : "nav-container"
-      } ${props.transparent ? "bg-transparent" : "bg-black/50"} ${
+      } ${props.transparent ? "bg-transparent" : "bg-black/30"} ${
         showNav() ? "top-0" : "top-[-104px]"
       } ${props.isHomepage ? "text-light" : "bg-white/50"}`}
     >
