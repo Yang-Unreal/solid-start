@@ -262,7 +262,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   return (
     <>
-      <div class={`relative ${isMenuButtonOnTop() ? "z-101" : ""}`}>
+      <div class={`group relative ${isMenuButtonOnTop() ? "z-101" : ""}`}>
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
           onClick={toggleDrawer}
@@ -286,17 +286,33 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 <div
                   ref={(el) => (line1Ref = el)}
                   class={`w-5 h-[1px] mb-1.5 ${
-                    props.isHomepage ? "bg-white" : "bg-black"
+                    props.isHomepage
+                      ? `bg-white group-hover:bg-black ${
+                          isOpen() ? "!bg-black" : ""
+                        }`
+                      : "bg-black"
                   }`}
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
                   class={`w-5 h-[1px] ${
-                    props.isHomepage ? "bg-white" : "bg-black"
+                    props.isHomepage
+                      ? `bg-white group-hover:bg-black ${
+                          isOpen() ? "!bg-black" : ""
+                        }`
+                      : "bg-black"
                   }`}
                 ></div>
               </div>
-              <p class="hidden md:block font-formula-bold text-xl transform translate-y-[1px]">
+              <p
+                class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] ${
+                  props.isHomepage
+                    ? `text-white group-hover:text-black ${
+                        isOpen() ? "!text-black" : ""
+                      }`
+                    : ""
+                }`}
+              >
                 MENU
               </p>
             </div>
@@ -328,14 +344,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <div>
           <h2 class="text-sm text-gray-400 tracking-widest mb-4">NAVIGATION</h2>
           <hr class="border-gray-700" />
-          <ul
-            ref={navLinksListRef}
-            class="mt-4 space-y-4 flex flex-col items-start"
-          >
+          <ul ref={navLinksListRef} class="mt-4  flex flex-col items-start">
             {navLinks().map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <li class="relative w-full">
+                <li class="relative py-2 w-full">
                   <MagneticLink
                     onClick={() => {
                       if (link.onClick) {
