@@ -344,11 +344,14 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <div>
           <h2 class="text-sm text-gray-400 tracking-widest mb-4">NAVIGATION</h2>
           <hr class="border-gray-700" />
-          <ul ref={navLinksListRef} class="mt-4  flex flex-col items-start">
+          <ul
+            ref={navLinksListRef}
+            class="mt-4 space-y-4 flex flex-col items-start"
+          >
             {navLinks().map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <li class="relative py-2 w-full">
+                <li class="relative w-full">
                   <MagneticLink
                     onClick={() => {
                       if (link.onClick) {
