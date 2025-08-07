@@ -17,6 +17,8 @@ import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
+import Lenis from "lenis";
+import { LenisContext } from "~/context/LenisContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -72,62 +74,74 @@ function AppContent(props: {
 }
 
 export default function App() {
+  let lenis: Lenis | undefined;
+  if (!isServer) {
+    lenis = new Lenis();
+
+    function raf(time: number) {
+      lenis!.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+  }
   return (
-    <Router
-      root={(props) => {
-        const location = useLocation();
-        const navigate = useNavigate();
-        const session = authClient.useSession();
-        const handleLogoutSuccess = () => navigate("/login", { replace: true });
+    <LenisContext.Provider value={lenis}>
+      <Router
+        root={(props) => {
+          const location = useLocation();
+          const navigate = useNavigate();
+          const session = authClient.useSession();
+          const handleLogoutSuccess = () => navigate("/login", { replace: true });
 
-        const isDashboardRoute = createMemo(() =>
-          location.pathname.startsWith("/dashboard")
-        );
+          const isDashboardRoute = createMemo(() =>
+            location.pathname.startsWith("/dashboard")
+          );
 
-        createEffect(() => {
-          const currentSession = session();
-          if (!currentSession.isPending) {
-            if (!currentSession.data?.user && isDashboardRoute()) {
-              navigate("/login", { replace: true });
+          createEffect(() => {
+            const currentSession = session();
+            if (!currentSession.isPending) {
+              if (!currentSession.data?.user && isDashboardRoute()) {
+                navigate("/login", { replace: true });
+              }
             }
+          });
+
+          const [isScrolled, setIsScrolled] = createSignal(false);
+
+          const handleScroll = () => {
+            setIsScrolled(window.scrollY > 100);
+          };
+
+          if (!isServer) {
+            onMount(() => {
+              window.addEventListener("scroll", handleScroll);
+            });
+
+            onCleanup(() => {
+              window.removeEventListener("scroll", handleScroll);
+            });
           }
-        });
-
-        const [isScrolled, setIsScrolled] = createSignal(false);
-
-        const handleScroll = () => {
-          setIsScrolled(window.scrollY > 100);
-        };
-
-        if (!isServer) {
-          onMount(() => {
-            window.addEventListener("scroll", handleScroll);
-          });
-
-          onCleanup(() => {
-            window.removeEventListener("scroll", handleScroll);
-          });
-        }
-        const isTransparentNavPage = createMemo(
-          () => location.pathname === "/"
-        );
-        const isHomepage = createMemo(() => location.pathname === "/");
-        return (
-          <SearchProvider>
-            <AppContent
-              children={props.children}
-              session={session}
-              handleLogoutSuccess={handleLogoutSuccess}
-              isDashboardRoute={isDashboardRoute}
-              isTransparentNavPage={isTransparentNavPage}
-              isScrolled={isScrolled}
-              isHomepage={isHomepage}
-            />
-          </SearchProvider>
-        );
-      }}
-    >
-      <FileRoutes />
-    </Router>
+          const isTransparentNavPage = createMemo(
+            () => location.pathname === "/"
+          );
+          const isHomepage = createMemo(() => location.pathname === "/");
+          return (
+            <SearchProvider>
+              <AppContent
+                children={props.children}
+                session={session}
+                handleLogoutSuccess={handleLogoutSuccess}
+                isDashboardRoute={isDashboardRoute}
+                isTransparentNavPage={isTransparentNavPage}
+                isScrolled={isScrolled}
+                isHomepage={isHomepage}
+              />
+            </SearchProvider>
+          );
+        }}
+      >
+        <FileRoutes />
+      </Router>
+    </LenisContext.Provider>
   );
 }

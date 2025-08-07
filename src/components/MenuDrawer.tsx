@@ -5,6 +5,7 @@ import { animate, stagger } from "animejs";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
+import { useLenis } from "~/context/LenisContext";
 
 import { type Session } from "better-auth";
 
@@ -29,6 +30,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isMenuButtonOnTop, setMenuButtonOnTop] = createSignal(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const lenis = useLenis();
 
   const closeDrawer = () => {
     if (!isOpen()) return;
@@ -217,14 +219,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     });
 
     createEffect(() => {
-      const handleWheel = (event: WheelEvent) => {
-        if (isOpen()) event.preventDefault();
-      };
-
-      const handleTouchMove = (event: TouchEvent) => {
-        if (isOpen()) event.preventDefault();
-      };
-
       const handleClickOutside = (event: MouseEvent) => {
         if (
           drawerRef &&
@@ -237,24 +231,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       };
 
       if (isOpen()) {
-        document.body.style.overflow = "hidden";
-        document.body.addEventListener("wheel", handleWheel, {
-          passive: false,
-        });
-        document.body.addEventListener("touchmove", handleTouchMove, {
-          passive: false,
-        });
+        lenis?.stop();
         document.addEventListener("mousedown", handleClickOutside);
       } else {
-        document.body.style.overflow = "";
-        document.body.removeEventListener("wheel", handleWheel);
-        document.body.removeEventListener("touchmove", handleTouchMove);
+        lenis?.start();
         document.removeEventListener("mousedown", handleClickOutside);
       }
+
       onCleanup(() => {
-        document.body.style.overflow = "";
-        document.body.removeEventListener("wheel", handleWheel);
-        document.body.removeEventListener("touchmove", handleTouchMove);
+        lenis?.start();
         document.removeEventListener("mousedown", handleClickOutside);
       });
     });
