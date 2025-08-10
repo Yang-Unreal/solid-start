@@ -49,7 +49,11 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
   const [isReady, setIsReady] = createSignal(false);
 
   const handleMouseEnter = () => {
-    if (isMobile()) return;
+    if (
+      isMobile() ||
+      (local.triggerLeaveAnimation && local.triggerLeaveAnimation())
+    )
+      return;
     if (local.enableHoverCircle && circleRef) {
       if (circleAnimation) circleAnimation.pause();
       circleAnimation = animate(circleRef, {

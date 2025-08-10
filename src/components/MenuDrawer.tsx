@@ -32,10 +32,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const navigate = useNavigate();
   const lenis = useLenis();
 
-  const closeDrawer = () => {
+  const closeDrawer = (isFromButtonClick: boolean = false) => {
     if (!isOpen()) return;
     setIsOpen(false);
-    setShouldTriggerMenuButtonLeaveAnimation(true);
+    if (!isFromButtonClick) {
+      setShouldTriggerMenuButtonLeaveAnimation(true);
+    }
     setTimeout(() => {
       setMenuButtonOnTop(false);
     }, 500);
@@ -48,7 +50,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   const toggleDrawer = () => {
     if (isOpen()) {
-      closeDrawer();
+      closeDrawer(true);
     } else {
       openDrawer();
     }
