@@ -36,10 +36,10 @@ const SearchModal: Component<SearchModalProps> = (props) => {
           class="text-xl items-center justify-center"
           aria-label="Homepage"
         >
-          <YourLogo class="h-4 md:h-5 w-auto" />
+          <YourLogo class="h-4 md:h-5 w-auto text-black" />
         </A>
         <div class="absolute top-2 right-3 md:right-11 lg:right-17">
-          <button onClick={props.onClose}>
+          <button onClick={props.onClose} class="text-black">
             <X size={24} />
           </button>
         </div>
