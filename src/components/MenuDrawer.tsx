@@ -292,7 +292,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 ></div>
               </div>
               <p
-                class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] transition-colors duration-600 ${
+                class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 ${
                   props.isHomepage
                     ? `text-white group-hover:text-black ${
                         isOpen() ? "!text-black" : ""

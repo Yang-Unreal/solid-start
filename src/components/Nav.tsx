@@ -67,7 +67,7 @@ export default function Nav(props: {
                   }`}
                 />
                 <p
-                  class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] transition-colors duration-600 group-hover:text-black ${
+                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 group-hover:text-black ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -100,7 +100,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] transition-colors duration-600 group-hover:text-black ${
+                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 group-hover:text-black ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -124,7 +124,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] transition-colors duration-600 group-hover:text-black ${
+                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 group-hover:text-black ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >

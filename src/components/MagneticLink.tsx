@@ -33,7 +33,6 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
   const [isMobile, setIsMobile] = createSignal(false);
 
   let buttonAnimatableInstance: any;
-  let innerAnimatableInstance: any;
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isMobile() || !localElementRef || !buttonAnimatableInstance) return;
@@ -47,11 +46,6 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
 
     buttonAnimatableInstance.translateX(distanceX * 0.2);
     buttonAnimatableInstance.translateY(distanceY * 0.2);
-
-    if (innerAnimatableInstance) {
-      innerAnimatableInstance.translateX(distanceX * 0.15);
-      innerAnimatableInstance.translateY(distanceY * 0.15);
-    }
   };
 
   const handleMouseLeave = () => {
@@ -60,10 +54,6 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
     if (buttonAnimatableInstance) {
       buttonAnimatableInstance.translateX(0);
       buttonAnimatableInstance.translateY(0);
-    }
-    if (innerAnimatableInstance) {
-      innerAnimatableInstance.translateX(0);
-      innerAnimatableInstance.translateY(0);
     }
   };
 
@@ -76,14 +66,6 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
 
   const setInnerRef = (el: HTMLElement) => {
     innerElementRef = el;
-    if (innerElementRef && !innerAnimatableInstance && !isMobile()) {
-      innerAnimatableInstance = createAnimatable(innerElementRef, {
-        translateX: 0,
-        translateY: 0,
-        ease: eases.outElastic(1, 0.3),
-        duration: 1500,
-      });
-    }
   };
 
   onMount(() => {
@@ -106,7 +88,7 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
           translateX: 0,
           translateY: 0,
           ease: eases.outElastic(1, 0.3),
-          duration: 1500,
+          duration: 1000,
         });
 
         localElementRef.addEventListener("mousemove", handleMouseMove);
@@ -115,7 +97,6 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
         localElementRef.removeEventListener("mousemove", handleMouseMove);
         localElementRef.removeEventListener("mouseleave", handleMouseLeave);
         if (buttonAnimatableInstance) buttonAnimatableInstance.translateX(0);
-        if (innerAnimatableInstance) innerAnimatableInstance.translateY(0);
       }
     }
   });
