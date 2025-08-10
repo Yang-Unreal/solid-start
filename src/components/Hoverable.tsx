@@ -54,7 +54,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
       if (circleAnimation) circleAnimation.pause();
       circleAnimation = animate(circleRef, {
         translateY: ["101%", "0%"],
-        duration: 400,
+        duration: 600,
         easing: "easeOutQuad",
       });
     }
@@ -66,7 +66,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
       if (circleAnimation) circleAnimation.pause();
       circleAnimation = animate(circleRef, {
         translateY: "-101%",
-        duration: 400,
+        duration: 600,
         easing: "easeInQuad",
       });
     }

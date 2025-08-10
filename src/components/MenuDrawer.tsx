@@ -126,7 +126,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       }
 
       const easing = "easeOutQuint";
-      const duration = 400;
+      const duration = 600;
 
       // Animate Drawer
       if (drawerRef) {
@@ -270,7 +270,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <div>
                 <div
                   ref={(el) => (line1Ref = el)}
-                  class={`w-5 h-[1px] mb-1.5 ${
+                  class={`w-5 h-[1px] mb-1.5 transition-colors duration-600 ${
                     props.isHomepage
                       ? `bg-white group-hover:bg-black ${
                           isOpen() ? "!bg-black" : ""
@@ -280,7 +280,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
-                  class={`w-5 h-[1px] ${
+                  class={`w-5 h-[1px] transition-colors duration-600 ${
                     props.isHomepage
                       ? `bg-white group-hover:bg-black ${
                           isOpen() ? "!bg-black" : ""
@@ -290,7 +290,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 ></div>
               </div>
               <p
-                class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] ${
+                class={`hidden md:block font-formula-bold text-xl transform translate-y-[1px] transition-colors duration-600 ${
                   props.isHomepage
                     ? `text-white group-hover:text-black ${
                         isOpen() ? "!text-black" : ""
