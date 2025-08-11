@@ -19,6 +19,7 @@ import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
 import { LenisContext } from "~/context/LenisContext";
+import Preloader from "./components/Preloader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -91,7 +92,8 @@ export default function App() {
           const location = useLocation();
           const navigate = useNavigate();
           const session = authClient.useSession();
-          const handleLogoutSuccess = () => navigate("/login", { replace: true });
+          const handleLogoutSuccess = () =>
+            navigate("/login", { replace: true });
 
           const isDashboardRoute = createMemo(() =>
             location.pathname.startsWith("/dashboard")
@@ -127,6 +129,7 @@ export default function App() {
           const isHomepage = createMemo(() => location.pathname === "/");
           return (
             <SearchProvider>
+              <Preloader />
               <AppContent
                 children={props.children}
                 session={session}

@@ -32,7 +32,7 @@
   --background-hsl: hsl(0, 0%, 100%); /* Changed to pure black */
   --foreground-rgb: hsl(0, 0%, 100%);
 
-  --font-sans: "Roboto Condensed", system-ui, -apple-system, BlinkMacSystemFont,
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Roboto Condensed",
     "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
