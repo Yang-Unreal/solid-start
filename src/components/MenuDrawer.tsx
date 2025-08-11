@@ -2,7 +2,7 @@
 
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { animate, stagger } from "animejs";
-import { A, useLocation, useNavigate } from "@solidjs/router";
+import { useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
@@ -236,12 +236,16 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         lenis?.stop();
         document.addEventListener("mousedown", handleClickOutside);
       } else {
-        lenis?.start();
+        if (hasBeenOpened()) {
+          lenis?.start();
+        }
         document.removeEventListener("mousedown", handleClickOutside);
       }
 
       onCleanup(() => {
-        lenis?.start();
+        if (hasBeenOpened()) {
+          lenis?.start();
+        }
         document.removeEventListener("mousedown", handleClickOutside);
       });
     });

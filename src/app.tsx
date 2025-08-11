@@ -78,6 +78,7 @@ export default function App() {
   let lenis: Lenis | undefined;
   if (!isServer) {
     lenis = new Lenis();
+    lenis.stop();
 
     function raf(time: number) {
       lenis!.raf(time);
@@ -85,6 +86,7 @@ export default function App() {
     }
     requestAnimationFrame(raf);
   }
+
   return (
     <LenisContext.Provider value={lenis}>
       <Router
