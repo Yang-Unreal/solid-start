@@ -78,7 +78,6 @@ export default function App() {
   let lenis: Lenis | undefined;
   if (!isServer) {
     lenis = new Lenis();
-    lenis.stop();
 
     function raf(time: number) {
       lenis!.raf(time);

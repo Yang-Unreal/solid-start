@@ -59,12 +59,13 @@ export default function Preloader() {
     exitTimeout = window.setTimeout(() => {
       setShow(false);
       setPath(targetPath);
-      lenis?.start();
+      lenis?.scrollTo(0);
     }, totalAnimationTime);
 
     // Cleanup timers when the component is unmounted
     onCleanup(() => {
-      lenis?.start();
+      lenis?.scrollTo(0);
+
       window.clearTimeout(initialTimeout);
       window.clearInterval(wordInterval);
       window.clearTimeout(exitTimeout);
