@@ -20,6 +20,7 @@ import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
 import { LenisContext } from "~/context/LenisContext";
 import Preloader from "./components/Preloader";
+import { PreloaderProvider, usePreloader } from "./context/PreloaderContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,19 +57,25 @@ function AppContent(props: {
           name="description"
           content="Let the hidden pears shine for the world"
         />
-        <Nav
-          onLogoutSuccess={props.handleLogoutSuccess}
-          session={props.session}
-          transparent={props.isTransparentNavPage() && !props.isScrolled()}
-          removeNavContainerClass={
-            props.isTransparentNavPage() && !props.isScrolled()
-          }
-          isHomepage={props.isHomepage()}
-        />
+        <div
+          class={`relative transition-all duration-1000 ${
+            usePreloader().isFinished() ? "top-0" : "top-[100vh]"
+          }`}
+        >
+          <Nav
+            onLogoutSuccess={props.handleLogoutSuccess}
+            session={props.session}
+            transparent={props.isTransparentNavPage() && !props.isScrolled()}
+            removeNavContainerClass={
+              props.isTransparentNavPage() && !props.isScrolled()
+            }
+            isHomepage={props.isHomepage()}
+          />
 
-        <main class="flex-grow">
-          <Suspense fallback={null}>{props.children}</Suspense>
-        </main>
+          <main class="flex-grow">
+            <Suspense fallback={null}>{props.children}</Suspense>
+          </main>
+        </div>
       </MetaProvider>
     </QueryClientProvider>
   );
@@ -129,18 +136,20 @@ export default function App() {
           );
           const isHomepage = createMemo(() => location.pathname === "/");
           return (
-            <SearchProvider>
-              <Preloader />
-              <AppContent
-                children={props.children}
-                session={session}
-                handleLogoutSuccess={handleLogoutSuccess}
-                isDashboardRoute={isDashboardRoute}
-                isTransparentNavPage={isTransparentNavPage}
-                isScrolled={isScrolled}
-                isHomepage={isHomepage}
-              />
-            </SearchProvider>
+            <PreloaderProvider>
+              <SearchProvider>
+                <Preloader />
+                <AppContent
+                  children={props.children}
+                  session={session}
+                  handleLogoutSuccess={handleLogoutSuccess}
+                  isDashboardRoute={isDashboardRoute}
+                  isTransparentNavPage={isTransparentNavPage}
+                  isScrolled={isScrolled}
+                  isHomepage={isHomepage}
+                />
+              </SearchProvider>
+            </PreloaderProvider>
           );
         }}
       >

@@ -1,5 +1,6 @@
 import { createSignal, onMount, onCleanup } from "solid-js";
 import { useLenis } from "~/context/LenisContext";
+import { usePreloader } from "~/context/PreloaderContext";
 
 const WORDS = [
   "Hello",
@@ -20,6 +21,7 @@ export default function Preloader() {
   const [dimension, setDimension] = createSignal({ width: 0, height: 0 });
   const [path, setPath] = createSignal("");
   const lenis = useLenis();
+  const { setIsFinished } = usePreloader();
 
   onMount(() => {
     setDimension({ width: window.innerWidth, height: window.innerHeight });
@@ -60,6 +62,7 @@ export default function Preloader() {
       setShow(false);
       setPath(targetPath);
       lenis?.scrollTo(0);
+      setIsFinished(true);
     }, totalAnimationTime);
 
     // Cleanup timers when the component is unmounted
