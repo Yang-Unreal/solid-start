@@ -38,7 +38,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     if (!isFromButtonClick) {
       setShouldTriggerMenuButtonLeaveAnimation(true);
     }
-    setMenuButtonOnTop(false);
   };
 
   const openDrawer = () => {
@@ -155,11 +154,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               0
             )
             // Nav links fade in and slide up
-            .to(
+            .fromTo(
               links,
+              { x: -40, opacity: 0 },
               {
+                x: 0,
                 opacity: 1,
-                y: 0,
                 delay: 0.1,
                 stagger: 0.05,
                 duration: 0.4,
@@ -193,8 +193,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             .to(
               links,
               {
+                x: -40,
                 opacity: 0,
-                y: 40,
                 stagger: 0.03,
                 duration: 0.15,
                 ease: "quart.in",
