@@ -1,7 +1,7 @@
 // src/components/MenuDrawer.tsx
 
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
-import { animate, stagger } from "animejs";
+import { gsap } from "gsap";
 import { useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
@@ -38,9 +38,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     if (!isFromButtonClick) {
       setShouldTriggerMenuButtonLeaveAnimation(true);
     }
-    setTimeout(() => {
-      setMenuButtonOnTop(false);
-    }, 500);
+    setMenuButtonOnTop(false);
   };
 
   const openDrawer = () => {
@@ -127,75 +125,82 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         setHasBeenOpened(true);
       }
 
-      const easing = "easeOutQuint";
-      const duration = 600;
+      const duration = 0.6; // GSAP uses seconds
 
-      // Animate Drawer
-      if (drawerRef) {
-        if (isOpen()) {
-          animate(drawerRef, {
-            translateX: ["calc(-100% - 5rem)", "0%"],
-            duration,
-            easing: "easeOutQuint",
-          });
-        } else if (hasBeenOpened()) {
-          animate(drawerRef, {
-            translateX: ["0%", "calc(-100% - 5rem)"],
-            duration,
-            easing: "easeInQuint",
-          });
-        }
-      }
-
-      // Animate SVG Path
-      if (svgPathRef) {
-        if (isOpen()) {
-          // Animate from curve to straight when opening
-          animate(svgPathRef, {
-            d: [pathCurve, pathStraight],
-            duration,
-            easing,
-          });
-        } else if (hasBeenOpened()) {
-          // Animate from straight to curve when closing
-          animate(svgPathRef, {
-            d: [pathStraight, pathCurve],
-            duration,
-            easing,
-          });
-        }
-      }
-
-      // Animate Nav Links
-      if (navLinksListRef) {
+      // Animate Drawer, SVG Path, and Nav Links together
+      if (drawerRef && svgPathRef && navLinksListRef) {
         const links = Array.from(navLinksListRef.children);
+        const tl = gsap.timeline();
+
         if (isOpen()) {
-          for (const link of links) {
-            if (link instanceof HTMLElement) {
-              link.style.opacity = "0";
-              link.style.transform = "translateY(40px)";
-            }
-          }
-          animate(links, {
-            opacity: [0, 1],
-            translateY: [40, 0],
-            delay: stagger(50, { start: 100 }),
-            duration: 400,
-            easing: "easeOutQuart",
-          });
+          // Drawer opens
+          tl.to(
+            drawerRef,
+            {
+              x: "0%",
+              duration,
+              ease: "quint.out",
+            },
+            0
+          )
+            // SVG path from curve to straight
+            .fromTo(
+              svgPathRef,
+              { attr: { d: pathCurve } },
+              {
+                attr: { d: pathStraight },
+                duration,
+                ease: "quint.out",
+              },
+              0
+            )
+            // Nav links fade in and slide up
+            .to(
+              links,
+              {
+                opacity: 1,
+                y: 0,
+                delay: 0.1,
+                stagger: 0.05,
+                duration: 0.4,
+                ease: "quart.out",
+              },
+              0
+            );
         } else if (hasBeenOpened()) {
-          if (
-            links.length > 0 &&
-            (links[0] as HTMLElement).style.opacity === "1"
-          ) {
-            animate(links, {
-              opacity: 0,
-              translateY: 40,
-              delay: stagger(30),
-              duration: 150,
-              easing: "easeInQuart",
-            });
-          }
+          // Drawer closes
+          tl.to(
+            drawerRef,
+            {
+              x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
+              duration,
+              ease: "quint.in",
+            },
+            0
+          )
+            // SVG path from straight to curve
+            .fromTo(
+              svgPathRef,
+              { attr: { d: pathStraight } },
+              {
+                attr: { d: pathCurve },
+                duration,
+                ease: "quint.in",
+              },
+              0
+            )
+            // Nav links fade out and slide down
+            .to(
+              links,
+              {
+                opacity: 0,
+                y: 40,
+                stagger: 0.03,
+                duration: 0.15,
+                ease: "quart.in",
+              },
+              0
+            );
         }
       }
     });
@@ -205,17 +210,19 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         const isDrawerOpen = isOpen();
         const yTranslate = isDrawerOpen ? 3.5 : 0;
         const rotate = isDrawerOpen ? 45 : 0;
-        animate(line1Ref, {
-          translateY: yTranslate,
+        const duration = 0.3;
+
+        gsap.to(line1Ref, {
+          y: yTranslate,
           rotate: rotate,
-          duration: 300,
-          easing: "easeOutQuad",
+          duration: duration,
+          ease: "quad.out",
         });
-        animate(line2Ref, {
-          translateY: -yTranslate,
+        gsap.to(line2Ref, {
+          y: -yTranslate,
           rotate: -rotate,
-          duration: 300,
-          easing: "easeOutQuad",
+          duration: duration,
+          ease: "quad.out",
         });
       }
     });
@@ -305,7 +312,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           >
             <path
               ref={(el) => (svgPathRef = el)}
-              d={pathStraight}
+              d={pathCurve}
               fill="#121212"
             />
           </svg>
