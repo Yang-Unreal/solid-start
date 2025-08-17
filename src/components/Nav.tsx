@@ -62,12 +62,12 @@ export default function Nav(props: {
                 <Search
                   stroke-width="1"
                   size={20}
-                  class={`transition-colors duration-600 group-hover:text-black ${
+                  class={`transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 />
                 <p
-                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 group-hover:text-black ${
+                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -100,7 +100,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 group-hover:text-black ${
+                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -109,7 +109,7 @@ export default function Nav(props: {
                 <User
                   stroke-width="1"
                   size={20}
-                  class={`transition-colors duration-600 group-hover:text-black ${
+                  class={`transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 />
@@ -124,7 +124,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 group-hover:text-black ${
+                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -133,7 +133,7 @@ export default function Nav(props: {
                 <ShoppingBag
                   stroke-width="1"
                   size={20}
-                  class={`transition-colors duration-600 group-hover:text-black ${
+                  class={`transition-colors duration-600 ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 />

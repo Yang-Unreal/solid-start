@@ -257,11 +257,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <MagneticLink
           ref={(el) => (menuButtonRef = el)}
           onClick={toggleDrawer}
-          class={` w-full h-8 px-1.5 md:px-3 rounded-full flex flex-col justify-center items-center ${
-            isOpen() ? "bg-primary-accent" : ""
-          }`}
+          class={` w-full h-8 px-1.5 md:px-3 rounded-full flex flex-col justify-center items-center `}
           aria-label="Toggle menu"
-          enableHoverCircle={true}
+          enableHoverCircle={false}
           hoverCircleColor="hsl(75, 99%, 52%)"
           applyOverflowHidden={true}
           triggerLeaveAnimation={shouldTriggerMenuButtonLeaveAnimation}
@@ -276,33 +274,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <div>
                 <div
                   ref={(el) => (line1Ref = el)}
-                  class={`w-5 h-[1px] mb-1.5 transition-colors duration-600 ${
-                    props.isHomepage
-                      ? `bg-white group-hover:bg-black ${
-                          isOpen() ? "!bg-black" : ""
-                        }`
-                      : "bg-black"
-                  }`}
+                  class={`w-5 h-[1px] mb-1.5 transition-colors duration-600 bg-white`}
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
-                  class={`w-5 h-[1px] transition-colors duration-600 ${
-                    props.isHomepage
-                      ? `bg-white group-hover:bg-black ${
-                          isOpen() ? "!bg-black" : ""
-                        }`
-                      : "bg-black"
-                  }`}
+                  class={`w-5 h-[1px] transition-colors duration-600 bg-white`}
                 ></div>
               </div>
               <p
-                class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 ${
-                  props.isHomepage
-                    ? `text-white group-hover:text-black ${
-                        isOpen() ? "!text-black" : ""
-                      }`
-                    : ""
-                }`}
+                class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 text-white`}
               >
                 MENU
               </p>

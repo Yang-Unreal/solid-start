@@ -8,7 +8,7 @@ import {
   type Accessor,
   type Setter,
 } from "solid-js";
-import { createAnimatable, eases } from "animejs";
+import { gsap } from "gsap";
 import Hoverable from "./Hoverable";
 
 interface MagneticLinkProps {
@@ -32,10 +32,8 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
 
   const [isMobile, setIsMobile] = createSignal(false);
 
-  let buttonAnimatableInstance: any;
-
   const handleMouseMove = (e: MouseEvent) => {
-    if (isMobile() || !localElementRef || !buttonAnimatableInstance) return;
+    if (isMobile() || !localElementRef) return;
 
     const rect = localElementRef.getBoundingClientRect();
     const elementCenterX = rect.left + rect.width / 2;
@@ -44,17 +42,23 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
     const distanceX = e.clientX - elementCenterX;
     const distanceY = e.clientY - elementCenterY;
 
-    buttonAnimatableInstance.translateX(distanceX * 0.2);
-    buttonAnimatableInstance.translateY(distanceY * 0.2);
+    gsap.to(localElementRef, {
+      x: distanceX * 0.2,
+      y: distanceY * 0.2,
+      duration: 1,
+      ease: "elastic.out(1, 0.3)",
+    });
   };
 
   const handleMouseLeave = () => {
-    if (isMobile()) return;
+    if (isMobile() || !localElementRef) return;
 
-    if (buttonAnimatableInstance) {
-      buttonAnimatableInstance.translateX(0);
-      buttonAnimatableInstance.translateY(0);
-    }
+    gsap.to(localElementRef, {
+      x: 0,
+      y: 0,
+      duration: 1,
+      ease: "elastic.out(1, 0.3)",
+    });
   };
 
   const setRef = (el: HTMLButtonElement) => {
@@ -84,19 +88,12 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
   createEffect(() => {
     if (localElementRef) {
       if (!isMobile()) {
-        buttonAnimatableInstance = createAnimatable(localElementRef, {
-          translateX: 0,
-          translateY: 0,
-          ease: eases.outElastic(1, 0.3),
-          duration: 1000,
-        });
-
         localElementRef.addEventListener("mousemove", handleMouseMove);
         localElementRef.addEventListener("mouseleave", handleMouseLeave);
       } else {
         localElementRef.removeEventListener("mousemove", handleMouseMove);
         localElementRef.removeEventListener("mouseleave", handleMouseLeave);
-        if (buttonAnimatableInstance) buttonAnimatableInstance.translateX(0);
+        gsap.to(localElementRef, { x: 0, y: 0 });
       }
     }
   });

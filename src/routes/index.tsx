@@ -19,12 +19,12 @@ export default function Home() {
             </h1>
             <HoverableButton
               as="button"
-              class="border rounded-full px-5 py-2 text-sm mt-2 transition-colors duration-300 hover:border-transparent hover:text-black"
+              class="border rounded-full px-5 py-2 text-xs mt-2 transition-colors duration-300 hover:border-transparent hover:text-black"
               enableHoverCircle
               applyOverflowHidden
               hoverCircleColor="hsl(75, 99%, 52%)"
             >
-              Start Your Sourcing
+              START YOUR SOURCING
             </HoverableButton>
           </div>
           <div class="w-1/3 text-white text-center">
@@ -33,12 +33,12 @@ export default function Home() {
             </h1>
             <HoverableButton
               as="button"
-              class="border rounded-full px-5 py-2 text-sm mt-2 transition-colors duration-300 hover:border-transparent hover:text-black"
+              class="border rounded-full px-5 py-2 text-xs mt-2 transition-colors duration-300 hover:border-transparent hover:text-black"
               enableHoverCircle
               applyOverflowHidden
               hoverCircleColor="hsl(75, 99%, 52%)"
             >
-              Browse Our Store
+              BROWSE OUR STORE
             </HoverableButton>
           </div>
           <div class="w-1/3 text-white text-center ">
@@ -52,7 +52,7 @@ export default function Home() {
               applyOverflowHidden
               hoverCircleColor="hsl(75, 99%, 52%)"
             >
-              How We Protect You
+              HOW WE PROTECT YOU
             </HoverableButton>
           </div>
         </div>

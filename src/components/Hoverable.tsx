@@ -9,7 +9,7 @@ import {
   type Component,
   splitProps,
 } from "solid-js";
-import { animate, utils } from "animejs";
+import { gsap } from "gsap";
 import { Dynamic } from "solid-js/web";
 
 interface HoverableProps<E extends HTMLElement = HTMLElement>
@@ -43,7 +43,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
 
   let containerRef: E | undefined;
   let circleRef: HTMLDivElement | undefined;
-  let circleAnimation: ReturnType<typeof animate> | undefined;
+  let circleAnimation: gsap.core.Tween | undefined;
 
   const [isMobile, setIsMobile] = createSignal(false);
   const [isReady, setIsReady] = createSignal(false);
@@ -55,23 +55,27 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
     )
       return;
     if (local.enableHoverCircle && circleRef) {
-      if (circleAnimation) circleAnimation.pause();
-      circleAnimation = animate(circleRef, {
-        translateY: ["101%", "0%"],
-        duration: 600,
-        easing: "easeOutQuad",
-      });
+      if (circleAnimation) circleAnimation.kill();
+      circleAnimation = gsap.fromTo(
+        circleRef,
+        { y: "101%" },
+        {
+          y: "0%",
+          duration: 0.6,
+          ease: "power2.out",
+        }
+      );
     }
   };
 
   const triggerCircleExitAnimation = () => {
     if (isMobile() || (local.isLocked && local.isLocked())) return;
     if (local.enableHoverCircle && circleRef) {
-      if (circleAnimation) circleAnimation.pause();
-      circleAnimation = animate(circleRef, {
-        translateY: "-101%",
-        duration: 600,
-        easing: "easeInQuad",
+      if (circleAnimation) circleAnimation.kill();
+      circleAnimation = gsap.to(circleRef, {
+        y: "-101%",
+        duration: 0.3,
+        ease: "power2.in",
       });
     }
   };
@@ -100,7 +104,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
 
   createEffect(() => {
     if (local.enableHoverCircle && !isMobile() && circleRef) {
-      utils.set(circleRef, { translateY: "101%" });
+      gsap.set(circleRef, { y: "101%" });
     }
   });
 

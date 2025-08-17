@@ -22,7 +22,7 @@ const NavButton: Component<NavButtonProps> = (props) => {
         onClick={props.onClick}
         class="w-auto h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full"
         aria-label={props["aria-label"]}
-        enableHoverCircle={true}
+        enableHoverCircle={false}
         hoverCircleColor="hsl(75, 99%, 52%)"
         applyOverflowHidden={true}
         triggerLeaveAnimation={shouldTriggerLeaveAnimation}
