@@ -281,15 +281,21 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <div>
                 <div
                   ref={(el) => (line1Ref = el)}
-                  class={`w-5 h-[1px] mb-1.5 transition-colors duration-600 bg-white`}
+                  class={`w-5 h-[1px] mb-1.5 transition-colors duration-600 ${
+                    props.isHomepage ? "bg-white" : "bg-black"
+                  }`}
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
-                  class={`w-5 h-[1px] transition-colors duration-600 bg-white`}
+                  class={`w-5 h-[1px] transition-colors duration-600 ${
+                    props.isHomepage ? "bg-white" : "bg-black"
+                  }`}
                 ></div>
               </div>
               <p
-                class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 text-white`}
+                class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 ${
+                  props.isHomepage ? "text-white" : "text-black"
+                }`}
               >
                 MENU
               </p>
