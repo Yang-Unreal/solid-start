@@ -278,18 +278,20 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               ref={innerRef}
               class="flex flex-row gap-2 justify-center items-center "
             >
-              <div>
+              <div class="flex flex-col gap-1.5 justify-center items-center ">
                 <div
                   ref={(el) => (line1Ref = el)}
-                  class={`w-5 h-[1px] mb-1.5 transition-colors duration-600 ${
+                  class={`w-5 h-[1px] transition-colors duration-600 ${
                     props.isHomepage ? "bg-white" : "bg-black"
                   }`}
+                  style={{ 'will-change': 'transform' }}
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
                   class={`w-5 h-[1px] transition-colors duration-600 ${
                     props.isHomepage ? "bg-white" : "bg-black"
                   }`}
+                  style={{ 'will-change': 'transform' }}
                 ></div>
               </div>
               <p
