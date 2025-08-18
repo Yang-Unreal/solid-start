@@ -139,10 +139,9 @@ export default function ProductDetailPage() {
                       <For each={Array.from({ length: 6 })}>
                         {(_, index) => (
                           <span
-                            class="w-2 h-2 bg-gray-400 rounded-full cursor-pointer"
+                            class="w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
                             classList={{
-                              "bg-primary-accent":
-                                currentImageIndex() === index(),
+                              "bg-gray-800": currentImageIndex() === index(),
                             }}
                             onClick={() => {
                               setCurrentImageIndex(index());
@@ -172,7 +171,7 @@ export default function ProductDetailPage() {
                 </p>
 
                 <div class="mt-8">
-                  <button class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500 focus:ring-opacity-50 transition-all duration-200 text-lg font-semibold">
+                  <button class="w-full bg-white text-black border py-3 rounded-full  text-lg font-semibold">
                     Add to Cart
                   </button>
                 </div>
