@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
                     index={currentImageIndex()}
                     size="detail"
                     alt={p().name}
-                    class="w-full h-full object-cover"
+                    class="w-full h-full object-cover rounded-lg"
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
