@@ -293,7 +293,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 ></div>
               </div>
               <p
-                class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600 ${
+                class={`hidden md:block  text-sm relative  transition-colors duration-600 ${
                   props.isHomepage ? "text-white" : "text-black"
                 }`}
               >

@@ -46,6 +46,7 @@ export default function Nav(props: {
       } ${props.isHomepage ? "text-light" : "bg-white/50"}`}
     >
       <div class="relative flex items-center h-18 md:h-26 font-sans justify-between">
+        {/* <div class="absolute h-[1px] w-full bg-light"></div> */}
         <div class="flex items-center justify-center">
           <MenuDrawer
             onLogoutSuccess={props.onLogoutSuccess}
@@ -67,7 +68,7 @@ export default function Nav(props: {
                   }`}
                 />
                 <p
-                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600  ${
+                  class={`hidden md:block  text-sm relative transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -100,7 +101,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600  ${
+                  class={`hidden md:block  text-sm relative transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -124,7 +125,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block font-formula-bold text-xl relative top-[1px] transition-colors duration-600  ${
+                  class={`hidden md:block  text-sm relative transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
