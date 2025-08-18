@@ -5,7 +5,7 @@ const HoverableButton: Component<ComponentProps<typeof Hoverable>> = (
   props
 ) => {
   return (
-    <div class="inline-block">
+    <div class="block">
       <Hoverable
         {...props}
         class={`flex items-center justify-center ${props.class || ""}`}

@@ -5,6 +5,7 @@ import {
   createSignal,
   createEffect,
 } from "solid-js";
+import HoverableButton from "~/components/HoverableButton";
 import { useParams } from "@solidjs/router";
 import { type Product } from "~/db/schema";
 import ProductImage from "~/components/ProductImage";
@@ -171,9 +172,15 @@ export default function ProductDetailPage() {
                 </p>
 
                 <div class="mt-8">
-                  <button class="w-full bg-white text-black border py-3 rounded-full  text-lg font-semibold">
+                  <HoverableButton
+                    as="button"
+                    enableHoverCircle
+                    applyOverflowHidden
+                    hoverCircleColor="hsl(75, 99%, 52%)"
+                    class="w-full border rounded-full px-5 py-3 text-lg font-semibold transition-colors duration-300 hover:border-transparent hover:text-black"
+                  >
                     Add to Cart
-                  </button>
+                  </HoverableButton>
                 </div>
 
                 <div class="mt-10 border-t border-gray-200 pt-8">
