@@ -58,7 +58,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div class="min-h-screen bg-cover bg-center bg-[url('/heroBackground.webp')]"></div>
+      <div class="min-h-screen bg-cover bg-center "></div>
       <div class="min-h-screen bg-cover bg-center bg-[url('/heroBackground.webp')]"></div>
       <div class="min-h-screen "></div>
       <Footer />

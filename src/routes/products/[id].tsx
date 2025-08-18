@@ -123,10 +123,11 @@ export default function ProductDetailPage() {
                             index={index()}
                             size="thumbnail"
                             alt={`Product thumbnail ${index() + 1}`}
-                            class="w-20 aspect-video object-cover cursor-pointer rounded-md border-2 border-transparent hover:border-primary-accent transition-all duration-200 hover:opacity-100"
+                            class="w-20 aspect-video object-cover cursor-pointer rounded-md   transition-all duration-200 hover:opacity-100"
                             classList={{
                               "opacity-50": currentImageIndex() !== index(),
-                              "opacity-100": currentImageIndex() === index(),
+                              "opacity-100 border":
+                                currentImageIndex() === index(),
                             }}
                             onClick={() => setCurrentImageIndex(index())}
                           />
