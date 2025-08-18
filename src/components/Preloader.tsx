@@ -77,7 +77,7 @@ export default function Preloader() {
 
   return (
     <div
-      class={`fixed left-0 h-screen w-screen bg-black flex justify-center items-center text-white text-7xl z-60 transition-all duration-[800ms] ease-[cubic-bezier(0.76,0,0.24,1)] delay-[200ms] ${
+      class={`fixed left-0 h-screen w-screen bg-black flex justify-center items-center text-white text-6xl z-60 transition-all duration-[800ms] ease-[cubic-bezier(0.76,0,0.24,1)] delay-[200ms] ${
         show() ? "top-0" : "top-[-100vh]"
       }`}
     >
