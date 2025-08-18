@@ -68,7 +68,7 @@ export default function Nav(props: {
                   }`}
                 />
                 <p
-                  class={`hidden md:block  text-sm relative transition-colors duration-600  ${
+                  class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -101,7 +101,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block  text-sm relative transition-colors duration-600  ${
+                  class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >
@@ -125,7 +125,7 @@ export default function Nav(props: {
             {(ref) => (
               <div ref={ref} class="flex gap-2 justify-center items-center">
                 <p
-                  class={`hidden md:block  text-sm relative transition-colors duration-600  ${
+                  class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
                     props.isHomepage ? "text-light" : ""
                   }`}
                 >

@@ -1,5 +1,7 @@
 /* src/app.css */
 
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap");
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
@@ -177,5 +179,13 @@ html::-webkit-scrollbar {
 
   .font-formula-light {
     font-family: "FormulaCondensed-Light", sans-serif;
+  }
+
+  .font-permanent-marker {
+    font-family: "Permanent Marker", cursive;
+  }
+
+  .font-inconsolata {
+    font-family: "Inconsolata", monospace;
   }
 }
