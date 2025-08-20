@@ -1,4 +1,3 @@
-// src/app.tsx
 import { Router, useLocation, useNavigate } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
 import {
@@ -11,7 +10,6 @@ import {
 } from "solid-js";
 import { isServer } from "solid-js/web";
 import Nav from "~/components/Nav";
-
 import "./app.css";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
@@ -21,6 +19,7 @@ import Lenis from "lenis";
 import { LenisContext } from "~/context/LenisContext";
 import Preloader from "./components/Preloader";
 import { PreloaderProvider, usePreloader } from "./context/PreloaderContext";
+import gsap from "gsap";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,6 +48,19 @@ function AppContent(props: {
   isScrolled: () => boolean;
   isHomepage: () => boolean;
 }) {
+  const { isFinished } = usePreloader();
+  let mainContainerRef: HTMLDivElement | undefined;
+
+  createEffect(() => {
+    if (isFinished() && mainContainerRef) {
+      gsap.fromTo(
+        mainContainerRef,
+        { y: "100%" },
+        { y: 0, duration: 1, ease: "power3.out" }
+      );
+    }
+  });
+
   return (
     <QueryClientProvider client={queryClient}>
       <MetaProvider>
@@ -57,11 +69,7 @@ function AppContent(props: {
           name="description"
           content="Let the hidden pears shine for the world"
         />
-        <div
-          class={`relative transition-all duration-1000 ${
-            usePreloader().isFinished() ? "top-0" : "top-[100vh]"
-          }`}
-        >
+        <div ref={mainContainerRef}>
           <Nav
             onLogoutSuccess={props.handleLogoutSuccess}
             session={props.session}

@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup } from "solid-js";
+import { createSignal, onMount, onCleanup, createEffect } from "solid-js";
 import { useLenis } from "~/context/LenisContext";
 import { usePreloader } from "~/context/PreloaderContext";
 
@@ -61,14 +61,11 @@ export default function Preloader() {
     exitTimeout = window.setTimeout(() => {
       setShow(false);
       setPath(targetPath);
-      lenis?.scrollTo(0);
       setIsFinished(true);
     }, totalAnimationTime);
 
     // Cleanup timers when the component is unmounted
     onCleanup(() => {
-      lenis?.scrollTo(0);
-
       window.clearTimeout(initialTimeout);
       window.clearInterval(wordInterval);
       window.clearTimeout(exitTimeout);
