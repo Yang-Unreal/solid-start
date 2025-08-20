@@ -39,13 +39,17 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`fixed w-full z-50 nav-padding transition-all duration-200 ${
-        props.removeNavContainerClass ? "" : "nav-container"
-      } ${props.transparent ? "bg-transparent" : "bg-black/30"} ${
-        showNav() ? "top-0" : "top-[-104px]"
-      } ${props.isHomepage ? "text-light" : "bg-white/50"}`}
+      class={`fixed  w-full z-50 nav-padding transition-all duration-200   ${
+        showNav() ? "top-3" : "top-[-104px]"
+      } `}
     >
-      <div class="relative flex items-center h-18 md:h-26 font-sans justify-between">
+      <div
+        class={`rounded-full relative flex items-center h-18 md:h-12 font-sans justify-between ${
+          props.removeNavContainerClass ? "" : "nav-container"
+        } ${props.transparent ? "bg-transparent" : "bg-black/30"} ${
+          props.isHomepage ? "text-light" : "bg-white/50"
+        }`}
+      >
         {/* <div class="absolute h-[1px] w-full bg-light"></div> */}
         <div class="flex items-center justify-center">
           <MenuDrawer

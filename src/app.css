@@ -162,7 +162,7 @@ html::-webkit-scrollbar {
   }
 
   .nav-padding {
-    @apply px-3 md:pl-11 lg:pl-17  md:pr-11 lg:pr-17;
+    @apply px-3 md:px-11 lg:px-17;
   }
   .container-padding {
     @apply px-3 md:px-11 lg:px-17;
@@ -170,7 +170,7 @@ html::-webkit-scrollbar {
 
   .nav-container::before {
     content: "";
-    @apply absolute inset-0 -z-10 backdrop-blur-lg;
+    @apply absolute inset-0 -z-10 backdrop-blur-lg rounded-full;
   }
 
   .font-formula-bold {
