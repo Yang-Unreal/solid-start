@@ -1,5 +1,5 @@
-import { createSignal, onMount, onCleanup, createEffect } from "solid-js";
-import { useLenis } from "~/context/LenisContext";
+import { createSignal, onMount, onCleanup } from "solid-js";
+
 import { usePreloader } from "~/context/PreloaderContext";
 
 const WORDS = [
@@ -20,7 +20,7 @@ export default function Preloader() {
   const [show, setShow] = createSignal(true);
   const [dimension, setDimension] = createSignal({ width: 0, height: 0 });
   const [path, setPath] = createSignal("");
-  const lenis = useLenis();
+
   const { setIsFinished } = usePreloader();
 
   onMount(() => {
