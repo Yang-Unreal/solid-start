@@ -25,7 +25,7 @@ export default function Home() {
             </h1>
             <HoverableButton
               as="button"
-              class="border rounded-full px-5 py-2 text-xs font-inconsolata mt-2 transition-colors duration-300 hover:border-transparent hover:text-black"
+              class="border rounded-full px-5 py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
               enableHoverCircle
               applyOverflowHidden
               hoverCircleColor="hsl(75, 99%, 52%)"
@@ -39,7 +39,7 @@ export default function Home() {
             </h1>
             <HoverableButton
               as="button"
-              class=" border rounded-full px-5 py-2 text-xs font-inconsolata mt-2 transition-colors duration-300 hover:border-transparent hover:text-black"
+              class=" border rounded-full px-5 py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
               enableHoverCircle
               applyOverflowHidden
               hoverCircleColor="hsl(75, 99%, 52%)"
@@ -53,7 +53,7 @@ export default function Home() {
             </h1>
             <HoverableButton
               as="button"
-              class="border rounded-full px-5 py-2 text-xs font-inconsolata mt-2 transition-colors duration-300 hover:border-transparent hover:text-black"
+              class="border rounded-full px-5 py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
               enableHoverCircle
               applyOverflowHidden
               hoverCircleColor="hsl(75, 99%, 52%)"

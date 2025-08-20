@@ -42,7 +42,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
   ]);
 
   let containerRef: E | undefined;
-  let circleRef: HTMLDivElement | undefined;
+  let circleRef: SVGSVGElement | undefined;
   let circleAnimation: gsap.core.Tween | undefined;
 
   const [isMobile, setIsMobile] = createSignal(false);
@@ -61,7 +61,7 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
         { y: "101%" },
         {
           y: "0%",
-          duration: 0.6,
+          duration: 0.5,
           ease: "power2.out",
         }
       );
@@ -74,8 +74,8 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
       if (circleAnimation) circleAnimation.kill();
       circleAnimation = gsap.to(circleRef, {
         y: "-101%",
-        duration: 0.3,
-        ease: "power2.in",
+        duration: 0.5,
+        ease: "power2.out",
       });
     }
   };
@@ -155,15 +155,24 @@ const Hoverable = <E extends HTMLElement = HTMLElement>(
     >
       <div class="relative z-10">{local.children}</div>
       {local.enableHoverCircle && !isMobile() && (
-        <div
+        <svg
           ref={(el) => (circleRef = el)}
-          class={`absolute w-full aspect-square rounded-full z-0 bg-[var(--hover-bg)] ${
+          class={`absolute w-[150%] h-[200%] top-[-50%] left-[-25%] z-0 ${
             isReady() ? "visible" : "invisible"
           }`}
-          style={{
-            "--hover-bg": local.hoverCircleColor || "#455CE9",
-          }}
-        ></div>
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          <ellipse
+            cx="50"
+            cy="50"
+            rx="50"
+            ry="50"
+            style={{
+              fill: local.hoverCircleColor || "#455CE9",
+            }}
+          />
+        </svg>
       )}
     </Dynamic>
   );
