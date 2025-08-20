@@ -81,21 +81,18 @@ function AppContent(props: {
           name="description"
           content="Let the hidden pears shine for the world"
         />
-        <div ref={mainContainerRef}>
-          <Nav
-            onLogoutSuccess={props.handleLogoutSuccess}
-            session={props.session}
-            transparent={props.isTransparentNavPage() && !props.isScrolled()}
-            removeNavContainerClass={
-              props.isTransparentNavPage() && !props.isScrolled()
-            }
-            isHomepage={props.isHomepage()}
-          />
-
-          <main class="flex-grow">
-            <Suspense fallback={null}>{props.children}</Suspense>
-          </main>
-        </div>
+        <Nav
+          onLogoutSuccess={props.handleLogoutSuccess}
+          session={props.session}
+          transparent={props.isTransparentNavPage() && !props.isScrolled()}
+          removeNavContainerClass={
+            props.isTransparentNavPage() && !props.isScrolled()
+          }
+          isHomepage={props.isHomepage()}
+        />
+        <main class="flex-grow" ref={mainContainerRef}>
+          <Suspense fallback={null}>{props.children}</Suspense>
+        </main>
       </MetaProvider>
     </QueryClientProvider>
   );
