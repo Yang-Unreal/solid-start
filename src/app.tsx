@@ -16,7 +16,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
-import { LenisContext } from "~/context/LenisContext";
+import { LenisContext, useLenis } from "~/context/LenisContext";
 import Preloader from "./components/Preloader";
 import { PreloaderProvider, usePreloader } from "./context/PreloaderContext";
 import gsap from "gsap";
@@ -49,14 +49,26 @@ function AppContent(props: {
   isHomepage: () => boolean;
 }) {
   const { isFinished } = usePreloader();
+  const lenis = useLenis();
   let mainContainerRef: HTMLDivElement | undefined;
+
+  onMount(() => {
+    lenis?.stop();
+  });
 
   createEffect(() => {
     if (isFinished() && mainContainerRef) {
       gsap.fromTo(
         mainContainerRef,
         { y: "100%" },
-        { y: 0, duration: 1, ease: "power3.out" }
+        {
+          y: 0,
+          duration: 1,
+          ease: "power3.out",
+          onComplete: () => {
+            lenis?.start();
+          },
+        }
       );
     }
   });
