@@ -24,6 +24,7 @@ interface MagneticLinkProps {
   setTriggerLeaveAnimation?: Setter<boolean>;
   class?: string;
   isLocked?: Accessor<boolean>;
+  "aria-label"?: string;
 }
 
 const MagneticLink: Component<MagneticLinkProps> = (props) => {
@@ -117,6 +118,7 @@ const MagneticLink: Component<MagneticLinkProps> = (props) => {
       ref={setRef}
       onClick={props.onClick}
       class={props.class}
+      aria-label={props["aria-label"]}
     >
       {typeof props.children === "function"
         ? props.children(setInnerRef)
