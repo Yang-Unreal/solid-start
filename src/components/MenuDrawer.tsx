@@ -308,7 +308,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 left-0  h-full w-full md:w-2/3 lg:w-1/3 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
+        class="fixed top-0 left-0  h-full w-full lg:w-2/3 xl:w-1/3 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
         style="transform: translateX(calc(-100% - 5rem));"
       >
         {/* SVG Curve Element */}
@@ -328,7 +328,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
         {/* Top Section: Navigation */}
         <div>
-          <h2 class="text-sm text-gray-400 tracking-widest mb-4 px-1.5 md:px-3">
+          <h2 class="text-sm text-gray-400 tracking-widest mb-4 px-3">
             NAVIGATION
           </h2>
           <hr class="border-gray-700" />
@@ -339,7 +339,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             {navLinks().map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <li class="relative w-full mb-4 px-1.5 md:px-3">
+                <li class="relative w-full mb-4 px-3">
                   <MagneticLink
                     onClick={() => {
                       if (link.onClick) {
@@ -392,10 +392,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
         {/* Bottom Section: Socials */}
         <div class="mt-8">
-          <h2 class="text-sm text-gray-400 tracking-widest mb-4 px-1.5 md:px-3">
+          <h2 class="text-sm text-gray-400 tracking-widest mb-4 px-3">
             SOCIALS
           </h2>
-          <div class="flex flex-wrap gap-x-8 gap-y-2 px-1.5 md:px-3">
+          <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
             {socialLinks.map((link) => (
               <MagneticLink
                 onClick={() => {

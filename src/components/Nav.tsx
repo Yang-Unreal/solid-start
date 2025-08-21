@@ -39,7 +39,7 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`px-4 lg:px-4 fixed  w-full z-50  transition-all duration-200   ${
+      class={`px-1 md:px-4 lg:px-4 fixed  w-full z-50  transition-all duration-200   ${
         showNav() ? "top-3" : "top-[-104px]"
       } `}
     >
