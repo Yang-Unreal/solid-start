@@ -35,7 +35,7 @@ export default function Home() {
           </div>
           <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
             <h1 class="text-md md:text-xl font-permanent-marker">
-              THE APEX COLLECTION
+              APEX COLLECTION
             </h1>
             <HoverableButton
               as="button"

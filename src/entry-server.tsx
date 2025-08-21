@@ -24,16 +24,7 @@ export default createHandler((event) => {
               href="/icon-dark.svg"
               media="(prefers-color-scheme: dark)"
             />
-            <link rel="preconnect" href="https://fonts.googleapis.com" />
-            <link
-              rel="preconnect"
-              href="https://fonts.gstatic.com"
-              crossorigin=""
-            />
-            <link
-              rel="stylesheet"
-              href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap"
-            />
+
             <link
               rel="preload"
               href="https://minio.limingcn.com/solid-start/fonts/PermanentMarker-Regular.woff2"
@@ -42,10 +33,14 @@ export default createHandler((event) => {
               crossorigin=""
             />
             <link
-              rel="stylesheet"
-              href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap"
+              rel="preload"
+              href="https://minio.limingcn.com/solid-start/fonts/Inconsolata-Regular.woff2"
+              as="font"
+              type="font/woff2"
+              crossorigin=""
             />
-            <link
+
+            {/* <link
               rel="preload"
               href="https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Bold.woff2"
               as="font"
@@ -58,7 +53,7 @@ export default createHandler((event) => {
               as="font"
               type="font/woff2"
               crossorigin=""
-            />
+            /> */}
             {assets}
           </head>
           <body>
