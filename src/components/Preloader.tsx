@@ -1,6 +1,5 @@
-import { createSignal, onMount, onCleanup, createMemo, Show } from "solid-js";
-
-import { usePreloader } from "~/context/PreloaderContext";
+import { createSignal, onMount } from "solid-js";
+import gsap from "gsap";
 
 const WORDS = [
   "Hello",
@@ -12,85 +11,104 @@ const WORDS = [
   "Guten tag",
   "Hallo",
 ];
-const FIRST_WORD_DELAY = 300; // ms
-const SUBSEQUENT_WORD_DELAY = 150; // ms
 
-export default function Preloader() {
+export default function Preloader(props: {
+  mainContainerRef: HTMLDivElement | undefined;
+}) {
   const [index, setIndex] = createSignal(0);
-  const [show, setShow] = createSignal(true);
-  const [dimension, setDimension] = createSignal({ width: 0, height: 0 });
-  const { setIsFinished } = usePreloader();
 
-  const initialPath = createMemo(() => {
-    const d = dimension();
-    return `M0 0 L${d.width} 0 L${d.width} ${d.height} Q${d.width / 2} ${
-      d.height * 1.2
-    } 0 ${d.height} L0 0`;
-  });
-
-  const targetPath = createMemo(() => {
-    const d = dimension();
-    return `M0 0 L${d.width} 0 L${d.width} ${d.height} Q${d.width / 2} ${
-      d.height
-    } 0 ${d.height} L0 0`;
-  });
-
-  const [path, setPath] = createSignal(initialPath());
+  let preloaderRef: HTMLDivElement | undefined;
+  let wordsRef: HTMLParagraphElement | undefined;
+  let pathRef: SVGPathElement | undefined;
 
   onMount(() => {
-    setDimension({ width: window.innerWidth, height: window.innerHeight });
-    setPath(initialPath());
-    let wordInterval: number;
-    let exitTimeout: number;
+    if (typeof window === "undefined" || !preloaderRef || !wordsRef || !pathRef)
+      return;
 
-    const totalAnimationTime =
-      FIRST_WORD_DELAY + (WORDS.length - 1) * SUBSEQUENT_WORD_DELAY;
+    console.log("mainContainerRef in Preloader:", props.mainContainerRef);
 
-    const updateWord = () => {
-      setIndex((prev) => {
-        const nextIndex = prev + 1;
-        if (nextIndex < WORDS.length) {
-          return nextIndex;
-        }
-        // Last word has been shown, stop the interval
-        window.clearInterval(wordInterval);
-        return prev;
-      });
-    };
+    pathRef.setAttribute(
+      "d",
+      `M0 0 L${window.innerWidth} 0 L${window.innerWidth} ${
+        window.innerHeight
+      } Q${window.innerWidth / 2} ${window.innerHeight * 1.2} 0 ${
+        window.innerHeight
+      } L0 0`
+    );
 
-    const initialTimeout = window.setTimeout(() => {
-      wordInterval = window.setInterval(updateWord, SUBSEQUENT_WORD_DELAY);
-    }, FIRST_WORD_DELAY);
+    const tl = gsap.timeline();
 
-    exitTimeout = window.setTimeout(() => {
-      setShow(false);
-      setPath(targetPath);
-      setIsFinished(true);
-    }, totalAnimationTime);
-
-    // Cleanup timers when the component is unmounted
-    onCleanup(() => {
-      window.clearTimeout(initialTimeout);
-      window.clearInterval(wordInterval);
-      window.clearTimeout(exitTimeout);
+    tl.to(wordsRef, {
+      duration: 0.8,
+      opacity: 1,
+      ease: "power2.inOut",
     });
+
+    WORDS.forEach((_, i) => {
+      if (i > 0) {
+        tl.to(
+          {},
+          {
+            duration: 0.15,
+            onComplete: () => {
+              setIndex(i);
+            },
+          }
+        );
+      }
+    });
+
+    tl.to(
+      preloaderRef,
+      {
+        y: "-100vh",
+        duration: 0.8,
+        ease: "cubic-bezier(0.76, 0, 0.24, 1)",
+      },
+      "-=0.5"
+    );
+
+    if (props.mainContainerRef) {
+      gsap.set(props.mainContainerRef, { y: "100vh" });
+      tl.to(
+        props.mainContainerRef,
+        {
+          y: 0,
+          duration: 0.8,
+          ease: "cubic-bezier(0.76, 0, 0.24, 1)",
+        },
+        "-=0.8"
+      );
+    }
+
+    tl.to(
+      pathRef,
+      {
+        attr: {
+          d: `M0 0 L${window.innerWidth} 0 L${window.innerWidth} ${
+            window.innerHeight
+          } Q${window.innerWidth / 2} ${window.innerHeight} 0 ${
+            window.innerHeight
+          } L0 0`,
+        },
+        duration: 0.7,
+        ease: "cubic-bezier(0.76, 0, 0.24, 1)",
+      },
+      "<0.3"
+    );
   });
 
   return (
     <div
-      class={`fixed left-0 h-screen w-screen bg-black flex justify-center items-center text-white text-6xl z-60 transition-all duration-[800ms] ease-[cubic-bezier(0.76,0,0.24,1)] delay-[200ms] ${
-        show() ? "top-0" : "top-[-100vh]"
-      }`}
+      ref={preloaderRef}
+      class="fixed left-0 top-0 z-60 h-screen w-screen bg-black flex justify-center items-center text-white text-6xl"
     >
-      <Show when={dimension().width > 0}>
-        <svg class="absolute top-0 left-0 w-full h-[120%] pointer-events-none">
-          <path
-            d={path()}
-            class="fill-black transition-all duration-[700ms] ease-[cubic-bezier(0.76,0,0.24,1)] delay-[300ms]"
-          ></path>
-        </svg>
-      </Show>
-      <p class="relative z-10 w-96 text-center">{WORDS[index()]}</p>
+      <svg class="absolute top-0 left-0 w-full h-[120%] pointer-events-none">
+        <path ref={pathRef} d="" class="fill-black"></path>
+      </svg>
+      <p ref={wordsRef} class="relative z-61 w-96 text-center opacity-0">
+        {WORDS[index()]}
+      </p>
     </div>
   );
 }

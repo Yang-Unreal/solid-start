@@ -18,8 +18,6 @@ import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
 import { LenisContext, useLenis } from "~/context/LenisContext";
 import Preloader from "./components/Preloader";
-import { PreloaderProvider, usePreloader } from "./context/PreloaderContext";
-import gsap from "gsap";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -47,30 +45,12 @@ function AppContent(props: {
   isTransparentNavPage: () => boolean;
   isScrolled: () => boolean;
   isHomepage: () => boolean;
+  mainContainerRef: (el: HTMLElement) => void;
 }) {
-  const { isFinished } = usePreloader();
   const lenis = useLenis();
-  let mainContainerRef: HTMLDivElement | undefined;
 
   onMount(() => {
     lenis?.stop();
-  });
-
-  createEffect(() => {
-    if (isFinished() && mainContainerRef) {
-      gsap.fromTo(
-        mainContainerRef,
-        { y: "100%" },
-        {
-          y: 0,
-          duration: 1,
-          ease: "power3.out",
-          onComplete: () => {
-            lenis?.start();
-          },
-        }
-      );
-    }
   });
 
   return (
@@ -90,7 +70,7 @@ function AppContent(props: {
           }
           isHomepage={props.isHomepage()}
         />
-        <main class="flex-grow" ref={mainContainerRef}>
+        <main class="flex-grow" ref={props.mainContainerRef}>
           <Suspense fallback={null}>{props.children}</Suspense>
         </main>
       </MetaProvider>
@@ -152,22 +132,22 @@ export default function App() {
             () => location.pathname === "/"
           );
           const isHomepage = createMemo(() => location.pathname === "/");
+          const [mainContainerRef, setMainContainerRef] = createSignal<HTMLDivElement | undefined>(undefined);
 
           return (
-            <PreloaderProvider>
-              <SearchProvider>
-                <Preloader />
-                <AppContent
-                  children={props.children}
-                  session={session}
-                  handleLogoutSuccess={handleLogoutSuccess}
-                  isDashboardRoute={isDashboardRoute}
-                  isTransparentNavPage={isTransparentNavPage}
-                  isScrolled={isScrolled}
-                  isHomepage={isHomepage}
-                />
-              </SearchProvider>
-            </PreloaderProvider>
+            <SearchProvider>
+              <Preloader mainContainerRef={mainContainerRef()} />
+              <AppContent
+                children={props.children}
+                session={session}
+                handleLogoutSuccess={handleLogoutSuccess}
+                isDashboardRoute={isDashboardRoute}
+                isTransparentNavPage={isTransparentNavPage}
+                isScrolled={isScrolled}
+                isHomepage={isHomepage}
+                mainContainerRef={setMainContainerRef}
+              />
+            </SearchProvider>
           );
         }}
       >
