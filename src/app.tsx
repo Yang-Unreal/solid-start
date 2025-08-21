@@ -152,14 +152,11 @@ export default function App() {
             () => location.pathname === "/"
           );
           const isHomepage = createMemo(() => location.pathname === "/");
-          const [isMounted, setIsMounted] = createSignal(false);
-          onMount(() => {
-            setIsMounted(true);
-          });
+
           return (
             <PreloaderProvider>
               <SearchProvider>
-                {isMounted() && <Preloader />}
+                <Preloader />
                 <AppContent
                   children={props.children}
                   session={session}

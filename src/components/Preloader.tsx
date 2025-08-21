@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup, createMemo } from "solid-js";
+import { createSignal, onMount, onCleanup, createMemo, Show } from "solid-js";
 
 import { usePreloader } from "~/context/PreloaderContext";
 
@@ -24,7 +24,7 @@ export default function Preloader() {
   const initialPath = createMemo(() => {
     const d = dimension();
     return `M0 0 L${d.width} 0 L${d.width} ${d.height} Q${d.width / 2} ${
-      d.height + 300
+      d.height * 1.2
     } 0 ${d.height} L0 0`;
   });
 
@@ -82,12 +82,14 @@ export default function Preloader() {
         show() ? "top-0" : "top-[-100vh]"
       }`}
     >
-      <svg class="absolute top-0 left-0 w-full h-[calc(100%+300px)] pointer-events-none">
-        <path
-          d={path()}
-          class="fill-black transition-all duration-[700ms] ease-[cubic-bezier(0.76,0,0.24,1)] delay-[300ms]"
-        ></path>
-      </svg>
+      <Show when={dimension().width > 0}>
+        <svg class="absolute top-0 left-0 w-full h-[120%] pointer-events-none">
+          <path
+            d={path()}
+            class="fill-black transition-all duration-[700ms] ease-[cubic-bezier(0.76,0,0.24,1)] delay-[300ms]"
+          ></path>
+        </svg>
+      </Show>
       <p class="relative z-10 w-96 text-center">{WORDS[index()]}</p>
     </div>
   );
