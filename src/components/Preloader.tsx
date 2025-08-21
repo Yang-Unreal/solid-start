@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup } from "solid-js";
+import { createSignal, onMount, onCleanup, createMemo } from "solid-js";
 
 import { usePreloader } from "~/context/PreloaderContext";
 
@@ -19,23 +19,27 @@ export default function Preloader() {
   const [index, setIndex] = createSignal(0);
   const [show, setShow] = createSignal(true);
   const [dimension, setDimension] = createSignal({ width: 0, height: 0 });
-  const [path, setPath] = createSignal("");
-
   const { setIsFinished } = usePreloader();
+
+  const initialPath = createMemo(() => {
+    const d = dimension();
+    return `M0 0 L${d.width} 0 L${d.width} ${d.height} Q${d.width / 2} ${
+      d.height + 300
+    } 0 ${d.height} L0 0`;
+  });
+
+  const targetPath = createMemo(() => {
+    const d = dimension();
+    return `M0 0 L${d.width} 0 L${d.width} ${d.height} Q${d.width / 2} ${
+      d.height
+    } 0 ${d.height} L0 0`;
+  });
+
+  const [path, setPath] = createSignal(initialPath());
 
   onMount(() => {
     setDimension({ width: window.innerWidth, height: window.innerHeight });
-    const initialPath = `M0 0 L${dimension().width} 0 L${dimension().width} ${
-      dimension().height
-    } Q${dimension().width / 2} ${dimension().height + 300} 0 ${
-      dimension().height
-    }  L0 0`;
-    setPath(initialPath);
-    const targetPath = `M0 0 L${dimension().width} 0 L${dimension().width} ${
-      dimension().height
-    } Q${dimension().width / 2} ${dimension().height} 0 ${
-      dimension().height
-    }  L0 0`;
+    setPath(initialPath());
     let wordInterval: number;
     let exitTimeout: number;
 
