@@ -18,7 +18,7 @@ export default function Home() {
           CHINA SOURCING <br />
           SIMPLIFIED
         </h1>
-        <div class="absolute flex flex-col md:flex-row h-auto w-full bottom-8 md:bottom-12 container-padding gap-2 md:gap-10 ">
+        <div class="absolute flex flex-col md:flex-row h-auto w-full justify-center items-center bottom-8 md:bottom-12 container-padding gap-2 md:gap-10 ">
           <div class="w-full md:w-1/3 flex flex-col items-center justify-center text-center text-white">
             <h1 class="text-md md:text-xl font-permanent-marker">
               BESPOKE SOURCING
