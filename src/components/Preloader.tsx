@@ -88,7 +88,7 @@ export default function Preloader() {
           class="fill-black transition-all duration-[700ms] ease-[cubic-bezier(0.76,0,0.24,1)] delay-[300ms]"
         ></path>
       </svg>
-      <p class="relative z-10">{WORDS[index()]}</p>
+      <p class="relative z-10 w-96 text-center">{WORDS[index()]}</p>
     </div>
   );
 }

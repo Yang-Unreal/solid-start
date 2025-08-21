@@ -35,8 +35,11 @@ export default createHandler((event) => {
               href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap"
             />
             <link
-              rel="stylesheet"
-              href="https://fonts.googleapis.com/css2?family=Permanent+Marker&display=swap"
+              rel="preload"
+              href="https://minio.limingcn.com/solid-start/fonts/PermanentMarker-Regular.woff2"
+              as="font"
+              type="font/woff2"
+              crossorigin=""
             />
             <link
               rel="stylesheet"
