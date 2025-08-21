@@ -162,7 +162,7 @@ html::-webkit-scrollbar {
   }
 
   .nav-padding {
-    @apply px-3 md:px-11 lg:px-17;
+    @apply px-3 md:px-11 lg:px-13;
   }
   .container-padding {
     @apply px-3 md:px-11 lg:px-17;

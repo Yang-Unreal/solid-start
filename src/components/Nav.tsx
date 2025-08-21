@@ -39,112 +39,116 @@ export default function Nav(props: {
 
   return (
     <nav
-      class={`fixed  w-full z-50 nav-padding transition-all duration-200   ${
+      class={`px-4 lg:px-4 fixed  w-full z-50  transition-all duration-200   ${
         showNav() ? "top-3" : "top-[-104px]"
       } `}
     >
       <div
-        class={`rounded-full relative flex items-center h-18 md:h-12 font-sans justify-between ${
+        class={`rounded-full relative flex h-12  ${
           props.removeNavContainerClass ? "" : "nav-container"
-        } ${props.transparent ? "bg-transparent" : "bg-black/30"} ${
-          props.isHomepage ? "text-light" : "bg-white/50"
+        } ${props.transparent ? "bg-transparent" : "bg-black/60"} ${
+          props.isHomepage ? "text-light" : "bg-white/60"
         }`}
       >
         {/* <div class="absolute h-[1px] w-full bg-light"></div> */}
-        <div class="flex items-center justify-center">
-          <MenuDrawer
-            onLogoutSuccess={props.onLogoutSuccess}
-            session={props.session}
-            isHomepage={props.isHomepage}
-          />
-          <NavButton
-            onClick={() => setIsMobileSearchOpen(true)}
-            aria-label="Search"
-            isHomepage={props.isHomepage}
-          >
-            {(ref) => (
-              <div class="flex justify-center items-center gap-2" ref={ref}>
-                <Search
-                  stroke-width="1"
-                  size={20}
-                  class={`transition-colors duration-600  ${
-                    props.isHomepage ? "text-light" : ""
-                  }`}
-                />
-                <p
-                  class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
-                    props.isHomepage ? "text-light" : ""
-                  }`}
-                >
-                  SEARCH
-                </p>
-              </div>
+        <div class="w-full items-center  flex justify-between nav-padding">
+          <div class="flex items-center justify-center">
+            <MenuDrawer
+              onLogoutSuccess={props.onLogoutSuccess}
+              session={props.session}
+              isHomepage={props.isHomepage}
+            />
+            <NavButton
+              onClick={() => setIsMobileSearchOpen(true)}
+              aria-label="Search"
+              isHomepage={props.isHomepage}
+            >
+              {(ref) => (
+                <div class="flex justify-center items-center gap-2" ref={ref}>
+                  <Search
+                    stroke-width="1"
+                    size={20}
+                    class={`transition-colors duration-600  ${
+                      props.isHomepage ? "text-light" : ""
+                    }`}
+                  />
+                  <p
+                    class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
+                      props.isHomepage ? "text-light" : ""
+                    }`}
+                  >
+                    SEARCH
+                  </p>
+                </div>
+              )}
+            </NavButton>
+            {isMobileSearchOpen() && (
+              <SearchModal onClose={() => setIsMobileSearchOpen(false)} />
             )}
-          </NavButton>
-          {isMobileSearchOpen() && (
-            <SearchModal onClose={() => setIsMobileSearchOpen(false)} />
-          )}
-        </div>
+          </div>
 
-        <A
-          href="/"
-          class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
-          aria-label="Homepage"
-        >
-          <YourLogo class="h-4 md:h-5 w-auto" />
-        </A>
+          <A
+            href="/"
+            class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
+            aria-label="Homepage"
+          >
+            <YourLogo class="h-4 md:h-5 w-auto" />
+          </A>
 
-        <div class="flex items-center justify-center">
-          <NavButton
-            onClick={() =>
-              props.session().data ? navigate("/dashboard") : navigate("/login")
-            }
-            aria-label="User"
-            isHomepage={props.isHomepage}
-          >
-            {(ref) => (
-              <div ref={ref} class="flex gap-2 justify-center items-center">
-                <p
-                  class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
-                    props.isHomepage ? "text-light" : ""
-                  }`}
-                >
-                  USER
-                </p>
-                <User
-                  stroke-width="1"
-                  size={20}
-                  class={`transition-colors duration-600  ${
-                    props.isHomepage ? "text-light" : ""
-                  }`}
-                />
-              </div>
-            )}
-          </NavButton>
-          <NavButton
-            onClick={() => navigate("/products")}
-            aria-label="Products"
-            isHomepage={props.isHomepage}
-          >
-            {(ref) => (
-              <div ref={ref} class="flex gap-2 justify-center items-center">
-                <p
-                  class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
-                    props.isHomepage ? "text-light" : ""
-                  }`}
-                >
-                  STORE
-                </p>
-                <ShoppingBag
-                  stroke-width="1"
-                  size={20}
-                  class={`transition-colors duration-600 ${
-                    props.isHomepage ? "text-light" : ""
-                  }`}
-                />
-              </div>
-            )}
-          </NavButton>
+          <div class="flex items-center justify-center">
+            <NavButton
+              onClick={() =>
+                props.session().data
+                  ? navigate("/dashboard")
+                  : navigate("/login")
+              }
+              aria-label="User"
+              isHomepage={props.isHomepage}
+            >
+              {(ref) => (
+                <div ref={ref} class="flex gap-2 justify-center items-center">
+                  <p
+                    class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
+                      props.isHomepage ? "text-light" : ""
+                    }`}
+                  >
+                    USER
+                  </p>
+                  <User
+                    stroke-width="1"
+                    size={20}
+                    class={`transition-colors duration-600  ${
+                      props.isHomepage ? "text-light" : ""
+                    }`}
+                  />
+                </div>
+              )}
+            </NavButton>
+            <NavButton
+              onClick={() => navigate("/products")}
+              aria-label="Products"
+              isHomepage={props.isHomepage}
+            >
+              {(ref) => (
+                <div ref={ref} class="flex gap-2 justify-center items-center">
+                  <p
+                    class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
+                      props.isHomepage ? "text-light" : ""
+                    }`}
+                  >
+                    STORE
+                  </p>
+                  <ShoppingBag
+                    stroke-width="1"
+                    size={20}
+                    class={`transition-colors duration-600 ${
+                      props.isHomepage ? "text-light" : ""
+                    }`}
+                  />
+                </div>
+              )}
+            </NavButton>
+          </div>
         </div>
       </div>
     </nav>
