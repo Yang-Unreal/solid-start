@@ -25,8 +25,6 @@ export default function Preloader(props: {
     if (typeof window === "undefined" || !preloaderRef || !wordsRef || !pathRef)
       return;
 
-    console.log("mainContainerRef in Preloader:", props.mainContainerRef);
-
     pathRef.setAttribute(
       "d",
       `M0 0 L${window.innerWidth} 0 L${window.innerWidth} ${
