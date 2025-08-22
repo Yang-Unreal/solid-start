@@ -1,4 +1,4 @@
-import { createSignal, on, onMount } from "solid-js";
+import { createSignal, onMount } from "solid-js";
 import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
 
@@ -26,6 +26,7 @@ export default function Preloader(props: {
   onMount(() => {
     if (typeof window === "undefined" || !preloaderRef || !wordsRef || !pathRef)
       return;
+    lenis?.scrollTo(0);
 
     pathRef.setAttribute(
       "d",

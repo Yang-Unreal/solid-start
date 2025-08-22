@@ -16,7 +16,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
-import { LenisContext, useLenis } from "~/context/LenisContext";
+import { LenisContext } from "~/context/LenisContext";
 import Preloader from "./components/Preloader";
 
 const queryClient = new QueryClient({
@@ -47,12 +47,6 @@ function AppContent(props: {
   isHomepage: () => boolean;
   mainContainerRef: (el: HTMLElement) => void;
 }) {
-  const lenis = useLenis();
-
-  onMount(() => {
-    lenis?.stop();
-  });
-
   return (
     <QueryClientProvider client={queryClient}>
       <MetaProvider>
@@ -132,11 +126,13 @@ export default function App() {
             () => location.pathname === "/"
           );
           const isHomepage = createMemo(() => location.pathname === "/");
-          const [mainContainerRef, setMainContainerRef] = createSignal<HTMLDivElement | undefined>(undefined);
+          const [mainContainerRef, setMainContainerRef] = createSignal<
+            HTMLDivElement | undefined
+          >(undefined);
 
           return (
             <SearchProvider>
-              <Preloader mainContainerRef={mainContainerRef()} />
+              {/* <Preloader mainContainerRef={mainContainerRef()} /> */}
               <AppContent
                 children={props.children}
                 session={session}
