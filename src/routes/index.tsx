@@ -12,8 +12,7 @@ export default function Home() {
         name="description"
         content="Bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
-      <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-center bg-[url('/heroBackground.webp')]">
-        <div class="absolute inset-0 bg-black opacity-20"></div>
+      <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-black bg-center bg-[url('/heroBackground.webp')]">
         <h1 class="absolute text-light-gray text-5xl md:text-[120px] font-permanent-marker top-2/6 text-center leading-18 md:leading-35">
           CHINA SOURCING <br />
           SIMPLIFIED

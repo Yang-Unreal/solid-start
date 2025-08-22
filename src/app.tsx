@@ -17,7 +17,7 @@ import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
 import { LenisContext } from "~/context/LenisContext";
-import Preloader from "./components/Preloader";
+// import Preloader from "./components/Preloader";
 
 const queryClient = new QueryClient({
   defaultOptions: {
