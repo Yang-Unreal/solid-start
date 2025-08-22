@@ -1,5 +1,6 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal, on, onMount } from "solid-js";
 import gsap from "gsap";
+import { useLenis } from "~/context/LenisContext";
 
 const WORDS = [
   "Hello",
@@ -20,6 +21,7 @@ export default function Preloader(props: {
   let preloaderRef: HTMLDivElement | undefined;
   let wordsRef: HTMLParagraphElement | undefined;
   let pathRef: SVGPathElement | undefined;
+  const lenis = useLenis();
 
   onMount(() => {
     if (typeof window === "undefined" || !preloaderRef || !wordsRef || !pathRef)
@@ -34,7 +36,11 @@ export default function Preloader(props: {
       } L0 0`
     );
 
-    const tl = gsap.timeline();
+    const tl = gsap.timeline({
+      onComplete: () => {
+        lenis?.start();
+      },
+    });
 
     tl.to(wordsRef, {
       duration: 0.8,
