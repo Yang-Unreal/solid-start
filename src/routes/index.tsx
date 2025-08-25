@@ -12,7 +12,10 @@ export default function Home() {
         name="description"
         content="Bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
-      <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-black bg-center bg-[url('/heroBackground.webp')]">
+      <div
+        class="relative min-h-screen flex items-center justify-center overflow-hidden bg-cover bg-black bg-center"
+        style="background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/heroBackground.webp');"
+      >
         <h1 class="absolute text-light-gray text-5xl md:text-[120px] font-permanent-marker top-2/6 text-center leading-18 md:leading-35">
           CHINA SOURCING <br />
           SIMPLIFIED
@@ -48,7 +51,7 @@ export default function Home() {
           </div>
           <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
             <h1 class="text-md md:text-xl font-permanent-marker">
-              ELIMINATE RISK
+              RISK ELIMINATION
             </h1>
             <HoverableButton
               as="button"
@@ -64,7 +67,10 @@ export default function Home() {
       </div>
 
       <div class="min-h-screen bg-cover bg-center "></div>
-      <div class="min-h-screen bg-cover bg-center bg-[url('/heroBackground.webp')]"></div>
+      <div
+        class="min-h-screen bg-cover bg-center"
+        style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/heroBackground.webp');"
+      ></div>
       <div class="min-h-screen "></div>
       <Footer />
     </main>
