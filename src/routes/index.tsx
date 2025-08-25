@@ -21,7 +21,7 @@ export default function Home() {
       />
       <div class="relative min-h-screen overflow-hidden bg-black">
         <div
-          class="w-full min-h-screen flex items-center justify-center transition-opacity duration-300 bg-cover  bg-center"
+          class="w-full min-h-screen flex items-center justify-center transition-opacity duration-400 bg-cover  bg-center"
           style={{
             "background-image":
               "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/heroBackground.webp')",
