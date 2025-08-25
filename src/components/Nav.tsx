@@ -58,9 +58,9 @@ export default function Nav() {
   });
 
   const transparent = createMemo(() => isTransparentNavPage() && !isScrolled());
-  const removeNavContainerClass = createMemo(
-    () => isTransparentNavPage() && !isScrolled()
-  );
+  // const removeNavContainerClass = createMemo(
+  //   () => isTransparentNavPage() && !isScrolled()
+  // );
 
   return (
     <nav
@@ -70,10 +70,8 @@ export default function Nav() {
     >
       <div
         class={`rounded-full relative flex h-12  ${
-          removeNavContainerClass() ? "" : "nav-container"
-        } ${transparent() ? "bg-transparent" : "bg-black/60"} ${
-          isHomepage() ? "text-light" : "bg-white/60"
-        }`}
+          transparent() ? "bg-transparent" : "bg-black"
+        } text-light`}
       >
         {/* <div class="absolute h-[1px] w-full bg-light"></div> */}
         <div class="w-full items-center  flex justify-between nav-padding">

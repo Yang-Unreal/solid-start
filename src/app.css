@@ -183,10 +183,10 @@ html::-webkit-scrollbar {
     @apply px-3 md:px-11 lg:px-17;
   }
 
-  .nav-container::before {
+  /* .nav-container::before {
     content: "";
     @apply absolute inset-0 -z-10 backdrop-blur-lg rounded-full;
-  }
+  } */
 
   /* .font-formula-bold {
     font-family: "FormulaCondensed-Bold", sans-serif;
