@@ -12,24 +12,12 @@ import { isServer } from "solid-js/web";
 import "./app.css";
 import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
-import Lenis from "lenis";
-import { LenisContext } from "~/context/LenisContext";
+import { LenisProvider } from "~/context/LenisContext";
 import { AppContent } from "~/components/AppContent";
 
 export default function App() {
-  let lenis: Lenis | undefined;
-  if (!isServer) {
-    lenis = new Lenis();
-
-    function raf(time: number) {
-      lenis!.raf(time);
-      requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-  }
-
   return (
-    <LenisContext.Provider value={lenis}>
+    <LenisProvider>
       <Router
         root={(props) => {
           const location = useLocation();
@@ -88,6 +76,6 @@ export default function App() {
       >
         <FileRoutes />
       </Router>
-    </LenisContext.Provider>
+    </LenisProvider>
   );
 }
