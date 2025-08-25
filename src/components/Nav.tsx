@@ -12,13 +12,12 @@ import SearchModal from "./SearchModal";
 import NavButton from "./NavButton";
 import YourLogo from "./YourLogo";
 import { isServer } from "solid-js/web";
+import { useAuth } from "~/context/AuthContext";
 
-export default function Nav(props: {
-  onLogoutSuccess: () => void;
-  session: any;
-}) {
+export default function Nav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { session, handleLogoutSuccess } = useAuth();
   const isTransparentNavPage = createMemo(() => location.pathname === "/");
   const isHomepage = createMemo(() => location.pathname === "/");
 
@@ -58,9 +57,7 @@ export default function Nav(props: {
     onCleanup(() => window.removeEventListener("scroll", handleScroll));
   });
 
-  const transparent = createMemo(
-    () => isTransparentNavPage() && !isScrolled()
-  );
+  const transparent = createMemo(() => isTransparentNavPage() && !isScrolled());
   const removeNavContainerClass = createMemo(
     () => isTransparentNavPage() && !isScrolled()
   );
@@ -82,8 +79,8 @@ export default function Nav(props: {
         <div class="w-full items-center  flex justify-between nav-padding">
           <div class="flex items-center justify-center">
             <MenuDrawer
-              onLogoutSuccess={props.onLogoutSuccess}
-              session={props.session}
+              onLogoutSuccess={handleLogoutSuccess}
+              session={session}
               isHomepage={isHomepage()}
             />
             <NavButton
@@ -126,9 +123,7 @@ export default function Nav(props: {
           <div class="flex items-center justify-center">
             <NavButton
               onClick={() =>
-                props.session().data
-                  ? navigate("/dashboard")
-                  : navigate("/login")
+                session().data ? navigate("/dashboard") : navigate("/login")
               }
               aria-label="User"
               isHomepage={isHomepage()}
@@ -182,4 +177,3 @@ export default function Nav(props: {
     </nav>
   );
 }
-

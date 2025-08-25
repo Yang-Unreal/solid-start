@@ -3,7 +3,7 @@ import { createContext, createEffect, createMemo, useContext } from "solid-js";
 import { authClient } from "~/lib/auth-client";
 
 // Define the shape of the context
-type AuthContextType = {
+export type AuthContextType = {
   session: ReturnType<typeof authClient.useSession>;
   handleLogoutSuccess: () => void;
 };

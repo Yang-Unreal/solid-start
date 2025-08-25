@@ -6,16 +6,15 @@ import { useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
+import type { AuthContextType } from "~/context/AuthContext"; // CHANGE: Import the correct type
 
-import { type Session } from "better-auth";
+// CHANGE: The 'Session' type from 'better-auth' is no longer needed here.
+// import { type Session } from "better-auth";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
   onLogoutSuccess: () => void;
-  session: () => {
-    data: Session | null;
-    isPending: boolean;
-  };
+  session: AuthContextType["session"]; // CHANGE: Use the session type from the AuthContext
   isHomepage?: boolean;
 }
 
@@ -88,7 +87,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     const links: { href: string; label: string; onClick?: () => void }[] =
       props.links ? [...props.links] : baseNavLinks;
 
-    if (props.session().data) {
+    // CHANGE: Check for the nested 'user' object to determine if the user is logged in
+    if (props.session().data?.user) {
       links.push({ href: "/dashboard", label: "Dashboard" });
       links.push({ href: "#", label: "Logout", onClick: handleLogout });
     } else {
