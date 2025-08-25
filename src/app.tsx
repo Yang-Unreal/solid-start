@@ -12,30 +12,12 @@ import { isServer } from "solid-js/web";
 import Nav from "~/components/Nav";
 import "./app.css";
 import { Meta, MetaProvider, Title } from "@solidjs/meta";
-import { QueryClient, QueryClientProvider } from "@tanstack/solid-query";
+import { QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
+import { queryClient } from "~/lib/query-client";
 import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
 import { LenisContext } from "~/context/LenisContext";
-// import Preloader from "./components/Preloader";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 5 * 60 * 1000,
-      gcTime: 10 * 60 * 1000,
-      retry: 3,
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      experimental_prefetchInRender: true,
-    },
-    mutations: {
-      retry: 1,
-      retryDelay: 1000,
-    },
-  },
-});
 
 function AppContent(props: {
   children: any;
@@ -45,7 +27,6 @@ function AppContent(props: {
   isTransparentNavPage: () => boolean;
   isScrolled: () => boolean;
   isHomepage: () => boolean;
-  mainContainerRef: (el: HTMLElement) => void;
 }) {
   return (
     <QueryClientProvider client={queryClient}>
@@ -64,7 +45,7 @@ function AppContent(props: {
           }
           isHomepage={props.isHomepage()}
         />
-        <main class="flex-grow" ref={props.mainContainerRef}>
+        <main class="flex-grow">
           <Suspense fallback={null}>{props.children}</Suspense>
         </main>
       </MetaProvider>
@@ -126,13 +107,9 @@ export default function App() {
             () => location.pathname === "/"
           );
           const isHomepage = createMemo(() => location.pathname === "/");
-          const [mainContainerRef, setMainContainerRef] = createSignal<
-            HTMLDivElement | undefined
-          >(undefined);
 
           return (
             <SearchProvider>
-              {/* <Preloader mainContainerRef={mainContainerRef()} /> */}
               <AppContent
                 children={props.children}
                 session={session}
@@ -141,7 +118,6 @@ export default function App() {
                 isTransparentNavPage={isTransparentNavPage}
                 isScrolled={isScrolled}
                 isHomepage={isHomepage}
-                mainContainerRef={setMainContainerRef}
               />
             </SearchProvider>
           );
