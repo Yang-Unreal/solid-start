@@ -13,36 +13,10 @@ export default function App() {
     <LenisProvider>
       <Router
         root={(props) => {
-          const location = useLocation();
-          const isTransparentNavPage = createMemo(
-            () => location.pathname === "/"
-          );
-          const isHomepage = createMemo(() => location.pathname === "/");
-
-          const [isScrolled, setIsScrolled] = createSignal(false);
-          const handleScroll = () => {
-            setIsScrolled(window.scrollY > 100);
-          };
-
-          if (!isServer) {
-            onMount(() => {
-              window.addEventListener("scroll", handleScroll);
-            });
-
-            onCleanup(() => {
-              window.removeEventListener("scroll", handleScroll);
-            });
-          }
-
           return (
             <AuthProvider>
               <SearchProvider>
-                <AppContent
-                  children={props.children}
-                  isTransparentNavPage={isTransparentNavPage}
-                  isScrolled={isScrolled}
-                  isHomepage={isHomepage}
-                />
+                <AppContent children={props.children} />
               </SearchProvider>
             </AuthProvider>
           );

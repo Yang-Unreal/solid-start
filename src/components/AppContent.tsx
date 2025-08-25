@@ -7,9 +7,6 @@ import Nav from "./Nav";
 
 export function AppContent(props: {
   children: any;
-  isTransparentNavPage: () => boolean;
-  isScrolled: () => boolean;
-  isHomepage: () => boolean;
 }) {
   const { session, handleLogoutSuccess } = useAuth();
   return (
@@ -23,11 +20,6 @@ export function AppContent(props: {
         <Nav
           onLogoutSuccess={handleLogoutSuccess}
           session={session}
-          transparent={props.isTransparentNavPage() && !props.isScrolled()}
-          removeNavContainerClass={
-            props.isTransparentNavPage() && !props.isScrolled()
-          }
-          isHomepage={props.isHomepage()}
         />
         <main class="flex-grow">
           <Suspense fallback={null}>{props.children}</Suspense>

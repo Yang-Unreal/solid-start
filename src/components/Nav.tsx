@@ -1,20 +1,41 @@
-import { A, useNavigate } from "@solidjs/router";
-import { createEffect, onCleanup, createSignal } from "solid-js";
+import { A, useLocation, useNavigate } from "@solidjs/router";
+import {
+  createEffect,
+  onCleanup,
+  createSignal,
+  createMemo,
+  onMount,
+} from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
 import { ShoppingBag, Search, User } from "lucide-solid";
 import SearchModal from "./SearchModal";
 import NavButton from "./NavButton";
 import YourLogo from "./YourLogo";
+import { isServer } from "solid-js/web";
 
 export default function Nav(props: {
   onLogoutSuccess: () => void;
   session: any;
-  transparent?: boolean;
-  removeNavContainerClass?: boolean;
-  isHomepage?: boolean;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isTransparentNavPage = createMemo(() => location.pathname === "/");
+  const isHomepage = createMemo(() => location.pathname === "/");
 
+  const [isScrolled, setIsScrolled] = createSignal(false);
+  const handleScrollForTransparent = () => {
+    setIsScrolled(window.scrollY > 100);
+  };
+
+  if (!isServer) {
+    onMount(() => {
+      window.addEventListener("scroll", handleScrollForTransparent);
+    });
+
+    onCleanup(() => {
+      window.removeEventListener("scroll", handleScrollForTransparent);
+    });
+  }
   const [showNav, setShowNav] = createSignal(true);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = createSignal(false);
 
@@ -37,6 +58,13 @@ export default function Nav(props: {
     onCleanup(() => window.removeEventListener("scroll", handleScroll));
   });
 
+  const transparent = createMemo(
+    () => isTransparentNavPage() && !isScrolled()
+  );
+  const removeNavContainerClass = createMemo(
+    () => isTransparentNavPage() && !isScrolled()
+  );
+
   return (
     <nav
       class={`px-1 md:px-4 lg:px-4 fixed  w-full z-50  transition-all duration-200   ${
@@ -45,9 +73,9 @@ export default function Nav(props: {
     >
       <div
         class={`rounded-full relative flex h-12  ${
-          props.removeNavContainerClass ? "" : "nav-container"
-        } ${props.transparent ? "bg-transparent" : "bg-black/60"} ${
-          props.isHomepage ? "text-light" : "bg-white/60"
+          removeNavContainerClass() ? "" : "nav-container"
+        } ${transparent() ? "bg-transparent" : "bg-black/60"} ${
+          isHomepage() ? "text-light" : "bg-white/60"
         }`}
       >
         {/* <div class="absolute h-[1px] w-full bg-light"></div> */}
@@ -56,12 +84,12 @@ export default function Nav(props: {
             <MenuDrawer
               onLogoutSuccess={props.onLogoutSuccess}
               session={props.session}
-              isHomepage={props.isHomepage}
+              isHomepage={isHomepage()}
             />
             <NavButton
               onClick={() => setIsMobileSearchOpen(true)}
               aria-label="Search"
-              isHomepage={props.isHomepage}
+              isHomepage={isHomepage()}
             >
               {(ref) => (
                 <div class="flex justify-center items-center gap-2" ref={ref}>
@@ -69,12 +97,12 @@ export default function Nav(props: {
                     stroke-width="1"
                     size={20}
                     class={`transition-colors duration-600  ${
-                      props.isHomepage ? "text-light" : ""
+                      isHomepage() ? "text-light" : ""
                     }`}
                   />
                   <p
                     class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
-                      props.isHomepage ? "text-light" : ""
+                      isHomepage() ? "text-light" : ""
                     }`}
                   >
                     SEARCH
@@ -103,13 +131,13 @@ export default function Nav(props: {
                   : navigate("/login")
               }
               aria-label="User"
-              isHomepage={props.isHomepage}
+              isHomepage={isHomepage()}
             >
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
                   <p
                     class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
-                      props.isHomepage ? "text-light" : ""
+                      isHomepage() ? "text-light" : ""
                     }`}
                   >
                     USER
@@ -118,7 +146,7 @@ export default function Nav(props: {
                     stroke-width="1"
                     size={20}
                     class={`transition-colors duration-600  ${
-                      props.isHomepage ? "text-light" : ""
+                      isHomepage() ? "text-light" : ""
                     }`}
                   />
                 </div>
@@ -127,13 +155,13 @@ export default function Nav(props: {
             <NavButton
               onClick={() => navigate("/products")}
               aria-label="Products"
-              isHomepage={props.isHomepage}
+              isHomepage={isHomepage()}
             >
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
                   <p
                     class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
-                      props.isHomepage ? "text-light" : ""
+                      isHomepage() ? "text-light" : ""
                     }`}
                   >
                     STORE
@@ -142,7 +170,7 @@ export default function Nav(props: {
                     stroke-width="1"
                     size={20}
                     class={`transition-colors duration-600 ${
-                      props.isHomepage ? "text-light" : ""
+                      isHomepage() ? "text-light" : ""
                     }`}
                   />
                 </div>
@@ -154,3 +182,4 @@ export default function Nav(props: {
     </nav>
   );
 }
+
