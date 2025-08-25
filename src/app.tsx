@@ -1,19 +1,12 @@
-import { Router, useLocation, useNavigate } from "@solidjs/router";
+import { Router, useLocation } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
-import {
-  Suspense,
-  createEffect,
-  createMemo,
-  createSignal,
-  onCleanup,
-  onMount,
-} from "solid-js";
+import { createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { isServer } from "solid-js/web";
 import "./app.css";
-import { authClient } from "~/lib/auth-client";
 import { SearchProvider } from "~/context/SearchContext";
 import { LenisProvider } from "~/context/LenisContext";
 import { AppContent } from "~/components/AppContent";
+import { AuthProvider } from "~/context/AuthContext";
 
 export default function App() {
   return (
@@ -21,26 +14,12 @@ export default function App() {
       <Router
         root={(props) => {
           const location = useLocation();
-          const navigate = useNavigate();
-          const session = authClient.useSession();
-          const handleLogoutSuccess = () =>
-            navigate("/login", { replace: true });
-
-          const isDashboardRoute = createMemo(() =>
-            location.pathname.startsWith("/dashboard")
+          const isTransparentNavPage = createMemo(
+            () => location.pathname === "/"
           );
-
-          createEffect(() => {
-            const currentSession = session();
-            if (!currentSession.isPending) {
-              if (!currentSession.data?.user && isDashboardRoute()) {
-                navigate("/login", { replace: true });
-              }
-            }
-          });
+          const isHomepage = createMemo(() => location.pathname === "/");
 
           const [isScrolled, setIsScrolled] = createSignal(false);
-
           const handleScroll = () => {
             setIsScrolled(window.scrollY > 100);
           };
@@ -54,23 +33,18 @@ export default function App() {
               window.removeEventListener("scroll", handleScroll);
             });
           }
-          const isTransparentNavPage = createMemo(
-            () => location.pathname === "/"
-          );
-          const isHomepage = createMemo(() => location.pathname === "/");
 
           return (
-            <SearchProvider>
-              <AppContent
-                children={props.children}
-                session={session}
-                handleLogoutSuccess={handleLogoutSuccess}
-                isDashboardRoute={isDashboardRoute}
-                isTransparentNavPage={isTransparentNavPage}
-                isScrolled={isScrolled}
-                isHomepage={isHomepage}
-              />
-            </SearchProvider>
+            <AuthProvider>
+              <SearchProvider>
+                <AppContent
+                  children={props.children}
+                  isTransparentNavPage={isTransparentNavPage}
+                  isScrolled={isScrolled}
+                  isHomepage={isHomepage}
+                />
+              </SearchProvider>
+            </AuthProvider>
           );
         }}
       >
