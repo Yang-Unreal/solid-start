@@ -93,12 +93,12 @@ export default function Nav() {
                   <Search
                     stroke-width="1"
                     size={20}
-                    class={`transition-colors duration-600  ${
+                    class={`transition-colors   ${
                       isHomepage() ? "text-light" : ""
                     }`}
                   />
                   <p
-                    class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
+                    class={`hidden md:block  text-md font-inconsolata relative transition-colors   ${
                       isHomepage() ? "text-light" : ""
                     }`}
                   >
@@ -131,7 +131,7 @@ export default function Nav() {
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
                   <p
-                    class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
+                    class={`hidden md:block  text-md font-inconsolata relative transition-colors  ${
                       isHomepage() ? "text-light" : ""
                     }`}
                   >
@@ -140,7 +140,7 @@ export default function Nav() {
                   <User
                     stroke-width="1"
                     size={20}
-                    class={`transition-colors duration-600  ${
+                    class={`transition-colors   ${
                       isHomepage() ? "text-light" : ""
                     }`}
                   />
@@ -155,7 +155,7 @@ export default function Nav() {
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
                   <p
-                    class={`hidden md:block  text-md font-inconsolata relative transition-colors duration-600  ${
+                    class={`hidden md:block  text-md font-inconsolata relative transition-colors   ${
                       isHomepage() ? "text-light" : ""
                     }`}
                   >
@@ -164,7 +164,7 @@ export default function Nav() {
                   <ShoppingBag
                     stroke-width="1"
                     size={20}
-                    class={`transition-colors duration-600 ${
+                    class={`transition-colors  ${
                       isHomepage() ? "text-light" : ""
                     }`}
                   />

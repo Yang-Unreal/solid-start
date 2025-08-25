@@ -6,15 +6,12 @@ import { useLocation, useNavigate } from "@solidjs/router";
 import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
-import type { AuthContextType } from "~/context/AuthContext"; // CHANGE: Import the correct type
-
-// CHANGE: The 'Session' type from 'better-auth' is no longer needed here.
-// import { type Session } from "better-auth";
+import type { AuthContextType } from "~/context/AuthContext";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
   onLogoutSuccess: () => void;
-  session: AuthContextType["session"]; // CHANGE: Use the session type from the AuthContext
+  session: AuthContextType["session"];
   isHomepage?: boolean;
 }
 
@@ -27,13 +24,25 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     setShouldTriggerMenuButtonLeaveAnimation,
   ] = createSignal(false);
   const [isMenuButtonOnTop, setMenuButtonOnTop] = createSignal(false);
+  // CHANGE: New signal to control the closing animation
+  const [shouldAnimateClose, setShouldAnimateClose] = createSignal(true);
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
 
-  const closeDrawer = (isFromButtonClick: boolean = false) => {
+  // CHANGE: The closeDrawer function now accepts an options object
+  const closeDrawer = (
+    options: { isFromButtonClick?: boolean; immediate?: boolean } = {}
+  ) => {
+    const { isFromButtonClick = false, immediate = false } = options;
+
     if (!isOpen()) return;
+
+    // Set whether the animation should play or not
+    setShouldAnimateClose(!immediate);
+
     setIsOpen(false);
+
     if (!isFromButtonClick) {
       setShouldTriggerMenuButtonLeaveAnimation(true);
     }
@@ -46,7 +55,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   const toggleDrawer = () => {
     if (isOpen()) {
-      closeDrawer(true);
+      // Plays animation by default
+      closeDrawer({ isFromButtonClick: true });
     } else {
       openDrawer();
     }
@@ -57,18 +67,17 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   let line1Ref: HTMLDivElement | undefined;
   let line2Ref: HTMLDivElement | undefined;
   let navLinksListRef: HTMLUListElement | undefined;
-  let svgPathRef: SVGPathElement | undefined; // Ref for the SVG path
+  let svgPathRef: SVGPathElement | undefined;
 
   const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
 
-  // SVG path definitions for the curve animation
   const pathStraight = "M 0 0 Q 0 500 0 1000";
   const pathCurve = "M 0 0 Q 160 500 0 1000";
 
+  // CHANGE: Simplified the handleLogout function. The closeDrawer call is now handled by the link's onClick.
   const handleLogout = async () => {
     await authClient.signOut();
     props.onLogoutSuccess();
-    closeDrawer();
   };
 
   const navLinks = () => {
@@ -87,7 +96,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     const links: { href: string; label: string; onClick?: () => void }[] =
       props.links ? [...props.links] : baseNavLinks;
 
-    // CHANGE: Check for the nested 'user' object to determine if the user is logged in
     if (props.session().data?.user) {
       links.push({ href: "/dashboard", label: "Dashboard" });
       links.push({ href: "#", label: "Logout", onClick: handleLogout });
@@ -168,39 +176,46 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               0
             );
         } else if (hasBeenOpened()) {
-          // Drawer closes
-          tl.to(
-            drawerRef,
-            {
-              x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
-              duration,
-              ease: "quint.in",
-            },
-            0
-          )
-            // SVG path from straight to curve
-            .fromTo(
-              svgPathRef,
-              { attr: { d: pathStraight } },
+          // CHANGE: Conditional closing logic
+          if (shouldAnimateClose()) {
+            // Animate the close
+            tl.to(
+              drawerRef,
               {
-                attr: { d: pathCurve },
+                x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
                 duration,
                 ease: "quint.in",
               },
               0
             )
-            // Nav links fade out and slide down
-            .to(
-              links,
-              {
-                x: -40,
-                opacity: 0,
-                stagger: 0.03,
-                duration: 0.15,
-                ease: "quart.in",
-              },
-              0
-            );
+              .fromTo(
+                svgPathRef,
+                { attr: { d: pathStraight } },
+                {
+                  attr: { d: pathCurve },
+                  duration,
+                  ease: "quint.in",
+                },
+                0
+              )
+              .to(
+                links,
+                {
+                  x: -40,
+                  opacity: 0,
+                  stagger: 0.03,
+                  duration: 0.15,
+                  ease: "quart.in",
+                },
+                0
+              );
+          } else {
+            // Close immediately without animation
+            gsap.set(drawerRef, {
+              x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
+            });
+            gsap.set(links, { opacity: 0, x: -40 });
+          }
         }
       }
     });
@@ -235,6 +250,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           !drawerRef.contains(event.target as Node) &&
           !menuButtonRef.contains(event.target as Node)
         ) {
+          // Plays animation by default
           closeDrawer();
         }
       };
@@ -281,21 +297,21 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <div class="flex flex-col gap-1.5 justify-center items-center ">
                 <div
                   ref={(el) => (line1Ref = el)}
-                  class={`w-5 h-[1px] transition-colors duration-600 ${
+                  class={`w-5 h-[1px] transition-colors  ${
                     props.isHomepage ? "bg-white" : "bg-black"
                   }`}
                   style={{ "will-change": "transform" }}
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
-                  class={`w-5 h-[1px] transition-colors duration-600 ${
+                  class={`w-5 h-[1px] transition-colors  ${
                     props.isHomepage ? "bg-white" : "bg-black"
                   }`}
                   style={{ "will-change": "transform" }}
                 ></div>
               </div>
               <p
-                class={`hidden md:block  text-md font-inconsolata  relative  transition-colors duration-600  ${
+                class={`hidden md:block  text-md font-inconsolata  relative  transition-colors   ${
                   props.isHomepage ? "text-white" : "text-black"
                 }`}
               >
@@ -308,7 +324,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 left-0  h-full w-full lg:w-2/3 xl:w-1/3 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
+        class="fixed top-0 left-0  h-full w-full lg:w-1/2 xl:w-1/4 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
         style="transform: translateX(calc(-100% - 5rem));"
       >
         {/* SVG Curve Element */}
@@ -341,13 +357,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               return (
                 <li class="relative w-full mb-4 px-3">
                   <MagneticLink
+                    // CHANGE: onClick logic updated for all links
                     onClick={() => {
                       if (link.onClick) {
                         link.onClick();
                       } else {
                         navigate(link.href);
-                        closeDrawer();
                       }
+                      // Close the drawer immediately
+                      closeDrawer({ immediate: true });
                     }}
                     class={`relative ${isMobile() ? "w-full" : ""}`}
                   >
@@ -400,7 +418,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <MagneticLink
                 onClick={() => {
                   navigate(link.href);
-                  closeDrawer();
+                  // Also close immediately for social links
+                  closeDrawer({ immediate: true });
                 }}
                 class="relative text-white transition-colors duration-300 group"
               >
