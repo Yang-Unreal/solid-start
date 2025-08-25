@@ -9,49 +9,12 @@ import {
   onMount,
 } from "solid-js";
 import { isServer } from "solid-js/web";
-import Nav from "~/components/Nav";
 import "./app.css";
-import { Meta, MetaProvider, Title } from "@solidjs/meta";
-import { QueryClientProvider } from "@tanstack/solid-query";
 import { authClient } from "~/lib/auth-client";
-import { queryClient } from "~/lib/query-client";
 import { SearchProvider } from "~/context/SearchContext";
 import Lenis from "lenis";
 import { LenisContext } from "~/context/LenisContext";
-
-function AppContent(props: {
-  children: any;
-  session: any;
-  handleLogoutSuccess: () => void;
-  isDashboardRoute: () => boolean;
-  isTransparentNavPage: () => boolean;
-  isScrolled: () => boolean;
-  isHomepage: () => boolean;
-}) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <MetaProvider>
-        <Title>Liming</Title>
-        <Meta
-          name="description"
-          content="Let the hidden pears shine for the world"
-        />
-        <Nav
-          onLogoutSuccess={props.handleLogoutSuccess}
-          session={props.session}
-          transparent={props.isTransparentNavPage() && !props.isScrolled()}
-          removeNavContainerClass={
-            props.isTransparentNavPage() && !props.isScrolled()
-          }
-          isHomepage={props.isHomepage()}
-        />
-        <main class="flex-grow">
-          <Suspense fallback={null}>{props.children}</Suspense>
-        </main>
-      </MetaProvider>
-    </QueryClientProvider>
-  );
-}
+import { AppContent } from "~/components/AppContent";
 
 export default function App() {
   let lenis: Lenis | undefined;
