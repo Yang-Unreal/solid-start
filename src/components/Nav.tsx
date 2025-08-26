@@ -70,8 +70,10 @@ export default function Nav() {
     >
       <div
         class={`rounded-full relative flex h-12  ${
-          transparent() ? "bg-transparent" : "bg-black"
-        } text-light`}
+          transparent()
+            ? "bg-transparent text-light"
+            : "bg-white/50 backdrop-blur-lg text-black"
+        }`}
       >
         {/* <div class="absolute h-[1px] w-full bg-light"></div> */}
         <div class="w-full items-center  flex justify-between nav-padding">
@@ -79,12 +81,12 @@ export default function Nav() {
             <MenuDrawer
               onLogoutSuccess={handleLogoutSuccess}
               session={session}
-              isHomepage={isHomepage()}
+              isTransparent={transparent()}
             />
             <NavButton
               onClick={() => setIsMobileSearchOpen(true)}
               aria-label="Search"
-              isHomepage={isHomepage()}
+              isTransparent={transparent()}
             >
               {(ref) => (
                 <div class="flex justify-center items-center gap-2" ref={ref}>
@@ -92,12 +94,12 @@ export default function Nav() {
                     stroke-width="1"
                     size={20}
                     class={`transition-colors   ${
-                      isHomepage() ? "text-light" : ""
+                      transparent() ? "text-light" : "text-black"
                     }`}
                   />
                   <p
                     class={`hidden md:block  text-md font-inconsolata relative transition-colors   ${
-                      isHomepage() ? "text-light" : ""
+                      transparent() ? "text-light" : "text-black"
                     }`}
                   >
                     SEARCH
@@ -124,13 +126,13 @@ export default function Nav() {
                 session().data ? navigate("/dashboard") : navigate("/login")
               }
               aria-label="User"
-              isHomepage={isHomepage()}
+              isTransparent={transparent()}
             >
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
                   <p
                     class={`hidden md:block  text-md font-inconsolata relative transition-colors  ${
-                      isHomepage() ? "text-light" : ""
+                      transparent() ? "text-light" : "text-black"
                     }`}
                   >
                     USER
@@ -139,7 +141,7 @@ export default function Nav() {
                     stroke-width="1"
                     size={20}
                     class={`transition-colors   ${
-                      isHomepage() ? "text-light" : ""
+                      transparent() ? "text-light" : "text-black"
                     }`}
                   />
                 </div>
@@ -148,13 +150,13 @@ export default function Nav() {
             <NavButton
               onClick={() => navigate("/products")}
               aria-label="Products"
-              isHomepage={isHomepage()}
+              isTransparent={transparent()}
             >
               {(ref) => (
                 <div ref={ref} class="flex gap-2 justify-center items-center">
                   <p
                     class={`hidden md:block  text-md font-inconsolata relative transition-colors   ${
-                      isHomepage() ? "text-light" : ""
+                      transparent() ? "text-light" : "text-black"
                     }`}
                   >
                     STORE
@@ -163,7 +165,7 @@ export default function Nav() {
                     stroke-width="1"
                     size={20}
                     class={`transition-colors  ${
-                      isHomepage() ? "text-light" : ""
+                      transparent() ? "text-light" : "text-black"
                     }`}
                   />
                 </div>

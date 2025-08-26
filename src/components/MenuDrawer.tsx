@@ -12,7 +12,7 @@ interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
   onLogoutSuccess: () => void;
   session: AuthContextType["session"];
-  isHomepage?: boolean;
+  isTransparent?: boolean;
 }
 
 export default function MenuDrawer(props: MenuDrawerProps) {
@@ -297,17 +297,23 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <div class="flex flex-col gap-1.5 justify-center items-center ">
                 <div
                   ref={(el) => (line1Ref = el)}
-                  class={`w-5 h-[1px] transition-colors bg-light`}
+                  class={`w-5 h-[1px] transition-colors ${
+                    props.isTransparent ? "bg-light" : "bg-black"
+                  }`}
                   style={{ "will-change": "transform" }}
                 ></div>
                 <div
                   ref={(el) => (line2Ref = el)}
-                  class={`w-5 h-[1px] transition-colors  bg-light`}
+                  class={`w-5 h-[1px] transition-colors ${
+                    props.isTransparent ? "bg-light" : "bg-black"
+                  }`}
                   style={{ "will-change": "transform" }}
                 ></div>
               </div>
               <p
-                class={`hidden md:block  text-md font-inconsolata  relative  transition-colors   text-light`}
+                class={`hidden md:block  text-md font-inconsolata  relative  transition-colors   ${
+                  props.isTransparent ? "text-light" : "text-black"
+                }`}
               >
                 MENU
               </p>
