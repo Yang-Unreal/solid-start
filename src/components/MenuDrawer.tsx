@@ -1,5 +1,3 @@
-// src/components/MenuDrawer.tsx
-
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { gsap } from "gsap";
 import { useLocation, useNavigate } from "@solidjs/router";
@@ -7,65 +5,25 @@ import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
 import type { AuthContextType } from "~/context/AuthContext";
+import { X } from "lucide-solid";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
   onLogoutSuccess: () => void;
   session: AuthContextType["session"];
-  isTransparent?: boolean;
+  isOpen: boolean;
+  onClose: (options?: { immediate?: boolean }) => void;
+  menuButtonRef?: HTMLElement;
 }
 
 export default function MenuDrawer(props: MenuDrawerProps) {
-  const [isOpen, setIsOpen] = createSignal(false);
   const [isMobile, setIsMobile] = createSignal(false);
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
-  const [
-    shouldTriggerMenuButtonLeaveAnimation,
-    setShouldTriggerMenuButtonLeaveAnimation,
-  ] = createSignal(false);
-  const [isMenuButtonOnTop, setMenuButtonOnTop] = createSignal(false);
-  // CHANGE: New signal to control the closing animation
-  const [shouldAnimateClose, setShouldAnimateClose] = createSignal(true);
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
 
-  // CHANGE: The closeDrawer function now accepts an options object
-  const closeDrawer = (
-    options: { isFromButtonClick?: boolean; immediate?: boolean } = {}
-  ) => {
-    const { isFromButtonClick = false, immediate = false } = options;
-
-    if (!isOpen()) return;
-
-    // Set whether the animation should play or not
-    setShouldAnimateClose(!immediate);
-
-    setIsOpen(false);
-
-    if (!isFromButtonClick) {
-      setShouldTriggerMenuButtonLeaveAnimation(true);
-    }
-  };
-
-  const openDrawer = () => {
-    setMenuButtonOnTop(true);
-    setIsOpen(true);
-  };
-
-  const toggleDrawer = () => {
-    if (isOpen()) {
-      // Plays animation by default
-      closeDrawer({ isFromButtonClick: true });
-    } else {
-      openDrawer();
-    }
-  };
-
-  let menuButtonRef: HTMLButtonElement | undefined;
   let drawerRef: HTMLDivElement | undefined;
-  let line1Ref: HTMLDivElement | undefined;
-  let line2Ref: HTMLDivElement | undefined;
   let navLinksListRef: HTMLUListElement | undefined;
   let svgPathRef: SVGPathElement | undefined;
 
@@ -74,7 +32,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const pathStraight = "M 0 0 Q 0 500 0 1000";
   const pathCurve = "M 0 0 Q 160 500 0 1000";
 
-  // CHANGE: Simplified the handleLogout function. The closeDrawer call is now handled by the link's onClick.
   const handleLogout = async () => {
     await authClient.signOut();
     props.onLogoutSuccess();
@@ -128,19 +85,17 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   if (!import.meta.env.SSR) {
     createEffect(() => {
-      if (isOpen()) {
+      if (props.isOpen) {
         setHasBeenOpened(true);
       }
 
       const duration = 0.6; // GSAP uses seconds
 
-      // Animate Drawer, SVG Path, and Nav Links together
       if (drawerRef && svgPathRef && navLinksListRef) {
         const links = Array.from(navLinksListRef.children);
         const tl = gsap.timeline();
 
-        if (isOpen()) {
-          // Drawer opens
+        if (props.isOpen) {
           tl.to(
             drawerRef,
             {
@@ -150,7 +105,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             },
             0
           )
-            // SVG path from curve to straight
             .fromTo(
               svgPathRef,
               { attr: { d: pathCurve } },
@@ -161,7 +115,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               },
               0
             )
-            // Nav links fade in and slide up
             .fromTo(
               links,
               { x: -40, opacity: 0 },
@@ -176,69 +129,37 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               0
             );
         } else if (hasBeenOpened()) {
-          // CHANGE: Conditional closing logic
-          if (shouldAnimateClose()) {
-            // Animate the close
-            tl.to(
-              drawerRef,
+          tl.to(
+            drawerRef,
+            {
+              x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
+              duration,
+              ease: "quint.in",
+            },
+            0
+          )
+            .fromTo(
+              svgPathRef,
+              { attr: { d: pathStraight } },
               {
-                x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
+                attr: { d: pathCurve },
                 duration,
                 ease: "quint.in",
               },
               0
             )
-              .fromTo(
-                svgPathRef,
-                { attr: { d: pathStraight } },
-                {
-                  attr: { d: pathCurve },
-                  duration,
-                  ease: "quint.in",
-                },
-                0
-              )
-              .to(
-                links,
-                {
-                  x: -40,
-                  opacity: 0,
-                  stagger: 0.03,
-                  duration: 0.15,
-                  ease: "quart.in",
-                },
-                0
-              );
-          } else {
-            // Close immediately without animation
-            gsap.set(drawerRef, {
-              x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
-            });
-            gsap.set(links, { opacity: 0, x: -40 });
-          }
+            .to(
+              links,
+              {
+                x: -40,
+                opacity: 0,
+                stagger: 0.03,
+                duration: 0.15,
+                ease: "quart.in",
+              },
+              0
+            );
         }
-      }
-    });
-
-    createEffect(() => {
-      if (line1Ref && line2Ref) {
-        const isDrawerOpen = isOpen();
-        const yTranslate = isDrawerOpen ? 3.5 : 0;
-        const rotate = isDrawerOpen ? 45 : 0;
-        const duration = 0.3;
-
-        gsap.to(line1Ref, {
-          y: yTranslate,
-          rotate: rotate,
-          duration: duration,
-          ease: "quad.out",
-        });
-        gsap.to(line2Ref, {
-          y: -yTranslate,
-          rotate: -rotate,
-          duration: duration,
-          ease: "quad.out",
-        });
       }
     });
 
@@ -246,16 +167,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       const handleClickOutside = (event: MouseEvent) => {
         if (
           drawerRef &&
-          menuButtonRef &&
           !drawerRef.contains(event.target as Node) &&
-          !menuButtonRef.contains(event.target as Node)
+          props.menuButtonRef &&
+          !props.menuButtonRef.contains(event.target as Node)
         ) {
-          // Plays animation by default
-          closeDrawer();
+          props.onClose();
         }
       };
 
-      if (isOpen()) {
+      if (props.isOpen) {
         lenis?.stop();
         document.addEventListener("mousedown", handleClickOutside);
       } else {
@@ -275,165 +195,118 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   }
 
   return (
-    <>
-      <div class={`group relative ${isMenuButtonOnTop() ? "z-101" : ""}`}>
-        <MagneticLink
-          ref={(el) => (menuButtonRef = el)}
-          onClick={toggleDrawer}
-          class={` w-full h-8 px-1.5 md:px-3 rounded-full flex flex-col justify-center items-center `}
-          aria-label="Toggle menu"
-          enableHoverCircle={false}
-          hoverCircleColor="hsl(75, 99%, 52%)"
-          applyOverflowHidden={true}
-          triggerLeaveAnimation={shouldTriggerMenuButtonLeaveAnimation}
-          setTriggerLeaveAnimation={setShouldTriggerMenuButtonLeaveAnimation}
-          isLocked={isOpen}
-        >
-          {(innerRef) => (
-            <div
-              ref={innerRef}
-              class="flex flex-row gap-2 justify-center items-center "
-            >
-              <div class="flex flex-col gap-1.5 justify-center items-center ">
-                <div
-                  ref={(el) => (line1Ref = el)}
-                  class={`w-5 h-[1px] transition-colors ${
-                    props.isTransparent ? "bg-light" : "bg-black"
-                  }`}
-                  style={{ "will-change": "transform" }}
-                ></div>
-                <div
-                  ref={(el) => (line2Ref = el)}
-                  class={`w-5 h-[1px] transition-colors ${
-                    props.isTransparent ? "bg-light" : "bg-black"
-                  }`}
-                  style={{ "will-change": "transform" }}
-                ></div>
-              </div>
-              <p
-                class={`hidden md:block  text-md font-inconsolata  relative  transition-colors   ${
-                  props.isTransparent ? "text-light" : "text-black"
-                }`}
-              >
-                MENU
-              </p>
-            </div>
-          )}
-        </MagneticLink>
-      </div>
-
-      <div
-        ref={(el) => (drawerRef = el)}
-        class="fixed top-0 left-0  h-full w-full lg:w-1/2 xl:w-1/4 bg-[#121212] text-white z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
-        style="transform: translateX(calc(-100% - 5rem));"
+    <div
+      ref={(el) => (drawerRef = el)}
+      class="fixed top-0 left-0  h-full w-full lg:w-1/2 xl:w-1/4 bg-white text-black z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
+      style="transform: translateX(calc(-100% - 5rem));"
+    >
+      <button
+        onClick={() => props.onClose()}
+        class="absolute top-4 right-4 text-black"
+        aria-label="Close menu"
       >
-        {/* SVG Curve Element */}
-        <div class="absolute top-0 right-0 h-full w-20 pointer-events-none translate-x-[calc(100%-1px)]">
-          <svg
-            class="h-full w-full"
-            viewBox="0 0 80 1000"
-            preserveAspectRatio="none"
-          >
-            <path
-              ref={(el) => (svgPathRef = el)}
-              d={pathCurve}
-              fill="#121212"
-            />
-          </svg>
-        </div>
+        <X size={32} />
+      </button>
+      <div class="absolute top-0 right-0 h-full w-20 pointer-events-none translate-x-[calc(100%-1px)]">
+        <svg
+          class="h-full w-full"
+          viewBox="0 0 80 1000"
+          preserveAspectRatio="none"
+        >
+          <path
+            ref={(el) => (svgPathRef = el)}
+            d={pathCurve}
+            fill="white"
+          />
+        </svg>
+      </div>
 
-        {/* Top Section: Navigation */}
-        <div>
-          <h2 class="text-sm text-gray-400 tracking-widest mb-4 px-3">
-            NAVIGATION
-          </h2>
-          <hr class="border-gray-700" />
-          <ul
-            ref={navLinksListRef}
-            class="mt-4 space-y-4 flex flex-col items-start"
-          >
-            {navLinks().map((link) => {
-              const isActive = location.pathname === link.href;
-              return (
-                <li class="relative w-full mb-4 px-3">
-                  <MagneticLink
-                    // CHANGE: onClick logic updated for all links
-                    onClick={() => {
-                      if (link.onClick) {
-                        link.onClick();
-                      } else {
-                        navigate(link.href);
-                      }
-                      // Close the drawer immediately
-                      closeDrawer({ immediate: true });
-                    }}
-                    class={`relative ${isMobile() ? "w-full" : ""}`}
-                  >
-                    {(innerRef) => (
-                      <div class="items-center">
-                        <div
-                          ref={innerRef}
-                          class={`text-left text-4xl  font-light transition-colors duration-300 ${
-                            isActive
-                              ? "text-white"
-                              : "text-white/70 hover:text-white"
-                          }`}
-                          onMouseEnter={() => setHoveredLink(link.href)}
-                          onMouseLeave={() => setHoveredLink(null)}
-                        >
-                          {link.label}
-                        </div>
-                        <span
-                          class={`absolute -left-6 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white hidden md:block ${
-                            (isActive && hoveredLink() === null) ||
-                            hoveredLink() === link.href
-                              ? "scale-100"
-                              : "scale-0"
-                          }`}
-                        ></span>
-                        <span
-                          class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-white block md:hidden ${
-                            (isActive && hoveredLink() === null) ||
-                            hoveredLink() === link.href
-                              ? "scale-100"
-                              : "scale-0"
-                          }`}
-                        ></span>
+      <div>
+        <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">
+          NAVIGATION
+        </h2>
+        <hr class="border-gray-200" />
+        <ul
+          ref={navLinksListRef}
+          class="mt-4 space-y-4 flex flex-col items-start"
+        >
+          {navLinks().map((link) => {
+            const isActive = location.pathname === link.href;
+            return (
+              <li class="relative w-full mb-4 px-3">
+                <MagneticLink
+                  onClick={() => {
+                    if (link.onClick) {
+                      link.onClick();
+                    } else {
+                      navigate(link.href);
+                    }
+                    props.onClose({ immediate: true });
+                  }}
+                  class={`relative ${isMobile() ? "w-full" : ""}`}
+                >
+                  {(innerRef) => (
+                    <div class="items-center">
+                      <div
+                        ref={innerRef}
+                        class={`text-left text-4xl  font-light transition-colors duration-300 ${
+                          isActive
+                            ? "text-black"
+                            : "text-black/70 hover:text-black"
+                        }`}
+                        onMouseEnter={() => setHoveredLink(link.href)}
+                        onMouseLeave={() => setHoveredLink(null)}
+                      >
+                        {link.label}
                       </div>
-                    )}
-                  </MagneticLink>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
+                      <span
+                        class={`absolute -left-6 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-black hidden md:block ${
+                          (isActive && hoveredLink() === null) ||
+                          hoveredLink() === link.href
+                            ? "scale-100"
+                            : "scale-0"
+                        }`}
+                      ></span>
+                      <span
+                        class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-black block md:hidden ${
+                          (isActive && hoveredLink() === null) ||
+                          hoveredLink() === link.href
+                            ? "scale-100"
+                            : "scale-0"
+                        }`}
+                      ></span>
+                    </div>
+                  )}
+                </MagneticLink>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
 
-        {/* Bottom Section: Socials */}
-        <div class="mt-8">
-          <h2 class="text-sm text-gray-400 tracking-widest mb-4 px-3">
-            SOCIALS
-          </h2>
-          <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
-            {socialLinks.map((link) => (
-              <MagneticLink
-                onClick={() => {
-                  navigate(link.href);
-                  // Also close immediately for social links
-                  closeDrawer({ immediate: true });
-                }}
-                class="relative text-white transition-colors duration-300 group"
-              >
-                {(innerRef) => (
-                  <>
-                    <div ref={innerRef}>{link.label}</div>
-                    <span class="absolute bottom-0 left-1/2 w-full h-[1.5px] bg-white transform -translate-x-1/2 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></span>
-                  </>
-                )}
-              </MagneticLink>
-            ))}
-          </div>
+      <div class="mt-8">
+        <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">
+          SOCIALS
+        </h2>
+        <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
+          {socialLinks.map((link) => (
+            <MagneticLink
+              onClick={() => {
+                navigate(link.href);
+                props.onClose({ immediate: true });
+              }}
+              class="relative text-black transition-colors duration-300 group"
+            >
+              {(innerRef) => (
+                <>
+                  <div ref={innerRef}>{link.label}</div>
+                  <span class="absolute bottom-0 left-1/2 w-full h-[1.5px] bg-black transform -translate-x-1/2 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></span>
+                </>
+              )}
+            </MagneticLink>
+          ))}
         </div>
       </div>
-    </>
+    </div>
   );
 }

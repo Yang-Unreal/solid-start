@@ -1,7 +1,7 @@
-import { createSignal, type Component, type JSX } from "solid-js";
+import { createSignal, type Component, type JSX, splitProps } from "solid-js";
 import MagneticLink from "~/components/MagneticLink";
 
-interface NavButtonProps {
+interface NavButtonProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'children'> {
   onClick: () => void;
   "aria-label": string;
   isTransparent?: boolean;
@@ -9,19 +9,20 @@ interface NavButtonProps {
 }
 
 const NavButton: Component<NavButtonProps> = (props) => {
+  const [local, others] = splitProps(props, ["onClick", "aria-label", "isTransparent", "children", "class"]);
   const [shouldTriggerLeaveAnimation, setShouldTriggerLeaveAnimation] =
     createSignal(false);
 
   return (
     <div
+      {...others}
       onMouseEnter={() => setShouldTriggerLeaveAnimation(false)}
       onMouseLeave={() => setShouldTriggerLeaveAnimation(true)}
-      class={`group ${props.isTransparent ? "text-light" : "text-black"}`}
-    >
+      class={`group ${local.isTransparent ? "text-light" : "text-black"} ${local.class || ''}`}>
       <MagneticLink
-        onClick={props.onClick}
+        onClick={local.onClick}
         class="w-auto h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full"
-        aria-label={props["aria-label"]}
+        aria-label={local["aria-label"]}
         enableHoverCircle={false}
         hoverCircleColor="hsl(75, 99%, 52%)"
         applyOverflowHidden={true}
