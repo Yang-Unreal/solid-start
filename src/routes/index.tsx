@@ -19,12 +19,16 @@ export default function Home() {
         name="description"
         content="Bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
-      <div class="relative min-h-screen overflow-hidden bg-black">
+      <div
+        class="relative min-h-screen overflow-hidden bg-black "
+        style={{
+          "background-image":
+            "linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), url('/heroBackground.webp')",
+        }}
+      >
         <div
           class="w-full min-h-screen flex items-center justify-center transition-opacity duration-200 bg-cover  bg-center"
           style={{
-            "background-image":
-              "linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2)), url('/heroBackground.webp')",
             opacity: heroOpacity(),
           }}
         >
