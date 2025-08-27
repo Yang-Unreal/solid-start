@@ -32,18 +32,18 @@ export default function Home() {
           //   opacity: heroOpacity(),
           // }}
         >
-          <h1 class="absolute text-light-gray text-5xl md:text-[120px] font-permanent-marker top-2/6 text-center leading-18 md:leading-35">
+          <h1 class="absolute w-full text-light-gray text-5xl md:text-[120px] font-permanent-marker top-2/6 text-center leading-18 md:leading-35">
             CHINA SOURCING <br />
             SIMPLIFIED
           </h1>
           <div class="absolute flex flex-col md:flex-row h-auto w-full justify-center items-center bottom-8 md:bottom-12 container-padding gap-2 md:gap-10 ">
             <div class="w-full md:w-1/3 flex flex-col items-center justify-center text-center text-white">
-              <h1 class="text-md md:text-xl font-permanent-marker">
+              <h1 class="w-41 text-md md:text-xl font-permanent-marker">
                 BESPOKE SOURCING
               </h1>
               <HoverableButton
                 as="button"
-                class="border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="border w-39 rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(75, 99%, 52%)"
@@ -52,12 +52,12 @@ export default function Home() {
               </HoverableButton>
             </div>
             <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
-              <h1 class="text-md md:text-xl font-permanent-marker">
+              <h1 class="w-41 text-md md:text-xl font-permanent-marker">
                 APEX COLLECTION
               </h1>
               <HoverableButton
                 as="button"
-                class=" border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="w-39 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(75, 99%, 52%)"
@@ -66,12 +66,12 @@ export default function Home() {
               </HoverableButton>
             </div>
             <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
-              <h1 class="text-md md:text-xl font-permanent-marker">
+              <h1 class="w-41 text-md md:text-xl font-permanent-marker">
                 RISK ELIMINATION
               </h1>
               <HoverableButton
                 as="button"
-                class="border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="w-39 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(75, 99%, 52%)"
