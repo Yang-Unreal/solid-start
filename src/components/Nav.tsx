@@ -85,7 +85,10 @@ export default function Nav() {
                 isTransparent={transparent()}
               >
                 {(ref) => (
-                  <div class="flex justify-center items-center gap-2" ref={ref}>
+                  <div
+                    class="flex justify-center items-center gap-2 lg:w-19"
+                    ref={ref}
+                  >
                     <MenuIcon
                       isOpen={isMenuOpen()}
                       isTransparent={transparent()}
@@ -106,7 +109,10 @@ export default function Nav() {
                 isTransparent={transparent()}
               >
                 {(ref) => (
-                  <div class="flex justify-center items-center gap-2" ref={ref}>
+                  <div
+                    class="flex justify-center items-center gap-2 lg:w-19"
+                    ref={ref}
+                  >
                     <Search
                       stroke-width="1"
                       size={20}
@@ -133,6 +139,7 @@ export default function Nav() {
               href="/"
               class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
               aria-label="Homepage"
+              title="Homepage"
             >
               <YourLogo class="h-4 md:h-5 w-auto" />
             </A>
@@ -148,7 +155,7 @@ export default function Nav() {
                 {(ref) => (
                   <div
                     ref={ref}
-                    class="flex gap-2 justify-center items-center"
+                    class="flex gap-2 justify-center items-center lg:w-19"
                   >
                     <p
                       class={`hidden md:block  text-md font-inconsolata relative transition-colors  ${
@@ -175,7 +182,7 @@ export default function Nav() {
                 {(ref) => (
                   <div
                     ref={ref}
-                    class="flex gap-2 justify-center items-center"
+                    class="flex gap-2 justify-center items-center lg:w-19"
                   >
                     <p
                       class={`hidden md:block  text-md font-inconsolata relative transition-colors   ${
