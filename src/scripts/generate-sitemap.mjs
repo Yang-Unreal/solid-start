@@ -1,8 +1,6 @@
 import { writeFileSync } from 'fs';
 import { glob } from 'glob';
 import { SitemapStream, streamToPromise } from 'sitemap';
-import { fileURLToPath } from 'url';
-import { dirname, join, relative } from 'path';
 
 // The base URL of your site
 const hostname = 'https://limingcn.com';
@@ -19,7 +17,7 @@ async function generateSitemap() {
       cwd: routesDir,
       ignore: [
         'api/**/*.tsx', // Exclude API routes
-        '[...404].tsx', // Exclude 404 page
+        '\[...404\].tsx', // Exclude 404 page (escaped for glob)
       ],
     });
 
@@ -36,16 +34,21 @@ async function generateSitemap() {
     // Add each route to the sitemap
     files.forEach((file) => {
       let url = file
-        .replace(/\/index\.tsx$/, '') // Remove /index.tsx
+        .replace(/index\.tsx$/, '') // Remove index.tsx
         .replace(/\.tsx$/, '') // Remove .tsx extension
-        .replace(/\[\w+\]/, ''); // Remove dynamic segments like [id] or [...slug]
+        .replace(/\[\w+\]\.tsx$/, ''); // Remove dynamic segments like [id].tsx or [...slug].tsx
 
       // Handle root route
       if (url === '') {
         url = '/';
       }
 
-      sitemapStream.write({ url: `/${url}` });
+      // Ensure leading slash
+      if (!url.startsWith('/')) {
+        url = '/' + url;
+      }
+
+      sitemapStream.write({ url: `${url}` });
     });
 
     sitemapStream.end();
