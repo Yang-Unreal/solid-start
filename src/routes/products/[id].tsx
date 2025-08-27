@@ -123,7 +123,7 @@ export default function ProductDetailPage() {
                             imageBaseUrl={p().imageBaseUrl}
                             index={index()}
                             size="thumbnail"
-                            alt={`Product thumbnail ${index() + 1}`}
+                            alt={`${p().name} thumbnail ${index() + 1}`}
                             class="w-20 aspect-video object-cover cursor-pointer rounded-md   transition-all duration-200 hover:opacity-100"
                             classList={{
                               "opacity-50": currentImageIndex() !== index(),

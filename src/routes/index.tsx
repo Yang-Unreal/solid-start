@@ -33,8 +33,7 @@ export default function Home() {
           }}
         >
           <h1 class="absolute text-light-gray text-5xl md:text-[120px] font-permanent-marker top-2/6 text-center leading-18 md:leading-35">
-            CHINA SOURCING <br />
-            SIMPLIFIED
+            Liming
           </h1>
           <div class="absolute flex flex-col md:flex-row h-auto w-full justify-center items-center bottom-8 md:bottom-12 container-padding gap-2 md:gap-10 ">
             <div class="w-full md:w-1/3 flex flex-col items-center justify-center text-center text-white">
@@ -82,7 +81,14 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div class="min-h-screen bg-cover bg-center "></div>
+      <div class="min-h-screen bg-light-gray flex items-center justify-center text-black">
+        <div class="text-center max-w-4xl mx-auto px-4">
+            <h2 class="text-4xl font-permanent-marker mb-4">What is Liming?</h2>
+            <p class="text-lg font-inconsolata">
+                At Liming, we believe sourcing from China should be simple and secure. We are a bespoke sourcing and product procurement service dedicated to simplifying the entire process for our clients. From finding the right manufacturer to ensuring quality control and handling logistics, Liming is your trusted partner on the ground. We eliminate risks and streamline operations, making global trade accessible and efficient.
+            </p>
+        </div>
+      </div>
       <div
         class="min-h-screen bg-cover bg-center"
         style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/heroBackground.webp');"
