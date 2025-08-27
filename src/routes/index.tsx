@@ -38,7 +38,7 @@ export default function Home() {
           </h1>
           <div class="absolute flex flex-col md:flex-row h-auto w-full justify-center items-center bottom-8 md:bottom-12 container-padding gap-2 md:gap-10 ">
             <div class="w-full md:w-1/3 flex flex-col items-center justify-center text-center text-white">
-              <h1 class="w-41 text-md md:text-xl font-permanent-marker">
+              <h1 class="w-52 text-md md:text-xl font-permanent-marker">
                 BESPOKE SOURCING
               </h1>
               <HoverableButton
@@ -52,7 +52,7 @@ export default function Home() {
               </HoverableButton>
             </div>
             <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
-              <h1 class="w-41 text-md md:text-xl font-permanent-marker">
+              <h1 class="w-52 text-md md:text-xl font-permanent-marker">
                 APEX COLLECTION
               </h1>
               <HoverableButton
@@ -66,7 +66,7 @@ export default function Home() {
               </HoverableButton>
             </div>
             <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
-              <h1 class="w-41 text-md md:text-xl font-permanent-marker">
+              <h1 class="w-52 text-md md:text-xl font-permanent-marker">
                 RISK ELIMINATION
               </h1>
               <HoverableButton
