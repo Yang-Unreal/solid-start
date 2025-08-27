@@ -27,10 +27,10 @@ export default function Home() {
         }}
       >
         <div
-          class="w-full min-h-screen flex items-center justify-center transition-opacity duration-200 "
-          style={{
-            opacity: heroOpacity(),
-          }}
+          class="w-full min-h-screen flex items-center justify-center transition-opacity  "
+          // style={{
+          //   opacity: heroOpacity(),
+          // }}
         >
           <h1 class="absolute text-light-gray text-5xl md:text-[120px] font-permanent-marker top-2/6 text-center leading-18 md:leading-35">
             CHINA SOURCING <br />
