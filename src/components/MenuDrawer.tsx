@@ -19,6 +19,7 @@ interface MenuDrawerProps {
 export default function MenuDrawer(props: MenuDrawerProps) {
   const [isMobile, setIsMobile] = createSignal(false);
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
+  const [skipAnimation, setSkipAnimation] = createSignal(false);
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
@@ -87,6 +88,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     createEffect(() => {
       if (props.isOpen) {
         setHasBeenOpened(true);
+        setSkipAnimation(false);
       }
 
       const duration = 0.6; // GSAP uses seconds
@@ -129,36 +131,42 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               0
             );
         } else if (hasBeenOpened()) {
-          tl.to(
-            drawerRef,
-            {
+          if (skipAnimation()) {
+            gsap.set(drawerRef, {
               x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
-              duration,
-              ease: "quint.in",
-            },
-            0
-          )
-            .fromTo(
-              svgPathRef,
-              { attr: { d: pathStraight } },
+            });
+          } else {
+            tl.to(
+              drawerRef,
               {
-                attr: { d: pathCurve },
+                x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
                 duration,
                 ease: "quint.in",
               },
               0
             )
-            .to(
-              links,
-              {
-                x: -40,
-                opacity: 0,
-                stagger: 0.03,
-                duration: 0.15,
-                ease: "quart.in",
-              },
-              0
-            );
+              .fromTo(
+                svgPathRef,
+                { attr: { d: pathStraight } },
+                {
+                  attr: { d: pathCurve },
+                  duration,
+                  ease: "quint.in",
+                },
+                0
+              )
+              .to(
+                links,
+                {
+                  x: -40,
+                  opacity: 0,
+                  stagger: 0.03,
+                  duration: 0.15,
+                  ease: "quart.in",
+                },
+                0
+              );
+          }
         }
       }
     });
@@ -236,12 +244,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <li class="relative w-full mb-4 px-3">
                 <MagneticLink
                   onClick={() => {
+                    setSkipAnimation(true);
                     if (link.onClick) {
                       link.onClick();
                     } else {
                       navigate(link.href);
                     }
-                    props.onClose({ immediate: true });
+                    props.onClose();
                   }}
                   class={`relative ${isMobile() ? "w-full" : ""}`}
                 >
@@ -292,8 +301,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           {socialLinks.map((link) => (
             <MagneticLink
               onClick={() => {
+                setSkipAnimation(true);
                 navigate(link.href);
-                props.onClose({ immediate: true });
+                props.onClose();
               }}
               class="relative text-black transition-colors duration-300 group"
             >
