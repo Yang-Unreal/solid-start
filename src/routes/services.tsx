@@ -1,6 +1,3 @@
-import { Title } from "@solidjs/meta";
-import { HttpStatusCode } from "@solidjs/start";
-
 export default function Services() {
   return (
     <main class="pt-16 bg-white min-h-screen">

@@ -1,6 +1,3 @@
-import { Title } from "@solidjs/meta";
-import { HttpStatusCode } from "@solidjs/start";
-
 export default function Contact() {
   return (
     <main class="pt-16 bg-white min-h-screen">
