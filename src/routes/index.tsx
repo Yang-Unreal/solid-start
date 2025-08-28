@@ -14,7 +14,7 @@ export default function Home() {
 
   return (
     <main>
-      <Title>Liming - China Sourcing Simplified</Title>
+      <Title>Official LIMING Website | LIMING</Title>
       <Meta
         name="description"
         content="Bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
