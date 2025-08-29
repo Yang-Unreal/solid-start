@@ -32,50 +32,53 @@ export default function Home() {
           //   opacity: heroOpacity(),
           // }}
         >
-          <h1 class="absolute w-full text-light-gray text-5xl md:text-[140px] font-formula-bold top-2/5 text-center leading-18 md:leading-35">
-            TRUSTED PARTNER
+          <h1 class="absolute w-full text-light-gray text-5xl md:text-[155px] font-formula-bold top-3/7 text-center leading-18 md:leading-37">
+            YOUR TRUSTED
             <br />
-            YOUR BRIDGE TO CHINA
+            BRIDGE TO CHINA
           </h1>
-          <div class="absolute flex flex-col md:flex-row h-auto w-full justify-between items-center bottom-8 md:bottom-15 container-padding gap-2 md:gap-10 ">
-            <div class="w-full md:w-1/5 flex flex-col items-center  text-center text-white">
-              <h1 class="w-52 text-md md:text-3xl font-formula-bold">
-                BESPOKE SOURCING
-              </h1>
+          <div class="absolute flex flex-col md:flex-row h-auto w-full justify-between items-center bottom-50 md:bottom-15 container-padding gap-2 md:gap-10 ">
+            <div class="w-full md:w-1/5 flex flex-col items-center  text-center text-white  gap-2">
               <HoverableButton
                 as="button"
-                class="w-32 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-formula-bold mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="w-35 border rounded-full px-2 py-1.5 text-xs font-inconsolata  transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
-                hoverCircleColor="hsl(75, 99%, 52%)"
+                hoverCircleColor="hsl(255, 100%, 100%)"
               >
                 START YOUR SOURCING
               </HoverableButton>
+              <h1 class="w-55 text-md md:text-4xl font-formula-bold">
+                BESPOKE SOURCING
+              </h1>
             </div>
-            {/* <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
+            {/* <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center gap-2">
               <HoverableButton
                 as="button"
-                class="w-39 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="w-35 border rounded-full px-2 py-1.5 text-xs font-inconsolata  transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(75, 99%, 52%)"
               >
-                BROW OUR STORE
+                BROWSE OUR STORE
               </HoverableButton>
-            </div> */}
-            <div class="w-full md:w-1/5 flex flex-col items-center text-white text-center ">
-              <h1 class="w-52 text-md md:text-3xl font-formula-bold">
-                RISK ELIMINATION
+              <h1 class="w-55 text-md md:text-4xl font-formula-bold">
+                APEX COLLECTION
               </h1>
+            </div> */}
+            <div class="w-full md:w-1/5 flex flex-col items-center text-white text-center gap-2">
               <HoverableButton
                 as="button"
-                class="w-32 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-formula-bold mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="w-35 border rounded-full px-2 py-1.5 text-xs font-inconsolata  transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
-                hoverCircleColor="hsl(75, 99%, 52%)"
+                hoverCircleColor="hsl(255, 100%, 100%)"
               >
                 HOW WE PROTECT YOU
               </HoverableButton>
+              <h1 class="w-55 text-md md:text-4xl font-formula-bold">
+                RISK ELIMINATION
+              </h1>
             </div>
           </div>
         </div>
