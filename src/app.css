@@ -4,14 +4,14 @@
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
 
-@font-face {
+/* @font-face {
   font-family: "Permanent Marker";
   src: url("https://minio.limingcn.com/solid-start/fonts/PermanentMarker-Regular.woff2")
     format("woff2");
   font-weight: normal;
   font-style: normal;
   font-display: block;
-}
+} */
 @font-face {
   font-family: "Inconsolata";
   src: url("https://minio.limingcn.com/solid-start/fonts/Inconsolata-Regular.woff2")
@@ -30,14 +30,14 @@
   font-display: block;
 }
 
-@font-face {
+/* @font-face {
   font-family: "FormulaCondensed-Light";
   src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Light.woff2")
     format("woff2");
   font-weight: 300;
   font-style: normal;
   font-display: block;
-}
+} */
 
 @theme {
   --color-primary-accent: hsl(75, 99%, 52%);
@@ -192,13 +192,13 @@ html::-webkit-scrollbar {
     font-family: "FormulaCondensed-Bold", sans-serif;
   }
 
-  .font-formula-light {
+  /* .font-formula-light {
     font-family: "FormulaCondensed-Light", sans-serif;
   }
 
   .font-permanent-marker {
     font-family: "Permanent Marker", cursive;
-  }
+  } */
 
   .font-inconsolata {
     font-family: "Inconsolata", monospace;
