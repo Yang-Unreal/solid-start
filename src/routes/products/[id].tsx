@@ -170,8 +170,8 @@ export default function ProductDetailPage() {
                     as="button"
                     enableHoverCircle
                     applyOverflowHidden
-                    hoverCircleColor="hsl(75, 99%, 52%)"
-                    class="w-full border rounded-full px-5 py-3 text-lg font-semibold transition-colors duration-300 hover:border-transparent hover:text-black"
+                    hoverCircleColor="	hsl(0, 0%, 0%)"
+                    class="w-1/2 border rounded-full px-5 py-3 text-lg font-semibold transition-colors duration-300 hover:border-transparent hover:text-white"
                   >
                     Add to Cart
                   </HoverableButton>

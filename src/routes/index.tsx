@@ -46,10 +46,10 @@ export default function Home() {
                 applyOverflowHidden
                 hoverCircleColor="hsl(255, 100%, 100%)"
               >
-                START YOUR SOURCING
+                Start Your Sourcing
               </HoverableButton>
               <h1 class="w-55 text-3xl md:text-4xl font-formula-bold">
-                BESPOKE SOURCING
+                Bespoke Sourcing
               </h1>
             </div>
             {/* <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center gap-2">
@@ -74,10 +74,10 @@ export default function Home() {
                 applyOverflowHidden
                 hoverCircleColor="hsl(255, 100%, 100%)"
               >
-                HOW WE PROTECT YOU
+                How We Protect You
               </HoverableButton>
               <h1 class="w-55 text-3xl md:text-4xl font-formula-bold">
-                RISK ELIMINATION
+                Risk Elimination
               </h1>
             </div>
           </div>
