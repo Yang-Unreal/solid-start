@@ -7,13 +7,12 @@ import {
   onMount,
 } from "solid-js";
 import MenuDrawer from "~/components/MenuDrawer";
-import { ShoppingBag, Search, User } from "lucide-solid";
+import { ShoppingBag, Search, User, Menu } from "lucide-solid";
 import SearchModal from "./SearchModal";
 import NavButton from "./NavButton";
 import YourLogo from "./YourLogo";
 import { isServer } from "solid-js/web";
 import { useAuth } from "~/context/AuthContext";
-import MenuIcon from "./MenuIcon";
 
 export default function Nav() {
   const navigate = useNavigate();
@@ -87,9 +86,12 @@ export default function Nav() {
                     class="flex justify-center items-center gap-2 lg:w-19"
                     ref={ref}
                   >
-                    <MenuIcon
-                      isOpen={isMenuOpen()}
-                      isTransparent={transparent()}
+                    <Menu
+                      stroke-width="1"
+                      size={20}
+                      class={`transition-colors ${
+                        transparent() ? "text-light" : "text-black"
+                      }`}
                     />
                     <p
                       class={`hidden md:block  text-md font-inconsolata relative transition-colors   ${
@@ -209,6 +211,13 @@ export default function Nav() {
         onLogoutSuccess={handleLogoutSuccess}
         session={session}
         menuButtonRef={menuButtonRef}
+      />
+      <div
+        class={`fixed inset-0 bg-black/50 z-90 transition-opacity duration-300 ${
+          isMenuOpen() ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setIsMenuOpen(false)}
+        aria-hidden={!isMenuOpen()}
       />
     </>
   );
