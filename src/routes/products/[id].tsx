@@ -1,14 +1,8 @@
-import {
-  For,
-  Show,
-  createResource,
-  createSignal,
-  createEffect,
-} from "solid-js";
+import { For, Show, createResource, createSignal } from "solid-js";
 import HoverableButton from "~/components/HoverableButton";
 import { useParams } from "@solidjs/router";
 import { type Product } from "~/db/schema";
-import ProductImage from "~/components/ProductImage";
+import ProductImage from "~/components/product/ProductImage";
 
 export default function ProductDetailPage() {
   const params = useParams();

@@ -1,16 +1,13 @@
 import { Suspense } from "solid-js";
-import Nav from "./Nav";
+import Nav from "./nav/Nav";
 
-export function AppContent(props: {
-  children: any;
-}) {
+export function AppContent(props: { children: any }) {
   return (
     <>
-        <Nav />
-        <main class="flex-grow">
-          <Suspense fallback={null}>{props.children}</Suspense>
-        </main>
+      <Nav />
+      <main class="flex-grow">
+        <Suspense fallback={null}>{props.children}</Suspense>
+      </main>
     </>
   );
 }
-

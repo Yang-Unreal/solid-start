@@ -2,7 +2,7 @@ import { For, Show, createMemo } from "solid-js";
 import { A } from "@solidjs/router";
 import type { Product } from "~/db/schema";
 import type { QueryObserverResult } from "@tanstack/solid-query";
-import ProductImage from "~/components/ProductImage";
+import ProductImage from "~/components/product/ProductImage";
 
 // --- Interface Definitions (reverted to include full pagination info) ---
 interface PaginationInfo {

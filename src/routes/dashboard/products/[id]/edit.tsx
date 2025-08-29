@@ -1,6 +1,6 @@
 // src/routes/dashboard/products/[id]/edit.tsx
 import { createSignal, Show, createEffect, For } from "solid-js";
-import ProductImage from "~/components/ProductImage";
+import ProductImage from "~/components/product/ProductImage";
 import { useNavigate, useParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {

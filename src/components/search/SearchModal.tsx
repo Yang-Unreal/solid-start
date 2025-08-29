@@ -2,10 +2,10 @@ import { A } from "@solidjs/router";
 import { createSignal, createMemo, type Component } from "solid-js";
 import { SlidersHorizontal, X } from "lucide-solid";
 import SearchInput from "./SearchInput";
-import Hoverable from "./Hoverable";
-import { useSearch } from "../context/SearchContext";
-import FilterSidebar from "./FilterSidebar";
-import YourLogo from "~/components/YourLogo";
+import Hoverable from "../Hoverable";
+import { useSearch } from "../../context/SearchContext";
+import FilterSidebar from "../filter/FilterSidebar";
+import YourLogo from "~/components/logo/YourLogo";
 
 interface SearchModalProps {
   onClose: () => void;

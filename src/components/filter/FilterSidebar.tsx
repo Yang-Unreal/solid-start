@@ -2,7 +2,7 @@
 import { createMemo } from "solid-js";
 import { useQuery } from "@tanstack/solid-query";
 
-import FilterDropdown from "~/components/FilterDropdowns";
+import FilterDropdown from "~/components/filter/FilterDropdowns";
 import { useSearch } from "~/context/SearchContext";
 
 interface FilterSidebarProps {

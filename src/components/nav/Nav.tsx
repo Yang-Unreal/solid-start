@@ -6,11 +6,11 @@ import {
   createMemo,
   onMount,
 } from "solid-js";
-import MenuDrawer from "~/components/MenuDrawer";
+import MenuDrawer from "~/components/nav/MenuDrawer";
 import { ShoppingBag, Search, User, Menu } from "lucide-solid";
-import SearchModal from "./SearchModal";
-import NavButton from "./NavButton";
-import YourLogo from "./YourLogo";
+import SearchModal from "../search/SearchModal";
+import NavButton from "../NavButton";
+import YourLogo from "../logo/YourLogo";
 import { isServer } from "solid-js/web";
 import { useAuth } from "~/context/AuthContext";
 import { useLenis } from "~/context/LenisContext";

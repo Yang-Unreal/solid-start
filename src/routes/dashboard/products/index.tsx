@@ -1,7 +1,7 @@
 // src/routes/dashboard/products.tsx
 import { Suspense } from "solid-js";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
-import ProductListDashboard from "~/components/ProductListDashboard";
+import ProductListDashboard from "~/components/product/ProductListDashboard";
 import type { Product } from "~/db/schema";
 import { useSearch } from "~/context/SearchContext";
 

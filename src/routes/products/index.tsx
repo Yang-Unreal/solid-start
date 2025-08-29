@@ -2,7 +2,7 @@
 
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
-import ProductDisplayArea from "~/components/ProductDisplayArea";
+import ProductDisplayArea from "~/components/product/ProductDisplayArea";
 import { useSearch } from "~/context/SearchContext";
 import type { Product } from "~/db/schema";
 
