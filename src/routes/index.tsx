@@ -32,12 +32,12 @@ export default function Home() {
           //   opacity: heroOpacity(),
           // }}
         >
-          <h1 class="absolute w-full text-light-gray text-5xl md:text-[155px] font-formula-bold top-3/7 text-center leading-18 md:leading-37">
+          <h1 class="absolute w-full text-light-gray text-6xl md:text-[155px] font-formula-bold top-3/7 text-center leading-18 md:leading-37">
             YOUR TRUSTED
             <br />
             BRIDGE TO CHINA
           </h1>
-          <div class="absolute flex flex-col md:flex-row h-auto w-full justify-between items-center bottom-50 md:bottom-15 container-padding gap-2 md:gap-10 ">
+          <div class="absolute flex flex-col md:flex-row h-auto w-full justify-between items-center bottom-20 md:bottom-15 container-padding gap-2 md:gap-10 ">
             <div class="w-full md:w-1/5 flex flex-col items-center  text-center text-white  gap-2">
               <HoverableButton
                 as="button"
