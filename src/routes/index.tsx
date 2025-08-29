@@ -17,7 +17,7 @@ export default function Home() {
       <Title>Official LIMING Website | LIMING</Title>
       <Meta
         name="description"
-        content="Bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
+        content="LIMING offers bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
       <div
         class="relative min-h-screen overflow-hidden bg-black bg-cover  bg-center"
@@ -32,18 +32,19 @@ export default function Home() {
           //   opacity: heroOpacity(),
           // }}
         >
-          <h1 class="absolute w-full text-light-gray text-5xl md:text-[120px] font-permanent-marker top-2/6 text-center leading-18 md:leading-35">
-            CHINA SOURCING <br />
-            SIMPLIFIED
+          <h1 class="absolute w-full text-light-gray text-5xl md:text-[140px] font-formula-bold top-2/5 text-center leading-18 md:leading-35">
+            TRUSTED PARTNER
+            <br />
+            YOUR BRIDGE TO CHINA
           </h1>
-          <div class="absolute flex flex-col md:flex-row h-auto w-full justify-center items-center bottom-8 md:bottom-12 container-padding gap-2 md:gap-10 ">
-            <div class="w-full md:w-1/3 flex flex-col items-center justify-center text-center text-white">
-              <h1 class="w-52 text-md md:text-xl font-permanent-marker">
+          <div class="absolute flex flex-col md:flex-row h-auto w-full justify-between items-center bottom-8 md:bottom-15 container-padding gap-2 md:gap-10 ">
+            <div class="w-full md:w-1/5 flex flex-col items-center  text-center text-white">
+              <h1 class="w-52 text-md md:text-3xl font-formula-bold">
                 BESPOKE SOURCING
               </h1>
               <HoverableButton
                 as="button"
-                class="border w-39 rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="w-32 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-formula-bold mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(75, 99%, 52%)"
@@ -51,10 +52,7 @@ export default function Home() {
                 START YOUR SOURCING
               </HoverableButton>
             </div>
-            <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
-              <h1 class="w-52 text-md md:text-xl font-permanent-marker">
-                APEX COLLECTION
-              </h1>
+            {/* <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
               <HoverableButton
                 as="button"
                 class="w-39 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
@@ -62,16 +60,16 @@ export default function Home() {
                 applyOverflowHidden
                 hoverCircleColor="hsl(75, 99%, 52%)"
               >
-                BROWSE OUR STORE
+                BROW OUR STORE
               </HoverableButton>
-            </div>
-            <div class="w-full md:w-1/3 flex flex-col items-center text-white text-center ">
-              <h1 class="w-52 text-md md:text-xl font-permanent-marker">
+            </div> */}
+            <div class="w-full md:w-1/5 flex flex-col items-center text-white text-center ">
+              <h1 class="w-52 text-md md:text-3xl font-formula-bold">
                 RISK ELIMINATION
               </h1>
               <HoverableButton
                 as="button"
-                class="w-39 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-inconsolata mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="w-32 border rounded-full px-3 md:px-5 py-1 md:py-2 text-xs font-formula-bold mt-2 transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(75, 99%, 52%)"

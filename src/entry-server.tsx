@@ -40,7 +40,7 @@ export default createHandler((event) => {
               crossorigin=""
             />
 
-            {/* <link
+            <link
               rel="preload"
               href="https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Bold.woff2"
               as="font"
@@ -53,7 +53,7 @@ export default createHandler((event) => {
               as="font"
               type="font/woff2"
               crossorigin=""
-            /> */}
+            />
             {assets}
           </head>
           <body>

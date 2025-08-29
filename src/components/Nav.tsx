@@ -65,15 +65,13 @@ export default function Nav() {
   return (
     <>
       <nav
-        class={`px-1 md:px-4 lg:px-4 fixed  w-full z-50  transition-all duration-200   ${
-          showNav() ? "top-3" : "top-[-104px]"
+        class={` fixed  w-full z-50  transition-all duration-200   ${
+          showNav() ? "top-0" : "top-[-104px]"
         } `}
       >
         <div
-          class={`rounded-full relative flex h-12  ${
-            transparent()
-              ? "bg-transparent text-light"
-              : "bg-white/50 backdrop-blur-lg text-black"
+          class={` relative flex h-18  ${
+            transparent() ? "bg-transparent text-light" : "bg-white  text-black"
           }`}
         >
           <div class="w-full items-center  flex justify-between nav-padding">

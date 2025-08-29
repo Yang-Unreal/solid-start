@@ -21,7 +21,7 @@
   font-display: block;
 }
 
-/* @font-face {
+@font-face {
   font-family: "FormulaCondensed-Bold";
   src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Bold.woff2")
     format("woff2");
@@ -37,7 +37,7 @@
   font-weight: 300;
   font-style: normal;
   font-display: swap;
-} */
+}
 
 @theme {
   --color-primary-accent: hsl(75, 99%, 52%);
@@ -188,13 +188,13 @@ html::-webkit-scrollbar {
     @apply absolute inset-0 -z-10 backdrop-blur-lg rounded-full;
   } */
 
-  /* .font-formula-bold {
+  .font-formula-bold {
     font-family: "FormulaCondensed-Bold", sans-serif;
   }
 
   .font-formula-light {
     font-family: "FormulaCondensed-Light", sans-serif;
-  } */
+  }
 
   .font-permanent-marker {
     font-family: "Permanent Marker", cursive;
