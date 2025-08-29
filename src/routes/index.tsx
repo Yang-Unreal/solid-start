@@ -48,7 +48,7 @@ export default function Home() {
               >
                 START YOUR SOURCING
               </HoverableButton>
-              <h1 class="w-55 text-md md:text-4xl font-formula-bold">
+              <h1 class="w-55 text-3xl md:text-4xl font-formula-bold">
                 BESPOKE SOURCING
               </h1>
             </div>
@@ -76,7 +76,7 @@ export default function Home() {
               >
                 HOW WE PROTECT YOU
               </HoverableButton>
-              <h1 class="w-55 text-md md:text-4xl font-formula-bold">
+              <h1 class="w-55 text-3xl md:text-4xl font-formula-bold">
                 RISK ELIMINATION
               </h1>
             </div>
