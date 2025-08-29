@@ -13,11 +13,13 @@ import NavButton from "./NavButton";
 import YourLogo from "./YourLogo";
 import { isServer } from "solid-js/web";
 import { useAuth } from "~/context/AuthContext";
+import { useLenis } from "~/context/LenisContext";
 
 export default function Nav() {
   const navigate = useNavigate();
   const location = useLocation();
   const { session, handleLogoutSuccess } = useAuth();
+  const lenis = useLenis();
   const isTransparentNavPage = createMemo(() => location.pathname === "/");
   const isHomepage = createMemo(() => location.pathname === "/");
 
@@ -41,6 +43,14 @@ export default function Nav() {
   let menuButtonRef: HTMLDivElement | undefined;
 
   let lastScrollY = 0;
+
+  createEffect(() => {
+    if (isMenuOpen()) {
+      lenis?.stop();
+    } else {
+      lenis?.start();
+    }
+  });
 
   createEffect(() => {
     const handleScroll = () => {
