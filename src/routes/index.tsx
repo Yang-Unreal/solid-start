@@ -47,7 +47,7 @@ export default function Home() {
           //   opacity: heroOpacity(),
           // }}
         >
-          <h1 class="absolute w-full text-light-gray text-6xl md:text-[155px] font-formula-bold top-3/7 text-center leading-18 md:leading-37">
+          <h1 class="absolute w-full text-light-gray text-7xl md:text-[155px] font-formula-bold bottom-50 md:top-3/7 text-center leading-18 md:leading-37">
             YOUR TRUSTED
             <br />
             BRIDGE TO CHINA
