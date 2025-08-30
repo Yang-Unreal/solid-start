@@ -48,9 +48,18 @@ export default function Home() {
           // }}
         >
           <h1 class="absolute w-full text-light-gray text-7xl md:text-[155px] font-formula-bold bottom-50 md:top-3/7 text-center leading-18 md:leading-37">
-            YOUR TRUSTED
-            <br />
-            BRIDGE TO CHINA
+            <span class="hidden md:block">
+              YOUR TRUSTED
+              <br />
+              BRIDGE TO CHINA
+            </span>
+            <span class="md:hidden">
+              YOUR
+              <br />
+              TRUSTED BRIDGE
+              <br />
+              TO CHINA
+            </span>
           </h1>
           <div class="absolute flex flex-row h-auto w-full justify-between items-center bottom-20 md:bottom-15 container-padding gap-20 md:gap-10 ">
             <div class="w-full md:w-1/5 flex flex-col items-center  text-center text-white  gap-2">
