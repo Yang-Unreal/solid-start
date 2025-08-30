@@ -1,15 +1,29 @@
 // src/routes/index.tsx
 
 import { Meta, Title } from "@solidjs/meta";
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, onCleanup } from "solid-js";
 import Footer from "~/components/Footer";
 import HoverableButton from "~/components/HoverableButton";
 
 export default function Home() {
   const [heroOpacity, setHeroOpacity] = createSignal(0);
+  let heroRef: HTMLDivElement | undefined;
 
   onMount(() => {
     setHeroOpacity(1);
+    if (heroRef) {
+      const setHeroHeight = () => {
+        if (heroRef) {
+          heroRef.style.height = `${window.innerHeight}px`;
+        }
+      };
+      setHeroHeight();
+      window.addEventListener("resize", setHeroHeight);
+
+      onCleanup(() => {
+        window.removeEventListener("resize", setHeroHeight);
+      });
+    }
   });
 
   return (
@@ -20,14 +34,15 @@ export default function Home() {
         content="LIMING offers bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
       <div
-        class="relative h-screen overflow-hidden bg-black bg-cover  bg-center"
+        ref={heroRef}
+        class="relative overflow-hidden bg-black bg-cover  bg-center"
         style={{
           "background-image":
             "linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), url('/heroBackground.webp')",
         }}
       >
         <div
-          class="w-full h-screen flex items-center justify-center transition-opacity  "
+          class="w-full h-full flex items-center justify-center transition-opacity  "
           // style={{
           //   opacity: heroOpacity(),
           // }}
