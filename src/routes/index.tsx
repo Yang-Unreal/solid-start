@@ -37,18 +37,18 @@ export default function Home() {
             <br />
             BRIDGE TO CHINA
           </h1>
-          <div class="absolute flex flex-col md:flex-row h-auto w-full justify-between items-center bottom-20 md:bottom-15 container-padding gap-2 md:gap-10 ">
+          <div class="absolute flex flex-row h-auto w-full justify-between items-center bottom-20 md:bottom-15 container-padding gap-20 md:gap-10 ">
             <div class="w-full md:w-1/5 flex flex-col items-center  text-center text-white  gap-2">
               <HoverableButton
                 as="button"
-                class="w-35 border rounded-full px-2 py-1.5 text-xs font-inconsolata  transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="md:w-35 border rounded-full px-2 py-1 md:py-1.5 text-[8px] md:text-xs font-inconsolata  transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(255, 100%, 100%)"
               >
                 Start Your Sourcing
               </HoverableButton>
-              <h1 class="w-55 text-3xl md:text-4xl font-formula-bold">
+              <h1 class="md:w-55 text-xl md:text-4xl font-formula-bold">
                 Bespoke Sourcing
               </h1>
             </div>
@@ -69,14 +69,14 @@ export default function Home() {
             <div class="w-full md:w-1/5 flex flex-col items-center text-white text-center gap-2">
               <HoverableButton
                 as="button"
-                class="w-35 border rounded-full px-2 py-1.5 text-xs font-inconsolata  transition-colors duration-500 hover:border-transparent hover:text-black"
+                class="md:w-35 border rounded-full px-2 py-1 md:py-1.5 text-[8px] md:text-xs font-inconsolata  transition-colors duration-500 hover:border-transparent hover:text-black"
                 enableHoverCircle
                 applyOverflowHidden
                 hoverCircleColor="hsl(255, 100%, 100%)"
               >
                 How We Protect You
               </HoverableButton>
-              <h1 class="w-55 text-3xl md:text-4xl font-formula-bold">
+              <h1 class="md:w-55 text-xl md:text-4xl font-formula-bold">
                 Risk Elimination
               </h1>
             </div>
