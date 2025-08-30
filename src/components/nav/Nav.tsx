@@ -10,6 +10,7 @@ import MenuDrawer from "~/components/nav/MenuDrawer";
 import { ShoppingBag, Search, User, Menu } from "lucide-solid";
 import SearchModal from "../search/SearchModal";
 import NavButton from "../NavButton";
+import MobileLogo from "../logo/MobileLogo";
 import YourLogo from "../logo/YourLogo";
 import { isServer } from "solid-js/web";
 import { useAuth } from "~/context/AuthContext";
@@ -151,7 +152,8 @@ export default function Nav() {
               aria-label="Homepage"
               title="Homepage"
             >
-              <YourLogo class="h-4 md:h-5 w-auto" />
+              <YourLogo class="h-4 md:h-5 w-auto hidden md:block" />
+              <MobileLogo class="h-6  w-auto md:hidden" />
             </A>
 
             <div class="flex items-center justify-center">
