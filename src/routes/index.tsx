@@ -20,14 +20,14 @@ export default function Home() {
         content="LIMING offers bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
       <div
-        class="relative min-h-screen overflow-hidden bg-black bg-cover  bg-center"
+        class="relative h-screen overflow-hidden bg-black bg-cover  bg-center"
         style={{
           "background-image":
             "linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.2)), url('/heroBackground.webp')",
         }}
       >
         <div
-          class="w-full min-h-screen flex items-center justify-center transition-opacity  "
+          class="w-full h-screen flex items-center justify-center transition-opacity  "
           // style={{
           //   opacity: heroOpacity(),
           // }}
