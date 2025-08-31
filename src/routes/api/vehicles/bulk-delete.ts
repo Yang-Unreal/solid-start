@@ -1,41 +1,27 @@
-// src/routes/api/products/bulk-delete.ts
+// src/routes/api/vehicles/bulk-delete.ts
 import { type APIEvent } from "@solidjs/start/server";
 import db from "~/db/index";
-import { product as productTable } from "~/db/schema";
-import { inArray } from "drizzle-orm";
-import { z } from "zod/v4";
+import { vehicles as vehiclesTable, photos as photosTable } from "~/db/schema";
+import { inArray, eq } from "drizzle-orm";
+import { z } from "zod";
 import { kv } from "~/lib/redis";
-import { minio, bucket, endpoint } from "~/lib/minio";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { productsIndex, pollTask } from "~/lib/meilisearch";
+import { deleteFile } from "~/lib/minio";
+import { vehiclesIndex, pollTask } from "~/lib/meilisearch";
 
 const BulkDeletePayloadSchema = z.object({
-  ids: z.array(z.string().uuid()).min(1),
+  ids: z.array(z.string().regex(/^\d+$/)).min(1),
 });
 
-// Helper function to extract MinIO object key from a full URL
-const getMinioObjectKey = (url: string | undefined): string | null => {
-  if (!url || !endpoint || !bucket) return null;
-  const baseUrl = `${endpoint}/${bucket}/`;
-  if (url.startsWith(baseUrl)) {
-    return url.substring(baseUrl.length);
+// Helper function to extract MinIO object key from a photo URL
+const getMinioObjectKey = (photoUrl: string): string | null => {
+  // Extract the object key from the photo URL
+  // URL format: https://minio.example.com/bucket/vehicles/filename.jpg
+  const urlParts = photoUrl.split("/");
+  const vehiclesIndex = urlParts.findIndex((part) => part === "vehicles");
+  if (vehiclesIndex !== -1 && vehiclesIndex < urlParts.length - 1) {
+    return urlParts.slice(vehiclesIndex).join("/");
   }
   return null;
-};
-
-// Helper function to generate MinIO object keys for a given imageBaseUrl
-const generateImageKeys = (imageBaseUrl: string): string[] => {
-  const keys: string[] = [];
-  const sizes = ["thumbnail", "card", "detail"];
-  const formats = ["avif", "webp", "jpeg"];
-  const index = 0; // Assuming index 0 for the primary image based on current schema limitations
-
-  for (const size of sizes) {
-    for (const format of formats) {
-      keys.push(`products/${imageBaseUrl}-${index}-${size}.${format}`);
-    }
-  }
-  return keys;
 };
 
 export async function POST({ request }: APIEvent) {
@@ -53,62 +39,74 @@ export async function POST({ request }: APIEvent) {
       );
     }
 
-    const productIdsToDelete = validationResult.data.ids;
+    const vehicleIdsToDelete = validationResult.data.ids.map((id) =>
+      parseInt(id, 10)
+    );
 
-    // Fetch product imageBaseUrls before deleting from the database
-    const productsWithImages = await db
-      .select({ imageBaseUrl: productTable.imageBaseUrl })
-      .from(productTable)
-      .where(inArray(productTable.id, productIdsToDelete));
+    // Fetch vehicle photos before deleting from the database
+    const vehiclesWithPhotos = await db
+      .select({
+        vehicle_id: vehiclesTable.vehicle_id,
+        photo_url: photosTable.photo_url,
+      })
+      .from(vehiclesTable)
+      .leftJoin(
+        photosTable,
+        eq(vehiclesTable.vehicle_id, photosTable.vehicle_id)
+      )
+      .where(inArray(vehiclesTable.vehicle_id, vehicleIdsToDelete));
 
-    // Collect all image keys to delete from MinIO
-    const imageKeysToDelete: string[] = [];
-    for (const product of productsWithImages) {
-      if (product.imageBaseUrl) {
-        imageKeysToDelete.push(...generateImageKeys(product.imageBaseUrl));
+    // Collect all photo URLs to delete from MinIO
+    const photoUrlsToDelete: string[] = [];
+    for (const vehicle of vehiclesWithPhotos) {
+      if (vehicle.photo_url) {
+        photoUrlsToDelete.push(vehicle.photo_url);
       }
     }
 
-    // Delete images from MinIO
-    if (imageKeysToDelete.length > 0) {
+    // Delete photos from MinIO
+    if (photoUrlsToDelete.length > 0) {
       console.log(
-        `Attempting to delete ${imageKeysToDelete.length} images from MinIO.`
+        `Attempting to delete ${photoUrlsToDelete.length} photos from MinIO.`
       );
       await Promise.all(
-        imageKeysToDelete.map((key) =>
-          minio.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }))
-        )
+        photoUrlsToDelete.map(async (photoUrl) => {
+          const objectKey = getMinioObjectKey(photoUrl);
+          if (objectKey) {
+            await deleteFile(objectKey);
+          }
+        })
       );
-      console.log("MinIO image deletion complete.");
+      console.log("MinIO photo deletion complete.");
     }
 
-    // Delete from the database
-    const deletedProducts = await db
-      .delete(productTable)
-      .where(inArray(productTable.id, productIdsToDelete))
-      .returning({ id: productTable.id });
+    // Delete from the database (this will cascade delete photos due to foreign key constraints)
+    const deletedVehicles = await db
+      .delete(vehiclesTable)
+      .where(inArray(vehiclesTable.vehicle_id, vehicleIdsToDelete))
+      .returning({ vehicle_id: vehiclesTable.vehicle_id });
 
     // Sync bulk deletion to MeiliSearch
-    if (deletedProducts.length > 0) {
-      const deletedIds = deletedProducts.map((p) => p.id);
-      const task = await productsIndex.deleteDocuments(deletedIds);
+    if (deletedVehicles.length > 0) {
+      const deletedIds = deletedVehicles.map((v) => v.vehicle_id);
+      const task = await vehiclesIndex.deleteDocuments(deletedIds);
       await pollTask(task.taskUid);
     }
 
-    // Invalidate Redis cache for products and filter options
-    const productKeys = await kv.keys("products:*");
-    if (productKeys.length > 0) await kv.del(...productKeys);
+    // Invalidate Redis cache for vehicles and filter options
+    const vehicleKeys = await kv.keys("vehicles:*");
+    if (vehicleKeys.length > 0) await kv.del(...vehicleKeys);
     await kv.del("filter-options");
 
     return new Response(
       JSON.stringify({
-        message: `${deletedProducts.length} products deleted.`,
-        deletedIds: deletedProducts.map((p) => p.id),
+        message: `${deletedVehicles.length} vehicles deleted.`,
+        deletedIds: deletedVehicles.map((v) => v.vehicle_id),
       }),
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error during bulk product deletion:", error);
+    console.error("Error during bulk vehicle deletion:", error);
     return new Response(
       JSON.stringify({ error: "Failed to perform bulk delete." }),
       { status: 500 }
