@@ -101,30 +101,6 @@ export default function VehiclesPage() {
     ] as const,
     queryFn: fetchVehiclesQueryFn,
     keepPreviousData: true,
-    select: (data) => {
-      // Guard against undefined data
-      if (!data || !data.data) {
-        return {
-          data: [],
-          pagination: {
-            currentPage: 1,
-            pageSize: pageSize(),
-            totalItems: 0,
-            totalPages: 0,
-          },
-        };
-      }
-
-      // The public API from meilisearch does not include photos by default.
-      // We map the data to include an empty photos array to match the expected type.
-      const vehiclesWithPhotos: VehicleWithPhotos[] = data.data.map(
-        (vehicle) => ({
-          ...vehicle,
-          photos: [], // Add an empty photos array
-        })
-      );
-      return { ...data, data: vehiclesWithPhotos };
-    },
   }));
 
   return (

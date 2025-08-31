@@ -61,6 +61,7 @@ export const setupMeilisearch = async () => {
   try {
     const task = await vehiclesIndex.updateSettings({
       filterableAttributes: [
+        "vehicle_id",
         "brand",
         "model",
         "date_of_manufacture",
