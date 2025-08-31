@@ -195,7 +195,7 @@ async function handleGetVehicleList(url: URL) {
     };
 
     const filterParam = url.searchParams.get("filter");
-    if (filterParam) {
+    if (filterParam && filterParam.length > 0) {
       searchOptions.filter = filterParam;
     } else {
       searchOptions.filter = "vehicle_id >= 0";
