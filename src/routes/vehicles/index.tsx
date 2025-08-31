@@ -1,6 +1,7 @@
 // src/routes/vehicles/index.tsx
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
 import { Suspense } from "solid-js";
+import { isServer, getRequestEvent } from "solid-js/web";
 import { useSearch } from "~/context/SearchContext";
 import type { Vehicle, Photo } from "~/db/schema";
 import VehicleDisplayArea from "~/components/vehicle/VehicleDisplayArea";
@@ -35,7 +36,10 @@ const fetchVehicles = async (
     sort,
   });
 
-  const res = await fetch(`/api/vehicles?${params.toString()}`);
+  const baseUrl = isServer
+    ? new URL(getRequestEvent()!.request.url).origin
+    : "";
+  const res = await fetch(`${baseUrl}/api/vehicles?${params.toString()}`);
   if (!res.ok) {
     throw new Error("Failed to fetch vehicles");
   }
