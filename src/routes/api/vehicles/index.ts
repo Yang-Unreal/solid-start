@@ -9,7 +9,7 @@ import {
   vehicleFeaturesLink,
   features,
 } from "~/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { z } from "zod";
 import {
   minio,
@@ -140,8 +140,22 @@ async function handleGetVehicleList(url: URL) {
       hitsPerPage: pageSize,
     });
 
+    // Get vehicle IDs from search results
+    const vehicleIds = searchResult.hits.map((hit) => hit.vehicle_id);
+
+    // Fetch vehicles with photos from database
+    const vehiclesWithPhotos =
+      vehicleIds.length > 0
+        ? await db.query.vehicles.findMany({
+            where: inArray(vehiclesTable.vehicle_id, vehicleIds),
+            with: {
+              photos: true,
+            },
+          })
+        : [];
+
     const responseBody = {
-      data: searchResult.hits,
+      data: vehiclesWithPhotos,
       pagination: {
         currentPage: searchResult.page,
         pageSize: searchResult.hitsPerPage,
