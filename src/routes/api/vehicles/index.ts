@@ -134,10 +134,15 @@ async function handleGetVehicleList(url: URL) {
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const pageSize = parseInt(url.searchParams.get("pageSize") || "30", 10);
     const searchQuery = url.searchParams.get("search") || "";
+    const sortParam = url.searchParams.get("sort") || "vehicle_id:asc";
+
+    // Parse sort parameter (e.g., "price:asc" -> ["price", "asc"])
+    const [sortBy, sortOrder] = sortParam.split(":");
 
     const searchResult = await vehiclesIndex.search(searchQuery, {
       page,
       hitsPerPage: pageSize,
+      sort: [`${sortBy}:${sortOrder}`],
     });
 
     // Get vehicle IDs from search results

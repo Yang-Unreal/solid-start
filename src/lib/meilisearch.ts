@@ -68,6 +68,7 @@ export const setupMeilisearch = async () => {
         "transmission",
       ],
       sortableAttributes: [
+        "vehicle_id",
         "price",
         "date_of_manufacture",
         "mileage",
