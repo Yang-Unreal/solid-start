@@ -1,14 +1,25 @@
 import { For, Show, createResource, createSignal } from "solid-js";
 import HoverableButton from "~/components/HoverableButton";
 import { useParams } from "@solidjs/router";
-import { type Product } from "~/db/schema";
-import ProductImage from "~/components/product/ProductImage";
+import {
+  type Vehicle,
+  type Photo,
+  type EngineDetail,
+  type ElectricDetail,
+} from "~/db/schema";
+import VehicleImage from "~/components/vehicle/VehicleImage";
 
-export default function ProductDetailPage() {
+type VehicleWithRelations = Vehicle & {
+  photos: Photo[];
+  engineDetails: EngineDetail | null;
+  electricDetails: ElectricDetail | null;
+};
+
+export default function VehicleDetailPage() {
   const params = useParams();
-  const productId = () => params.id;
+  const vehicleId = () => params.id;
 
-  const [productData] = createResource(productId, async (id) => {
+  const [vehicleData] = createResource(vehicleId, async (id) => {
     if (!id) {
       return null;
     }
@@ -19,13 +30,13 @@ export default function ProductDetailPage() {
         import.meta.env.VITE_INTERNAL_API_ORIGIN ||
         `http://localhost:${process.env.PORT || 3000}`;
     }
-    const fetchUrl = `${baseUrl}/api/products?id=${id}`;
+    const fetchUrl = `${baseUrl}/api/vehicles?id=${id}`;
     const response = await fetch(fetchUrl);
     if (!response.ok) {
-      throw new Error("Failed to fetch product");
+      throw new Error("Failed to fetch vehicle");
     }
     const result = await response.json();
-    return result.data[0] as Product;
+    return result.data[0] as VehicleWithRelations;
   });
 
   const [currentImageIndex, setCurrentImageIndex] = createSignal(0);
@@ -45,11 +56,11 @@ export default function ProductDetailPage() {
 
     if (Math.abs(diff) > 50) {
       // Threshold for a swipe
-      const p = productData();
-      if (!p?.imageBaseUrl) return;
+      const v = vehicleData();
+      if (!v?.photos || v.photos.length === 0) return;
 
       let newIndex = currentImageIndex();
-      const totalImages = 6; // Assuming 6 images per product (0-5)
+      const totalImages = v.photos.length;
       if (diff > 0) {
         // Swiped left, go to next image
         newIndex = (newIndex + 1) % totalImages;
@@ -72,11 +83,11 @@ export default function ProductDetailPage() {
     <main class="min-h-screen container-padding pt-25">
       <div class="px-1.5 md:px-3">
         <h1 class="items-center justify-center w-full text-center font-extrabold text-3xl md:text-5xl pb-12">
-          PRODUCT DETAIL
+          VEHICLE DETAIL
         </h1>
         <div class="h-[1px] bg-gray-300 w-full mb-5"></div>
-        <Show when={productData()} fallback={<p>Product not found.</p>}>
-          {(p) => (
+        <Show when={vehicleData()} fallback={<p>Vehicle not found.</p>}>
+          {(v) => (
             <div class="md:flex md:space-x-8">
               <div class="md:w-3/5 flex flex-col">
                 {/* Main Image */}
@@ -85,20 +96,18 @@ export default function ProductDetailPage() {
                   onMouseEnter={() => setShowThumbnails(true)}
                   onMouseLeave={() => setShowThumbnails(false)}
                 >
-                  <ProductImage
-                    imageBaseUrl={p().imageBaseUrl}
-                    index={currentImageIndex()}
-                    size="detail"
-                    alt={p().name}
+                  <VehicleImage
+                    photoUrl={v().photos?.[currentImageIndex()]?.photo_url}
+                    alt={v().model}
                     class="w-full h-full object-cover rounded-lg"
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                   />
                   {/* Image Index for Mobile */}
-                  <Show when={p().imageBaseUrl}>
+                  <Show when={v().photos && v().photos.length > 0}>
                     <div class="absolute top-2 right-3 bg-black bg-opacity-30 text-white text-xs px-2 py-0.5 rounded-full md:hidden">
-                      {currentImageIndex() + 1} / 6
+                      {currentImageIndex() + 1} / {v().photos.length}
                     </div>
                   </Show>
                   {/* Dots and Thumbnails for image navigation */}
@@ -111,19 +120,16 @@ export default function ProductDetailPage() {
                         "opacity-100": showThumbnails(),
                       }}
                     >
-                      <For each={Array.from({ length: 6 })}>
-                        {(_, index) => (
-                          <ProductImage
-                            imageBaseUrl={p().imageBaseUrl}
-                            index={index()}
-                            size="thumbnail"
-                            alt={`${p().name} thumbnail ${index() + 1}`}
-                            class="w-20 aspect-video object-cover cursor-pointer rounded-md   transition-all duration-200 hover:opacity-100"
-                            classList={{
-                              "opacity-50": currentImageIndex() !== index(),
-                              "opacity-100 border":
-                                currentImageIndex() === index(),
-                            }}
+                      <For each={v().photos}>
+                        {(photo, index) => (
+                          <VehicleImage
+                            photoUrl={photo.photo_url}
+                            alt={`${v().model} thumbnail ${index() + 1}`}
+                            class={`w-20 aspect-video object-cover cursor-pointer rounded-md transition-all duration-200 hover:opacity-100 ${
+                              currentImageIndex() === index()
+                                ? "opacity-100 border-2 border-blue-500"
+                                : "opacity-50"
+                            }`}
                             onClick={() => setCurrentImageIndex(index())}
                           />
                         )}
@@ -131,7 +137,7 @@ export default function ProductDetailPage() {
                     </div>
                     {/* Dots */}
                     <div class="hidden md:flex justify-center space-x-2">
-                      <For each={Array.from({ length: 6 })}>
+                      <For each={v().photos}>
                         {(_, index) => (
                           <span
                             class="w-2 h-2 bg-gray-300 rounded-full cursor-pointer"
@@ -149,20 +155,14 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              {/* Product Details (Right Column) */}
+              {/* Vehicle Details (Right Column) */}
               <div class="w-full md:w-2/5 mt-8 md:mt-0">
-                <h1 class="text-3xl font-bold text-gray-900">{p().name}</h1>
-                <p class="mt-2 text-xl text-gray-700">
-                  ${(p().priceInCents / 100).toFixed(2)}
-                </p>
-                <div class="mt-4">
-                  <span class="text-sm text-gray-600">
-                    In Stock: {p().stockQuantity}
-                  </span>
-                </div>
-
+                <h1 class="text-3xl font-bold text-gray-900">
+                  {v().brand} {v().model}
+                </h1>
+                <p class="mt-2 text-xl text-gray-700">${v().price}</p>
                 <p class="mt-6 text-gray-700 leading-relaxed">
-                  {p().description}
+                  {v().general_description}
                 </p>
 
                 <div class="mt-8">
@@ -173,52 +173,43 @@ export default function ProductDetailPage() {
                     hoverCircleColor="	hsl(0, 0%, 0%)"
                     class="w-1/2 border rounded-full px-5 py-3 text-lg font-semibold transition-colors duration-300 hover:border-transparent hover:text-white"
                   >
-                    Add to Cart
+                    Contact Seller
                   </HoverableButton>
                 </div>
 
                 <div class="mt-10 border-t border-gray-200 pt-8">
                   <h2 class="text-xl font-semibold text-gray-800">
-                    Product Details
+                    Vehicle Details
                   </h2>
                   <ul class="mt-4 text-gray-700 space-y-2">
-                    <Show when={p().brand}>
-                      <li>
-                        <strong class="font-medium">Brand:</strong> {p().brand}
-                      </li>
-                    </Show>
-                    <Show when={p().model}>
-                      <li>
-                        <strong class="font-medium">Model:</strong> {p().model}
-                      </li>
-                    </Show>
-                    <Show when={p().fuelType}>
-                      <li>
-                        <strong class="font-medium">Fuel Type:</strong>{" "}
-                        {p().fuelType}
-                      </li>
-                    </Show>
-                    <Show when={!p().brand && !p().model && !p().fuelType}>
-                      <li>No additional details available.</li>
-                    </Show>
+                    <li>
+                      <strong class="font-medium">Brand:</strong> {v().brand}
+                    </li>
+                    <li>
+                      <strong class="font-medium">Model:</strong> {v().model}
+                    </li>
+                    <li>
+                      <strong class="font-medium">Year:</strong>{" "}
+                      {v().date_of_manufacture}
+                    </li>
+                    <li>
+                      <strong class="font-medium">Mileage:</strong>{" "}
+                      {v().mileage} km
+                    </li>
+                    <li>
+                      <strong class="font-medium">Horsepower:</strong>{" "}
+                      {v().horsepower} HP
+                    </li>
+                    <li>
+                      <strong class="font-medium">Transmission:</strong>{" "}
+                      {v().transmission}
+                    </li>
                   </ul>
                 </div>
               </div>
             </div>
           )}
         </Show>
-        <div
-          class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center mt-20"
-          style="background-image: url('/heroBackground.webp');"
-        ></div>{" "}
-        <div
-          class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center"
-          style="background-image: url('/heroBackground.webp');"
-        ></div>{" "}
-        <div
-          class="relative min-h-screen flex items-center justify-center overflow-hidden bg-white bg-cover bg-center"
-          style="background-image: url('/heroBackground.webp');"
-        ></div>
       </div>
     </main>
   );

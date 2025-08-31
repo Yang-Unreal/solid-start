@@ -45,8 +45,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       { href: "/about", label: "About" },
       { href: "/services", label: "Services" },
       {
-        href: isDashboard ? "/dashboard/products" : "/products",
-        label: "Products",
+        href: isDashboard ? "/dashboard/vehicles" : "/vehicles",
+        label: "Vehicles",
       },
       { href: "/contact", label: "Contact" },
     ];
@@ -221,11 +221,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           viewBox="0 0 80 1000"
           preserveAspectRatio="none"
         >
-          <path
-            ref={(el) => (svgPathRef = el)}
-            d={pathCurve}
-            fill="white"
-          />
+          <path ref={(el) => (svgPathRef = el)} d={pathCurve} fill="white" />
         </svg>
       </div>
 
@@ -294,9 +290,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       </div>
 
       <div class="mt-8">
-        <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">
-          SOCIALS
-        </h2>
+        <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">SOCIALS</h2>
         <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
           {socialLinks.map((link) => (
             <MagneticLink

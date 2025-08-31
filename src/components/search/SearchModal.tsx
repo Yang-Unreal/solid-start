@@ -13,20 +13,12 @@ interface SearchModalProps {
 
 const SearchModal: Component<SearchModalProps> = (props) => {
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = createSignal(false);
-  const {
-    searchQuery,
-    onSearchChange,
-    selectedBrands,
-    selectedCategories,
-    selectedFuelTypes,
-  } = useSearch();
+  const { searchQuery, onSearchChange, selectedFilters } = useSearch();
 
-  const hasActiveFilters = createMemo(
-    () =>
-      selectedBrands().length > 0 ||
-      selectedCategories().length > 0 ||
-      selectedFuelTypes().length > 0
-  );
+  const hasActiveFilters = createMemo(() => {
+    const filters = selectedFilters();
+    return Object.values(filters).some((values) => values.length > 0);
+  });
 
   return (
     <div class="fixed inset-0 bg-white z-50 nav-padding">
