@@ -36,14 +36,17 @@ export function SearchProvider(props: { children: any }) {
   const [sortOption, setSortOption] = createSignal("price:asc");
 
   onMount(() => {
-    const storedQuery = localStorage.getItem(LS_SEARCH_QUERY_KEY);
-    if (storedQuery) setSearchQuery(storedQuery);
+    // Only access localStorage on the client side
+    if (typeof window !== "undefined") {
+      const storedQuery = localStorage.getItem(LS_SEARCH_QUERY_KEY);
+      if (storedQuery) setSearchQuery(storedQuery);
 
-    const storedFilters = localStorage.getItem(LS_SELECTED_FILTERS_KEY);
-    if (storedFilters) setSelectedFilters(JSON.parse(storedFilters));
+      const storedFilters = localStorage.getItem(LS_SELECTED_FILTERS_KEY);
+      if (storedFilters) setSelectedFilters(JSON.parse(storedFilters));
 
-    const storedSortOption = localStorage.getItem(LS_SORT_OPTION_KEY);
-    if (storedSortOption) setSortOption(storedSortOption);
+      const storedSortOption = localStorage.getItem(LS_SORT_OPTION_KEY);
+      if (storedSortOption) setSortOption(storedSortOption);
+    }
   });
 
   const onSearchChange = (query: string) => {

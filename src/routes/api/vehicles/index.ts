@@ -9,7 +9,7 @@ import {
   vehicleFeaturesLink,
   features,
 } from "~/db/schema";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, inArray, desc } from "drizzle-orm";
 import { z } from "zod";
 import {
   minio,
@@ -40,7 +40,10 @@ async function invalidateCache() {
 
 // --- GET Handlers ---
 
-async function handleGetSingleVehicle(vehicleId: string) {
+async function handleGetSingleVehicle(
+  vehicleId: string,
+  fresh: boolean = false
+) {
   const idValidationResult = z.string().regex(/^\d+$/).safeParse(vehicleId);
   if (!idValidationResult.success) {
     return new Response(
@@ -54,16 +57,20 @@ async function handleGetSingleVehicle(vehicleId: string) {
 
   const singleVehicleCacheKey = `vehicle:${parsedId}`;
   let cachedVehicle = null;
-  try {
-    cachedVehicle = await kv.get(singleVehicleCacheKey);
-  } catch (error) {
-    console.error("Redis cache read error:", error);
-  }
 
-  if (cachedVehicle) {
-    return new Response(JSON.stringify(cachedVehicle), {
-      headers: { "Content-Type": "application/json" },
-    });
+  // Skip cache if fresh data is requested
+  if (!fresh) {
+    try {
+      cachedVehicle = await kv.get(singleVehicleCacheKey);
+    } catch (error) {
+      console.error("Redis cache read error:", error);
+    }
+
+    if (cachedVehicle) {
+      return new Response(cachedVehicle, {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   }
 
   try {
@@ -138,7 +145,6 @@ async function handleGetSingleVehicle(vehicleId: string) {
       },
     };
 
-    // Cache the result (non-blocking)
     try {
       kv.set(
         singleVehicleCacheKey,
@@ -164,19 +170,23 @@ async function handleGetSingleVehicle(vehicleId: string) {
   }
 }
 
-async function handleGetVehicleList(url: URL) {
+async function handleGetVehicleList(url: URL, fresh: boolean = false) {
   const listCacheKey = `vehicles:list:${url.searchParams.toString()}`;
   let cachedList = null;
-  try {
-    cachedList = await kv.get(listCacheKey);
-  } catch (error) {
-    console.error("Redis cache read error:", error);
-  }
 
-  if (cachedList) {
-    return new Response(JSON.stringify(cachedList), {
-      headers: { "Content-Type": "application/json" },
-    });
+  // Skip cache if fresh data is requested
+  if (!fresh) {
+    try {
+      cachedList = await kv.get(listCacheKey);
+    } catch (error) {
+      console.error("Redis cache read error:", error);
+    }
+
+    if (cachedList) {
+      return new Response(cachedList, {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   }
 
   try {
@@ -197,9 +207,8 @@ async function handleGetVehicleList(url: URL) {
     const filterParam = url.searchParams.get("filter");
     if (filterParam && filterParam.length > 0) {
       searchOptions.filter = filterParam;
-    } else {
-      searchOptions.filter = "vehicle_id >= 0";
     }
+    // If no filter, don't set it - Meilisearch will return all documents
 
     const searchResult = await vehiclesIndex.search(searchQuery, searchOptions);
 
@@ -240,7 +249,6 @@ async function handleGetVehicleList(url: URL) {
       },
     };
 
-    // Cache the result (non-blocking)
     try {
       kv.set(listCacheKey, JSON.stringify(responseBody), "EX", 600).catch(
         (error) => {
@@ -266,11 +274,12 @@ async function handleGetVehicleList(url: URL) {
 export async function GET({ request }: APIEvent) {
   const url = new URL(request.url);
   const vehicleId = url.searchParams.get("id");
+  const fresh = url.searchParams.get("fresh") === "true";
 
   if (vehicleId) {
-    return handleGetSingleVehicle(vehicleId);
+    return handleGetSingleVehicle(vehicleId, fresh);
   } else {
-    return handleGetVehicleList(url);
+    return handleGetVehicleList(url, fresh);
   }
 }
 
@@ -377,8 +386,17 @@ export async function POST({ request }: APIEvent) {
       throw new Error("Transaction failed and vehicle was not created.");
     }
 
-    const task = await vehiclesIndex.addDocuments([newVehicle]);
-    await pollTask(task.taskUid);
+    // Update Meilisearch index and wait for completion
+    try {
+      const addTask = await vehiclesIndex.addDocuments([newVehicle]);
+      if (addTask.taskUid) {
+        await pollTask(addTask.taskUid);
+      }
+    } catch (err) {
+      console.error("Meilisearch add error:", err);
+      // Don't fail the entire creation if MeiliSearch fails
+    }
+
     await invalidateCache();
 
     return new Response(
@@ -414,7 +432,9 @@ export async function PUT({ request }: APIEvent) {
 
   try {
     const body = await request.json();
-    const validationResult = updateVehicleSchema.safeParse(body);
+    const { photosToDelete, newPhotoUrls, ...vehicleData } = body;
+
+    const validationResult = updateVehicleSchema.safeParse(vehicleData);
 
     if (!validationResult.success) {
       return new Response(
@@ -428,16 +448,103 @@ export async function PUT({ request }: APIEvent) {
 
     const dataToUpdate = validationResult.data;
 
-    const updatedVehicles = await db
-      .update(vehiclesTable)
-      .set(dataToUpdate)
-      .where(eq(vehiclesTable.vehicle_id, parsedId))
-      .returning();
+    await db.transaction(async (tx) => {
+      // Update vehicle data
+      await tx
+        .update(vehiclesTable)
+        .set(dataToUpdate)
+        .where(eq(vehiclesTable.vehicle_id, parsedId));
 
-    const updatedVehicle = updatedVehicles[0]!;
+      // Delete marked photos
+      if (photosToDelete && photosToDelete.length > 0) {
+        // Get photo URLs for deletion from MinIO
+        const photosToDeleteRecords = await tx
+          .select({ photo_url: photosTable.photo_url })
+          .from(photosTable)
+          .where(
+            and(
+              eq(photosTable.vehicle_id, parsedId),
+              inArray(photosTable.photo_id, photosToDelete)
+            )
+          );
 
-    const task = await vehiclesIndex.updateDocuments([updatedVehicle]);
-    await pollTask(task.taskUid);
+        // Delete from MinIO
+        for (const photo of photosToDeleteRecords) {
+          const key = photo.photo_url.split("/").pop();
+          if (key) {
+            try {
+              await deleteFile(`vehicles/${key}`);
+            } catch (error) {
+              console.error("Error deleting file from MinIO:", error);
+            }
+          }
+        }
+
+        // Delete from database
+        await tx
+          .delete(photosTable)
+          .where(
+            and(
+              eq(photosTable.vehicle_id, parsedId),
+              inArray(photosTable.photo_id, photosToDelete)
+            )
+          );
+      }
+
+      // Add new photos
+      if (newPhotoUrls && newPhotoUrls.length > 0) {
+        // Get the maximum display_order for this vehicle
+        const maxDisplayOrderResult = await tx
+          .select({ display_order: photosTable.display_order })
+          .from(photosTable)
+          .where(eq(photosTable.vehicle_id, parsedId))
+          .orderBy(desc(photosTable.display_order))
+          .limit(1);
+
+        let nextDisplayOrder = 1;
+        if (maxDisplayOrderResult.length > 0 && maxDisplayOrderResult[0]) {
+          nextDisplayOrder = maxDisplayOrderResult[0].display_order + 1;
+        }
+
+        const newPhotos = newPhotoUrls.map((url: string, index: number) => ({
+          vehicle_id: parsedId,
+          photo_url: url,
+          display_order: nextDisplayOrder + index,
+        }));
+
+        await tx.insert(photosTable).values(newPhotos);
+      }
+    });
+
+    // Get updated vehicle
+    const updatedVehicle = await db.query.vehicles.findFirst({
+      where: eq(vehiclesTable.vehicle_id, parsedId),
+    });
+
+    if (updatedVehicle) {
+      // Update Meilisearch index and wait for completion
+      try {
+        const deleteTask = await vehiclesIndex.deleteDocument(
+          updatedVehicle.vehicle_id
+        );
+        if (deleteTask.taskUid) {
+          await pollTask(deleteTask.taskUid);
+        }
+      } catch (err) {
+        console.error("Meilisearch delete error:", err);
+        // Continue with add operation even if delete fails
+      }
+
+      try {
+        const addTask = await vehiclesIndex.addDocuments([updatedVehicle]);
+        if (addTask.taskUid) {
+          await pollTask(addTask.taskUid);
+        }
+      } catch (err) {
+        console.error("Meilisearch add error:", err);
+        // Don't fail the entire update if MeiliSearch fails
+      }
+    }
 
     await invalidateCache();
 
@@ -497,8 +604,16 @@ export async function DELETE({ request }: APIEvent) {
       });
     }
 
-    const task = await vehiclesIndex.deleteDocument(parsedId);
-    await pollTask(task.taskUid);
+    // Update Meilisearch index and wait for completion
+    try {
+      const deleteTask = await vehiclesIndex.deleteDocument(parsedId);
+      if (deleteTask.taskUid) {
+        await pollTask(deleteTask.taskUid);
+      }
+    } catch (err) {
+      console.error("Meilisearch delete error:", err);
+      // Don't fail the entire deletion if MeiliSearch fails
+    }
 
     await invalidateCache();
 

@@ -14,13 +14,6 @@ interface PaginationInfo {
   totalPages: number;
 }
 interface ApiResponse {
-  data: Vehicle[];
-  pagination: PaginationInfo;
-  error?: string;
-}
-
-// Define a type for the transformed data, including pagination
-interface TransformedApiResponse {
   data: VehicleWithPhotos[];
   pagination: PaginationInfo;
   error?: string;
@@ -74,15 +67,7 @@ export default function DashboardVehiclesPage() {
     return response.json();
   };
 
-  const vehiclesQuery: UseQueryResult<TransformedApiResponse, Error> = useQuery<
-    ApiResponse,
-    Error,
-    TransformedApiResponse,
-    readonly [
-      string,
-      { page: number; size: number; q?: string; filter: string }
-    ]
-  >(() => ({
+  const vehiclesQuery: UseQueryResult<ApiResponse, Error> = useQuery(() => ({
     queryKey: [
       VEHICLES_QUERY_KEY_PREFIX,
       {
@@ -93,29 +78,11 @@ export default function DashboardVehiclesPage() {
       },
     ] as const,
     queryFn: fetchVehiclesQueryFn,
-    keepPreviousData: true,
-
-    select: (data) => {
-      // Guard against undefined data
-      if (!data || !data.data) {
-        return {
-          data: [],
-          pagination: {
-            currentPage: 1,
-            pageSize: FIXED_PAGE_SIZE,
-            totalItems: 0,
-            totalPages: 0,
-          },
-        };
-      }
-      const vehiclesWithPhotos: VehicleWithPhotos[] = data.data.map(
-        (vehicle) => ({
-          ...vehicle,
-          photos: [], // Add an empty photos array
-        })
-      );
-      return { ...data, data: vehiclesWithPhotos };
-    },
+    staleTime: 30000, // 30 seconds stale time
+    cacheTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
+    refetchOnMount: false, // Don't refetch on mount to prevent hydration mismatch
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    keepPreviousData: true, // Keep previous data while loading
   }));
 
   return (

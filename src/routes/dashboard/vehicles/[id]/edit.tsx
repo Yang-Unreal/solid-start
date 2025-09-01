@@ -1,5 +1,5 @@
 // src/routes/dashboard/vehicles/[id]/edit.tsx
-import { createSignal, Show, createEffect } from "solid-js";
+import { createSignal, Show, createEffect, For } from "solid-js";
 import { useNavigate, useParams, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -8,7 +8,7 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/solid-query";
-import type { Vehicle } from "~/db/schema";
+import type { Vehicle, Photo } from "~/db/schema";
 import { authClient } from "~/lib/auth-client";
 import { z } from "zod";
 
@@ -41,7 +41,7 @@ const EditVehicleFormSchema = z.object({
   interior: z.string().trim().min(1),
   seating: z.coerce.number().int().positive(),
   warranty: z.string().trim().optional(),
-  maintenance_booklet: z.boolean().default(false),
+  maintenance_booklet: z.string().optional(),
   powertrain_type: z.enum(["Gasoline", "Hybrid", "Electric"]),
   general_description: z.string().trim().optional(),
   specification_description: z.string().trim().optional(),
@@ -51,23 +51,49 @@ const EditVehicleFormSchema = z.object({
 });
 
 type VehicleFormValues = z.infer<typeof EditVehicleFormSchema>;
-type UpdateVehicleDBData = Partial<VehicleFormValues>;
+type UpdateVehicleDBData = Partial<z.infer<typeof EditVehicleFormSchema>>;
 
 interface ApiResponse {
-  data: Vehicle[];
+  data: (Vehicle & { photos: Photo[] })[];
 }
 
 async function updateVehicleInDB(
-  updatedVehicle: UpdateVehicleDBData & { id: string }
+  updatedVehicle: UpdateVehicleDBData & {
+    id: string;
+    photosToDelete?: number[];
+    newPhotoUrls?: string[];
+  }
 ): Promise<Vehicle> {
+  const { photosToDelete, newPhotoUrls, ...vehicleData } = updatedVehicle;
   const fetchUrl = `/api/vehicles?id=${updatedVehicle.id}`;
   const response = await fetch(fetchUrl, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updatedVehicle),
+    body: JSON.stringify({
+      ...vehicleData,
+      photosToDelete,
+      newPhotoUrls,
+    }),
   });
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
+
+    // If there are specific validation issues, format them
+    if (errorData.issues) {
+      const issueMessages = Object.entries(errorData.issues)
+        .map(([field, errors]: [string, any]) => {
+          if (errors && errors._errors && errors._errors.length > 0) {
+            return `${field}: ${errors._errors.join(", ")}`;
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .join("; ");
+      throw new Error(
+        issueMessages || errorData.error || `Error updating vehicle`
+      );
+    }
+
     throw new Error(errorData.error || `Error updating vehicle`);
   }
   return (await response.json()).vehicle as Vehicle;
@@ -94,13 +120,16 @@ export default function EditVehiclePage() {
           `http://localhost:${process.env.PORT || 3000}`;
       }
 
-      const fetchUrl = `${baseUrl}/api/vehicles?id=${id}`;
+      const fetchUrl = `${baseUrl}/api/vehicles?id=${id}&fresh=true`;
       const response = await fetch(fetchUrl);
       if (!response.ok) throw new Error("Failed to fetch vehicle for editing.");
       return (await response.json()) as ApiResponse;
     },
     enabled: !!vehicleId(),
-    staleTime: 5 * 60 * 1000,
+    staleTime: 0, // Disable caching for real-time data
+    cacheTime: 0, // Don't cache the data
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnWindowFocus: false, // Don't refetch on window focus for edit page
   }));
 
   const existingVehicle = () => vehicleQuery.data?.data?.[0];
@@ -146,40 +175,70 @@ export default function EditVehiclePage() {
   const [formErrors, setFormErrors] =
     createSignal<z.ZodFormattedError<VehicleFormValues> | null>(null);
 
+  // Image management state
+  const [currentPhotos, setCurrentPhotos] = createSignal<Photo[]>([]);
+  const [newFiles, setNewFiles] = createSignal<File[]>([]);
+  const [photosToDelete, setPhotosToDelete] = createSignal<number[]>([]);
+  const [isUploading, setIsUploading] = createSignal(false);
+
   createEffect(() => {
     const vehicle = existingVehicle();
     if (vehicle) {
-      setBrand(vehicle.brand ?? "");
-      setModel(vehicle.model ?? "");
-      setPrice(vehicle.price ?? "");
-      setDateOfManufacture(vehicle.date_of_manufacture?.toString() ?? "");
-      setMileage(vehicle.mileage?.toString() ?? "");
-      setHorsepower(vehicle.horsepower?.toString() ?? "");
-      setTopSpeedKph(vehicle.top_speed_kph?.toString() ?? "");
-      setAcceleration(vehicle.acceleration_0_100_sec ?? "");
-      setTransmission(vehicle.transmission ?? "");
-      setWeightKg(vehicle.weight_kg?.toString() ?? "");
-      setExterior(vehicle.exterior ?? "");
-      setInterior(vehicle.interior ?? "");
-      setSeating(vehicle.seating?.toString() ?? "");
-      setWarranty(vehicle.warranty ?? "");
+      setBrand(vehicle.brand || "");
+      setModel(vehicle.model || "");
+      const priceValue = vehicle.price
+        ? parseFloat(vehicle.price.toString())
+        : 0;
+      setPrice(priceValue > 0 ? vehicle.price!.toString() : "10000");
+      const dateValue = vehicle.date_of_manufacture || 0;
+      setDateOfManufacture(
+        dateValue >= 1900 ? vehicle.date_of_manufacture!.toString() : "2020"
+      );
+      const mileageValue = vehicle.mileage || 0;
+      setMileage(mileageValue >= 0 ? vehicle.mileage!.toString() : "0");
+      const hpValue = vehicle.horsepower || 0;
+      setHorsepower(hpValue > 0 ? vehicle.horsepower!.toString() : "100");
+      const speedValue = vehicle.top_speed_kph || 0;
+      setTopSpeedKph(
+        speedValue > 0 ? vehicle.top_speed_kph!.toString() : "200"
+      );
+      const accelValue = vehicle.acceleration_0_100_sec
+        ? parseFloat(vehicle.acceleration_0_100_sec.toString())
+        : 0;
+      setAcceleration(
+        accelValue > 0 ? vehicle.acceleration_0_100_sec!.toString() : "5.0"
+      );
+      setTransmission(vehicle.transmission || "");
+      const weightValue = vehicle.weight_kg || 0;
+      setWeightKg(weightValue > 0 ? vehicle.weight_kg!.toString() : "1000");
+      setExterior(vehicle.exterior || "");
+      setInterior(vehicle.interior || "");
+      const seatingValue = vehicle.seating || 0;
+      setSeating(seatingValue > 0 ? vehicle.seating!.toString() : "4");
+      setWarranty(vehicle.warranty || "");
       setMaintenanceBooklet(vehicle.maintenance_booklet ?? false);
-      setPowertrainType(vehicle.powertrain_type ?? "Gasoline");
-      setGeneralDescription(vehicle.general_description ?? "");
-      setSpecificationDescription(vehicle.specification_description ?? "");
-      setAppearanceTitle(vehicle.appearance_title ?? "");
-      setAppearanceDescription(vehicle.appearance_description ?? "");
-      setFeatureDescription(vehicle.feature_description ?? "");
+      setPowertrainType(vehicle.powertrain_type || "Gasoline");
+      setGeneralDescription(vehicle.general_description || "");
+      setSpecificationDescription(vehicle.specification_description || "");
+      setAppearanceTitle(vehicle.appearance_title || "");
+      setAppearanceDescription(vehicle.appearance_description || "");
+      setFeatureDescription(vehicle.feature_description || "");
+      setCurrentPhotos(vehicle.photos || []);
     }
   });
 
   const vehicleUpdateMutation: UseMutationResult<
     Vehicle,
     Error,
-    UpdateVehicleDBData & { id: string }
+    UpdateVehicleDBData & {
+      id: string;
+      photosToDelete?: number[];
+      newPhotoUrls?: string[];
+    }
   > = useMutation(() => ({
     mutationFn: updateVehicleInDB,
     onSuccess: (updatedVehicle) => {
+      // Invalidate any cached queries that might exist
       queryClient.invalidateQueries({ queryKey: [VEHICLES_QUERY_KEY_PREFIX] });
       queryClient.setQueryData(["vehicle", vehicleId()], {
         data: [updatedVehicle],
@@ -190,6 +249,46 @@ export default function EditVehiclePage() {
       setFormErrors({ _errors: [error.message] } as any);
     },
   }));
+
+  // Image management functions
+  const handleFileSelect = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const files = target.files;
+    if (files) {
+      const fileArray = Array.from(files);
+      setNewFiles((prev) => [...prev, ...fileArray]);
+    }
+  };
+
+  const removeNewFile = (index: number) => {
+    setNewFiles((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const markPhotoForDeletion = (photoId: number) => {
+    setPhotosToDelete((prev) => [...prev, photoId]);
+    setCurrentPhotos((prev) => prev.filter((p) => p.photo_id !== photoId));
+  };
+
+  const uploadImages = async (): Promise<string[]> => {
+    if (newFiles().length === 0) return [];
+
+    const formData = new FormData();
+    newFiles().forEach((file) => {
+      formData.append("photos", file);
+    });
+
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to upload images");
+    }
+
+    const result = await response.json();
+    return result.imageUrls || [];
+  };
 
   const handleSubmit = async (e: Event) => {
     e.preventDefault();
@@ -210,7 +309,7 @@ export default function EditVehiclePage() {
       interior: interior(),
       seating: seating(),
       warranty: warranty(),
-      maintenance_booklet: maintenance_booklet(),
+      maintenance_booklet: maintenance_booklet() ? "true" : "false",
       powertrain_type: powertrain_type(),
       general_description: general_description(),
       specification_description: specification_description(),
@@ -224,10 +323,28 @@ export default function EditVehiclePage() {
       return;
     }
 
-    vehicleUpdateMutation.mutate({
-      id: vehicleId()!,
-      ...validationResult.data,
-    });
+    try {
+      setIsUploading(true);
+
+      // Upload new images first
+      const uploadedUrls = await uploadImages();
+
+      // Update vehicle data with photo operations
+      const updateData = {
+        ...validationResult.data,
+        photosToDelete: photosToDelete(),
+        newPhotoUrls: uploadedUrls,
+      };
+
+      vehicleUpdateMutation.mutate({
+        id: vehicleId()!,
+        ...updateData,
+      });
+    } catch (error) {
+      setFormErrors({ _errors: [(error as Error).message] } as any);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const inputBaseClasses = `block w-full mt-1 py-2 px-3 rounded-md border transition duration-150 ease-in-out bg-white text-neutral-900 border-neutral-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-black`;
@@ -631,11 +748,86 @@ export default function EditVehiclePage() {
               </div>
             </div>
 
-            {/* --- Image Upload Placeholder --- */}
+            {/* --- Image Management --- */}
             <div class="pt-4 border-t">
-              <h2 class="text-xl font-semibold text-neutral-700">Images</h2>
-              <div class="mt-2 w-full h-32 border-2 border-dashed border-neutral-300 rounded-md flex items-center justify-center text-neutral-500">
-                Image editing feature will be added here.
+              <h2 class="text-xl font-semibold text-neutral-700 mb-4">
+                Images
+              </h2>
+
+              {/* Current Images */}
+              <div class="mb-6">
+                <h3 class="text-lg font-medium text-neutral-600 mb-3">
+                  Current Images
+                </h3>
+                <Show
+                  when={currentPhotos().length > 0}
+                  fallback={
+                    <p class="text-neutral-500">No images uploaded yet.</p>
+                  }
+                >
+                  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <For each={currentPhotos()}>
+                      {(photo, index) => (
+                        <div class="relative group">
+                          <img
+                            src={photo.photo_url}
+                            alt={`Vehicle image ${index() + 1}`}
+                            class="w-full h-24 object-cover rounded-md border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => markPhotoForDeletion(photo.photo_id)}
+                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Delete image"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+                    </For>
+                  </div>
+                </Show>
+              </div>
+
+              {/* New Images to Upload */}
+              <div class="mb-6">
+                <h3 class="text-lg font-medium text-neutral-600 mb-3">
+                  Add New Images
+                </h3>
+                <div class="space-y-4">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    class="block w-full text-sm text-neutral-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-neutral-800"
+                    disabled={isUploading()}
+                  />
+
+                  <Show when={newFiles().length > 0}>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      <For each={newFiles()}>
+                        {(file, index) => (
+                          <div class="relative group">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`New image ${index() + 1}`}
+                              class="w-full h-24 object-cover rounded-md border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeNewFile(index())}
+                              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                              title="Remove image"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        )}
+                      </For>
+                    </div>
+                  </Show>
+                </div>
               </div>
             </div>
 
@@ -650,22 +842,23 @@ export default function EditVehiclePage() {
               <A
                 href="/dashboard/vehicles"
                 class={`min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-neutral-200 text-neutral-800 hover:bg-neutral-300 ${
-                  vehicleUpdateMutation.isPending
+                  vehicleUpdateMutation.isPending || isUploading()
                     ? "opacity-50 cursor-not-allowed"
                     : ""
                 }`}
                 onClick={(e) => {
-                  if (vehicleUpdateMutation.isPending) e.preventDefault();
+                  if (vehicleUpdateMutation.isPending || isUploading())
+                    e.preventDefault();
                 }}
               >
                 Cancel
               </A>
               <button
                 type="submit"
-                disabled={vehicleUpdateMutation.isPending}
+                disabled={vehicleUpdateMutation.isPending || isUploading()}
                 class="min-w-[130px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800 active:bg-neutral-700 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 focus:ring-offset-white disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {vehicleUpdateMutation.isPending
+                {vehicleUpdateMutation.isPending || isUploading()
                   ? "Updating Vehicle..."
                   : "Update Vehicle"}
               </button>

@@ -35,6 +35,7 @@ export default function VehicleDisplayArea(props: {
   vehiclesQuery: UseQueryResult<TransformedApiResponse, Error>;
   currentPage: Accessor<number>;
   setCurrentPage: Setter<number>;
+  selectedFilters: Accessor<Record<string, string[]>>;
 }) {
   const vehicles = () => props.vehiclesQuery.data?.data || [];
   const pagination = () => props.vehiclesQuery.data?.pagination;
@@ -84,7 +85,7 @@ export default function VehicleDisplayArea(props: {
 
   return (
     <div class="flex flex-col md:flex-row">
-      <FilterSidebar show={true} />
+      <FilterSidebar show={Object.keys(props.selectedFilters()).length > 0} />
       <div class="flex-grow px-1.5 md:px-3">
         <Show
           when={!props.vehiclesQuery.isLoading}
