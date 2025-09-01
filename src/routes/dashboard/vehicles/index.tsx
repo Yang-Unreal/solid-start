@@ -1,34 +1,33 @@
-// src/routes/dashboard/products.tsx
+// src/routes/dashboard/vehicles/index.tsx
 import { Suspense } from "solid-js";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
-import ProductListDashboard from "~/components/product/ProductListDashboard";
-import type { Product } from "~/db/schema";
+import VehicleListDashboard from "~/components/product/VehicleListDashboard";
+import type { Vehicle } from "~/db/schema";
 import { useSearch } from "~/context/SearchContext";
 
 interface PaginationInfo {
   currentPage: number;
   pageSize: number;
-  totalProducts: number;
+  totalVehicles: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
 interface ApiResponse {
-  data: Product[];
+  data: Vehicle[];
   pagination: PaginationInfo;
   error?: string;
 }
 
-const PRODUCTS_QUERY_KEY_PREFIX = "products";
+const VEHICLES_QUERY_KEY_PREFIX = "vehicles";
 
 const FIXED_PAGE_SIZE = 10;
 
-export default function DashboardProductsPage() {
+export default function DashboardVehiclesPage() {
   const {
     searchQuery,
     selectedBrands,
-    selectedCategories,
-    selectedFuelTypes,
+    selectedPowertrainTypes,
     currentPage,
     setCurrentPage,
   } = useSearch();
@@ -36,28 +35,24 @@ export default function DashboardProductsPage() {
 
   const buildFilterString = () => {
     const filters: string[] = [];
-    if (selectedBrands().length > 0)
+    if (selectedBrands().length > 0) {
       filters.push(
         `brand IN [${selectedBrands()
           .map((b) => `"${b}"`)
           .join(", ")}]`
       );
-    if (selectedCategories().length > 0)
+    }
+    if (selectedPowertrainTypes().length > 0) {
       filters.push(
-        `category IN [${selectedCategories()
-          .map((c) => `"${c}"`)
+        `powertrain_type IN [${selectedPowertrainTypes()
+          .map((p) => `"${p}"`)
           .join(", ")}]`
       );
-    if (selectedFuelTypes().length > 0)
-      filters.push(
-        `fuelType IN [${selectedFuelTypes()
-          .map((f) => `"${f}"`)
-          .join(", ")}]`
-      );
+    }
     return filters.join(" AND ");
   };
 
-  const fetchProductsQueryFn = async (context: {
+  const fetchVehiclesQueryFn = async (context: {
     queryKey: readonly [
       string,
       { page: number; size: number; q?: string; filter: string }
@@ -79,23 +74,15 @@ export default function DashboardProductsPage() {
     if (q) params.append("q", q);
     if (filter) params.append("filter", filter);
 
-    const fetchUrl = `${baseUrl}/api/products?${params.toString()}`;
+    const fetchUrl = `${baseUrl}/api/vehicles?${params.toString()}`;
     const response = await fetch(fetchUrl);
     if (!response.ok) throw new Error("Network response was not ok");
     return response.json();
   };
 
-  const productsQuery: UseQueryResult<ApiResponse, Error> = useQuery<
-    ApiResponse,
-    Error,
-    ApiResponse,
-    readonly [
-      string,
-      { page: number; size: number; q?: string; filter: string }
-    ]
-  >(() => ({
+  const vehiclesQuery: UseQueryResult<ApiResponse, Error> = useQuery(() => ({
     queryKey: [
-      PRODUCTS_QUERY_KEY_PREFIX,
+      VEHICLES_QUERY_KEY_PREFIX,
       {
         page: currentPage(),
         size: pageSize(),
@@ -103,7 +90,7 @@ export default function DashboardProductsPage() {
         filter: buildFilterString(),
       },
     ] as const,
-    queryFn: fetchProductsQueryFn,
+    queryFn: fetchVehiclesQueryFn,
     keepPreviousData: true,
   }));
 
@@ -113,8 +100,8 @@ export default function DashboardProductsPage() {
         {/* Main content area */}
         <Suspense>
           <div class="flex-grow px-1.5 md:px-3">
-            <ProductListDashboard
-              productsQuery={productsQuery}
+            <VehicleListDashboard
+              vehiclesQuery={vehiclesQuery}
               currentPage={currentPage}
               setCurrentPage={setCurrentPage}
               pageSize={pageSize}

@@ -1,99 +1,100 @@
 import { For, Show, createMemo } from "solid-js";
 import { A } from "@solidjs/router";
-import type { Product } from "~/db/schema";
+import type { Vehicle } from "~/db/schema";
 import type { QueryObserverResult } from "@tanstack/solid-query";
-import ProductImage from "~/components/product/ProductImage";
+import VehicleImage from "~/components/product/VehicleImage";
 
-// --- Interface Definitions (reverted to include full pagination info) ---
+// --- Interface Definitions ---
 interface PaginationInfo {
   currentPage: number;
   pageSize: number;
-  totalProducts: number;
+  totalVehicles: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
 
 interface ApiResponse {
-  data: Product[];
+  data: Vehicle[];
   pagination: PaginationInfo;
   error?: string;
 }
 
-interface ProductDisplayAreaProps {
-  productsQuery: QueryObserverResult<ApiResponse, Error>;
-  handlePageChange: (newPage: number) => void; // Re-added
+interface VehicleDisplayAreaProps {
+  vehiclesQuery: QueryObserverResult<ApiResponse, Error>;
+  handlePageChange: (newPage: number) => void;
   pageSize: () => number;
 }
 
-// --- Helper Functions (unchanged) ---
-const formatPrice = (priceInCents: number) =>
-  `$${(priceInCents / 100).toLocaleString("en-US")}`;
+// --- Helper Functions ---
+const formatPrice = (price: number | string | null | undefined) => {
+  if (price === null || price === undefined) return "N/A";
+  const numPrice = typeof price === "string" ? parseFloat(price) : price;
+  if (isNaN(numPrice)) return "N/A";
+  return `$${numPrice.toLocaleString("en-US")}`;
+};
 
-// --- Main Component (Updated Logic) ---
-const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
-  const memoizedProducts = createMemo(
-    () => props.productsQuery.data?.data || []
+// --- Main Component ---
+const VehicleDisplayArea = (props: VehicleDisplayAreaProps) => {
+  const memoizedVehicles = createMemo(
+    () => props.vehiclesQuery.data?.data || []
   );
-  const pagination = () => props.productsQuery.data?.pagination || null;
-  const error = () => props.productsQuery.error;
+  const pagination = () => props.vehiclesQuery.data?.pagination || null;
+  const error = () => props.vehiclesQuery.error;
 
-  const isLoading = () => props.productsQuery.isLoading;
+  const isLoading = () => props.vehiclesQuery.isLoading;
 
   return (
     <>
-      {/* State 1: Error occurred */}
       <Show when={error()}>
         <div class="text-center py-10">
           <p class="text-xl text-red-600">
             Error: {error()?.message || "An unknown error occurred."}
           </p>
-          <p class="text-neutral-700 mt-2">
-            Please try refreshing.{" "}
-            <button
-              onClick={() => props.productsQuery.refetch()}
-              class="ml-2 text-sky-600 underline"
-              aria-label="Retry fetching products"
-            >
-              Retry
-            </button>
-          </p>
+          <button
+            onClick={() => props.vehiclesQuery.refetch()}
+            class="ml-2 text-sky-600 underline"
+          >
+            Retry
+          </button>
         </div>
       </Show>
 
       <div class="relative">
-        {/* --- Product Grid Container (Always rendered for hydration stability) --- */}
         <div
-          class={`product-grid-container justify-center gap-2 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4`}
+          class={`vehicle-grid-container justify-center gap-2 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4`}
         >
-          {/* Only show products if not loading and no error, and products exist */}
           <Show
-            when={!isLoading() && !error() && memoizedProducts().length > 0}
+            when={!isLoading() && !error() && memoizedVehicles().length > 0}
           >
-            <For each={memoizedProducts()}>
-              {(product) => (
+            <For each={memoizedVehicles()}>
+              {(vehicle) => (
                 <A
-                  href={`/products/${product.id}`}
+                  href={`/vehicles/${vehicle.vehicle_id}`}
                   class="card-content-host flex flex-col bg-white overflow-hidden"
                 >
                   <div class="w-full aspect-video bg-neutral-100 overflow-hidden">
-                    <ProductImage
-                      imageBaseUrl={product.imageBaseUrl}
+                    <VehicleImage
+                      vehicleId={vehicle.vehicle_id}
                       index={0}
                       size="card"
-                      alt={product.name}
+                      alt={`${vehicle.brand || ""} ${
+                        vehicle.model || ""
+                      }`.trim()}
                       class="w-full h-full object-cover"
                     />
                   </div>
                   <div class=" flex flex-col flex-grow">
                     <h2
                       class="text-md font-semibold text-neutral-800 truncate mb-4"
-                      title={product.name}
+                      title={`${vehicle.brand || ""} ${
+                        vehicle.model || ""
+                      }`.trim()}
                     >
-                      {product.name}
+                      {vehicle.brand || ""} {vehicle.model || ""}
                     </h2>
                     <p class="text-sm mt-2 mb-4 text-neutral-700 flex-grow">
-                      {formatPrice(product.priceInCents)}
+                      {formatPrice(vehicle.price)}
                     </p>
                   </div>
                 </A>
@@ -102,7 +103,6 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
           </Show>
         </div>
 
-        {/* --- Pagination Controls (Only show if not loading, no error, and pagination exists) --- */}
         <Show
           when={
             !isLoading() &&
@@ -116,12 +116,8 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
               onClick={() => props.handlePageChange(1)}
               disabled={!pagination()!.hasPreviousPage}
               class="pagination-button"
-              aria-label="First page"
             >
-              <span class="hidden sm:inline">First</span>
-              <span class="sm:hidden" aria-hidden="true">
-                «
-              </span>
+              First
             </button>
             <button
               onClick={() =>
@@ -129,12 +125,8 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
               }
               disabled={!pagination()!.hasPreviousPage}
               class="pagination-button"
-              aria-label="Previous page"
             >
-              <span class="hidden sm:inline">Previous</span>
-              <span class="sm:hidden" aria-hidden="true">
-                ‹
-              </span>
+              Previous
             </button>
             <span class="text-neutral-700 font-medium text-sm px-2">
               Page {pagination()!.currentPage} of {pagination()!.totalPages}
@@ -145,23 +137,15 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
               }
               disabled={!pagination()!.hasNextPage}
               class="pagination-button"
-              aria-label="Next page"
             >
-              <span class="hidden sm:inline">Next</span>
-              <span class="sm:hidden" aria-hidden="true">
-                ›
-              </span>
+              Next
             </button>
             <button
               onClick={() => props.handlePageChange(pagination()!.totalPages)}
               disabled={!pagination()!.hasNextPage}
               class="pagination-button"
-              aria-label="Last page"
             >
-              <span class="hidden sm:inline">Last</span>
-              <span class="sm:hidden" aria-hidden="true">
-                »
-              </span>
+              Last
             </button>
           </div>
         </Show>
@@ -170,4 +154,4 @@ const ProductDisplayArea = (props: ProductDisplayAreaProps) => {
   );
 };
 
-export default ProductDisplayArea;
+export default VehicleDisplayArea;

@@ -1,35 +1,34 @@
-// src/routes/products/index.tsx
+// src/routes/vehicles/index.tsx
 
 import { MetaProvider } from "@solidjs/meta";
 import { useQuery, type UseQueryResult } from "@tanstack/solid-query";
-import ProductDisplayArea from "~/components/product/ProductDisplayArea";
+import VehicleDisplayArea from "~/components/product/VehicleDisplayArea";
 import { useSearch } from "~/context/SearchContext";
-import type { Product } from "~/db/schema";
+import type { Vehicle } from "~/db/schema";
 
 interface PaginationInfo {
   currentPage: number;
   pageSize: number;
-  totalProducts: number;
+  totalVehicles: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
 interface ApiResponse {
-  data: Product[];
+  data: Vehicle[];
   pagination: PaginationInfo;
   error?: string;
 }
 
-const PRODUCTS_QUERY_KEY_PREFIX = "products";
+const VEHICLES_QUERY_KEY_PREFIX = "vehicles";
 const FIXED_PAGE_SIZE = 30;
 
-export default function ProductsPage() {
+export default function VehiclesPage() {
   const {
     searchQuery,
-
     selectedBrands,
-    selectedCategories,
     selectedFuelTypes,
+    selectedPowertrainTypes,
     currentPage,
     setCurrentPage,
   } = useSearch();
@@ -37,28 +36,28 @@ export default function ProductsPage() {
 
   const buildFilterString = () => {
     const filters: string[] = [];
-    if (selectedBrands().length > 0)
-      filters.push(
-        `brand IN [${selectedBrands()
-          .map((b) => `"${b}"`)
-          .join(", ")}]`
-      );
-    if (selectedCategories().length > 0)
-      filters.push(
-        `category IN [${selectedCategories()
-          .map((c) => `"${c}"`)
-          .join(", ")}]`
-      );
-    if (selectedFuelTypes().length > 0)
-      filters.push(
-        `fuelType IN [${selectedFuelTypes()
-          .map((f) => `"${f}"`)
-          .join(", ")}]`
-      );
+    if (selectedBrands().length > 0) {
+      const brandList = selectedBrands()
+        .map((b) => `"${b}"`)
+        .join(", ");
+      filters.push(`brand IN [${brandList}]`);
+    }
+    if (selectedFuelTypes().length > 0) {
+      const fuelList = selectedFuelTypes()
+        .map((f) => `"${f}"`)
+        .join(", ");
+      filters.push(`fuel_type IN [${fuelList}]`);
+    }
+    if (selectedPowertrainTypes().length > 0) {
+      const powertrainList = selectedPowertrainTypes()
+        .map((p) => `"${p}"`)
+        .join(", ");
+      filters.push(`powertrain_type IN [${powertrainList}]`);
+    }
     return filters.join(" AND ");
   };
 
-  const fetchProductsQueryFn = async (context: {
+  const fetchVehiclesQueryFn = async (context: {
     queryKey: readonly [
       string,
       { page: number; size: number; q?: string; filter: string }
@@ -77,14 +76,14 @@ export default function ProductsPage() {
     });
     if (q) params.append("q", q);
     if (filter) params.append("filter", filter);
-    const fetchUrl = `${baseUrl}/api/products?${params.toString()}`;
+    const fetchUrl = `${baseUrl}/api/vehicles?${params.toString()}`;
     const response = await fetch(fetchUrl);
     if (!response.ok)
       throw new Error((await response.json()).error || `HTTP error!`);
     return response.json();
   };
 
-  const productsQuery: UseQueryResult<ApiResponse, Error> = useQuery<
+  const vehiclesQuery: UseQueryResult<ApiResponse, Error> = useQuery<
     ApiResponse,
     Error,
     ApiResponse,
@@ -94,7 +93,7 @@ export default function ProductsPage() {
     ]
   >(() => ({
     queryKey: [
-      PRODUCTS_QUERY_KEY_PREFIX,
+      VEHICLES_QUERY_KEY_PREFIX,
       {
         page: currentPage(),
         size: pageSize(),
@@ -102,7 +101,7 @@ export default function ProductsPage() {
         filter: buildFilterString(),
       },
     ] as const,
-    queryFn: fetchProductsQueryFn,
+    queryFn: fetchVehiclesQueryFn,
     staleTime: 10 * 1000,
     keepPreviousData: true,
   }));
@@ -122,8 +121,8 @@ export default function ProductsPage() {
               <div class="flex flex-col md:flex-row">
                 {/* Main content area */}
                 <div class="flex-grow">
-                  <ProductDisplayArea
-                    productsQuery={productsQuery}
+                  <VehicleDisplayArea
+                    vehiclesQuery={vehiclesQuery}
                     handlePageChange={handlePageChange}
                     pageSize={pageSize}
                   />

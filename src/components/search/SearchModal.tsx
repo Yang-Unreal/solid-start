@@ -17,14 +17,12 @@ const SearchModal: Component<SearchModalProps> = (props) => {
     searchQuery,
     onSearchChange,
     selectedBrands,
-    selectedCategories,
     selectedFuelTypes,
   } = useSearch();
 
   const hasActiveFilters = createMemo(
     () =>
       selectedBrands().length > 0 ||
-      selectedCategories().length > 0 ||
       selectedFuelTypes().length > 0
   );
 

@@ -32,10 +32,10 @@ export default function FilterSidebar(props: FilterSidebarProps) {
   const {
     selectedBrands,
     setSelectedBrands,
-    selectedCategories,
-    setSelectedCategories,
     selectedFuelTypes,
     setSelectedFuelTypes,
+    selectedPowertrainTypes, // Added
+    setSelectedPowertrainTypes, // Added
   } = useSearch();
 
   const filterOptionsQuery = useQuery<FilterOptionsResponse, Error>(() => ({
@@ -49,8 +49,8 @@ export default function FilterSidebar(props: FilterSidebarProps) {
       ([value, count]) => ({ value, count })
     )
   );
-  const availableCategories = createMemo(() =>
-    Object.entries(filterOptionsQuery.data?.category || {}).map(
+  const availablePowertrainTypes = createMemo(() =>
+    Object.entries(filterOptionsQuery.data?.powertrain_type || {}).map(
       ([value, count]) => ({ value, count })
     )
   );
@@ -85,14 +85,14 @@ export default function FilterSidebar(props: FilterSidebarProps) {
         />
         <div class="h-[0.5px] bg-gray-300 w-full"></div>
         <FilterDropdown
-          title="Category"
-          options={availableCategories().map((c) => c.value)}
-          selectedOptions={selectedCategories()}
+          title="Powertrain Type"
+          options={availablePowertrainTypes().map((p) => p.value)}
+          selectedOptions={selectedPowertrainTypes()}
           onSelect={(option) => {
-            setSelectedCategories(
-              selectedCategories().includes(option)
-                ? selectedCategories().filter((c) => c !== option)
-                : [...selectedCategories(), option]
+            setSelectedPowertrainTypes(
+              selectedPowertrainTypes().includes(option)
+                ? selectedPowertrainTypes().filter((p) => p !== option)
+                : [...selectedPowertrainTypes(), option]
             );
           }}
           parentIsOpen={props.show}

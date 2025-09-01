@@ -18,8 +18,8 @@ const SearchInput = (props: SearchInputProps) => {
   const handleSearchSubmit = (e: Event) => {
     e.preventDefault();
     const targetPath = location.pathname.startsWith("/dashboard")
-      ? "/dashboard/products"
-      : "/products";
+      ? "/dashboard/vehicles"
+      : "/vehicles";
     navigate(targetPath);
     props.onSearchSubmit?.();
   };
@@ -28,7 +28,7 @@ const SearchInput = (props: SearchInputProps) => {
     <form onSubmit={handleSearchSubmit}>
       <div class="relative flex items-center">
         <label for={uniqueId} class="sr-only">
-          Search Products
+          Search Vehicles
         </label>
         <input
           id={uniqueId}
@@ -38,7 +38,7 @@ const SearchInput = (props: SearchInputProps) => {
           class={`w-full h-10 pl-1 pr-10 bg-neutral-50 rounded-full focus:outline-none transition-all duration-200 ease-in-out text-black ${
             props.class ?? ""
           }`}
-          aria-label="Search products"
+          aria-label="Search vehicles"
           placeholder="China's best, found for you"
         />
         <Hoverable

@@ -17,7 +17,7 @@ export default function DashboardLayout(props: RouteSectionProps) {
 
   return (
     <div class="pt-18 md:pt-26  container-padding">
-      {/* The router renders the correct page (index.tsx or products.tsx) here */}
+      {/* The router renders the correct page (index.tsx or vehicles.tsx) here */}
       {props.children}
     </div>
   );

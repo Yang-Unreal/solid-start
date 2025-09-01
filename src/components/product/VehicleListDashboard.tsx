@@ -1,4 +1,4 @@
-// src/components/ProductListDashboard.tsx
+// src/components/VehicleListDashboard.tsx
 import { For, Show, createSignal, createMemo } from "solid-js";
 import { A } from "@solidjs/router";
 import {
@@ -10,70 +10,68 @@ import type { Accessor, Setter } from "solid-js";
 import {
   PlusCircle,
   Trash2,
-  Pencil,
-  Square,
-  CheckSquare,
   ChevronsLeft,
   ChevronLeft,
   ChevronRight,
   ChevronsRight,
+  Square,
+  CheckSquare,
 } from "lucide-solid";
-import type { Product } from "~/db/schema";
-import ProductListItem from "./ProductListItem";
-import ProductTableRow from "./ProductTableRow";
+import type { Vehicle } from "~/db/schema";
+import VehicleListItem from "./VehicleListItem";
+import VehicleTableRow from "./VehicleTableRow";
 
 interface PaginationInfo {
   currentPage: number;
   pageSize: number;
-  totalProducts: number;
+  totalVehicles: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
 interface ApiResponse {
-  data: Product[];
+  data: Vehicle[];
   pagination: PaginationInfo;
   error?: string;
 }
 
-const PRODUCTS_QUERY_KEY_PREFIX = "products";
-const FIXED_PAGE_SIZE = 10;
+const VEHICLES_QUERY_KEY_PREFIX = "vehicles";
 
-async function deleteProductApi(
-  productId: string
-): Promise<{ message: string; product: Product }> {
-  const response = await fetch(`/api/products?id=${productId}`, {
+async function deleteVehicleApi(
+  vehicleId: string
+): Promise<{ message: string; vehicle: Vehicle }> {
+  const response = await fetch(`/api/vehicles?id=${vehicleId}`, {
     method: "DELETE",
   });
   if (!response.ok)
     throw new Error(
-      (await response.json()).error || "Failed to delete product"
+      (await response.json()).error || "Failed to delete vehicle"
     );
   return response.json();
 }
-async function bulkDeleteProductsApi(
-  productIds: string[]
-): Promise<{ message: string; deletedCount: number }> {
-  const response = await fetch("/api/products/bulk-delete", {
+async function bulkDeleteVehiclesApi(
+  vehicleIds: string[]
+): Promise<{ message: string; deletedIds: string[] }> {
+  const response = await fetch("/api/vehicles/bulk-delete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ids: productIds }),
+    body: JSON.stringify({ ids: vehicleIds }),
   });
   if (!response.ok)
     throw new Error(
-      (await response.json()).error || "Failed to bulk delete products"
+      (await response.json()).error || "Failed to bulk delete vehicles"
     );
   return response.json();
 }
 
-export default function ProductListDashboard(props: {
-  productsQuery: UseQueryResult<ApiResponse, Error>;
+export default function VehicleListDashboard(props: {
+  vehiclesQuery: UseQueryResult<ApiResponse, Error>;
   currentPage: Accessor<number>;
   setCurrentPage: Setter<number>;
   pageSize: Accessor<number>;
 }) {
   const tanstackQueryClient = useQueryClient();
-  const [selectedProductIds, setSelectedProductIds] = createSignal<Set<string>>(
+  const [selectedVehicleIds, setSelectedVehicleIds] = createSignal<Set<string>>(
     new Set()
   );
   const [deleteError, setDeleteError] = createSignal<string | null>(null);
@@ -81,65 +79,71 @@ export default function ProductListDashboard(props: {
     string | null
   >(null);
 
-  const products = () => props.productsQuery.data?.data || [];
-  const pagination = () => props.productsQuery.data?.pagination || null;
+  const vehicles = () => props.vehiclesQuery.data?.data || [];
+  const pagination = () => props.vehiclesQuery.data?.pagination || null;
 
-  const deleteProductMutation = useMutation(() => ({
-    mutationFn: deleteProductApi,
-    onSuccess: (data: { product: Product }) => {
+  const deleteVehicleMutation = useMutation(() => ({
+    mutationFn: deleteVehicleApi,
+    onSuccess: (data: { vehicle: Vehicle }) => {
       tanstackQueryClient.invalidateQueries({
-        queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
+        queryKey: [VEHICLES_QUERY_KEY_PREFIX],
       });
-      setShowSuccessMessage(`Product "${data.product.name}" deleted.`);
+      setShowSuccessMessage(
+        `Vehicle "${data.vehicle.brand} ${data.vehicle.model}" deleted.`
+      );
       setTimeout(() => setShowSuccessMessage(null), 3000);
     },
     onError: (err: Error) => setDeleteError(err.message),
   }));
 
-  const bulkDeleteProductsMutation = useMutation(() => ({
-    mutationFn: bulkDeleteProductsApi,
-    onSuccess: (data: { deletedCount: number }) => {
+  const bulkDeleteVehiclesMutation = useMutation(() => ({
+    mutationFn: bulkDeleteVehiclesApi,
+    onSuccess: (data: { deletedIds: string[] }) => {
       tanstackQueryClient.invalidateQueries({
-        queryKey: [PRODUCTS_QUERY_KEY_PREFIX],
+        queryKey: [VEHICLES_QUERY_KEY_PREFIX],
       });
-      setSelectedProductIds(new Set<string>());
-      setShowSuccessMessage(`${data.deletedCount} products deleted.`);
+      setSelectedVehicleIds(new Set<string>());
+      setShowSuccessMessage(`${data.deletedIds.length} vehicles deleted.`);
       setTimeout(() => setShowSuccessMessage(null), 3000);
     },
     onError: (err: Error) => setDeleteError(err.message),
   }));
 
-  const toggleProductSelection = (productId: string) =>
-    setSelectedProductIds((prev) => {
+  const toggleVehicleSelection = (vehicleId: string) =>
+    setSelectedVehicleIds((prev) => {
       const next = new Set(prev);
-      if (next.has(productId)) next.delete(productId);
-      else next.add(productId);
+      if (next.has(vehicleId)) next.delete(vehicleId);
+      else next.add(vehicleId);
       return next;
     });
-  const isProductSelected = (productId: string) =>
-    selectedProductIds().has(productId);
+  const isVehicleSelected = (vehicleId: string) =>
+    selectedVehicleIds().has(vehicleId);
   const isAllSelected = createMemo(() => {
-    const p = products();
+    const v = vehicles();
     return (
-      p.length > 0 &&
-      p.every((prod: Product) => selectedProductIds().has(prod.id))
+      v.length > 0 &&
+      v.every((vehicle: Vehicle) =>
+        selectedVehicleIds().has(vehicle.vehicle_id)
+      )
     );
   });
   const toggleSelectAll = () => {
     if (isAllSelected()) {
-      setSelectedProductIds(new Set<string>());
+      setSelectedVehicleIds(new Set<string>());
     } else {
-      setSelectedProductIds(new Set(products().map((p: Product) => p.id)));
+      setSelectedVehicleIds(
+        new Set(vehicles().map((v: Vehicle) => v.vehicle_id))
+      );
     }
   };
-  const handleDeleteProduct = (product: Product) => {
-    if (window.confirm(`Delete "${product.name}"?`))
-      deleteProductMutation.mutate(product.id);
+  const handleDeleteVehicle = (vehicle: Vehicle) => {
+    if (window.confirm(`Delete "${vehicle.brand} ${vehicle.model}"?`))
+      deleteVehicleMutation.mutate(vehicle.vehicle_id);
   };
   const handleBulkDelete = () => {
-    const ids = Array.from(selectedProductIds());
-    if (ids.length > 0 && window.confirm(`Delete ${ids.length} products?`))
-      bulkDeleteProductsMutation.mutate(ids);
+    const ids = Array.from(selectedVehicleIds());
+    if (ids.length > 0 && window.confirm(`Delete ${ids.length} vehicles?`))
+      bulkDeleteVehiclesMutation.mutate(ids);
   };
   const handlePageChange = (newPage: number) => {
     props.setCurrentPage(newPage);
@@ -151,25 +155,25 @@ export default function ProductListDashboard(props: {
     <div>
       <div class="flex justify-between items-center mb-4">
         <div class="w-full max-w-xs">
-          <h2 class="text-2xl font-bold text-black">Products List</h2>
+          <h2 class="text-2xl font-bold text-black">Vehicles List</h2>
         </div>
         <div class="flex items-center space-x-2">
           <A
-            href="/dashboard/products/new"
+            href="/dashboard/vehicles/new"
             class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-black text-white hover:bg-neutral-800"
           >
-            <PlusCircle size={18} class="mr-2" /> Add Product
+            <PlusCircle size={18} class="mr-2" /> Add Vehicle
           </A>
-          <Show when={selectedProductIds().size > 0}>
+          <Show when={selectedVehicleIds().size > 0}>
             <button
               onClick={handleBulkDelete}
-              disabled={bulkDeleteProductsMutation.isPending}
+              disabled={bulkDeleteVehiclesMutation.isPending}
               class="flex items-center min-w-[100px] text-center rounded-lg px-4 py-2 text-sm font-medium transition-colors duration-150 ease-in-out bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
             >
               <Trash2 size={18} class="mr-2" />{" "}
-              {bulkDeleteProductsMutation.isPending
+              {bulkDeleteVehiclesMutation.isPending
                 ? "Deleting..."
-                : `Delete Selected (${selectedProductIds().size})`}
+                : `Delete Selected (${selectedVehicleIds().size})`}
             </button>
           </Show>
         </div>
@@ -185,29 +189,29 @@ export default function ProductListDashboard(props: {
           {deleteError()}
         </div>
       </Show>
-      <Show when={props.productsQuery.error}>
-        <p class="text-red-500">Error: {props.productsQuery.error?.message}</p>
+      <Show when={props.vehiclesQuery.error}>
+        <p class="text-red-500">Error: {props.vehiclesQuery.error?.message}</p>
       </Show>
 
       <div class="flex space-x-4">
         <div class="flex-1">
           <div class="block md:hidden space-y-3">
             <Show
-              when={products().length > 0}
+              when={vehicles().length > 0}
               fallback={
                 <p class="text-center text-neutral-700 py-10">
-                  No products found.
+                  No vehicles found.
                 </p>
               }
             >
-              <For each={products()}>
-                {(product) => (
-                  <ProductListItem
-                    product={product}
-                    isSelected={isProductSelected(product.id)}
+              <For each={vehicles()}>
+                {(vehicle) => (
+                  <VehicleListItem
+                    vehicle={vehicle}
+                    isSelected={isVehicleSelected(vehicle.vehicle_id)}
                     isDeleting={false}
-                    onToggleSelect={toggleProductSelection}
-                    onDelete={handleDeleteProduct}
+                    onToggleSelect={toggleVehicleSelection}
+                    onDelete={handleDeleteVehicle}
                   />
                 )}
               </For>
@@ -216,10 +220,10 @@ export default function ProductListDashboard(props: {
 
           <div class="hidden md:block overflow-x-auto bg-white shadow-md rounded-lg">
             <Show
-              when={products().length > 0}
+              when={vehicles().length > 0}
               fallback={
                 <p class="text-center text-neutral-700 py-10">
-                  No products found.
+                  No vehicles found.
                 </p>
               }
             >
@@ -240,19 +244,19 @@ export default function ProductListDashboard(props: {
                       Image
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                      Product
+                      Vehicle
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                      Category
+                      Brand
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
+                      Model
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                       Price
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                      Stock
-                    </th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
-                      Created At
+                      Mileage
                     </th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-neutral-500 uppercase tracking-wider">
                       Actions
@@ -260,17 +264,17 @@ export default function ProductListDashboard(props: {
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-neutral-200">
-                  <For each={products()}>
-                    {(product) => (
-                      <ProductTableRow
-                        product={product}
-                        isSelected={isProductSelected(product.id)}
+                  <For each={vehicles()}>
+                    {(vehicle) => (
+                      <VehicleTableRow
+                        vehicle={vehicle}
+                        isSelected={isVehicleSelected(vehicle.vehicle_id)}
                         isDeleting={
-                          deleteProductMutation.isPending &&
-                          deleteProductMutation.variables === product.id
+                          deleteVehicleMutation.isPending &&
+                          deleteVehicleMutation.variables === vehicle.vehicle_id
                         }
-                        onToggleSelect={toggleProductSelection}
-                        onDelete={handleDeleteProduct}
+                        onToggleSelect={toggleVehicleSelection}
+                        onDelete={handleDeleteVehicle}
                       />
                     )}
                   </For>
