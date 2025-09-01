@@ -6,25 +6,6 @@ import { useSearch } from "~/context/SearchContext";
 import type { Vehicle, Photo } from "~/db/schema";
 import VehicleDisplayArea from "~/components/vehicle/VehicleDisplayArea";
 
-interface FilterOptionsResponse
-  extends Record<string, Record<string, number>> {}
-
-const FILTER_OPTIONS_QUERY_KEY = "filterOptions";
-
-const fetchFilterOptionsQueryFn = async (): Promise<FilterOptionsResponse> => {
-  let baseUrl = "";
-  if (import.meta.env.SSR) {
-    baseUrl =
-      import.meta.env.VITE_INTERNAL_API_ORIGIN ||
-      `http://localhost:${process.env.PORT || 3000}`;
-  }
-  const fetchUrl = `${baseUrl}/api/filter-options`;
-  const response = await fetch(fetchUrl);
-  if (!response.ok)
-    throw new Error((await response.json()).error || `HTTP error!`);
-  return response.json();
-};
-
 export type VehicleWithPhotos = Vehicle & { photos: Photo[] };
 
 interface PaginationInfo {
@@ -77,15 +58,15 @@ export default function VehiclesPage() {
 
   const pageSize = () => 12;
 
-  const filterOptionsQuery = useQuery<FilterOptionsResponse, Error>(() => ({
-    queryKey: [FILTER_OPTIONS_QUERY_KEY] as const,
-    queryFn: fetchFilterOptionsQueryFn,
-    staleTime: 10 * 1000,
-  }));
-
   const buildFilterString = () => {
-    // Temporarily disabled for testing - always show all vehicles
-    return "";
+    const filters = selectedFilters();
+    return Object.entries(filters)
+      .filter(([, values]) => values.length > 0)
+      .map(([name, values]) => {
+        const quotedValues = values.map((v) => `"${v}"`).join(", ");
+        return `${name} IN [${quotedValues}]`;
+      })
+      .join(" AND ");
   };
 
   const vehiclesQuery: UseQueryResult<ApiResponse, Error> = useQuery<
@@ -108,7 +89,7 @@ export default function VehiclesPage() {
         buildFilterString(),
         sortOption()
       ),
-    keepPreviousData: false,
+    keepPreviousData: true,
   }));
 
   return (
@@ -119,7 +100,6 @@ export default function VehiclesPage() {
             vehiclesQuery={vehiclesQuery}
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
-            selectedFilters={selectedFilters}
           />
         </div>
       </main>

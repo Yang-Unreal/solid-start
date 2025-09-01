@@ -16,10 +16,7 @@ interface VehicleTableRowProps {
 
 export default function VehicleTableRow(props: VehicleTableRowProps) {
   return (
-    <tr
-      class={`hover:bg-gray-50 ${props.isSelected ? "bg-blue-50" : ""}`}
-      data-vehicle-id={props.vehicle.vehicle_id}
-    >
+    <tr class={`hover:bg-gray-50 ${props.isSelected ? "bg-blue-50" : ""}`}>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
         <input
           type="checkbox"
@@ -29,24 +26,19 @@ export default function VehicleTableRow(props: VehicleTableRowProps) {
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         <VehicleImage
-          photoUrl={
-            Array.isArray(props.vehicle.photos) &&
-            props.vehicle.photos.length > 0
-              ? props.vehicle.photos[0]?.photo_url
-              : null
-          }
+          photoUrl={props.vehicle.photos?.[0]?.photo_url}
           alt={props.vehicle.model}
           class="h-10 w-16 rounded-md object-cover"
         />
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-        {String(props.vehicle.brand || "")} {String(props.vehicle.model || "")}
+        {props.vehicle.brand} {props.vehicle.model}
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        ${String(props.vehicle.price || "0")}
+        ${props.vehicle.price}
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        {String(props.vehicle.date_of_manufacture || "")}
+        {props.vehicle.date_of_manufacture}
       </td>
       <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <A

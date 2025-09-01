@@ -1,16 +1,9 @@
-import {
-  createSignal,
-  For,
-  Show,
-  type Accessor,
-  type Setter,
-  type Resource,
-} from "solid-js";
+import { createSignal, For, Show, type Accessor, type Setter } from "solid-js";
 import {
   useQueryClient,
   useMutation,
-  type UseMutationResult,
   type UseQueryResult,
+  type UseMutationResult,
 } from "@tanstack/solid-query";
 import { A } from "@solidjs/router";
 import VehicleTableRow from "~/components/vehicle/VehicleTableRow";
@@ -71,10 +64,7 @@ export default function VehicleListDashboard(props: {
   const [selectedIds, setSelectedIds] = createSignal<number[]>([]);
   const [isDeleting, setIsDeleting] = createSignal(false);
 
-  const vehicles = () => {
-    const data = props.vehiclesQuery.data?.data;
-    return Array.isArray(data) ? data : [];
-  };
+  const vehicles = () => props.vehiclesQuery.data?.data || [];
   const pagination = () => props.vehiclesQuery.data?.pagination || null;
 
   const deleteMutation = useMutation(() => ({
@@ -204,14 +194,14 @@ export default function VehicleListDashboard(props: {
               when={!props.vehiclesQuery.isLoading}
               fallback={
                 <tr>
-                  <td colspan="6" class="text-center py-4">
+                  <td colspan="7" class="text-center py-4">
                     Loading...
                   </td>
                 </tr>
               }
             >
               <For each={vehicles()}>
-                {(vehicle, index) => (
+                {(vehicle) => (
                   <VehicleTableRow
                     vehicle={vehicle}
                     isSelected={selectedIds().includes(vehicle.vehicle_id)}

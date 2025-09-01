@@ -41,13 +41,8 @@ const NewVehicleFormSchema = z.object({
   interior: z.string().trim().min(1),
   seating: z.coerce.number().int().positive(),
   warranty: z.string().trim().optional(),
-  maintenance_booklet: z
-    .string()
-    .transform((val) => val === "true")
-    .optional(),
-  powertrain_type: z.enum(["Gasoline", "Hybrid", "Electric"], {
-    message: "Powertrain type is required.",
-  }),
+  maintenance_booklet: z.boolean().default(false),
+  powertrain_type: z.enum(["Gasoline", "Hybrid", "Electric"]),
   general_description: z.string().trim().optional(),
   specification_description: z.string().trim().optional(),
   appearance_title: z.string().trim().optional(),
@@ -56,11 +51,11 @@ const NewVehicleFormSchema = z.object({
   photos: z.array(z.instanceof(File)).optional(),
 });
 
-type VehicleFormValues = z.output<typeof NewVehicleFormSchema>;
-type CreateVehicleDBData = z.output<typeof NewVehicleFormSchema>;
+type VehicleFormValues = z.infer<typeof NewVehicleFormSchema>;
+type CreateVehicleDBData = VehicleFormValues;
 
 async function createVehicleInDB(
-  newVehicle: z.output<typeof NewVehicleFormSchema>
+  newVehicle: CreateVehicleDBData
 ): Promise<Vehicle> {
   // When creating, we send FormData, not JSON
   const formData = new FormData();
@@ -119,7 +114,7 @@ export default function AddVehiclePage() {
     }
   });
 
-  // Form state signals with default values
+  // Form state signals
   const [brand, setBrand] = createSignal("");
   const [model, setModel] = createSignal("");
   const [price, setPrice] = createSignal("");
@@ -136,8 +131,8 @@ export default function AddVehiclePage() {
   const [warranty, setWarranty] = createSignal("");
   const [maintenance_booklet, setMaintenanceBooklet] = createSignal(false);
   const [powertrain_type, setPowertrainType] = createSignal<
-    "Gasoline" | "Hybrid" | "Electric" | ""
-  >("");
+    "Gasoline" | "Hybrid" | "Electric"
+  >("Gasoline");
   const [general_description, setGeneralDescription] = createSignal("");
   const [specification_description, setSpecificationDescription] =
     createSignal("");
@@ -152,7 +147,7 @@ export default function AddVehiclePage() {
   const vehicleCreationMutation: UseMutationResult<
     Vehicle,
     Error,
-    z.output<typeof NewVehicleFormSchema>
+    CreateVehicleDBData
   > = useMutation(() => ({
     mutationFn: createVehicleInDB,
     onSuccess: () => {
@@ -183,7 +178,7 @@ export default function AddVehiclePage() {
       interior: interior(),
       seating: seating(),
       warranty: warranty(),
-      maintenance_booklet: maintenance_booklet() ? "true" : "false",
+      maintenance_booklet: maintenance_booklet(),
       powertrain_type: powertrain_type(),
       general_description: general_description(),
       specification_description: specification_description(),
@@ -305,7 +300,6 @@ export default function AddVehiclePage() {
                 onInput={(e) => setMileage(e.currentTarget.value)}
                 class={inputBaseClasses}
                 disabled={vehicleCreationMutation.isPending}
-                placeholder=""
               />
               <Show when={fieldError("mileage")}>
                 <p class="mt-1 text-xs text-red-500">{fieldError("mileage")}</p>
@@ -471,7 +465,6 @@ export default function AddVehiclePage() {
                 class={inputBaseClasses}
                 disabled={vehicleCreationMutation.isPending}
               >
-                <option value="">Select Powertrain Type</option>
                 <option value="Gasoline">Gasoline</option>
                 <option value="Hybrid">Hybrid</option>
                 <option value="Electric">Electric</option>
