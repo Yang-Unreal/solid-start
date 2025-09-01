@@ -1,11 +1,11 @@
 // scripts/sync-meilisearch.ts
 import "dotenv/config";
-import { vehicles as vehicleTable } from "~/db/schema";
+import { product as productTable } from "~/db/schema";
 import { count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 // --- Import pollTask from our library ---
-import { vehiclesIndex, setupMeilisearch, pollTask } from "~/lib/meilisearch";
+import { productsIndex, setupMeilisearch, pollTask } from "~/lib/meilisearch";
 import type { EnqueuedTask } from "meilisearch";
 const BATCH_SIZE = 1000;
 
@@ -22,40 +22,40 @@ const drizzleSyncPool = new Pool({
   // For simplicity, assuming it's a plain connection string without SSL issues.
   ssl: false, // Assuming DATABASE_URL_DRIZZLE_KIT is for non-SSL or self-signed certs
 });
-const drizzleSyncDb = drizzle(drizzleSyncPool, { schema: { vehicleTable } });
+const drizzleSyncDb = drizzle(drizzleSyncPool, { schema: { productTable } });
 
 /**
  * Main function to synchronize products from PostgreSQL to MeiliSearch.
  */
-async function syncVehicles() {
-  console.log("Starting vehicle synchronization with MeiliSearch...");
+async function syncProducts() {
+  console.log("Starting product synchronization with MeiliSearch...");
 
   try {
     // 1. Configure MeiliSearch index settings
     await setupMeilisearch();
 
     // 2. Clear all existing documents in the index
-    console.log('Clearing all documents from the "vehicles" index...');
-    const clearTask: EnqueuedTask = await vehiclesIndex.deleteAllDocuments();
+    console.log('Clearing all documents from the "products" index...');
+    const clearTask: EnqueuedTask = await productsIndex.deleteAllDocuments();
     await pollTask(clearTask.taskUid);
     console.log("Index cleared successfully.");
 
     // 3. Fetch products from the database in batches
-    console.log("Fetching vehicles from the PostgreSQL database in batches...");
-    const totalVehiclesResult = await drizzleSyncDb
+    console.log("Fetching products from the PostgreSQL database in batches...");
+    const totalProductsResult = await drizzleSyncDb
       .select({ count: count() })
-      .from(vehicleTable);
-    const totalVehicles = totalVehiclesResult[0]?.count || 0;
-    console.log(`Found ${totalVehicles} vehicles to sync.`);
+      .from(productTable);
+    const totalProducts = totalProductsResult[0]?.count || 0;
+    console.log(`Found ${totalProducts} products to sync.`);
 
-    if (totalVehicles === 0) {
+    if (totalProducts === 0) {
       console.log(
-        "No vehicles found in the database. Synchronization finished."
+        "No products found in the database. Synchronization finished."
       );
       return;
     }
 
-    const numBatches = Math.ceil(totalVehicles / BATCH_SIZE);
+    const numBatches = Math.ceil(totalProducts / BATCH_SIZE);
     const allEnqueuedTasks: EnqueuedTask[] = [];
 
     for (let i = 0; i < numBatches; i++) {
@@ -65,19 +65,19 @@ async function syncVehicles() {
           i + 1
         }/${numBatches} (offset: ${offset}, limit: ${BATCH_SIZE})...`
       );
-      const vehiclesBatch = await drizzleSyncDb
+      const productsBatch = await drizzleSyncDb
         .select()
-        .from(vehicleTable)
+        .from(productTable)
         .limit(BATCH_SIZE)
         .offset(offset);
 
-      if (vehiclesBatch.length > 0) {
+      if (productsBatch.length > 0) {
         console.log(
           `Adding batch ${i + 1} (${
-            vehiclesBatch.length
+            productsBatch.length
           } documents) to MeiliSearch...`
         );
-        const task = await vehiclesIndex.addDocuments(vehiclesBatch);
+        const task = await productsIndex.addDocuments(productsBatch);
         allEnqueuedTasks.push(task);
       }
     }
@@ -90,7 +90,7 @@ async function syncVehicles() {
     await Promise.all(pollPromises);
 
     console.log(
-      "Vehicle synchronization with MeiliSearch completed successfully."
+      "Product synchronization with MeiliSearch completed successfully."
     );
   } catch (error) {
     console.error(
@@ -105,4 +105,4 @@ async function syncVehicles() {
 }
 
 // Execute the synchronization
-syncVehicles();
+syncProducts();

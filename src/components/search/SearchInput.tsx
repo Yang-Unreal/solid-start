@@ -18,8 +18,8 @@ const SearchInput = (props: SearchInputProps) => {
   const handleSearchSubmit = (e: Event) => {
     e.preventDefault();
     const targetPath = location.pathname.startsWith("/dashboard")
-      ? "/dashboard/vehicles"
-      : "/vehicles";
+      ? "/dashboard/products"
+      : "/products";
     navigate(targetPath);
     props.onSearchSubmit?.();
   };

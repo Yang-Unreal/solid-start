@@ -187,7 +187,7 @@ export default function Nav() {
                 )}
               </NavButton>
               <NavButton
-                onClick={() => navigate("/vehicles")}
+                onClick={() => navigate("/products")}
                 aria-label="Products"
                 isTransparent={transparent()}
               >

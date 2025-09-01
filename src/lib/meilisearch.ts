@@ -1,6 +1,6 @@
 // src/lib/meilisearch.ts
 import { MeiliSearch, type Task } from "meilisearch";
-import type { Vehicle } from "~/db/schema";
+import type { Product } from "~/db/schema";
 
 if (!process.env.MEILISEARCH_HOST) {
   throw new Error("MEILISEARCH_HOST environment variable is not set.");
@@ -14,7 +14,7 @@ export const meilisearch = new MeiliSearch({
   apiKey: process.env.MEILISEARCH_API_KEY,
 });
 
-export const vehiclesIndex = meilisearch.index<Vehicle>("vehicles");
+export const productsIndex = meilisearch.index<Product>("products");
 
 /**
  * Polls MeiliSearch for a task's completion status.
@@ -59,33 +59,21 @@ export const pollTask = async (
  */
 export const setupMeilisearch = async () => {
   try {
-    const task = await vehiclesIndex.updateSettings({
-      filterableAttributes: [
-        "brand",
-        "model",
-        "date_of_manufacture",
-        "powertrain_type",
-        "transmission",
-      ],
-      sortableAttributes: [
-        "price",
-        "date_of_manufacture",
-        "mileage",
-        "horsepower",
-      ],
+    const task = await productsIndex.updateSettings({
+      filterableAttributes: ["brand", "category", "fuelType"],
+      sortableAttributes: ["priceInCents", "createdAt", "updatedAt"],
       searchableAttributes: [
+        "name",
+        "description",
         "brand",
         "model",
-        "exterior",
-        "interior",
-        "general_description",
-        "specification_description",
+        "category",
       ],
     });
 
     await pollTask(task.taskUid);
     console.log(
-      'MeiliSearch index "vehicles" has been configured successfully.'
+      'MeiliSearch index "products" has been configured successfully.'
     );
   } catch (error) {
     console.error("Error configuring MeiliSearch index:", error);

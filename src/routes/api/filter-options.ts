@@ -1,21 +1,14 @@
 import { type APIEvent } from "@solidjs/start/server";
-import { vehiclesIndex } from "~/lib/meilisearch";
+import { productsIndex } from "~/lib/meilisearch";
 import { kv } from "~/lib/redis";
-import type { GranularFilterableAttribute } from "meilisearch";
 
 const CACHE_KEY = "filter-options"; // Keep the key for potential future use, but remove caching logic for now
 
 export async function GET({ request }: APIEvent) {
   try {
-    // Get the filterable attributes from the index settings
-    const settings = await vehiclesIndex.getSettings();
-    const filterableAttributes = (settings.filterableAttributes || [])
-      .flat()
-      .map((attr) => (typeof attr === "string" ? attr : Object.keys(attr)[0]));
-
-    // Then, use those attributes to get the facet distribution
-    const searchResult = await vehiclesIndex.search("", {
-      facets: filterableAttributes as string[],
+    // Always fetch from MeiliSearch to ensure the freshest data
+    const searchResult = await productsIndex.search("", {
+      facets: ["brand", "category", "fuelType"],
       limit: 0, // We only need facets, no hits
     });
 

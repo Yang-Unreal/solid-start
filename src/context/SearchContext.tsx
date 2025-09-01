@@ -12,79 +12,99 @@ import {
 interface SearchContextType {
   searchQuery: Accessor<string>;
   onSearchChange: (query: string) => void;
-  selectedFilters: Accessor<Record<string, string[]>>;
-  updateFilter: (filterName: string, value: string) => void;
-  clearFilters: () => void;
+  selectedBrands: Accessor<string[]>;
+  setSelectedBrands: (brands: string[]) => void;
+  selectedCategories: Accessor<string[]>;
+  setSelectedCategories: (categories: string[]) => void;
+  selectedFuelTypes: Accessor<string[]>;
+  setSelectedFuelTypes: (fuelTypes: string[]) => void;
   currentPage: Accessor<number>;
   setCurrentPage: Setter<number>;
-  sortOption: Accessor<string>;
-  setSortOption: (sort: string) => void;
 }
 
 const SearchContext = createContext<SearchContextType>();
 
-const LS_SEARCH_QUERY_KEY = "searchQuery";
-const LS_SELECTED_FILTERS_KEY = "selectedFilters";
-const LS_SORT_OPTION_KEY = "sortOption";
+const LS_SEARCH_QUERY_KEY = "productSearchQuery";
+const LS_SELECTED_BRANDS_KEY = "selectedBrands";
+const LS_SELECTED_CATEGORIES_KEY = "selectedCategories";
+const LS_SELECTED_FUEL_TYPES_KEY = "selectedFuelTypes";
 
 export function SearchProvider(props: { children: any }) {
   const [searchQuery, setSearchQuery] = createSignal("");
-  const [selectedFilters, setSelectedFilters] = createSignal<
-    Record<string, string[]>
-  >({});
+  const [selectedBrands, setSelectedBrands] = createSignal<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = createSignal<string[]>(
+    []
+  );
+  const [selectedFuelTypes, setSelectedFuelTypes] = createSignal<string[]>([]);
   const [currentPage, setCurrentPage] = createSignal(1);
-  const [sortOption, setSortOption] = createSignal("price:asc");
 
   onMount(() => {
     const storedQuery = localStorage.getItem(LS_SEARCH_QUERY_KEY);
-    if (storedQuery) setSearchQuery(storedQuery);
+    if (storedQuery) {
+      setSearchQuery(storedQuery);
+    }
 
-    const storedFilters = localStorage.getItem(LS_SELECTED_FILTERS_KEY);
-    if (storedFilters) setSelectedFilters(JSON.parse(storedFilters));
+    const storedBrands = localStorage.getItem(LS_SELECTED_BRANDS_KEY);
+    if (storedBrands) {
+      setSelectedBrands(JSON.parse(storedBrands));
+    }
 
-    const storedSortOption = localStorage.getItem(LS_SORT_OPTION_KEY);
-    if (storedSortOption) setSortOption(storedSortOption);
+    const storedCategories = localStorage.getItem(LS_SELECTED_CATEGORIES_KEY);
+    if (storedCategories) {
+      setSelectedCategories(JSON.parse(storedCategories));
+    }
+
+    const storedFuelTypes = localStorage.getItem(LS_SELECTED_FUEL_TYPES_KEY);
+    if (storedFuelTypes) {
+      setSelectedFuelTypes(JSON.parse(storedFuelTypes));
+    }
   });
 
   const onSearchChange = (query: string) => {
     setSearchQuery(query);
-    localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
-  };
-
-  const updateFilter = (filterName: string, value: string) => {
-    const currentFilters = selectedFilters();
-    const currentValues = currentFilters[filterName] || [];
-    const newValues = currentValues.includes(value)
-      ? currentValues.filter((v) => v !== value)
-      : [...currentValues, value];
-
-    const newFilters = { ...currentFilters, [filterName]: newValues };
-    setSelectedFilters(newFilters);
-    localStorage.setItem(LS_SELECTED_FILTERS_KEY, JSON.stringify(newFilters));
-  };
-
-  const clearFilters = () => {
-    setSelectedFilters({});
-    localStorage.removeItem(LS_SELECTED_FILTERS_KEY);
-  };
-
-  const updateSortOption = (sort: string) => {
-    setSortOption(sort);
     if (typeof window !== "undefined") {
-      localStorage.setItem(LS_SORT_OPTION_KEY, sort);
+      localStorage.setItem(LS_SEARCH_QUERY_KEY, query);
+    }
+  };
+
+  const updateSelectedBrands = (brands: string[]) => {
+    setSelectedBrands(brands);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(LS_SELECTED_BRANDS_KEY, JSON.stringify(brands));
+    }
+  };
+
+  const updateSelectedCategories = (categories: string[]) => {
+    setSelectedCategories(categories);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        LS_SELECTED_CATEGORIES_KEY,
+        JSON.stringify(categories)
+      );
+    }
+  };
+
+  const updateSelectedFuelTypes = (fuelTypes: string[]) => {
+    setSelectedFuelTypes(fuelTypes);
+    if (typeof window !== "undefined") {
+      localStorage.setItem(
+        LS_SELECTED_FUEL_TYPES_KEY,
+        JSON.stringify(fuelTypes)
+      );
     }
   };
 
   const value = {
     searchQuery,
     onSearchChange,
-    selectedFilters,
-    updateFilter,
-    clearFilters,
+    selectedBrands,
+    setSelectedBrands: updateSelectedBrands,
+    selectedCategories,
+    setSelectedCategories: updateSelectedCategories,
+    selectedFuelTypes,
+    setSelectedFuelTypes: updateSelectedFuelTypes,
     currentPage,
     setCurrentPage,
-    sortOption,
-    setSortOption: updateSortOption,
   };
 
   return (
