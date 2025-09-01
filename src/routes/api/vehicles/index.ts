@@ -34,7 +34,6 @@ async function invalidateCache() {
     console.log("Successfully invalidated vehicle and filter options cache.");
   } catch (error) {
     console.error("Failed to invalidate vehicle cache:", error);
-    // Continue without cache invalidation if Redis fails
   }
 }
 
@@ -53,74 +52,31 @@ async function handleGetSingleVehicle(vehicleId: string) {
   const parsedId = parseInt(idValidationResult.data, 10);
 
   const singleVehicleCacheKey = `vehicle:${parsedId}`;
-  let cachedVehicle = null;
   try {
-    cachedVehicle = await kv.get(singleVehicleCacheKey);
+    const cachedVehicle = await kv.get(singleVehicleCacheKey);
+    if (cachedVehicle) {
+      return new Response(JSON.stringify(cachedVehicle), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   } catch (error) {
     console.error("Redis cache read error:", error);
   }
 
-  if (cachedVehicle) {
-    return new Response(JSON.stringify(cachedVehicle), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   try {
-    // First fetch the basic vehicle data
     const vehicle = await db.query.vehicles.findFirst({
       where: eq(vehiclesTable.vehicle_id, parsedId),
+      with: {
+        engineDetails: true,
+        electricDetails: true,
+        photos: true,
+        features: {
+          with: {
+            feature: true,
+          },
+        },
+      },
     });
-
-    if (!vehicle) {
-      return new Response(JSON.stringify({ error: "Vehicle not found." }), {
-        status: 404,
-      });
-    }
-
-    // Fetch related data separately to avoid relationship issues
-    let photos: any[] = [];
-    let engineDetails: any[] = [];
-    let electricDetails: any[] = [];
-
-    try {
-      const [photosResult, engineDetailsResult, electricDetailsResult] =
-        await Promise.all([
-          db
-            .select()
-            .from(photosTable)
-            .where(eq(photosTable.vehicle_id, parsedId)),
-          db
-            .select()
-            .from(engineDetailsTable)
-            .where(eq(engineDetailsTable.vehicle_id, parsedId)),
-          db
-            .select()
-            .from(electricDetailsTable)
-            .where(eq(electricDetailsTable.vehicle_id, parsedId)),
-        ]);
-
-      photos = photosResult || [];
-      engineDetails = engineDetailsResult || [];
-      electricDetails = electricDetailsResult || [];
-    } catch (error) {
-      console.error("Error fetching related data:", error);
-      // Continue with empty arrays if related data fetch fails
-    }
-
-    // Combine the data
-    const vehicleWithRelations = {
-      ...vehicle,
-      photos: Array.isArray(photos) ? photos : [],
-      engineDetails:
-        Array.isArray(engineDetails) && engineDetails.length > 0
-          ? engineDetails[0]
-          : null,
-      electricDetails:
-        Array.isArray(electricDetails) && electricDetails.length > 0
-          ? electricDetails[0]
-          : null,
-    };
 
     if (!vehicle) {
       return new Response(JSON.stringify({ error: "Vehicle not found." }), {
@@ -129,7 +85,7 @@ async function handleGetSingleVehicle(vehicleId: string) {
     }
 
     const responseBody = {
-      data: [vehicleWithRelations],
+      data: [vehicle],
       pagination: {
         currentPage: 1,
         pageSize: 1,
@@ -138,16 +94,13 @@ async function handleGetSingleVehicle(vehicleId: string) {
       },
     };
 
-    // Cache the result (non-blocking)
     try {
-      kv.set(
+      await kv.set(
         singleVehicleCacheKey,
         JSON.stringify(responseBody),
         "EX",
         3600
-      ).catch((error) => {
-        console.error("Redis cache write error:", error);
-      });
+      ); // Cache for 1 hour
     } catch (error) {
       console.error("Redis cache write error:", error);
     }
@@ -166,69 +119,45 @@ async function handleGetSingleVehicle(vehicleId: string) {
 
 async function handleGetVehicleList(url: URL) {
   const listCacheKey = `vehicles:list:${url.searchParams.toString()}`;
-  let cachedList = null;
   try {
-    cachedList = await kv.get(listCacheKey);
+    const cachedList = await kv.get(listCacheKey);
+    if (cachedList) {
+      return new Response(JSON.stringify(cachedList), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   } catch (error) {
     console.error("Redis cache read error:", error);
-  }
-
-  if (cachedList) {
-    return new Response(JSON.stringify(cachedList), {
-      headers: { "Content-Type": "application/json" },
-    });
   }
 
   try {
     const page = parseInt(url.searchParams.get("page") || "1", 10);
     const pageSize = parseInt(url.searchParams.get("pageSize") || "30", 10);
-    const searchQuery = url.searchParams.get("q") || "";
+    const searchQuery = url.searchParams.get("search") || "";
     const sortParam = url.searchParams.get("sort") || "vehicle_id:asc";
 
     // Parse sort parameter (e.g., "price:asc" -> ["price", "asc"])
     const [sortBy, sortOrder] = sortParam.split(":");
 
-    const searchOptions: any = {
+    const searchResult = await vehiclesIndex.search(searchQuery, {
       page,
       hitsPerPage: pageSize,
       sort: [`${sortBy}:${sortOrder}`],
-    };
+    });
 
-    const filterParam = url.searchParams.get("filter");
-    if (filterParam) {
-      searchOptions.filter = filterParam;
-    } else {
-      searchOptions.filter = "vehicle_id >= 0";
-    }
-
-    const searchResult = await vehiclesIndex.search(searchQuery, searchOptions);
-
-    // Extract vehicle IDs from the search results
+    // Get vehicle IDs from search results
     const vehicleIds = searchResult.hits.map((hit) => hit.vehicle_id);
 
-    let photos: any[] = [];
-    if (vehicleIds.length > 0) {
-      // Fetch photos for all vehicles in a single query
-      photos = await db
-        .select()
-        .from(photosTable)
-        .where(inArray(photosTable.vehicle_id, vehicleIds));
-    }
-
-    // Create a map of vehicleId to photos for efficient lookup
-    const photosMap = photos.reduce((acc, photo) => {
-      if (!acc[photo.vehicle_id]) {
-        acc[photo.vehicle_id] = [];
-      }
-      acc[photo.vehicle_id].push(photo);
-      return acc;
-    }, {});
-
-    // Attach photos to each vehicle
-    const vehiclesWithPhotos = searchResult.hits.map((vehicle) => ({
-      ...vehicle,
-      photos: photosMap[vehicle.vehicle_id] || [],
-    }));
+    // Fetch vehicles with photos from database
+    const vehiclesWithPhotos =
+      vehicleIds.length > 0
+        ? await db.query.vehicles.findMany({
+            where: inArray(vehiclesTable.vehicle_id, vehicleIds),
+            with: {
+              photos: true,
+            },
+          })
+        : [];
 
     const responseBody = {
       data: vehiclesWithPhotos,
@@ -240,13 +169,8 @@ async function handleGetVehicleList(url: URL) {
       },
     };
 
-    // Cache the result (non-blocking)
     try {
-      kv.set(listCacheKey, JSON.stringify(responseBody), "EX", 600).catch(
-        (error) => {
-          console.error("Redis cache write error:", error);
-        }
-      );
+      await kv.set(listCacheKey, JSON.stringify(responseBody), "EX", 600); // Cache for 10 minutes
     } catch (error) {
       console.error("Redis cache write error:", error);
     }
