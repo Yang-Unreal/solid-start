@@ -83,7 +83,7 @@ export async function POST(event: APIEvent) {
 
     // Generate a single base UUID for all images of this product
     const productImageBaseUrl = randomUUID();
-    const uploadedImageBaseUrls: string[] = [productImageBaseUrl]; // This array will now only contain one UUID
+    const uploadedUrls: string[] = [];
 
     for (let i = 0; i < files.length; i++) {
       const masterFile = files[i];
@@ -110,7 +110,7 @@ export async function POST(event: APIEvent) {
       };
       const formats = ["avif", "webp", "jpeg"] as const;
 
-      const uploadPromises: Promise<any>[] = [];
+      const uploadPromises: Promise<string>[] = [];
 
       for (const sizeName in sizes) {
         const { width, height } = sizes[sizeName as keyof typeof sizes];
@@ -132,7 +132,13 @@ export async function POST(event: APIEvent) {
           );
         }
       }
-      await Promise.all(uploadPromises);
+      const urls = await Promise.all(uploadPromises);
+      // Collect the detail-avif URL (index 6: thumbnail 0-2, card 3-5, detail 6-8, avif=0)
+      if (urls[6]) {
+        uploadedUrls.push(urls[6]);
+      } else {
+        return createErrorResponse("Failed to generate image URL.", 500);
+      }
     }
 
     // If new images were uploaded successfully and an old base URL was provided, delete the old image set
@@ -158,13 +164,11 @@ export async function POST(event: APIEvent) {
       }
     }
 
-    // Return the single base URL for the product's images
-    const imageBaseUrls: string[] = uploadedImageBaseUrls;
-
+    // Return the image URLs
     return createSuccessResponse({
       success: true,
-      imageBaseUrls, // Return the structured object
-      message: `Successfully processed and uploaded ${uploadedImageBaseUrls.length} image(s).`,
+      imageUrls: uploadedUrls,
+      message: `Successfully processed and uploaded ${uploadedUrls.length} image(s).`,
     });
   } catch (error: any) {
     console.error("=== Upload API Error ===", error);

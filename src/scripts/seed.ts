@@ -13,7 +13,7 @@ import {
 import { faker } from "@faker-js/faker";
 import { eq, sql } from "drizzle-orm";
 
-const NUM_VEHICLES_TO_SEED = 200;
+const NUM_VEHICLES_TO_SEED = 20;
 const ADMIN_EMAIL = "1@gmail.com";
 
 async function seedVehicles() {

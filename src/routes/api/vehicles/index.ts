@@ -10,10 +10,10 @@ import {
   vehicle_features,
   features,
 } from "~/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, and } from "drizzle-orm";
 import { z } from "zod";
 import { kv } from "~/lib/redis";
-import { minio, bucket } from "~/lib/minio";
+import { minio, bucket, endpoint } from "~/lib/minio";
 import { DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { vehiclesIndex, pollTask } from "~/lib/meilisearch";
 
@@ -60,6 +60,9 @@ const NewVehiclePayloadSchema = z.object({
   photos: z.array(
     z.object({ photo_url: z.string(), display_order: z.number() })
   ),
+  features: z
+    .array(z.object({ name: z.string(), category: z.string() }))
+    .optional(), // array of feature objects
   // Powertrain specific fields
   cylinder_amount: z.coerce.number().optional(),
   cylinder_capacity_cc: z.coerce.number().optional(),
@@ -88,6 +91,11 @@ async function handleGetSingleVehicle(vehicleId: string) {
       gasoline_powertrain: true,
       electric_powertrain: true,
       hybrid_powertrain: true,
+      features: {
+        with: {
+          feature: true,
+        },
+      },
     },
   });
 
@@ -169,6 +177,7 @@ export async function POST({ request }: APIEvent) {
 
     const {
       photos: photoData,
+      features: featureData,
       powertrain_type,
       cylinder_amount,
       cylinder_capacity_cc,
@@ -245,10 +254,67 @@ export async function POST({ request }: APIEvent) {
         );
       }
 
+      if (featureData && featureData.length > 0) {
+        const featureIds: string[] = [];
+        for (const feature of featureData) {
+          const existing = await tx.query.features.findFirst({
+            where: and(
+              eq(features.feature_name, feature.name),
+              eq(features.feature_category, feature.category as any)
+            ),
+          });
+          if (existing) {
+            featureIds.push(existing.feature_id);
+          } else {
+            const [inserted] = await tx
+              .insert(features)
+              .values({
+                feature_name: feature.name,
+                feature_category: feature.category as any,
+              })
+              .returning({ feature_id: features.feature_id });
+            if (inserted) {
+              featureIds.push(inserted.feature_id);
+            }
+          }
+        }
+        await tx.insert(vehicle_features).values(
+          featureIds.map((feature_id) => ({
+            vehicle_id: insertedVehicle.vehicle_id,
+            feature_id,
+          }))
+        );
+      }
+
       return insertedVehicle;
     });
 
+    if (!newVehicle) {
+      throw new Error("Failed to create vehicle");
+    }
+
     await invalidateVehicleCache();
+
+    // Sync with MeiliSearch
+    const fullVehicle = await db.query.vehicles.findFirst({
+      where: eq(vehicles.vehicle_id, newVehicle.vehicle_id),
+      with: {
+        photos: true,
+        gasoline_powertrain: true,
+        electric_powertrain: true,
+        hybrid_powertrain: true,
+        features: {
+          with: {
+            feature: true,
+          },
+        },
+      },
+    });
+
+    if (fullVehicle) {
+      const task = await vehiclesIndex.addDocuments([fullVehicle]);
+      await pollTask(task.taskUid);
+    }
 
     return new Response(JSON.stringify(newVehicle), { status: 201 });
   } catch (error) {
@@ -286,6 +352,7 @@ export async function PUT({ request }: APIEvent) {
 
     const {
       photos: photoData,
+      features: featureData,
       powertrain_type,
       cylinder_amount,
       cylinder_capacity_cc,
@@ -369,9 +436,65 @@ export async function PUT({ request }: APIEvent) {
       }
 
       if (photoData) {
+        // Get existing photos before deleting them (for MinIO cleanup)
+        const existingPhotos = await tx.query.photos.findMany({
+          where: eq(photos.vehicle_id, idValidationResult.data),
+        });
+
+        // Delete existing photos from database
         await tx
           .delete(photos)
           .where(eq(photos.vehicle_id, idValidationResult.data));
+
+        // Delete old images from MinIO that are not in the new photo data
+        if (existingPhotos.length > 0) {
+          const existingPhotoUrls = existingPhotos
+            .filter((p) => p.photo_url)
+            .map((p) => p.photo_url!);
+
+          const newPhotoUrls = photoData.map((p) => p.photo_url);
+
+          // Find photos that are being removed/replaced
+          const photosToDeleteFromMinio = existingPhotoUrls.filter(
+            (existingUrl) => !newPhotoUrls.includes(existingUrl)
+          );
+
+          if (photosToDeleteFromMinio.length > 0) {
+            try {
+              const photoKeysToDelete = photosToDeleteFromMinio.map((url) => {
+                const photoUrl = new URL(url);
+                if (!endpoint) throw new Error("MinIO endpoint not configured");
+                const endpointUrl = new URL(endpoint);
+                const endpointPath = endpointUrl.pathname.replace(/\/$/, "");
+                const bucketPrefix = `${endpointPath}/${bucket}`;
+                return photoUrl.pathname.replace(
+                  new RegExp(`^${bucketPrefix}/`),
+                  ""
+                );
+              });
+
+              await minio.send(
+                new DeleteObjectsCommand({
+                  Bucket: bucket,
+                  Delete: {
+                    Objects: photoKeysToDelete.map((k) => ({ Key: k })),
+                  },
+                })
+              );
+              console.log(
+                `Deleted ${photosToDeleteFromMinio.length} old images from MinIO`
+              );
+            } catch (minioError) {
+              console.error(
+                "Failed to delete old images from MinIO:",
+                minioError
+              );
+              // Continue with the update even if MinIO deletion fails
+            }
+          }
+        }
+
+        // Insert new photos
         await tx.insert(photos).values(
           photoData.map((p) => ({
             ...p,
@@ -380,10 +503,72 @@ export async function PUT({ request }: APIEvent) {
         );
       }
 
+      if (featureData) {
+        await tx
+          .delete(vehicle_features)
+          .where(eq(vehicle_features.vehicle_id, idValidationResult.data));
+        if (featureData.length > 0) {
+          const featureIds: string[] = [];
+          for (const feature of featureData) {
+            const existing = await tx.query.features.findFirst({
+              where: and(
+                eq(features.feature_name, feature.name),
+                eq(features.feature_category, feature.category as any)
+              ),
+            });
+            if (existing) {
+              featureIds.push(existing.feature_id);
+            } else {
+              const [inserted] = await tx
+                .insert(features)
+                .values({
+                  feature_name: feature.name,
+                  feature_category: feature.category as any,
+                })
+                .returning({ feature_id: features.feature_id });
+              if (inserted) {
+                featureIds.push(inserted.feature_id);
+              }
+            }
+          }
+          await tx.insert(vehicle_features).values(
+            featureIds.map((feature_id) => ({
+              vehicle_id: idValidationResult.data,
+              feature_id,
+            }))
+          );
+        }
+      }
+
       return updated;
     });
 
+    if (!updatedVehicle) {
+      throw new Error("Failed to update vehicle");
+    }
+
     await invalidateVehicleCache();
+
+    // Sync with MeiliSearch
+    const fullUpdatedVehicle = await db.query.vehicles.findFirst({
+      where: eq(vehicles.vehicle_id, updatedVehicle.vehicle_id),
+      with: {
+        photos: true,
+        gasoline_powertrain: true,
+        electric_powertrain: true,
+        hybrid_powertrain: true,
+        features: {
+          with: {
+            feature: true,
+          },
+        },
+      },
+    });
+
+    if (fullUpdatedVehicle) {
+      const task = await vehiclesIndex.updateDocuments([fullUpdatedVehicle]);
+      await pollTask(task.taskUid);
+    }
 
     return new Response(
       JSON.stringify({
@@ -412,21 +597,43 @@ export async function DELETE({ request }: APIEvent) {
   }
 
   try {
+    // Fetch the vehicle data before deleting it
+    const vehicleToDelete = await db.query.vehicles.findFirst({
+      where: eq(vehicles.vehicle_id, idValidationResult.data),
+    });
+
+    if (!vehicleToDelete) {
+      return new Response(JSON.stringify({ error: "Vehicle not found." }), {
+        status: 404,
+      });
+    }
+
     await db.transaction(async (tx) => {
       const photosToDelete = await tx.query.photos.findMany({
         where: eq(photos.vehicle_id, idValidationResult.data),
       });
 
       if (photosToDelete.length > 0) {
-        const photoKeysToDelete = photosToDelete
-          .filter((p) => p.photo_url)
-          .map((p) => new URL(p.photo_url!).pathname.substring(1));
-        await minio.send(
-          new DeleteObjectsCommand({
-            Bucket: bucket,
-            Delete: { Objects: photoKeysToDelete.map((k) => ({ Key: k })) },
-          })
-        );
+        const validPhotos = photosToDelete.filter((p) => p.photo_url !== null);
+        if (validPhotos.length > 0) {
+          const photoKeysToDelete = validPhotos.map((p) => {
+            const url = new URL(p.photo_url!);
+            if (!endpoint) throw new Error("MinIO endpoint not configured");
+            const endpointUrl = new URL(endpoint);
+            const endpointPath = endpointUrl.pathname.replace(/\/$/, "");
+            const bucketPrefix = `${endpointPath}/${bucket}`;
+            return url.pathname.replace(new RegExp(`^${bucketPrefix}/`), "");
+          });
+          await minio.send(
+            new DeleteObjectsCommand({
+              Bucket: bucket,
+              Delete: { Objects: photoKeysToDelete.map((k) => ({ Key: k })) },
+            })
+          );
+          console.log(
+            `Deleted ${validPhotos.length} images from MinIO during vehicle deletion`
+          );
+        }
       }
 
       await tx
@@ -439,9 +646,13 @@ export async function DELETE({ request }: APIEvent) {
 
     await invalidateVehicleCache();
 
-    return new Response(JSON.stringify({ message: "Vehicle deleted." }), {
-      status: 200,
-    });
+    return new Response(
+      JSON.stringify({
+        message: "Vehicle deleted successfully.",
+        vehicle: vehicleToDelete,
+      }),
+      { status: 200 }
+    );
   } catch (error) {
     console.error("Error deleting vehicle:", error);
     return new Response(

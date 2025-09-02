@@ -1,5 +1,14 @@
 // src/routes/dashboard/vehicles/new.tsx
-import { createSignal, Show, createEffect, For } from "solid-js";
+import {
+  createSignal,
+  Show,
+  createEffect,
+  For,
+  Index,
+  createResource,
+  createMemo,
+} from "solid-js";
+import { createStore } from "solid-js/store";
 import { useNavigate, A } from "@solidjs/router";
 import { MetaProvider, Title } from "@solidjs/meta";
 import {
@@ -7,7 +16,7 @@ import {
   useQueryClient,
   type UseMutationResult,
 } from "@tanstack/solid-query";
-import type { Vehicle } from "~/db/schema";
+import type { Vehicle, Feature } from "~/db/schema";
 import { authClient } from "~/lib/auth-client";
 import { z } from "zod";
 import { powertrainTypeEnum, featureCategoryEnum } from "~/db/schema";
@@ -54,6 +63,7 @@ type VehicleFormValues = z.infer<typeof NewVehicleFormSchema>;
 
 type CreateVehicleDBData = VehicleFormValues & {
   photos: { photo_url: string; display_order: number }[];
+  features: { name: string; category: string }[];
   // Powertrain specific fields
   cylinder_amount?: number;
   cylinder_capacity_cc?: number;
@@ -100,11 +110,22 @@ export default function AddVehiclePage() {
     }
   });
 
-  const [formValues, setFormValues] = createSignal<Partial<VehicleFormValues>>(
-    {}
-  );
+  const [formValues, setFormValues] = createStore<Partial<VehicleFormValues>>({
+    powertrain_type: undefined,
+    maintenance_booklet: false,
+  });
   const [powertrainSpecificValues, setPowertrainSpecificValues] =
     createSignal<any>({});
+
+  const formFields = createMemo(() =>
+    Object.keys(NewVehicleFormSchema.shape).filter(
+      (key) =>
+        !key.includes("description") &&
+        !key.includes("title") &&
+        key !== "powertrain_type" &&
+        key !== "maintenance_booklet"
+    )
+  );
 
   const [imageFiles, setImageFiles] = createSignal<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = createSignal<string[]>([]);
@@ -114,6 +135,10 @@ export default function AddVehiclePage() {
     null
   );
   const [isUploadingImage, setIsUploadingImage] = createSignal(false);
+
+  const [featuresList, setFeaturesList] = createSignal<
+    { name: string; category: string }[]
+  >([]);
 
   const vehicleCreationMutation: UseMutationResult<
     Vehicle,
@@ -158,7 +183,7 @@ export default function AddVehiclePage() {
       return;
     }
 
-    const validationResult = NewVehicleFormSchema.safeParse(formValues());
+    const validationResult = NewVehicleFormSchema.safeParse(formValues);
     if (!validationResult.success) {
       setFormErrors(validationResult.error.format());
       return;
@@ -203,6 +228,7 @@ export default function AddVehiclePage() {
         photo_url: url,
         display_order: index + 1,
       })),
+      features: featuresList(),
     };
 
     vehicleCreationMutation.mutate(vehicleDataForDB);
@@ -210,10 +236,10 @@ export default function AddVehiclePage() {
 
   const handleInputChange = (e: Event) => {
     const { name, value, type, checked } = e.currentTarget as HTMLInputElement;
-    setFormValues((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormValues(
+      name as keyof VehicleFormValues,
+      type === "checkbox" ? checked : value
+    );
   };
 
   const handlePowertrainInputChange = (e: Event) => {
@@ -246,46 +272,45 @@ export default function AddVehiclePage() {
         <form onSubmit={handleSubmit} class="space-y-5">
           {/* Core Vehicle Data */}
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {Object.keys(NewVehicleFormSchema.shape).map((key) => {
-              if (
-                key.includes("description") ||
-                key.includes("title") ||
-                key === "powertrain_type" ||
-                key === "maintenance_booklet"
-              )
-                return null;
-              const fieldKey = key as keyof typeof NewVehicleFormSchema.shape;
-              const fieldSchema = NewVehicleFormSchema.shape[fieldKey];
-              const fieldName = key as keyof VehicleFormValues;
-              const isRequired = !fieldSchema.isOptional();
-              const inputType =
-                "coerce" in fieldSchema._def ? "number" : "text";
-              const fieldValue = formValues()[fieldName];
-              return (
-                <div>
-                  <label for={key} class={labelBaseClasses}>
-                    {key.split("_").join(" ")}{" "}
-                    {isRequired && <span class="text-red-500">*</span>}
-                  </label>
-                  <input
-                    id={key}
-                    name={key}
-                    type={inputType}
-                    value={fieldValue !== undefined ? String(fieldValue) : ""}
-                    onInput={handleInputChange}
-                    class={inputBaseClasses}
-                    disabled={
-                      isUploadingImage() || vehicleCreationMutation.isPending
-                    }
-                  />
-                  <Show when={fieldError(fieldName)}>
-                    <p class="mt-1 text-xs text-red-500">
-                      {fieldError(fieldName)}
-                    </p>
-                  </Show>
-                </div>
-              );
-            })}
+            <For each={formFields()}>
+              {(key) => {
+                const fieldKey = key as keyof typeof NewVehicleFormSchema.shape;
+                const fieldSchema = NewVehicleFormSchema.shape[fieldKey];
+                const fieldName = key as keyof VehicleFormValues;
+                const isRequired = !fieldSchema.isOptional();
+                const inputType =
+                  "coerce" in fieldSchema._def ? "number" : "text";
+                const fieldValue = () => formValues[fieldName];
+                return (
+                  <div>
+                    <label for={key} class={labelBaseClasses}>
+                      {key.split("_").join(" ")}{" "}
+                      {isRequired && <span class="text-red-500">*</span>}
+                    </label>
+                    <input
+                      id={key}
+                      name={key}
+                      type={inputType}
+                      value={
+                        formValues[fieldName] !== undefined
+                          ? String(formValues[fieldName])
+                          : ""
+                      }
+                      onInput={handleInputChange}
+                      class={inputBaseClasses}
+                      disabled={
+                        isUploadingImage() || vehicleCreationMutation.isPending
+                      }
+                    />
+                    <Show when={fieldError(fieldName)}>
+                      <p class="mt-1 text-xs text-red-500">
+                        {fieldError(fieldName)}
+                      </p>
+                    </Show>
+                  </div>
+                );
+              }}
+            </For>
           </div>
 
           {/* Powertrain Type */}
@@ -297,7 +322,7 @@ export default function AddVehiclePage() {
               id="powertrain_type"
               name="powertrain_type"
               class={inputBaseClasses}
-              value={formValues().powertrain_type || ""}
+              value={formValues.powertrain_type || ""}
               onInput={handleInputChange}
             >
               <option value="">Select Powertrain</option>
@@ -305,10 +330,15 @@ export default function AddVehiclePage() {
                 {(pt) => <option value={pt}>{pt}</option>}
               </For>
             </select>
+            <Show when={fieldError("powertrain_type")}>
+              <p class="mt-1 text-xs text-red-500">
+                {fieldError("powertrain_type")}
+              </p>
+            </Show>
           </div>
 
           {/* Powertrain Specific Fields */}
-          <Show when={formValues().powertrain_type === "Gasoline"}>
+          <Show when={formValues.powertrain_type === "Gasoline"}>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label for="cylinder_amount" class={labelBaseClasses}>
@@ -348,7 +378,7 @@ export default function AddVehiclePage() {
               </div>
             </div>
           </Show>
-          <Show when={formValues().powertrain_type === "Electric"}>
+          <Show when={formValues.powertrain_type === "Electric"}>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label for="battery_capacity_kwh" class={labelBaseClasses}>
@@ -376,7 +406,7 @@ export default function AddVehiclePage() {
               </div>
             </div>
           </Show>
-          <Show when={formValues().powertrain_type === "Hybrid"}>
+          <Show when={formValues.powertrain_type === "Hybrid"}>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label for="electric_motor_power_kw" class={labelBaseClasses}>
@@ -414,6 +444,7 @@ export default function AddVehiclePage() {
               id="maintenance_booklet"
               name="maintenance_booklet"
               type="checkbox"
+              checked={formValues.maintenance_booklet || false}
               class="h-4 w-4 text-black border-neutral-300 rounded focus:ring-black"
               onInput={handleInputChange}
             />
@@ -423,6 +454,11 @@ export default function AddVehiclePage() {
             >
               Maintenance Booklet Included
             </label>
+            <Show when={fieldError("maintenance_booklet")}>
+              <p class="mt-1 text-xs text-red-500">
+                {fieldError("maintenance_booklet")}
+              </p>
+            </Show>
           </div>
 
           {/* Descriptive Content */}
@@ -488,7 +524,141 @@ export default function AddVehiclePage() {
             <label class={labelBaseClasses}>
               Vehicle Images <span class="text-red-500">*</span>
             </label>
-            {/* ... image upload UI ... */}
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleFileChange}
+              class={`${inputBaseClasses} file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-black file:text-white hover:file:bg-neutral-800`}
+              disabled={isUploadingImage() || vehicleCreationMutation.isPending}
+            />
+            <Show when={fileUploadError()}>
+              <p class="mt-1 text-xs text-red-500">{fileUploadError()}</p>
+            </Show>
+            <Show when={imagePreviewUrls().length > 0}>
+              <div class="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4">
+                <For each={imagePreviewUrls()}>
+                  {(url, index) => (
+                    <div class="relative">
+                      <img
+                        src={url}
+                        alt={`Preview ${index() + 1}`}
+                        class="w-full h-32 object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFiles = imageFiles().filter(
+                            (_, i) => i !== index()
+                          );
+                          const newUrls = imagePreviewUrls().filter(
+                            (_, i) => i !== index()
+                          );
+                          setImageFiles(newFiles);
+                          setImagePreviewUrls(newUrls);
+                        }}
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                        disabled={
+                          isUploadingImage() ||
+                          vehicleCreationMutation.isPending
+                        }
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                </For>
+              </div>
+            </Show>
+          </div>
+
+          {/* Features Input */}
+          <div>
+            <label class={labelBaseClasses}>Features</label>
+            <div class="space-y-4">
+              <Index each={featuresList()}>
+                {(feature, index) => (
+                  <div class="flex gap-4 items-end">
+                    <div class="flex-1">
+                      <label class="block text-sm font-medium text-neutral-700 mb-1">
+                        Feature Name
+                      </label>
+                      <input
+                        type="text"
+                        value={feature().name || ""}
+                        onInput={(e) => {
+                          const newList = [...featuresList()];
+                          newList[index] = {
+                            name: e.currentTarget.value,
+                            category: newList[index]!.category,
+                          };
+                          setFeaturesList(newList);
+                        }}
+                        class={inputBaseClasses}
+                        placeholder="Enter feature name"
+                        disabled={vehicleCreationMutation.isPending}
+                      />
+                    </div>
+                    <div class="flex-1">
+                      <label class="block text-sm font-medium text-neutral-700 mb-1">
+                        Category
+                      </label>
+                      <select
+                        value={feature().category || ""}
+                        onInput={(e) => {
+                          const newList = [...featuresList()];
+                          newList[index] = {
+                            name: newList[index]!.name,
+                            category: e.currentTarget.value,
+                          };
+                          setFeaturesList(newList);
+                        }}
+                        class={inputBaseClasses}
+                        disabled={vehicleCreationMutation.isPending}
+                      >
+                        <option value="">Select Category</option>
+                        <option value="Comfort and convenience">
+                          Comfort and convenience
+                        </option>
+                        <option value="Entertainment and Media">
+                          Entertainment and Media
+                        </option>
+                        <option value="Safety and security">
+                          Safety and security
+                        </option>
+                        <option value="Additional">Additional</option>
+                      </select>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newList = featuresList().filter(
+                          (_, i) => i !== index
+                        );
+                        setFeaturesList(newList);
+                      }}
+                      class="px-3 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                      disabled={vehicleCreationMutation.isPending}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </Index>
+              <button
+                type="button"
+                onClick={() => {
+                  setFeaturesList([
+                    ...featuresList(),
+                    { name: "", category: "" },
+                  ]);
+                }}
+                class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                disabled={vehicleCreationMutation.isPending}
+              >
+                Add Feature
+              </button>
+            </div>
           </div>
 
           <div class="flex items-center justify-end space-x-4 pt-3">

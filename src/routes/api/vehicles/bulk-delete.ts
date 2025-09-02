@@ -5,7 +5,7 @@ import { vehicles, photos } from "~/db/schema";
 import { inArray, eq } from "drizzle-orm";
 import { z } from "zod";
 import { kv } from "~/lib/redis";
-import { minio, bucket } from "~/lib/minio";
+import { minio, bucket, endpoint } from "~/lib/minio";
 import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { vehiclesIndex, pollTask } from "~/lib/meilisearch";
 
@@ -38,15 +38,53 @@ export async function POST({ request }: APIEvent) {
       if (photosToDelete.length > 0) {
         const validPhotos = photosToDelete.filter((p) => p.photo_url !== null);
         if (validPhotos.length > 0) {
-          const photoKeysToDelete = validPhotos.map((p) =>
-            new URL(p.photo_url!).pathname.substring(1)
-          );
-          await minio.send(
-            new DeleteObjectsCommand({
-              Bucket: bucket,
-              Delete: { Objects: photoKeysToDelete.map((k) => ({ Key: k })) },
-            })
-          );
+          try {
+            const photoKeysToDelete = validPhotos
+              .map((p) => {
+                try {
+                  const url = new URL(p.photo_url!);
+                  if (!endpoint)
+                    throw new Error("MinIO endpoint not configured");
+                  const endpointUrl = new URL(endpoint);
+                  const endpointPath = endpointUrl.pathname.replace(/\/$/, "");
+                  const bucketPrefix = `${endpointPath}/${bucket}`;
+                  return url.pathname.replace(
+                    new RegExp(`^${bucketPrefix}/`),
+                    ""
+                  );
+                } catch (urlError) {
+                  console.error(`Invalid photo URL: ${p.photo_url}`, urlError);
+                  return null;
+                }
+              })
+              .filter((key) => key !== null) as string[];
+
+            if (photoKeysToDelete.length > 0) {
+              console.log(
+                `Attempting to delete ${photoKeysToDelete.length} images from MinIO:`,
+                photoKeysToDelete
+              );
+
+              await minio.send(
+                new DeleteObjectsCommand({
+                  Bucket: bucket,
+                  Delete: {
+                    Objects: photoKeysToDelete.map((k) => ({ Key: k })),
+                  },
+                })
+              );
+
+              console.log(
+                `Successfully deleted ${photoKeysToDelete.length} images from MinIO during bulk delete`
+              );
+            }
+          } catch (minioError) {
+            console.error(
+              "Failed to delete images from MinIO during bulk delete:",
+              minioError
+            );
+            // Continue with the deletion even if MinIO cleanup fails
+          }
         }
       }
 
