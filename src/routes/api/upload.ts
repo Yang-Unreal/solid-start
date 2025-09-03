@@ -103,42 +103,30 @@ export async function POST(event: APIEvent) {
       const masterBuffer = Buffer.from(await masterFile.arrayBuffer());
       const sharpInstance = sharp(masterBuffer);
 
-      const sizes = {
-        thumbnail: { width: 96, height: 54 },
-        card: { width: 608, height: 342 },
-        detail: { width: 1280, height: 720 },
-      };
-      const formats = ["avif", "webp", "jpeg"] as const;
+      // Upload detail size in both AVIF and WebP formats for fallback
+      const fileNameBase = `${productImageBaseUrl}-${i}-detail`;
+      const resizedInstance = sharpInstance
+        .clone()
+        .resize(1280, 720, { fit: "inside", withoutEnlargement: true });
 
-      const uploadPromises: Promise<string>[] = [];
+      // Upload AVIF version (primary)
+      const avifUrl = await processAndUploadVariant(
+        resizedInstance,
+        fileNameBase,
+        "avif",
+        "image/avif"
+      );
 
-      for (const sizeName in sizes) {
-        const { width, height } = sizes[sizeName as keyof typeof sizes];
-        for (const format of formats) {
-          // Use the single productImageBaseUrl and the current file index 'i'
-          const fileNameBase = `${productImageBaseUrl}-${i}-${sizeName}`;
-          const mimeType = `image/${format}`;
-          const resizedInstance = sharpInstance
-            .clone()
-            .resize(width, height, { fit: "inside", withoutEnlargement: true });
+      // Upload WebP version (fallback)
+      const webpUrl = await processAndUploadVariant(
+        resizedInstance,
+        fileNameBase,
+        "webp",
+        "image/webp"
+      );
 
-          uploadPromises.push(
-            processAndUploadVariant(
-              resizedInstance,
-              fileNameBase,
-              format,
-              mimeType
-            )
-          );
-        }
-      }
-      const urls = await Promise.all(uploadPromises);
-      // Collect the detail-avif URL (index 6: thumbnail 0-2, card 3-5, detail 6-8, avif=0)
-      if (urls[6]) {
-        uploadedUrls.push(urls[6]);
-      } else {
-        return createErrorResponse("Failed to generate image URL.", 500);
-      }
+      // Store the AVIF URL in database, WebP will be used as fallback in frontend
+      uploadedUrls.push(avifUrl);
     }
 
     // If new images were uploaded successfully and an old base URL was provided, delete the old image set

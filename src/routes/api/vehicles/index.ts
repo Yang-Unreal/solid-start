@@ -616,14 +616,24 @@ export async function DELETE({ request }: APIEvent) {
       if (photosToDelete.length > 0) {
         const validPhotos = photosToDelete.filter((p) => p.photo_url !== null);
         if (validPhotos.length > 0) {
-          const photoKeysToDelete = validPhotos.map((p) => {
-            const url = new URL(p.photo_url!);
+          const photoKeysToDelete: string[] = [];
+
+          for (const photo of validPhotos) {
+            const url = new URL(photo.photo_url!);
             if (!endpoint) throw new Error("MinIO endpoint not configured");
             const endpointUrl = new URL(endpoint);
             const endpointPath = endpointUrl.pathname.replace(/\/$/, "");
             const bucketPrefix = `${endpointPath}/${bucket}`;
-            return url.pathname.replace(new RegExp(`^${bucketPrefix}/`), "");
-          });
+            const baseKey = url.pathname.replace(
+              new RegExp(`^${bucketPrefix}/`),
+              ""
+            );
+
+            // Add both AVIF and WebP versions
+            photoKeysToDelete.push(baseKey); // AVIF version
+            photoKeysToDelete.push(baseKey.replace(/\.avif$/, ".webp")); // WebP version
+          }
+
           await minio.send(
             new DeleteObjectsCommand({
               Bucket: bucket,
@@ -631,7 +641,7 @@ export async function DELETE({ request }: APIEvent) {
             })
           );
           console.log(
-            `Deleted ${validPhotos.length} images from MinIO during vehicle deletion`
+            `Deleted ${photoKeysToDelete.length} image files from MinIO during vehicle deletion`
           );
         }
       }

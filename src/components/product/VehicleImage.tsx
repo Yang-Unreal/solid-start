@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/solid-query";
-import { createSignal, createEffect } from "solid-js";
+import { createSignal, createEffect, createResource } from "solid-js";
 import type { Photo } from "~/db/schema";
 
 interface VehicleImageProps {
@@ -59,12 +59,30 @@ export default function VehicleImage(props: VehicleImageProps) {
     getImageUrl(photosQuery.data?.[props.index])
   );
 
+  const [fallbackSrc, setFallbackSrc] = createSignal<string | undefined>();
+
   createEffect(() => {
-    setImageSrc(getImageUrl(photosQuery.data?.[props.index]));
+    const photo = photosQuery.data?.[props.index];
+    if (photo && photo.photo_url) {
+      setImageSrc(photo.photo_url);
+      // Generate fallback URL by replacing .avif with .webp
+      const fallbackUrl = photo.photo_url.replace(/\.avif$/, ".webp");
+      setFallbackSrc(fallbackUrl);
+    }
   });
 
-  const handleImageError = () => {
-    // Fallback to a simple placeholder image (data URL to avoid CORS issues)
+  const handleImageError = (e: Event) => {
+    const img = e.target as HTMLImageElement;
+    const currentSrc = img.src;
+
+    // If AVIF failed and we have a fallback, try WebP
+    if (currentSrc.includes(".avif") && fallbackSrc()) {
+      console.log("AVIF not supported, trying WebP fallback");
+      img.src = fallbackSrc()!;
+      return;
+    }
+
+    // If WebP also failed or no fallback, show placeholder
     const placeholderSvg = `data:image/svg+xml;base64,${btoa(`
       <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#f3f4f6"/>

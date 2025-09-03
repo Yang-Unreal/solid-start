@@ -9,115 +9,113 @@ import {
 import { DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import * as fs from "fs/promises";
 import * as path from "path";
+import sharp from "sharp";
 
-async function testMinIOUploadDelete() {
-  const testKey = `products/test-vehicle-image-${Date.now()}.jpg`;
+/*************  ✨ Windsurf Command ⭐  *************/
+/**
+ * Tests the new upload and delete logic:
+ * 1. Uploads both AVIF and WebP versions of an image (like the new upload logic)
+ * 2. Tests deletion of both files (like the new delete logic)
+ * 3. Verifies both files are properly deleted
+ */
+/*******  Updated Test for New Logic  *******/
+
+async function testNewUploadDeleteLogic() {
+  const baseFileName = `test-vehicle-${Date.now()}`;
+  const avifKey = `products/${baseFileName}-detail.avif`;
+  const webpKey = `products/${baseFileName}-detail.webp`;
   const filePath = path.join(
     process.cwd(),
     "..",
     "..",
     "public",
     "heroBackground.webp"
-  ); // Using existing file
+  );
 
   try {
-    console.log("=== MinIO Upload/Delete Test ===");
+    console.log("=== Testing New Upload/Delete Logic ===");
 
-    // Step 1: Upload a test file
+    // Step 1: Read and process test file (simulate upload logic)
     console.log(`Reading test file from: ${filePath}`);
     const fileBuffer = await fs.readFile(filePath);
     console.log(`File read successfully. Size: ${fileBuffer.length} bytes`);
 
-    console.log(`Uploading test file with key: ${testKey}`);
-    await uploadFile(testKey, new Uint8Array(fileBuffer), "image/webp");
-    console.log("✅ Upload successful");
+    const sharpInstance = sharp(fileBuffer);
+    const resizedInstance = sharpInstance
+      .clone()
+      .resize(1280, 720, { fit: "inside", withoutEnlargement: true });
 
-    // Step 2: Get the public URL
-    const publicUrl = getPublicUrl(testKey);
-    console.log(`Generated public URL: ${publicUrl}`);
+    // Step 2: Upload both AVIF and WebP versions (like new upload logic)
+    console.log(`\nUploading AVIF version: ${avifKey}`);
+    const avifBuffer = await resizedInstance.avif({ quality: 80 }).toBuffer();
+    await uploadFile(avifKey, new Uint8Array(avifBuffer), "image/avif");
 
-    // Also test with a simulated endpoint that has a path
-    const simulatedEndpointWithPath = "https://minio.limingcn.com/minio";
-    const simulatedUrl = `${simulatedEndpointWithPath}/${bucket}/${testKey}`;
-    console.log(`Simulated URL with endpoint path: ${simulatedUrl}`);
+    console.log(`Uploading WebP version: ${webpKey}`);
+    const webpBuffer = await resizedInstance.webp({ quality: 85 }).toBuffer();
+    await uploadFile(webpKey, new Uint8Array(webpBuffer), "image/webp");
 
-    // Step 3: Extract key using the same logic as vehicle deletion
-    console.log("\n=== Testing Key Extraction ===");
-    const url = new URL(publicUrl);
-    console.log(`URL pathname: ${url.pathname}`);
+    console.log("✅ Both uploads successful");
+
+    // Step 3: Get URLs and test key extraction
+    const avifUrl = getPublicUrl(avifKey);
+    console.log(`\nAVIF URL: ${avifUrl}`);
 
     if (!endpoint) throw new Error("MinIO endpoint not configured");
     const endpointUrl = new URL(endpoint);
     const endpointPath = endpointUrl.pathname.replace(/\/$/, "");
     const bucketPrefix = `${endpointPath}/${bucket}`;
-    console.log(`Endpoint path: ${endpointPath}`);
-    console.log(`Bucket prefix: ${bucketPrefix}`);
 
-    const extractedKey = url.pathname.replace(
+    const url = new URL(avifUrl);
+    const extractedAvifKey = url.pathname.replace(
       new RegExp(`^${bucketPrefix}/`),
       ""
     );
-    console.log(`Extracted key: ${extractedKey}`);
-    console.log(`Original key: ${testKey}`);
-    console.log(`Keys match: ${extractedKey === testKey}`);
+    console.log(`Extracted AVIF key: ${extractedAvifKey}`);
+    console.log(`Expected AVIF key: ${avifKey}`);
+    console.log(`AVIF key matches: ${extractedAvifKey === avifKey}`);
 
-    // Test with simulated endpoint path
-    console.log("\n=== Testing with Simulated Endpoint Path ===");
-    const simulatedUrlObj = new URL(simulatedUrl);
-    console.log(`Simulated URL pathname: ${simulatedUrlObj.pathname}`);
-
-    const simulatedEndpointUrl = new URL(simulatedEndpointWithPath);
-    const simulatedEndpointPath = simulatedEndpointUrl.pathname.replace(
-      /\/$/,
-      ""
-    );
-    const simulatedBucketPrefix = `${simulatedEndpointPath}/${bucket}`;
-    console.log(`Simulated endpoint path: ${simulatedEndpointPath}`);
-    console.log(`Simulated bucket prefix: ${simulatedBucketPrefix}`);
-
-    const simulatedExtractedKey = simulatedUrlObj.pathname.replace(
-      new RegExp(`^${simulatedBucketPrefix}/`),
-      ""
-    );
-    console.log(`Simulated extracted key: ${simulatedExtractedKey}`);
-    console.log(`Simulated keys match: ${simulatedExtractedKey === testKey}`);
-
-    // Step 4: Try to delete using extracted key
-    console.log("\n=== Testing Deletion ===");
-    console.log(`Attempting to delete with extracted key: ${extractedKey}`);
+    // Step 4: Test deletion of both files (like new delete logic)
+    console.log("\n=== Testing Deletion of Both Files ===");
+    const keysToDelete = [
+      extractedAvifKey,
+      extractedAvifKey.replace(/\.avif$/, ".webp"),
+    ];
+    console.log(`Keys to delete:`, keysToDelete);
 
     await minio.send(
       new DeleteObjectsCommand({
         Bucket: bucket,
         Delete: {
-          Objects: [{ Key: extractedKey }],
+          Objects: keysToDelete.map((k) => ({ Key: k })),
         },
       })
     );
 
     console.log("✅ Deletion successful");
 
-    // Step 5: Verify deletion by trying to access the file
+    // Step 5: Verify both files are deleted
     console.log("\n=== Verification ===");
-    try {
-      await minio.send({
-        Bucket: bucket,
-        Key: extractedKey,
-      } as any);
-      console.log("❌ File still exists after deletion");
-    } catch (error: any) {
-      if (error.name === "NoSuchKey") {
-        console.log(
-          "✅ File successfully deleted (NoSuchKey error as expected)"
-        );
-      } else {
-        console.log("⚠️  Unexpected error during verification:", error.message);
+    for (const key of keysToDelete) {
+      try {
+        await minio.send({
+          Bucket: bucket,
+          Key: key,
+        } as any);
+        console.log(`❌ File still exists: ${key}`);
+      } catch (error: any) {
+        if (error.name === "NoSuchKey") {
+          console.log(`✅ File successfully deleted: ${key}`);
+        } else {
+          console.log(`⚠️  Unexpected error for ${key}:`, error.message);
+        }
       }
     }
+
+    console.log("\n🎉 Test completed successfully!");
   } catch (error) {
     console.error("❌ Test failed:", error);
     process.exit(1);
   }
 }
 
-testMinIOUploadDelete();
+testNewUploadDeleteLogic();

@@ -39,25 +39,30 @@ export async function POST({ request }: APIEvent) {
         const validPhotos = photosToDelete.filter((p) => p.photo_url !== null);
         if (validPhotos.length > 0) {
           try {
-            const photoKeysToDelete = validPhotos
-              .map((p) => {
-                try {
-                  const url = new URL(p.photo_url!);
-                  if (!endpoint)
-                    throw new Error("MinIO endpoint not configured");
-                  const endpointUrl = new URL(endpoint);
-                  const endpointPath = endpointUrl.pathname.replace(/\/$/, "");
-                  const bucketPrefix = `${endpointPath}/${bucket}`;
-                  return url.pathname.replace(
-                    new RegExp(`^${bucketPrefix}/`),
-                    ""
-                  );
-                } catch (urlError) {
-                  console.error(`Invalid photo URL: ${p.photo_url}`, urlError);
-                  return null;
-                }
-              })
-              .filter((key) => key !== null) as string[];
+            const photoKeysToDelete: string[] = [];
+
+            for (const photo of validPhotos) {
+              try {
+                const url = new URL(photo.photo_url!);
+                if (!endpoint) throw new Error("MinIO endpoint not configured");
+                const endpointUrl = new URL(endpoint);
+                const endpointPath = endpointUrl.pathname.replace(/\/$/, "");
+                const bucketPrefix = `${endpointPath}/${bucket}`;
+                const baseKey = url.pathname.replace(
+                  new RegExp(`^${bucketPrefix}/`),
+                  ""
+                );
+
+                // Add both AVIF and WebP versions
+                photoKeysToDelete.push(baseKey); // AVIF version
+                photoKeysToDelete.push(baseKey.replace(/\.avif$/, ".webp")); // WebP version
+              } catch (urlError) {
+                console.error(
+                  `Invalid photo URL: ${photo.photo_url}`,
+                  urlError
+                );
+              }
+            }
 
             if (photoKeysToDelete.length > 0) {
               console.log(
