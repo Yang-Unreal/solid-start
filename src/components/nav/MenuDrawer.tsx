@@ -1,11 +1,9 @@
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { gsap } from "gsap";
 import { useLocation, useNavigate } from "@solidjs/router";
-import MagneticLink from "~/components/MagneticLink";
 import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
 import type { AuthContextType } from "~/context/AuthContext";
-import { X } from "lucide-solid";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
@@ -26,12 +24,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   let drawerRef: HTMLDivElement | undefined;
   let navLinksListRef: HTMLUListElement | undefined;
-  let svgPathRef: SVGPathElement | undefined;
-
-  const [hoveredLink, setHoveredLink] = createSignal<string | null>(null);
-
-  const pathStraight = "M 0 0 Q 0 500 0 1000";
-  const pathCurve = "M 0 0 Q 160 500 0 1000";
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -41,26 +33,25 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const navLinks = () => {
     const isDashboard = location.pathname.startsWith("/dashboard");
     const baseNavLinks = [
-      { href: "/", label: "Home" },
-      { href: "/about", label: "About" },
-      { href: "/services", label: "Services" },
-      {
-        href: isDashboard ? "/dashboard/vehicles" : "/vehicles",
-        label: "Vehicles",
-      },
+      { href: "/", label: "Collection" },
+      { href: "/about", label: "About Us" },
       { href: "/contact", label: "Contact" },
+
+      { href: "/sourcing", label: "Bespoke Sourcing" },
+      { href: "/services", label: "After-sales Service" },
+      { href: "/account", label: "Account" },
     ];
 
     const links: { href: string; label: string; onClick?: () => void }[] =
       props.links ? [...props.links] : baseNavLinks;
 
-    if (props.session().data?.user) {
-      links.push({ href: "/dashboard", label: "Dashboard" });
-      links.push({ href: "#", label: "Logout", onClick: handleLogout });
-    } else {
-      links.push({ href: "/login", label: "Login" });
-      links.push({ href: "/signup", label: "Signup" });
-    }
+    // if (props.session().data?.user) {
+    //   links.push({ href: "/dashboard", label: "Dashboard" });
+    //   links.push({ href: "#", label: "Logout", onClick: handleLogout });
+    // } else {
+    //   links.push({ href: "/login", label: "Login" });
+    //   links.push({ href: "/signup", label: "Signup" });
+    // }
     return links;
   };
 
@@ -91,81 +82,38 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         setSkipAnimation(false);
       }
 
-      const duration = 0.6; // GSAP uses seconds
+      const duration = 0.8; // GSAP uses seconds
 
-      if (drawerRef && svgPathRef && navLinksListRef) {
+      if (drawerRef && navLinksListRef) {
         const links = Array.from(navLinksListRef.children);
         const tl = gsap.timeline();
 
         if (props.isOpen) {
-          tl.to(
+          tl.fromTo(
             drawerRef,
+            { x: "100%" },
             {
               x: "0%",
               duration,
-              ease: "quint.out",
+              ease: "power2.inOut",
             },
             0
-          )
-            .fromTo(
-              svgPathRef,
-              { attr: { d: pathCurve } },
-              {
-                attr: { d: pathStraight },
-                duration,
-                ease: "quint.out",
-              },
-              0
-            )
-            .fromTo(
-              links,
-              { x: -40, opacity: 0 },
-              {
-                x: 0,
-                opacity: 1,
-                delay: 0.1,
-                stagger: 0.05,
-                duration: 0.4,
-                ease: "quart.out",
-              },
-              0
-            );
+          );
         } else if (hasBeenOpened()) {
           if (skipAnimation()) {
             gsap.set(drawerRef, {
-              x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
+              x: () => (drawerRef ? drawerRef.offsetWidth + 80 : 0),
             });
           } else {
             tl.to(
               drawerRef,
               {
-                x: () => (drawerRef ? -drawerRef.offsetWidth - 80 : 0),
+                x: () => (drawerRef ? drawerRef.offsetWidth + 80 : 0),
                 duration,
-                ease: "quint.in",
+                ease: "power2.inOut",
               },
               0
-            )
-              .fromTo(
-                svgPathRef,
-                { attr: { d: pathStraight } },
-                {
-                  attr: { d: pathCurve },
-                  duration,
-                  ease: "quint.in",
-                },
-                0
-              )
-              .to(
-                links,
-                {
-                  x: -40,
-                  opacity: 0,
-                  stagger: 0.03,
-                  duration: 0.15,
-                  ease: "quart.in",
-                },
-                0
-              );
+            );
           }
         }
       }
@@ -205,109 +153,94 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   return (
     <div
       ref={(el) => (drawerRef = el)}
-      class="fixed top-0 left-0  h-full w-full lg:w-1/2 xl:w-1/4 bg-white text-black z-100 container-padding py-20 md:py-25  flex flex-col justify-between "
-      style="transform: translateX(calc(-100% - 5rem));"
+      class="fixed top-0 right-0  h-full w-full lg:w-3/5 bg-white text-black z-40  flex flex-col justify-between "
+      style="transform: translateX(calc(100% + 5rem));"
     >
-      <button
-        onClick={() => props.onClose()}
-        class="absolute top-4 right-4 text-black"
-        aria-label="Close menu"
-      >
-        <X size={32} />
-      </button>
-      <div class="absolute top-0 right-0 h-full w-20 pointer-events-none translate-x-[calc(100%-1px)]">
-        <svg
-          class="h-full w-full"
-          viewBox="0 0 80 1000"
-          preserveAspectRatio="none"
-        >
-          <path ref={(el) => (svgPathRef = el)} d={pathCurve} fill="white" />
-        </svg>
-      </div>
-
       <div>
-        <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">
-          NAVIGATION
-        </h2>
-        <hr class="border-gray-200" />
-        <ul
-          ref={navLinksListRef}
-          class="mt-4 space-y-4 flex flex-col items-start"
-        >
-          {navLinks().map((link) => {
-            const isActive = location.pathname === link.href;
-            return (
-              <li class="relative w-full mb-4 px-3">
-                <MagneticLink
-                  onClick={() => {
-                    setSkipAnimation(true);
-                    if (link.onClick) {
-                      link.onClick();
-                    } else {
-                      navigate(link.href);
-                    }
-                    props.onClose();
-                  }}
-                  class={`relative ${isMobile() ? "w-full" : ""}`}
-                >
-                  {(innerRef) => (
-                    <div class="items-center">
-                      <div
-                        ref={innerRef}
-                        class={`text-left text-4xl  font-light transition-colors duration-300 ${
-                          isActive
-                            ? "text-black"
-                            : "text-black/70 hover:text-black"
-                        }`}
-                        onMouseEnter={() => setHoveredLink(link.href)}
-                        onMouseLeave={() => setHoveredLink(null)}
-                      >
-                        {link.label}
+        <div class=" grid grid-cols-2 gap-8 px-[10vw] pt-[7vw]">
+          <ul ref={navLinksListRef} class="space-y-4">
+            {navLinks()
+              .slice(0, 3)
+              .map((link) => {
+                const isActive = location.pathname === link.href;
+                return (
+                  <li class="relative mb-4">
+                    <div
+                      onClick={() => {
+                        setSkipAnimation(true);
+                        if (link.onClick) {
+                          link.onClick();
+                        } else {
+                          navigate(link.href);
+                        }
+                        props.onClose();
+                      }}
+                      class="relative cursor-pointer"
+                    >
+                      <div class="items-center">
+                        <div
+                          class={`text-left text-6xl font-light font-bold${
+                            isActive ? "text-black" : "text-black/70"
+                          }`}
+                        >
+                          {link.label}
+                        </div>
                       </div>
-                      <span
-                        class={`absolute -left-6 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-black hidden md:block ${
-                          (isActive && hoveredLink() === null) ||
-                          hoveredLink() === link.href
-                            ? "scale-100"
-                            : "scale-0"
-                        }`}
-                      ></span>
-                      <span
-                        class={`absolute right-0 top-1/2 -translate-y-1/2 rounded-full transition-transform duration-300 ease-in-out w-2 h-2 bg-black block md:hidden ${
-                          (isActive && hoveredLink() === null) ||
-                          hoveredLink() === link.href
-                            ? "scale-100"
-                            : "scale-0"
-                        }`}
-                      ></span>
                     </div>
-                  )}
-                </MagneticLink>
-              </li>
-            );
-          })}
-        </ul>
+                  </li>
+                );
+              })}
+          </ul>
+          <ul class="space-y-4">
+            {navLinks()
+              .slice(3)
+              .map((link) => {
+                const isActive = location.pathname === link.href;
+                return (
+                  <li class="relative mb-4">
+                    <div
+                      onClick={() => {
+                        setSkipAnimation(true);
+                        if (link.onClick) {
+                          link.onClick();
+                        } else {
+                          navigate(link.href);
+                        }
+                        props.onClose();
+                      }}
+                      class="relative cursor-pointer"
+                    >
+                      <div class="items-center">
+                        <div
+                          class={`text-left text-4xl font-light ${
+                            isActive ? "text-black" : "text-black/70"
+                          }`}
+                        >
+                          {link.label}
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+          </ul>
+        </div>
       </div>
 
       <div class="mt-8">
         <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">SOCIALS</h2>
         <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
           {socialLinks.map((link) => (
-            <MagneticLink
+            <div
               onClick={() => {
                 setSkipAnimation(true);
                 navigate(link.href);
                 props.onClose();
               }}
-              class="relative text-black transition-colors duration-300 group"
+              class="text-black cursor-pointer"
             >
-              {(innerRef) => (
-                <>
-                  <div ref={innerRef}>{link.label}</div>
-                  <span class="absolute bottom-0 left-1/2 w-full h-[1.5px] bg-black transform -translate-x-1/2 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out"></span>
-                </>
-              )}
-            </MagneticLink>
+              <div>{link.label}</div>
+            </div>
           ))}
         </div>
       </div>

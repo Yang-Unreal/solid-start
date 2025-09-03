@@ -1,7 +1,8 @@
 import { createSignal, type Component, type JSX, splitProps } from "solid-js";
 import MagneticLink from "~/components/MagneticLink";
 
-interface NavButtonProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'children'> {
+interface NavButtonProps
+  extends Omit<JSX.HTMLAttributes<HTMLDivElement>, "children"> {
   onClick: () => void;
   "aria-label": string;
   isTransparent?: boolean;
@@ -9,7 +10,13 @@ interface NavButtonProps extends Omit<JSX.HTMLAttributes<HTMLDivElement>, 'child
 }
 
 const NavButton: Component<NavButtonProps> = (props) => {
-  const [local, others] = splitProps(props, ["onClick", "aria-label", "isTransparent", "children", "class"]);
+  const [local, others] = splitProps(props, [
+    "onClick",
+    "aria-label",
+    "isTransparent",
+    "children",
+    "class",
+  ]);
   const [shouldTriggerLeaveAnimation, setShouldTriggerLeaveAnimation] =
     createSignal(false);
 
@@ -18,10 +25,13 @@ const NavButton: Component<NavButtonProps> = (props) => {
       {...others}
       onMouseEnter={() => setShouldTriggerLeaveAnimation(false)}
       onMouseLeave={() => setShouldTriggerLeaveAnimation(true)}
-      class={`group ${local.isTransparent ? "text-light" : "text-black"} ${local.class || ''}`}>
+      class={`group ${local.isTransparent ? "text-light" : "text-black"} ${
+        local.class || ""
+      }`}
+    >
       <MagneticLink
         onClick={local.onClick}
-        class="w-auto h-8 px-1.5 md:px-3 flex justify-center items-center rounded-full"
+        class=" flex justify-center items-center"
         aria-label={local["aria-label"]}
         enableHoverCircle={false}
         hoverCircleColor="hsl(75, 99%, 52%)"

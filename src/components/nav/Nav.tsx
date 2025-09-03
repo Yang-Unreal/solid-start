@@ -16,7 +16,13 @@ import { isServer } from "solid-js/web";
 import { useAuth } from "~/context/AuthContext";
 import { useLenis } from "~/context/LenisContext";
 
-export default function Nav() {
+interface NavProps {
+  isMenuOpen: boolean;
+  setIsMenuOpen: (value: boolean) => void;
+  setMenuButtonRef: (el: HTMLElement | undefined) => void;
+}
+
+export default function Nav(props: NavProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { session, handleLogoutSuccess } = useAuth();
@@ -40,13 +46,12 @@ export default function Nav() {
   }
   const [showNav, setShowNav] = createSignal(true);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = createSignal(false);
-  const [isMenuOpen, setIsMenuOpen] = createSignal(false);
-  let menuButtonRef: HTMLDivElement | undefined;
+  let menuButtonRef: HTMLButtonElement | undefined;
 
   let lastScrollY = 0;
 
   createEffect(() => {
-    if (isMenuOpen()) {
+    if (props.isMenuOpen) {
       lenis?.stop();
     } else {
       lenis?.start();
@@ -79,42 +84,40 @@ export default function Nav() {
           showNav() ? "top-0" : "top-[-104px]"
         } `}
       >
-        <div
-          class={` relative flex h-18  ${
-            transparent() ? "bg-transparent text-light" : "bg-white  text-black"
-          }`}
-        >
-          <div class="w-full items-center  flex justify-between nav-padding">
+        <div class={` relative flex h-18  bg-transparent text-black`}>
+          <div class="w-full items-center  flex justify-between container-padding">
+            <A
+              href="/"
+              class=" items-center justify-center pl-3"
+              aria-label="Homepage"
+              title="Homepage"
+            >
+              {/* <YourLogo class="h-4 md:h-5 w-auto hidden md:block" /> */}
+              <MobileLogo class="h-6  w-auto" />
+            </A>
             <div class="flex items-center justify-center">
-              <NavButton
-                ref={menuButtonRef}
-                onClick={() => setIsMenuOpen(!isMenuOpen())}
-                aria-label="Menu"
-                isTransparent={transparent()}
+              <button
+                ref={(el) => {
+                  menuButtonRef = el;
+                  props.setMenuButtonRef(el);
+                }}
+                onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
+                class="border border-gray-200 rounded-sm bg-white"
               >
-                {(ref) => (
-                  <div
-                    class="flex justify-center items-center gap-2 lg:w-19"
-                    ref={ref}
+                <div class="flex justify-center items-center gap-2 px-3 py-2">
+                  <Menu
+                    stroke-width="2"
+                    size={20}
+                    class={`bg-transparent text-black`}
+                  />
+                  <p
+                    class={`hidden md:block  text-md font-bold font-inconsolata relative bg-transparent text-black`}
                   >
-                    <Menu
-                      stroke-width="1"
-                      size={20}
-                      class={`transition-colors ${
-                        transparent() ? "text-light" : "text-black"
-                      }`}
-                    />
-                    <p
-                      class={`hidden md:block  text-md font-inconsolata relative transition-colors   ${
-                        transparent() ? "text-light" : "text-black"
-                      }`}
-                    >
-                      MENU
-                    </p>
-                  </div>
-                )}
-              </NavButton>
-              <NavButton
+                    Menu
+                  </p>
+                </div>
+              </button>
+              {/* <NavButton
                 onClick={() => setIsMobileSearchOpen(true)}
                 aria-label="Search"
                 isTransparent={transparent()}
@@ -140,23 +143,13 @@ export default function Nav() {
                     </p>
                   </div>
                 )}
-              </NavButton>
-              {isMobileSearchOpen() && (
+              </NavButton> */}
+              {/* {isMobileSearchOpen() && (
                 <SearchModal onClose={() => setIsMobileSearchOpen(false)} />
-              )}
+              )} */}
             </div>
 
-            <A
-              href="/"
-              class="absolute left-1/2 -translate-x-1/2 items-center justify-center"
-              aria-label="Homepage"
-              title="Homepage"
-            >
-              <YourLogo class="h-4 md:h-5 w-auto hidden md:block" />
-              <MobileLogo class="h-6  w-auto md:hidden" />
-            </A>
-
-            <div class="flex items-center justify-center">
+            {/* <div class="flex items-center justify-center">
               <NavButton
                 onClick={() =>
                   session().data ? navigate("/dashboard") : navigate("/login")
@@ -213,24 +206,10 @@ export default function Nav() {
                   </div>
                 )}
               </NavButton>
-            </div>
+            </div> */}
           </div>
         </div>
       </nav>
-      <MenuDrawer
-        isOpen={isMenuOpen()}
-        onClose={() => setIsMenuOpen(false)}
-        onLogoutSuccess={handleLogoutSuccess}
-        session={session}
-        menuButtonRef={menuButtonRef}
-      />
-      <div
-        class={`fixed inset-0 bg-black/50 z-90 transition-opacity duration-300 ${
-          isMenuOpen() ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={() => setIsMenuOpen(false)}
-        aria-hidden={!isMenuOpen()}
-      />
     </>
   );
 }
