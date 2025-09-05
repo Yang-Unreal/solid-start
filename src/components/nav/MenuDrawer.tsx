@@ -82,7 +82,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         setSkipAnimation(false);
       }
 
-      const duration = 0.8; // GSAP uses seconds
+      const duration = 0.9; // GSAP uses seconds
 
       if (drawerRef && navLinksListRef) {
         const links = Array.from(navLinksListRef.children);
@@ -95,7 +95,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             {
               x: "0%",
               duration,
-              ease: "power2.inOut",
+              ease: "circ.inOut",
             },
             0
           );
@@ -110,7 +110,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               {
                 x: () => (drawerRef ? drawerRef.offsetWidth + 80 : 0),
                 duration,
-                ease: "power2.inOut",
+                ease: "circ.inOut",
               },
               0
             );
@@ -153,7 +153,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   return (
     <div
       ref={(el) => (drawerRef = el)}
-      class="fixed top-0 right-0  h-full w-full lg:w-3/5 bg-white text-black z-40  flex flex-col justify-between "
+      class="fixed top-0 right-0  h-full w-auto bg-white text-black z-40  flex flex-col justify-between "
       style="transform: translateX(calc(100% + 5rem));"
     >
       <div>
