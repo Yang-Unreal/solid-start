@@ -4,6 +4,12 @@ import { useLocation, useNavigate } from "@solidjs/router";
 import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
 import type { AuthContextType } from "~/context/AuthContext";
+import {
+  FaBrandsSquareFacebook,
+  FaBrandsInstagram,
+  FaBrandsSquareTwitter,
+  FaBrandsLinkedin,
+} from "solid-icons/fa";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
@@ -56,11 +62,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     return links;
   };
 
-  const socialLinks: { href: string; label: string; onClick?: () => void }[] = [
-    { href: "#", label: "Facebook" },
-    { href: "#", label: "Instagram" },
-    { href: "#", label: "Twitter" },
-    { href: "#", label: "LinkedIn" },
+  const socialLinks: {
+    href: string;
+    icon: any;
+    onClick?: () => void;
+  }[] = [
+    { href: "#", icon: FaBrandsSquareFacebook },
+    { href: "#", icon: FaBrandsInstagram },
+    { href: "#", icon: FaBrandsSquareTwitter },
+    { href: "#", icon: FaBrandsLinkedin },
   ];
 
   onMount(() => {
@@ -206,7 +216,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                         <div class="items-center" style="overflow: hidden;">
                           <div
                             ref={(el) => setTextRefs((prev) => [...prev, el])}
-                            class={`text-left text-6xl  font-bold ${
+                            class={`text-left text-6xl   ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
                             style="transform: translateY(100%);"
@@ -273,7 +283,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               <p>CN</p>
               <p>EN</p>
             </div>
-            <div class="flex flex-wrap gap-x-8 gap-y-2">
+            <div class="flex flex-wrap gap-x-4 gap-y-2">
               {socialLinks.map((link) => (
                 <div
                   onClick={() => {
@@ -283,7 +293,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   }}
                   class="text-black cursor-pointer"
                 >
-                  <div>{link.label}</div>
+                  <link.icon size={20} />
                 </div>
               ))}
             </div>
