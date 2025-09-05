@@ -1,6 +1,6 @@
 import { createSignal, createEffect, onMount, onCleanup } from "solid-js";
 import { gsap } from "gsap";
-import { useLocation, useNavigate } from "@solidjs/router";
+import { A, useLocation, useNavigate } from "@solidjs/router";
 import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
 import type { AuthContextType } from "~/context/AuthContext";
@@ -31,6 +31,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   let drawerRef: HTMLDivElement | undefined;
   let navLinksListRef: HTMLUListElement | undefined;
+  let textRef: HTMLDivElement | undefined;
 
   const handleLogout = async () => {
     await authClient.signOut();
@@ -151,6 +152,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         if (
           drawerRef &&
           !drawerRef.contains(event.target as Node) &&
+          textRef &&
+          !textRef.contains(event.target as Node) &&
           props.menuButtonRef &&
           !props.menuButtonRef.contains(event.target as Node)
         ) {
@@ -185,6 +188,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         style="transform: translateX(calc(100% + 5rem));"
       ></div>
       <div
+        ref={(el) => (textRef = el)}
         class="text-container fixed top-0 right-0 h-full w-[60vw] text-black z-50 flex flex-col justify-between "
         style={
           props.isOpen
@@ -201,14 +205,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   const isActive = location.pathname === link.href;
                   return (
                     <li class="relative mb-4">
-                      <div
-                        onClick={() => {
+                      <A
+                        href={link.href}
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSkipAnimation(true);
-                          if (link.onClick) {
-                            link.onClick();
-                          } else {
-                            navigate(link.href);
-                          }
+                          navigate(link.href);
                           props.onClose();
                         }}
                         class="relative cursor-pointer"
@@ -224,7 +226,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             {link.label}
                           </div>
                         </div>
-                      </div>
+                      </A>
                     </li>
                   );
                 })}
@@ -236,14 +238,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   const isActive = location.pathname === link.href;
                   return (
                     <li class="relative mb-4">
-                      <div
-                        onClick={() => {
+                      <A
+                        href={link.href}
+                        onClick={(e) => {
+                          e.preventDefault();
                           setSkipAnimation(true);
-                          if (link.onClick) {
-                            link.onClick();
-                          } else {
-                            navigate(link.href);
-                          }
+                          navigate(link.href);
                           props.onClose();
                         }}
                         class="relative cursor-pointer"
@@ -259,7 +259,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             {link.label}
                           </div>
                         </div>
-                      </div>
+                      </A>
                     </li>
                   );
                 })}

@@ -80,7 +80,7 @@ export default function Nav(props: NavProps) {
   return (
     <>
       <nav
-        class={` fixed  w-full z-50  transition-all duration-200   ${
+        class={` fixed  w-full z-[60]  transition-all duration-200   ${
           showNav() ? "top-0" : "top-[-104px]"
         } `}
       >
