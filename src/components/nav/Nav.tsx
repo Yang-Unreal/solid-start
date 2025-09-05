@@ -102,7 +102,9 @@ export default function Nav(props: NavProps) {
                   props.setMenuButtonRef(el);
                 }}
                 onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
-                class="border border-gray-200 rounded-sm bg-white"
+                class={`border rounded-sm bg-white ${
+                  props.isMenuOpen ? "border-black" : "border-gray-200"
+                } transition-colors duration-600`}
               >
                 <div class="flex justify-center items-center gap-2 px-3 py-2">
                   <Menu

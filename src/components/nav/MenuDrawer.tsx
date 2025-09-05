@@ -175,7 +175,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         style="transform: translateX(calc(100% + 5rem));"
       ></div>
       <div
-        class="text-container fixed top-0 right-0 h-full w-[60vw] text-black z-50 flex flex-col justify-between"
+        class="text-container fixed top-0 right-0 h-full w-[60vw] text-black z-50 flex flex-col justify-between "
         style={
           props.isOpen
             ? "clip-path: inset(0 0 0 100%);"
@@ -183,7 +183,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         }
       >
         <div>
-          <div class=" grid grid-cols-2 gap-8 px-[10vw] pt-[7vw]">
+          <div class=" flex px-[10vw] pt-[7vw] justify-between">
             <ul ref={navLinksListRef} class="space-y-4">
               {navLinks()
                 .slice(0, 3)
@@ -206,7 +206,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                         <div class="items-center" style="overflow: hidden;">
                           <div
                             ref={(el) => setTextRefs((prev) => [...prev, el])}
-                            class={`text-left text-6xl  font-bold${
+                            class={`text-left text-6xl  font-bold ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
                             style="transform: translateY(100%);"
@@ -257,23 +257,36 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           </div>
         </div>
 
-        <div class="mt-8">
-          <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">
-            SOCIALS
-          </h2>
-          <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
-            {socialLinks.map((link) => (
-              <div
-                onClick={() => {
-                  setSkipAnimation(true);
-                  navigate(link.href);
-                  props.onClose();
-                }}
-                class="text-black cursor-pointer"
-              >
-                <div>{link.label}</div>
-              </div>
-            ))}
+        <div class="flex flex-col gap-5 pl-[10vw] pb-[2vw] pr-[2vw]">
+          <div class="flex flex-col gap-3">
+            <div>
+              <p>Huangyan, Taizhou</p>
+              <p>Zhejiang, China</p>
+            </div>
+            <div>
+              <p>T: +86 133 3333 3333</p>
+              <p>E: 5oU8S@example.com</p>
+            </div>
+          </div>
+          <div class="flex justify-between">
+            <div class="flex gap-2 font-semibold">
+              <p>CN</p>
+              <p>EN</p>
+            </div>
+            <div class="flex flex-wrap gap-x-8 gap-y-2">
+              {socialLinks.map((link) => (
+                <div
+                  onClick={() => {
+                    setSkipAnimation(true);
+                    navigate(link.href);
+                    props.onClose();
+                  }}
+                  class="text-black cursor-pointer"
+                >
+                  <div>{link.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
