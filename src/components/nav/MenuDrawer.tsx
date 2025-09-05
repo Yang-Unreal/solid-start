@@ -103,16 +103,17 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         const tl = gsap.timeline();
 
         if (props.isOpen) {
-          tl.fromTo(
-            drawerRef,
-            { x: "100%" },
-            {
-              x: "0%",
-              duration,
-              ease: "circ.inOut",
-            },
-            0
-          );
+          if (drawerRef)
+            tl.fromTo(
+              drawerRef,
+              { x: "100%" },
+              {
+                x: "0%",
+                duration,
+                ease: "circ.inOut",
+              },
+              0
+            );
           tl.fromTo(
             textRefs(),
             { y: "100%" },
@@ -127,22 +128,24 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           );
         } else if (hasBeenOpened()) {
           if (skipAnimation()) {
-            gsap.set(drawerRef, {
-              x: () => (drawerRef ? drawerRef.offsetWidth + 80 : 0),
-            });
-            textRefs().forEach((textEl) => gsap.set(textEl, { y: "100%" }));
-          } else {
-            tl.to(
-              drawerRef,
-              {
-                x: () => (drawerRef ? drawerRef.offsetWidth + 80 : 0),
-                duration,
-                ease: "circ.inOut",
-              },
-              0
-            );
+            if (drawerRef)
+              gsap.set(drawerRef, {
+                x: () => drawerRef!.offsetWidth + 80,
+              });
             textRefs().forEach((textEl) => gsap.set(textEl, { y: "100%" }));
             gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
+          } else {
+            if (drawerRef)
+              tl.to(
+                drawerRef,
+                {
+                  x: () => drawerRef!.offsetWidth + 80,
+                  duration,
+                  ease: "circ.inOut",
+                },
+                0
+              );
+            textRefs().forEach((textEl) => gsap.set(textEl, { y: "100%" }));
             gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
           }
         }
@@ -184,6 +187,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   return (
     <>
+      <div class="fixed top-0 right-[61.5vw]  h-full  w-[0.5vw] bg-yellow z-40"></div>
+      <div class="fixed top-0 right-[60.5vw]  h-full  w-[0.5vw] bg-yellow z-40"></div>
       <div
         ref={(el) => (drawerRef = el)}
         class="fixed top-0 right-0 h-full w-[60vw] bg-yellow z-40"
