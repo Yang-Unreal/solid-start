@@ -113,7 +113,7 @@ export default function Nav(props: NavProps) {
                     class={`bg-transparent text-black`}
                   />
                   <p
-                    class={`hidden md:block  text-md font-bold font-inconsolata relative bg-transparent text-black`}
+                    class={`hidden md:block  text-sm font-bold  relative bg-transparent text-black`}
                   >
                     Menu
                   </p>
