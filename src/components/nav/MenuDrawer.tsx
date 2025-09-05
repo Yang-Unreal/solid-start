@@ -43,9 +43,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     const baseNavLinks = [
       { href: "/", label: "Collection" },
       { href: "/about", label: "About Us" },
+      { href: "/news", label: "News" },
       { href: "/contact", label: "Contact" },
 
       { href: "/sourcing", label: "Bespoke Sourcing" },
+      { href: "/inspection", label: "Inspection Before Shipment" },
       { href: "/services", label: "After-sales Service" },
       { href: "/account", label: "Account" },
     ];
@@ -94,7 +96,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         setSkipAnimation(false);
       }
 
-      const duration = 0.9; // GSAP uses seconds
+      const duration = 0.8; // GSAP uses seconds
 
       if (drawerRef && navLinksListRef) {
         const links = Array.from(navLinksListRef.children);
@@ -115,7 +117,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             textRefs(),
             { y: "100%" },
             { y: "0%", duration: 0.4, ease: "power1.inOut" },
-            0.4
+            0.3
           );
           tl.fromTo(
             ".text-container",
@@ -200,7 +202,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           <div class=" flex px-[10vw] pt-[7vw] justify-between">
             <ul ref={navLinksListRef} class="space-y-4">
               {navLinks()
-                .slice(0, 3)
+                .slice(0, 4)
                 .map((link) => {
                   const isActive = location.pathname === link.href;
                   return (
@@ -233,7 +235,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             </ul>
             <ul class="space-y-4">
               {navLinks()
-                .slice(3)
+                .slice(4)
                 .map((link) => {
                   const isActive = location.pathname === link.href;
                   return (
