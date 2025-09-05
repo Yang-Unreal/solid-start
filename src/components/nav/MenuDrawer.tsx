@@ -18,6 +18,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isMobile, setIsMobile] = createSignal(false);
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
   const [skipAnimation, setSkipAnimation] = createSignal(false);
+  const [textRefs, setTextRefs] = createSignal<HTMLDivElement[]>([]);
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
@@ -99,11 +100,24 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             },
             0
           );
+          tl.fromTo(
+            textRefs(),
+            { y: "100%" },
+            { y: "0%", duration: 0.4, ease: "power1.inOut" },
+            0.4
+          );
+          tl.fromTo(
+            ".text-container",
+            { clipPath: "inset(0 0 0 100%)" },
+            { clipPath: "inset(0 0 0 0%)", duration, ease: "circ.inOut" },
+            0
+          );
         } else if (hasBeenOpened()) {
           if (skipAnimation()) {
             gsap.set(drawerRef, {
               x: () => (drawerRef ? drawerRef.offsetWidth + 80 : 0),
             });
+            textRefs().forEach((textEl) => gsap.set(textEl, { y: "100%" }));
           } else {
             tl.to(
               drawerRef,
@@ -114,6 +128,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               },
               0
             );
+            textRefs().forEach((textEl) => gsap.set(textEl, { y: "100%" }));
+            gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
+            gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
           }
         }
       }
@@ -151,99 +168,115 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   }
 
   return (
-    <div
-      ref={(el) => (drawerRef = el)}
-      class="fixed top-0 right-0  h-full w-auto bg-white text-black z-40  flex flex-col justify-between "
-      style="transform: translateX(calc(100% + 5rem));"
-    >
-      <div>
-        <div class=" grid grid-cols-2 gap-8 px-[10vw] pt-[7vw]">
-          <ul ref={navLinksListRef} class="space-y-4">
-            {navLinks()
-              .slice(0, 3)
-              .map((link) => {
-                const isActive = location.pathname === link.href;
-                return (
-                  <li class="relative mb-4">
-                    <div
-                      onClick={() => {
-                        setSkipAnimation(true);
-                        if (link.onClick) {
-                          link.onClick();
-                        } else {
-                          navigate(link.href);
-                        }
-                        props.onClose();
-                      }}
-                      class="relative cursor-pointer"
-                    >
-                      <div class="items-center">
-                        <div
-                          class={`text-left text-6xl font-light font-bold${
-                            isActive ? "text-black" : "text-black/70"
-                          }`}
-                        >
-                          {link.label}
+    <>
+      <div
+        ref={(el) => (drawerRef = el)}
+        class="fixed top-0 right-0 h-full w-[60vw] bg-yellow z-40"
+        style="transform: translateX(calc(100% + 5rem));"
+      ></div>
+      <div
+        class="text-container fixed top-0 right-0 h-full w-[60vw] text-black z-50 flex flex-col justify-between"
+        style={
+          props.isOpen
+            ? "clip-path: inset(0 0 0 100%);"
+            : "visibility: hidden; clip-path: inset(0 0 0 100%);"
+        }
+      >
+        <div>
+          <div class=" grid grid-cols-2 gap-8 px-[10vw] pt-[7vw]">
+            <ul ref={navLinksListRef} class="space-y-4">
+              {navLinks()
+                .slice(0, 3)
+                .map((link) => {
+                  const isActive = location.pathname === link.href;
+                  return (
+                    <li class="relative mb-4">
+                      <div
+                        onClick={() => {
+                          setSkipAnimation(true);
+                          if (link.onClick) {
+                            link.onClick();
+                          } else {
+                            navigate(link.href);
+                          }
+                          props.onClose();
+                        }}
+                        class="relative cursor-pointer"
+                      >
+                        <div class="items-center" style="overflow: hidden;">
+                          <div
+                            ref={(el) => setTextRefs((prev) => [...prev, el])}
+                            class={`text-left text-6xl  font-bold${
+                              isActive ? "text-black" : "text-black/70"
+                            }`}
+                            style="transform: translateY(100%);"
+                          >
+                            {link.label}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
-          </ul>
-          <ul class="space-y-4">
-            {navLinks()
-              .slice(3)
-              .map((link) => {
-                const isActive = location.pathname === link.href;
-                return (
-                  <li class="relative mb-4">
-                    <div
-                      onClick={() => {
-                        setSkipAnimation(true);
-                        if (link.onClick) {
-                          link.onClick();
-                        } else {
-                          navigate(link.href);
-                        }
-                        props.onClose();
-                      }}
-                      class="relative cursor-pointer"
-                    >
-                      <div class="items-center">
-                        <div
-                          class={`text-left text-4xl font-light ${
-                            isActive ? "text-black" : "text-black/70"
-                          }`}
-                        >
-                          {link.label}
+                    </li>
+                  );
+                })}
+            </ul>
+            <ul class="space-y-4">
+              {navLinks()
+                .slice(3)
+                .map((link) => {
+                  const isActive = location.pathname === link.href;
+                  return (
+                    <li class="relative mb-4">
+                      <div
+                        onClick={() => {
+                          setSkipAnimation(true);
+                          if (link.onClick) {
+                            link.onClick();
+                          } else {
+                            navigate(link.href);
+                          }
+                          props.onClose();
+                        }}
+                        class="relative cursor-pointer"
+                      >
+                        <div class="items-center" style="overflow: hidden;">
+                          <div
+                            ref={(el) => setTextRefs((prev) => [...prev, el])}
+                            class={`text-left text-2xl  ${
+                              isActive ? "text-black" : "text-black/70"
+                            }`}
+                            style="transform: translateY(100%);"
+                          >
+                            {link.label}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </li>
-                );
-              })}
-          </ul>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
         </div>
-      </div>
 
-      <div class="mt-8">
-        <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">SOCIALS</h2>
-        <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
-          {socialLinks.map((link) => (
-            <div
-              onClick={() => {
-                setSkipAnimation(true);
-                navigate(link.href);
-                props.onClose();
-              }}
-              class="text-black cursor-pointer"
-            >
-              <div>{link.label}</div>
-            </div>
-          ))}
+        <div class="mt-8">
+          <h2 class="text-sm text-gray-500 tracking-widest mb-4 px-3">
+            SOCIALS
+          </h2>
+          <div class="flex flex-wrap gap-x-8 gap-y-2 px-3">
+            {socialLinks.map((link) => (
+              <div
+                onClick={() => {
+                  setSkipAnimation(true);
+                  navigate(link.href);
+                  props.onClose();
+                }}
+                class="text-black cursor-pointer"
+              >
+                <div>{link.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -43,6 +43,7 @@
   --color-primary-accent: hsl(75, 99%, 52%);
   --color-light: hsl(0, 0%, 100%);
   --color-light-gray: hsl(0, 0%, 95%);
+  --color-yellow: hsl(41, 87%, 57%);
 }
 
 :root {
