@@ -152,8 +152,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             );
           tl.fromTo(
             ".text-container",
-            { clipPath: "inset(0 0 0 100%)" },
-            { clipPath: "inset(0 0 0 0%)", duration, ease: "circ.inOut" },
+            { clipPath: "inset(0 0 0 100%)", visibility: "hidden" },
+            {
+              clipPath: "inset(0 0 0 0%)",
+              visibility: "visible",
+              duration,
+              ease: "circ.inOut",
+            },
             0
           );
           tl.fromTo(
@@ -192,7 +197,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               gsap.set(drawerRef, {
                 x: () => drawerRef!.offsetWidth,
               });
-            gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
+            gsap.set(".text-container", {
+              clipPath: "inset(0 0 0 100%)",
+              visibility: "hidden",
+            });
             gsap.set([...firstColumnRefs(), ...secondColumnRefs()], { y: 0 });
           } else {
             if (drawerRef)
@@ -234,6 +242,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               },
               0
             );
+            tl.set(".text-container", { visibility: "hidden" });
             tl.to(
               firstColumnRefs(),
               {
@@ -312,6 +321,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <div
         ref={(el) => (textRef = el)}
         class="text-container fixed top-0 right-0 h-full w-[60vw] text-black z-50 flex flex-col justify-between "
+        style="visibility: hidden;"
       >
         <div>
           <div class=" flex px-[10vw] pt-[7vw] justify-between">
