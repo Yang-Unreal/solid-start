@@ -78,6 +78,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   onMount(() => {
     if (!import.meta.env.SSR) {
+      if (textRef) {
+        gsap.set(textRef, { clipPath: "inset(0 0 0 100%)" });
+      }
       const mediaQuery = window.matchMedia("(max-width: 767px)");
       setIsMobile(mediaQuery.matches);
       const handleMediaQueryChange = (e: MediaQueryListEvent) =>
@@ -115,12 +118,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               0
             );
           tl.fromTo(
-            textRefs(),
-            { y: "100%" },
-            { y: "0%", duration: 0.4, ease: "power1.inOut" },
-            0.3
-          );
-          tl.fromTo(
             ".text-container",
             { clipPath: "inset(0 0 0 100%)" },
             { clipPath: "inset(0 0 0 0%)", duration, ease: "circ.inOut" },
@@ -130,23 +127,29 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           if (skipAnimation()) {
             if (drawerRef)
               gsap.set(drawerRef, {
-                x: () => drawerRef!.offsetWidth + 80,
+                x: () => drawerRef!.offsetWidth,
               });
-            textRefs().forEach((textEl) => gsap.set(textEl, { y: "100%" }));
             gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
           } else {
             if (drawerRef)
               tl.to(
                 drawerRef,
                 {
-                  x: () => drawerRef!.offsetWidth + 80,
+                  x: () => drawerRef!.offsetWidth,
                   duration,
                   ease: "circ.inOut",
                 },
                 0
               );
-            textRefs().forEach((textEl) => gsap.set(textEl, { y: "100%" }));
-            gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
+            tl.to(
+              ".text-container",
+              {
+                clipPath: "inset(0 0 0 100%)",
+                duration,
+                ease: "circ.inOut",
+              },
+              0
+            );
           }
         }
       }
@@ -192,16 +195,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <div
         ref={(el) => (drawerRef = el)}
         class="fixed top-0 right-0 h-full w-[60vw] bg-yellow z-40"
-        style="transform: translateX(calc(100% + 5rem));"
+        style="transform: translateX(100%);"
       ></div>
       <div
         ref={(el) => (textRef = el)}
         class="text-container fixed top-0 right-0 h-full w-[60vw] text-black z-50 flex flex-col justify-between "
-        style={
-          props.isOpen
-            ? "clip-path: inset(0 0 0 100%);"
-            : "visibility: hidden; clip-path: inset(0 0 0 100%);"
-        }
       >
         <div>
           <div class=" flex px-[10vw] pt-[7vw] justify-between">
@@ -228,7 +226,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             class={`text-left text-6xl   ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
-                            style="transform: translateY(100%);"
                           >
                             {link.label}
                           </div>
@@ -261,7 +258,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             class={`text-left text-2xl  ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
-                            style="transform: translateY(100%);"
                           >
                             {link.label}
                           </div>
