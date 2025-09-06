@@ -31,6 +31,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   let drawerRef: HTMLDivElement | undefined;
   let navLinksListRef: HTMLUListElement | undefined;
+  let secondNavLinksListRef: HTMLUListElement | undefined;
   let textRef: HTMLDivElement | undefined;
 
   const handleLogout = async () => {
@@ -101,9 +102,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
       const duration = 0.8; // GSAP uses seconds
 
-      if (drawerRef && navLinksListRef) {
-        const links = Array.from(navLinksListRef.children);
+      if (drawerRef && navLinksListRef && secondNavLinksListRef) {
         const tl = gsap.timeline();
+
+        if (!hasBeenOpened()) {
+          gsap.set(textRefs(), { y: 50 });
+        }
 
         if (props.isOpen) {
           if (drawerRef)
@@ -123,6 +127,16 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             { clipPath: "inset(0 0 0 0%)", duration, ease: "circ.inOut" },
             0
           );
+          tl.fromTo(
+            textRefs(),
+            { y: 50 },
+            {
+              y: 0,
+              duration: 0.5,
+              ease: "power2.out",
+            },
+            0.2
+          );
         } else if (hasBeenOpened()) {
           if (skipAnimation()) {
             if (drawerRef)
@@ -130,6 +144,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 x: () => drawerRef!.offsetWidth,
               });
             gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
+            gsap.set(textRefs(), { y: 0 });
           } else {
             if (drawerRef)
               tl.to(
@@ -147,6 +162,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 clipPath: "inset(0 0 0 100%)",
                 duration,
                 ease: "circ.inOut",
+              },
+              0
+            );
+            tl.to(
+              textRefs(),
+              {
+                y: 50,
+                duration: 0.5,
+                ease: "power2.out",
               },
               0
             );
@@ -235,7 +259,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   );
                 })}
             </ul>
-            <ul class="space-y-4">
+            <ul ref={secondNavLinksListRef} class="space-y-4">
               {navLinks()
                 .slice(4)
                 .map((link) => {
