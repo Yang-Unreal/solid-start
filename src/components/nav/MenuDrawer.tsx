@@ -24,7 +24,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isMobile, setIsMobile] = createSignal(false);
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
   const [skipAnimation, setSkipAnimation] = createSignal(false);
-  const [textRefs, setTextRefs] = createSignal<HTMLDivElement[]>([]);
+  const [firstColumnRefs, setFirstColumnRefs] = createSignal<HTMLDivElement[]>(
+    []
+  );
+  const [secondColumnRefs, setSecondColumnRefs] = createSignal<
+    HTMLDivElement[]
+  >([]);
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
@@ -106,7 +111,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         const tl = gsap.timeline();
 
         if (!hasBeenOpened()) {
-          gsap.set(textRefs(), { y: 50 });
+          gsap.set([...firstColumnRefs(), ...secondColumnRefs()], { y: 50 });
         }
 
         if (props.isOpen) {
@@ -128,14 +133,26 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             0
           );
           tl.fromTo(
-            textRefs(),
+            firstColumnRefs(),
             { y: 50 },
             {
               y: 0,
-              duration: 0.5,
-              ease: "power2.out",
+              duration: 0.6,
+              ease: "power2.inOut",
+              stagger: 0.05,
             },
-            0.2
+            0.3
+          );
+          tl.fromTo(
+            secondColumnRefs(),
+            { y: 50 },
+            {
+              y: 0,
+              duration: 0.6,
+              ease: "power2.inOut",
+              stagger: 0.05,
+            },
+            0.3
           );
         } else if (hasBeenOpened()) {
           if (skipAnimation()) {
@@ -144,7 +161,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 x: () => drawerRef!.offsetWidth,
               });
             gsap.set(".text-container", { clipPath: "inset(0 0 0 100%)" });
-            gsap.set(textRefs(), { y: 0 });
+            gsap.set([...firstColumnRefs(), ...secondColumnRefs()], { y: 0 });
           } else {
             if (drawerRef)
               tl.to(
@@ -166,11 +183,22 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               0
             );
             tl.to(
-              textRefs(),
+              firstColumnRefs(),
               {
                 y: 50,
-                duration: 0.5,
-                ease: "power2.out",
+                duration: 0.6,
+                ease: "power2.inOut",
+                stagger: 0.05,
+              },
+              0
+            );
+            tl.to(
+              secondColumnRefs(),
+              {
+                y: 50,
+                duration: 0.6,
+                ease: "power2.inOut",
+                stagger: 0.05,
               },
               0
             );
@@ -246,7 +274,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       >
                         <div class="items-center" style="overflow: hidden;">
                           <div
-                            ref={(el) => setTextRefs((prev) => [...prev, el])}
+                            ref={(el) =>
+                              setFirstColumnRefs((prev) => [...prev, el])
+                            }
                             class={`text-left text-6xl   ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
@@ -278,7 +308,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       >
                         <div class="items-center" style="overflow: hidden;">
                           <div
-                            ref={(el) => setTextRefs((prev) => [...prev, el])}
+                            ref={(el) =>
+                              setSecondColumnRefs((prev) => [...prev, el])
+                            }
                             class={`text-left text-2xl  ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
