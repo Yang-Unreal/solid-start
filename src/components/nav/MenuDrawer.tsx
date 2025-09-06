@@ -35,6 +35,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const lenis = useLenis();
 
   let drawerRef: HTMLDivElement | undefined;
+  let leftStripeRef: HTMLDivElement | undefined;
+  let rightStripeRef: HTMLDivElement | undefined;
   let navLinksListRef: HTMLUListElement | undefined;
   let secondNavLinksListRef: HTMLUListElement | undefined;
   let textRef: HTMLDivElement | undefined;
@@ -115,6 +117,28 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         }
 
         if (props.isOpen) {
+          if (leftStripeRef)
+            tl.fromTo(
+              leftStripeRef,
+              { x: "62vw" },
+              {
+                x: "0%",
+                duration,
+                ease: "circ.inOut",
+              },
+              0
+            );
+          if (rightStripeRef)
+            tl.fromTo(
+              rightStripeRef,
+              { x: "60.5vw" },
+              {
+                x: "0%",
+                duration,
+                ease: "circ.inOut",
+              },
+              0.05
+            );
           if (drawerRef)
             tl.fromTo(
               drawerRef,
@@ -124,7 +148,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                 duration,
                 ease: "circ.inOut",
               },
-              0
+              0.1
             );
           tl.fromTo(
             ".text-container",
@@ -156,6 +180,14 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           );
         } else if (hasBeenOpened()) {
           if (skipAnimation()) {
+            if (leftStripeRef)
+              gsap.set(leftStripeRef, {
+                x: "62vw",
+              });
+            if (rightStripeRef)
+              gsap.set(rightStripeRef, {
+                x: "61vw",
+              });
             if (drawerRef)
               gsap.set(drawerRef, {
                 x: () => drawerRef!.offsetWidth,
@@ -172,6 +204,26 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   ease: "circ.inOut",
                 },
                 0
+              );
+            if (rightStripeRef)
+              tl.to(
+                rightStripeRef,
+                {
+                  x: "61vw",
+                  duration,
+                  ease: "circ.inOut",
+                },
+                0.05
+              );
+            if (leftStripeRef)
+              tl.to(
+                leftStripeRef,
+                {
+                  x: "62vw",
+                  duration,
+                  ease: "circ.inOut",
+                },
+                0.1
               );
             tl.to(
               ".text-container",
@@ -242,8 +294,16 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   return (
     <>
-      <div class="fixed top-0 right-[61.5vw]  h-full  w-[0.5vw] bg-yellow z-40"></div>
-      <div class="fixed top-0 right-[60.5vw]  h-full  w-[0.5vw] bg-yellow z-40"></div>
+      <div
+        ref={(el) => (leftStripeRef = el)}
+        class="fixed top-0 right-[61.5vw]  h-full  w-[0.5vw] bg-yellow z-40"
+        style="transform: translateX(62vw);"
+      ></div>
+      <div
+        ref={(el) => (rightStripeRef = el)}
+        class="fixed top-0 right-[60.5vw]  h-full  w-[0.5vw] bg-yellow z-40"
+        style="transform: translateX(61vw);"
+      ></div>
       <div
         ref={(el) => (drawerRef = el)}
         class="fixed top-0 right-0 h-full w-[60vw] bg-yellow z-40"
