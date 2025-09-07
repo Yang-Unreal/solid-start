@@ -131,7 +131,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           if (rightStripeRef)
             tl.fromTo(
               rightStripeRef,
-              { x: "60.5vw" },
+              { x: "62vw" },
               {
                 x: "0%",
                 duration,
@@ -159,7 +159,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               duration,
               ease: "circ.inOut",
             },
-            0
+            0.1
           );
           tl.fromTo(
             firstColumnRefs(),
