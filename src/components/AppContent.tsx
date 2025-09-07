@@ -23,7 +23,7 @@ export function AppContent(props: { children: any }) {
         menuButtonRef={menuButtonRef()}
       />
       <div
-        class={`fixed inset-0 bg-black/50 z-30 transition-opacity duration-300 ${
+        class={`fixed inset-0 bg-black/80 z-30 transition-opacity duration-300 ${
           isMenuOpen() ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsMenuOpen(false)}
