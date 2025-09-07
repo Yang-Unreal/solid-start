@@ -63,13 +63,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     const links: { href: string; label: string; onClick?: () => void }[] =
       props.links ? [...props.links] : baseNavLinks;
 
-    // if (props.session().data?.user) {
-    //   links.push({ href: "/dashboard", label: "Dashboard" });
-    //   links.push({ href: "#", label: "Logout", onClick: handleLogout });
-    // } else {
-    //   links.push({ href: "/login", label: "Login" });
-    //   links.push({ href: "/signup", label: "Signup" });
-    // }
     return links;
   };
 
@@ -105,11 +98,21 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       if (props.isOpen) {
         setHasBeenOpened(true);
         setSkipAnimation(false);
+        if (drawerRef && textRef) {
+          drawerRef.style.width = textRef.offsetWidth + "px";
+        }
+        if (leftStripeRef && rightStripeRef && textRef) {
+          const w = textRef.offsetWidth;
+        }
       }
 
       const duration = 0.8; // GSAP uses seconds
 
-      if (drawerRef && navLinksListRef && secondNavLinksListRef) {
+      const w = textRef ? textRef.offsetWidth : 0;
+
+      const stripeWidth = 8;
+
+      if (drawerRef && navLinksListRef && secondNavLinksListRef && textRef) {
         const tl = gsap.timeline();
 
         if (!hasBeenOpened()) {
@@ -120,9 +123,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           if (leftStripeRef)
             tl.fromTo(
               leftStripeRef,
-              { x: "62vw" },
+              { right: stripeWidth + "px" },
               {
-                x: "0%",
+                right: w + 24 + "px",
+                visibility: "visible",
                 duration,
                 ease: "circ.inOut",
               },
@@ -131,9 +135,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           if (rightStripeRef)
             tl.fromTo(
               rightStripeRef,
-              { x: "62vw" },
+              { right: stripeWidth + "px" },
               {
-                x: "0%",
+                right: w + 8 + "px",
+                visibility: "visible",
                 duration,
                 ease: "circ.inOut",
               },
@@ -184,14 +189,17 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             0.3
           );
         } else if (hasBeenOpened()) {
+          const stripeWidth = 8;
           if (skipAnimation()) {
             if (leftStripeRef)
               gsap.set(leftStripeRef, {
-                x: "62vw",
+                right: stripeWidth + "px",
+                visibility: "hidden",
               });
             if (rightStripeRef)
               gsap.set(rightStripeRef, {
-                x: "61vw",
+                right: stripeWidth + "px",
+                visibility: "hidden",
               });
             if (drawerRef)
               gsap.set(drawerRef, {
@@ -217,7 +225,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               tl.to(
                 rightStripeRef,
                 {
-                  x: "61vw",
+                  right: stripeWidth + "px",
                   duration,
                   ease: "circ.inOut",
                 },
@@ -227,7 +235,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               tl.to(
                 leftStripeRef,
                 {
-                  x: "62vw",
+                  right: stripeWidth + "px",
                   duration,
                   ease: "circ.inOut",
                 },
@@ -243,6 +251,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
               0
             );
             tl.set(".text-container", { visibility: "hidden" });
+            if (leftStripeRef) tl.set(leftStripeRef, { visibility: "hidden" });
+            if (rightStripeRef)
+              tl.set(rightStripeRef, { visibility: "hidden" });
             tl.to(
               firstColumnRefs(),
               {
@@ -305,26 +316,26 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     <>
       <div
         ref={(el) => (leftStripeRef = el)}
-        class="fixed top-0 right-[61.5vw]  h-full  w-[0.5vw] bg-yellow z-40"
-        style="transform: translateX(62vw);"
+        class="fixed top-0 h-full w-2 bg-yellow z-40"
+        style="visibility: hidden;"
       ></div>
       <div
         ref={(el) => (rightStripeRef = el)}
-        class="fixed top-0 right-[60.5vw]  h-full  w-[0.5vw] bg-yellow z-40"
-        style="transform: translateX(61vw);"
+        class="fixed top-0 h-full w-2 bg-yellow z-40"
+        style="visibility: hidden;"
       ></div>
       <div
         ref={(el) => (drawerRef = el)}
-        class="fixed top-0 right-0 h-full w-[60vw] bg-yellow z-40"
+        class="fixed top-0 right-0 h-full bg-yellow z-40"
         style="transform: translateX(100%);"
       ></div>
       <div
         ref={(el) => (textRef = el)}
-        class="text-container fixed top-0 right-0 h-full w-[60vw] text-black z-50 flex flex-col justify-between "
+        class="text-container  fixed top-0 right-0 h-full w-auto text-black z-50 flex flex-col justify-between "
         style="visibility: hidden;"
       >
         <div>
-          <div class=" flex px-[10vw] pt-[7vw] justify-between">
+          <div class=" flex px-[10vw] pt-[7vw] justify-between gap-[10vw]">
             <ul ref={navLinksListRef} class="space-y-4">
               {navLinks()
                 .slice(0, 4)
