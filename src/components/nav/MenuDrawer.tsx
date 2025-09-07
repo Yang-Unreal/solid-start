@@ -21,6 +21,8 @@ interface MenuDrawerProps {
 }
 
 export default function MenuDrawer(props: MenuDrawerProps) {
+  const stripeWidth = 8;
+
   const [isMobile, setIsMobile] = createSignal(false);
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
   const [skipAnimation, setSkipAnimation] = createSignal(false);
@@ -101,16 +103,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         if (drawerRef && textRef) {
           drawerRef.style.width = textRef.offsetWidth + "px";
         }
-        if (leftStripeRef && rightStripeRef && textRef) {
-          const w = textRef.offsetWidth;
-        }
       }
 
       const duration = 0.8; // GSAP uses seconds
 
       const w = textRef ? textRef.offsetWidth : 0;
-
-      const stripeWidth = 8;
 
       if (drawerRef && navLinksListRef && secondNavLinksListRef && textRef) {
         const tl = gsap.timeline();
@@ -189,7 +186,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             0.3
           );
         } else if (hasBeenOpened()) {
-          const stripeWidth = 8;
           if (skipAnimation()) {
             if (leftStripeRef)
               gsap.set(leftStripeRef, {
