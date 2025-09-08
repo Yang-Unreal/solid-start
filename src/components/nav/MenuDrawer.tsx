@@ -84,14 +84,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       if (textRef) {
         gsap.set(textRef, { clipPath: "inset(0 0 0 100%)" });
       }
-      const mediaQuery = window.matchMedia("(max-width: 767px)");
-      setIsMobile(mediaQuery.matches);
-      const handleMediaQueryChange = (e: MediaQueryListEvent) =>
-        setIsMobile(e.matches);
-      mediaQuery.addEventListener("change", handleMediaQueryChange);
-      onCleanup(() =>
-        mediaQuery.removeEventListener("change", handleMediaQueryChange)
-      );
     }
   });
 
@@ -354,7 +346,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             ref={(el) =>
                               setFirstColumnRefs((prev) => [...prev, el])
                             }
-                            class={`text-left text-6xl   ${
+                            class={`text-left lg:text-6xl   ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
                           >

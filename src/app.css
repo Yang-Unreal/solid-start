@@ -201,4 +201,14 @@ html::-webkit-scrollbar {
   .font-inconsolata {
     font-family: "Inconsolata", monospace;
   }
+
+  .text-container {
+    width: auto;
+  }
+
+  @media (max-width: 1024px) {
+    .text-container {
+      width: 100vw;
+    }
+  }
 }
