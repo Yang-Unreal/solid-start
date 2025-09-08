@@ -211,4 +211,15 @@ html::-webkit-scrollbar {
       width: 100vw;
     }
   }
+
+  .nav-links-container {
+    flex-direction: row;
+  }
+
+  @media (max-width: 1024px) {
+    .nav-links-container {
+      flex-direction: column;
+      padding-top: 120px;
+    }
+  }
 }

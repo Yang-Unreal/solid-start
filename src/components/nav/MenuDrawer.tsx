@@ -323,7 +323,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         style="visibility: hidden;"
       >
         <div>
-          <div class=" flex px-[10vw] pt-[7vw] justify-between gap-[10vw]">
+          <div class="nav-links-container flex flex-row px-[10vw] pt-[7vw] justify-between gap-[10vw]">
             <ul ref={navLinksListRef} class="space-y-4">
               {navLinks()
                 .slice(0, 4)
@@ -346,7 +346,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             ref={(el) =>
                               setFirstColumnRefs((prev) => [...prev, el])
                             }
-                            class={`text-left lg:text-6xl   ${
+                            class={`text-left  text-2xl md:text-6xl   ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
                           >
@@ -358,13 +358,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   );
                 })}
             </ul>
-            <ul ref={secondNavLinksListRef} class="space-y-4">
+            <ul ref={secondNavLinksListRef} class="space-y-1 md:space-y-4">
               {navLinks()
                 .slice(4)
                 .map((link) => {
                   const isActive = location.pathname === link.href;
                   return (
-                    <li class="relative mb-4">
+                    <li class="relative">
                       <A
                         href={link.href}
                         onClick={(e) => {
@@ -380,7 +380,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                             ref={(el) =>
                               setSecondColumnRefs((prev) => [...prev, el])
                             }
-                            class={`text-left text-2xl  ${
+                            class={`text-left text-md md:text-2xl  ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
                           >
