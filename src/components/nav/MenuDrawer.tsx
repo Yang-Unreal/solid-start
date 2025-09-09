@@ -90,6 +90,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         setSkipAnimation(false);
         if (drawerRef && textRef) {
           drawerRef.style.width = textRef.offsetWidth + "px";
+          drawerRef.style.height = textRef.offsetHeight + "px";
         }
       }
 
@@ -272,16 +273,18 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   return (
     <>
-      <div
-        ref={(el) => (leftStripeRef = el)}
-        class="fixed top-0 h-full w-2 bg-yellow z-40"
-        style="visibility: hidden;"
-      ></div>
-      <div
-        ref={(el) => (rightStripeRef = el)}
-        class="fixed top-0 h-full w-2 bg-yellow z-40"
-        style="visibility: hidden;"
-      ></div>
+      <div class="stripe-container">
+        <div
+          ref={(el) => (leftStripeRef = el)}
+          class="fixed top-0 h-full w-2 bg-yellow z-40"
+          style="visibility: hidden;"
+        ></div>
+        <div
+          ref={(el) => (rightStripeRef = el)}
+          class="fixed top-0 h-full w-2 bg-yellow z-40"
+          style="visibility: hidden;"
+        ></div>
+      </div>
       <div
         ref={(el) => (drawerRef = el)}
         class="fixed top-0 right-0 h-full bg-yellow z-40"
@@ -289,11 +292,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       ></div>
       <div
         ref={(el) => (textRef = el)}
-        class="text-container  fixed top-0 right-0 h-full w-auto text-black z-50 flex flex-col justify-between "
+        class="text-container  fixed top-0 right-0 text-black z-50 flex flex-col justify-between "
         style="visibility: hidden;"
       >
         <div>
-          <div class="nav-links-container flex flex-row px-[10vw] pt-[7vw] justify-between gap-[10vw]">
+          <div class="nav-links-container  flex flex-row   justify-between gap-[10vw]">
             <ul ref={navLinksListRef} class="space-y-4">
               {navLinks()
                 .slice(0, 4)
@@ -361,7 +364,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           </div>
         </div>
 
-        <div class="flex flex-col gap-5 pl-[10vw] pb-[2vw] pr-[2vw]">
+        <div class="contact-container flex flex-col gap-5 pb-6">
           <div class="flex flex-col gap-3">
             <div>
               <p>Huangyan, Taizhou</p>

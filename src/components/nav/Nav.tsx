@@ -88,7 +88,7 @@ export default function Nav(props: NavProps) {
           <div class="w-full items-center  flex justify-between container-padding">
             <A
               href="/"
-              class=" items-center justify-center pl-3"
+              class="logo items-center justify-center "
               aria-label="Homepage"
               title="Homepage"
             >

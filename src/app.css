@@ -202,24 +202,64 @@ html::-webkit-scrollbar {
     font-family: "Inconsolata", monospace;
   }
 
+  .logo {
+    padding-left: 12px;
+  }
+
+  @media (max-width: 1024px) {
+    .logo {
+      padding-left: 0px;
+    }
+  }
+
   .text-container {
     width: auto;
+    height: 100vh;
   }
 
   @media (max-width: 1024px) {
     .text-container {
       width: 100vw;
+      height: auto;
     }
   }
 
   .nav-links-container {
     flex-direction: row;
+    padding-top: 7vw;
+    padding-right: 10vw;
+    padding-left: 10vw;
   }
 
   @media (max-width: 1024px) {
     .nav-links-container {
       flex-direction: column;
       padding-top: 120px;
+      padding-right: 16px;
+      padding-left: 16px;
     }
   }
+
+  .contact-container {
+    padding-top: 7vw;
+    padding-right: 24px;
+    padding-left: 10vw;
+  }
+
+  @media (max-width: 1024px) {
+    .contact-container {
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+  }
+
+  /* .stripe-container {
+    visibility: visible;
+  }
+
+  @media (max-width: 1024px) {
+    .stripe-container {
+      visibility: hidden;
+    }
+  } */
 }
