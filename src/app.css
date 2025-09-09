@@ -253,13 +253,13 @@ html::-webkit-scrollbar {
     }
   }
 
-  /* .stripe-container {
-    visibility: visible;
+  .stripe-container {
+    display: block;
   }
 
   @media (max-width: 1024px) {
     .stripe-container {
-      visibility: hidden;
+      display: none;
     }
-  } */
+  }
 }
