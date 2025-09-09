@@ -148,7 +148,13 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           0.1
         )
         .fromTo(
-          allColumns,
+          firstColumnRefs,
+          { y: 50 },
+          { y: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
+          0.3
+        )
+        .fromTo(
+          secondColumnRefs,
           { y: 50 },
           { y: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
           0.3
@@ -175,7 +181,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           0
         )
         .to(
-          allColumns,
+          firstColumnRefs,
+          { y: 50, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
+          0
+        )
+        .to(
+          secondColumnRefs,
           { y: 50, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
           0
         );
