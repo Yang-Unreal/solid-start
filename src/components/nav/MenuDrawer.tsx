@@ -26,12 +26,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isMobile, setIsMobile] = createSignal(false);
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
   const [skipAnimation, setSkipAnimation] = createSignal(false);
-  const [firstColumnRefs, setFirstColumnRefs] = createSignal<HTMLDivElement[]>(
-    []
-  );
-  const [secondColumnRefs, setSecondColumnRefs] = createSignal<
-    HTMLDivElement[]
-  >([]);
+  let firstColumnRefs: HTMLDivElement[] = [];
+  let secondColumnRefs: HTMLDivElement[] = [];
   const location = useLocation();
   const navigate = useNavigate();
   const lenis = useLenis();
@@ -105,7 +101,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         const tl = gsap.timeline();
 
         if (!hasBeenOpened()) {
-          gsap.set([...firstColumnRefs(), ...secondColumnRefs()], { y: 50 });
+          gsap.set([...firstColumnRefs, ...secondColumnRefs], { y: 50 });
         }
 
         if (props.isOpen) {
@@ -156,7 +152,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             0.1
           );
           tl.fromTo(
-            firstColumnRefs(),
+            firstColumnRefs,
             { y: 50 },
             {
               y: 0,
@@ -167,7 +163,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             0.3
           );
           tl.fromTo(
-            secondColumnRefs(),
+            secondColumnRefs,
             { y: 50 },
             {
               y: 0,
@@ -178,91 +174,65 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             0.3
           );
         } else if (hasBeenOpened()) {
-          if (skipAnimation()) {
-            if (leftStripeRef)
-              gsap.set(leftStripeRef, {
-                right: stripeWidth + "px",
-                visibility: "hidden",
-              });
-            if (rightStripeRef)
-              gsap.set(rightStripeRef, {
-                right: stripeWidth + "px",
-                visibility: "hidden",
-              });
-            if (drawerRef)
-              gsap.set(drawerRef, {
-                x: () => drawerRef!.offsetWidth,
-              });
-            gsap.set(".text-container", {
-              clipPath: "inset(0 0 0 100%)",
-              visibility: "hidden",
-            });
-            gsap.set([...firstColumnRefs(), ...secondColumnRefs()], { y: 0 });
-          } else {
-            if (drawerRef)
-              tl.to(
-                drawerRef,
-                {
-                  x: () => drawerRef!.offsetWidth,
-                  duration,
-                  ease: "circ.inOut",
-                },
-                0
-              );
-            if (rightStripeRef)
-              tl.to(
-                rightStripeRef,
-                {
-                  right: stripeWidth + "px",
-                  duration,
-                  ease: "circ.inOut",
-                },
-                0.05
-              );
-            if (leftStripeRef)
-              tl.to(
-                leftStripeRef,
-                {
-                  right: stripeWidth + "px",
-                  duration,
-                  ease: "circ.inOut",
-                },
-                0.1
-              );
+          if (drawerRef)
             tl.to(
-              ".text-container",
+              drawerRef,
               {
-                clipPath: "inset(0 0 0 100%)",
+                x: () => drawerRef!.offsetWidth,
                 duration,
                 ease: "circ.inOut",
               },
               0
             );
-            tl.set(".text-container", { visibility: "hidden" });
-            if (leftStripeRef) tl.set(leftStripeRef, { visibility: "hidden" });
-            if (rightStripeRef)
-              tl.set(rightStripeRef, { visibility: "hidden" });
+          if (rightStripeRef)
             tl.to(
-              firstColumnRefs(),
+              rightStripeRef,
               {
-                y: 50,
-                duration: 0.6,
-                ease: "power2.inOut",
-                stagger: 0.05,
+                right: -stripeWidth + "px",
+                duration,
+                ease: "circ.inOut",
               },
-              0
+              0.05
             );
+          if (leftStripeRef)
             tl.to(
-              secondColumnRefs(),
+              leftStripeRef,
               {
-                y: 50,
-                duration: 0.6,
-                ease: "power2.inOut",
-                stagger: 0.05,
+                right: -stripeWidth + "px",
+                duration,
+                ease: "circ.inOut",
               },
-              0
+              0.1
             );
-          }
+          tl.to(
+            ".text-container",
+            {
+              clipPath: "inset(0 0 0 100%)",
+              duration,
+              ease: "circ.inOut",
+            },
+            0
+          );
+          tl.to(
+            firstColumnRefs,
+            {
+              y: 50,
+              duration: 0.6,
+              ease: "power2.inOut",
+              stagger: 0.05,
+            },
+            0
+          );
+          tl.to(
+            secondColumnRefs,
+            {
+              y: 50,
+              duration: 0.6,
+              ease: "power2.inOut",
+              stagger: 0.05,
+            },
+            0
+          );
         }
       }
     });
@@ -327,7 +297,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             <ul ref={navLinksListRef} class="space-y-4">
               {navLinks()
                 .slice(0, 4)
-                .map((link) => {
+                .map((link, index) => {
                   const isActive = location.pathname === link.href;
                   return (
                     <li class="relative mb-4">
@@ -343,9 +313,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       >
                         <div class="items-center" style="overflow: hidden;">
                           <div
-                            ref={(el) =>
-                              setFirstColumnRefs((prev) => [...prev, el])
-                            }
+                            ref={(el) => (firstColumnRefs[index] = el)}
                             class={`text-left  text-2xl md:text-6xl   ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
@@ -361,7 +329,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             <ul ref={secondNavLinksListRef} class="space-y-1 md:space-y-4">
               {navLinks()
                 .slice(4)
-                .map((link) => {
+                .map((link, index) => {
                   const isActive = location.pathname === link.href;
                   return (
                     <li class="relative">
@@ -377,9 +345,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                       >
                         <div class="items-center" style="overflow: hidden;">
                           <div
-                            ref={(el) =>
-                              setSecondColumnRefs((prev) => [...prev, el])
-                            }
+                            ref={(el) => (secondColumnRefs[index] = el)}
                             class={`text-left text-md md:text-2xl  ${
                               isActive ? "text-black" : "text-black/70"
                             }`}
