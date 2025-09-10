@@ -269,17 +269,22 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     onCleanup(() => window.removeEventListener("resize", handleResize));
   });
 
-  createEffect(() => {
-    if (props.isOpen) {
-      setHasBeenOpened(true);
-      if (drawerRef && textRef) {
-        drawerRef.style.width = textRef.offsetWidth + "px";
-        drawerRef.style.height = textRef.offsetHeight + "px";
+  createEffect(
+    on(
+      () => props.isOpen,
+      (isOpen) => {
+        if (isOpen) {
+          setHasBeenOpened(true);
+          if (drawerRef && textRef) {
+            drawerRef.style.width = textRef.offsetWidth + "px";
+            drawerRef.style.height = textRef.offsetHeight + "px";
+          }
+        }
+        const textWidth = textRef ? textRef.offsetWidth : 0;
+        animateDrawer(isOpen, textWidth);
       }
-    }
-    const textWidth = textRef ? textRef.offsetWidth : 0;
-    animateDrawer(props.isOpen, textWidth);
-  });
+    )
+  );
 
   createEffect(
     on(isMobile, (isMobile) => {
