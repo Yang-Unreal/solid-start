@@ -80,6 +80,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const lenis = useLenis();
 
   const [hasBeenOpened, setHasBeenOpened] = createSignal(false);
+  const [isMobile, setIsMobile] = createSignal(
+    typeof window !== "undefined" ? window.innerWidth <= 1024 : false
+  );
   let firstColumnRefs: HTMLDivElement[] = [];
   let secondColumnRefs: HTMLDivElement[] = [];
 
@@ -197,6 +200,11 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     if (!import.meta.env.SSR && textRef) {
       gsap.set(textRef, { clipPath: "inset(0 0 0 100%)" });
     }
+    if (!import.meta.env.SSR) {
+      const handleResize = () => setIsMobile(window.innerWidth <= 1024);
+      window.addEventListener("resize", handleResize);
+      onCleanup(() => window.removeEventListener("resize", handleResize));
+    }
   });
 
   createEffect(() => {
@@ -242,7 +250,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
   return (
     <>
-      <div class="stripe-container">
+      <div>
         <div
           ref={leftStripeRef}
           class="fixed top-0 h-full w-2 bg-yellow z-40"
