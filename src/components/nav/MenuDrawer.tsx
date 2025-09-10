@@ -1,4 +1,11 @@
-import { createSignal, createEffect, onMount, onCleanup, For } from "solid-js";
+import {
+  createSignal,
+  createEffect,
+  onMount,
+  onCleanup,
+  For,
+  on,
+} from "solid-js";
 import { gsap } from "gsap";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { authClient } from "~/lib/auth-client";
@@ -264,6 +271,17 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     const textWidth = textRef ? textRef.offsetWidth : 0;
     animateDrawer(props.isOpen, textWidth);
   });
+
+  createEffect(
+    on(isMobile, (isMobile) => {
+      if (drawerRef && !props.isOpen) {
+        const newTransform = isMobile
+          ? "translateY(-100%)"
+          : "translateX(100%)";
+        gsap.set(drawerRef, { transform: newTransform });
+      }
+    })
+  );
 
   createEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
