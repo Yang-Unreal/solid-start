@@ -250,14 +250,23 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   };
 
   onMount(() => {
-    if (!import.meta.env.SSR && textRef) {
+    if (import.meta.env.SSR) return;
+
+    // Set initial transform state with GSAP
+    if (drawerRef) {
+      const initialTransform = isMobile()
+        ? "translateY(-100%)"
+        : "translateX(100%)";
+      gsap.set(drawerRef, { transform: initialTransform });
+    }
+
+    if (textRef) {
       gsap.set(textRef, { clipPath: "inset(0 0 0 100%)" });
     }
-    if (!import.meta.env.SSR) {
-      const handleResize = () => setIsMobile(window.innerWidth <= 1024);
-      window.addEventListener("resize", handleResize);
-      onCleanup(() => window.removeEventListener("resize", handleResize));
-    }
+
+    const handleResize = () => setIsMobile(window.innerWidth <= 1024);
+    window.addEventListener("resize", handleResize);
+    onCleanup(() => window.removeEventListener("resize", handleResize));
   });
 
   createEffect(() => {
@@ -326,13 +335,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           style="visibility: hidden;"
         />
       </div>
-      <div
-        ref={drawerRef}
-        class="fixed top-0 right-0 h-full bg-yellow z-40"
-        style={{
-          transform: isMobile() ? "translateY(-100%)" : "translateX(100%)",
-        }}
-      />
+      <div ref={drawerRef} class="fixed top-0 right-0 h-full bg-yellow z-40" />
       <div
         ref={textRef}
         class="text-container fixed top-0 right-0 text-black z-50 flex flex-col justify-between"
