@@ -10,6 +10,7 @@ import {
   FaBrandsSquareTwitter,
   FaBrandsLinkedin,
 } from "solid-icons/fa";
+import { is } from "drizzle-orm";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
@@ -111,18 +112,18 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     }
 
     if (isOpen) {
-      tl.fromTo(
-        leftStripeRef,
-        { right: STRIPE_WIDTH + "px" },
-        {
-          right: textWidth + 24 + "px",
-          visibility: "visible",
-          duration,
-          ease: "circ.inOut",
-        },
-        0
-      )
-        .fromTo(
+      if (!isMobile()) {
+        tl.fromTo(
+          leftStripeRef,
+          { right: STRIPE_WIDTH + "px" },
+          {
+            right: textWidth + 24 + "px",
+            visibility: "visible",
+            duration,
+            ease: "circ.inOut",
+          },
+          0
+        ).fromTo(
           rightStripeRef,
           { right: STRIPE_WIDTH + "px" },
           {
@@ -132,14 +133,27 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             ease: "circ.inOut",
           },
           0.05
-        )
-        .fromTo(
+        );
+      }
+
+      if (!isMobile()) {
+        tl.fromTo(
           drawerRef,
           { x: "100%" },
           { x: "0%", duration, ease: "circ.inOut" },
           0.1
-        )
-        .fromTo(
+        );
+      } else {
+        tl.fromTo(
+          drawerRef,
+          { y: "-100%" },
+          { y: "0%", duration, ease: "circ.inOut" },
+          0.1
+        );
+      }
+
+      if (!isMobile()) {
+        tl.fromTo(
           ".text-container",
           { clipPath: "inset(0 0 0 100%)", visibility: "hidden" },
           {
@@ -149,50 +163,82 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             ease: "circ.inOut",
           },
           0.1
-        )
-        .fromTo(
-          firstColumnRefs,
-          { y: 50 },
-          { y: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
-          0.3
-        )
-        .fromTo(
-          secondColumnRefs,
-          { y: 50 },
-          { y: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
-          0.3
         );
+      } else {
+        tl.fromTo(
+          ".text-container",
+          { clipPath: "inset(0 0 100% 0)", visibility: "hidden" },
+          {
+            clipPath: "inset(0 0 0% 0 )",
+            visibility: "visible",
+            duration,
+            ease: "circ.inOut",
+          },
+          0.1
+        );
+      }
+
+      tl.fromTo(
+        firstColumnRefs,
+        { y: 50 },
+        { y: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
+        0.3
+      ).fromTo(
+        secondColumnRefs,
+        { y: 50 },
+        { y: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
+        0.3
+      );
     } else if (hasBeenOpened()) {
-      tl.to(
-        drawerRef,
-        { x: () => drawerRef!.offsetWidth, duration, ease: "circ.inOut" },
-        0
-      )
-        .to(
+      if (!isMobile()) {
+        tl.to(
+          drawerRef,
+          { x: () => drawerRef!.offsetWidth, duration, ease: "circ.inOut" },
+          0
+        );
+      } else {
+        tl.to(
+          drawerRef,
+          { y: () => -drawerRef!.offsetHeight, duration, ease: "circ.inOut" },
+          0
+        );
+      }
+
+      if (!isMobile()) {
+        tl.to(
           rightStripeRef,
           { right: -STRIPE_WIDTH + "px", duration, ease: "circ.inOut" },
           0.05
-        )
-        .to(
+        ).to(
           leftStripeRef,
           { right: -STRIPE_WIDTH + "px", duration, ease: "circ.inOut" },
           0.1
-        )
-        .to(
+        );
+      }
+
+      if (!isMobile()) {
+        tl.to(
           ".text-container",
           { clipPath: "inset(0 0 0 100%)", duration, ease: "circ.inOut" },
           0
-        )
-        .to(
-          firstColumnRefs,
-          { y: 50, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
-          0
-        )
-        .to(
-          secondColumnRefs,
-          { y: 50, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
+        );
+      } else {
+        tl.to(
+          ".text-container",
+          { clipPath: "inset(0 0 100% 0 )", duration, ease: "circ.inOut" },
           0
         );
+      }
+
+      tl.to(
+        firstColumnRefs,
+        { y: 50, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
+        0
+      ).to(
+        secondColumnRefs,
+        { y: 50, duration: 0.6, ease: "power2.inOut", stagger: 0.05 },
+        0
+      );
     }
   };
 
@@ -265,7 +311,9 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       <div
         ref={drawerRef}
         class="fixed top-0 right-0 h-full bg-yellow z-40"
-        style="transform: translateX(100%);"
+        style={{
+          transform: isMobile() ? "translateY(-100%)" : "translateX(100%)",
+        }}
       />
       <div
         ref={textRef}
