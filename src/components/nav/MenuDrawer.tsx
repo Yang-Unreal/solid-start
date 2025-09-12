@@ -18,6 +18,7 @@ import {
   FaBrandsLinkedin,
 } from "solid-icons/fa";
 import { is } from "drizzle-orm";
+import { el } from "@faker-js/faker";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
@@ -97,6 +98,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   let drawerRef: HTMLDivElement | undefined;
   let leftStripeRef: HTMLDivElement | undefined;
   let rightStripeRef: HTMLDivElement | undefined;
+  let upStripeRef: HTMLDivElement | undefined;
+  let lowStripeRef: HTMLDivElement | undefined;
   let textRef: HTMLDivElement | undefined;
 
   const navLinks = () => props.links || BASE_NAV_LINKS;
@@ -106,8 +109,18 @@ export default function MenuDrawer(props: MenuDrawerProps) {
     props.onClose();
   };
 
-  const animateDrawer = (isOpen: boolean, textWidth: number) => {
-    if (!leftStripeRef || !rightStripeRef || !drawerRef) {
+  const animateDrawer = (
+    isOpen: boolean,
+    textWidth: number,
+    textHeight: number
+  ) => {
+    if (
+      !leftStripeRef ||
+      !rightStripeRef ||
+      !drawerRef ||
+      !upStripeRef ||
+      !lowStripeRef
+    ) {
       return;
     }
     const duration = 0.8;
@@ -140,6 +153,28 @@ export default function MenuDrawer(props: MenuDrawerProps) {
             ease: "circ.inOut",
           },
           0.05
+        );
+      } else {
+        tl.fromTo(
+          upStripeRef,
+          { top: -STRIPE_WIDTH + "px" },
+          {
+            top: textHeight + 8 + "px",
+            visibility: "visible",
+            duration,
+            ease: "circ.inOut",
+          },
+          0.05
+        ).fromTo(
+          lowStripeRef,
+          { top: -STRIPE_WIDTH + "px" },
+          {
+            top: textHeight + 24 + "px",
+            visibility: "visible",
+            duration,
+            ease: "circ.inOut",
+          },
+          0
         );
       }
 
@@ -221,6 +256,16 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           { right: -STRIPE_WIDTH + "px", duration, ease: "circ.inOut" },
           0.1
         );
+      } else {
+        tl.to(
+          upStripeRef,
+          { top: -STRIPE_WIDTH + "px", duration, ease: "circ.inOut" },
+          0.05
+        ).to(
+          lowStripeRef,
+          { top: -STRIPE_WIDTH + "px", duration, ease: "circ.inOut" },
+          0.1
+        );
       }
 
       if (!isMobile()) {
@@ -281,7 +326,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           }
         }
         const textWidth = textRef ? textRef.offsetWidth : 0;
-        animateDrawer(isOpen, textWidth);
+        const textHeight = textRef ? textRef.offsetHeight : 0;
+        animateDrawer(isOpen, textWidth, textHeight);
       }
     )
   );
@@ -337,6 +383,18 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         <div
           ref={rightStripeRef}
           class="fixed top-0 h-full w-2 bg-yellow z-40"
+          style="visibility: hidden;"
+        />
+      </div>
+      <div>
+        <div
+          ref={upStripeRef}
+          class="fixed top-0 w-full h-2 bg-yellow z-40"
+          style="visibility: hidden;"
+        />
+        <div
+          ref={lowStripeRef}
+          class="fixed top-0 w-full h-2 bg-yellow z-40"
           style="visibility: hidden;"
         />
       </div>
