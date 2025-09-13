@@ -8,7 +8,6 @@ import {
 } from "solid-js";
 import { gsap } from "gsap";
 import { A, useLocation, useNavigate } from "@solidjs/router";
-import { authClient } from "~/lib/auth-client";
 import { useLenis } from "~/context/LenisContext";
 import type { AuthContextType } from "~/context/AuthContext";
 import {
@@ -17,8 +16,6 @@ import {
   FaBrandsSquareTwitter,
   FaBrandsLinkedin,
 } from "solid-icons/fa";
-import { is } from "drizzle-orm";
-import { el } from "@faker-js/faker";
 
 interface MenuDrawerProps {
   links?: { href: string; label: string; onClick?: () => void }[];
