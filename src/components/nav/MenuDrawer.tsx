@@ -338,9 +338,71 @@ export default function MenuDrawer(props: MenuDrawerProps) {
 
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 1024);
-      if (localIsOpen() && drawerRef && textRef) {
-        drawerRef.style.width = `${textRef.offsetWidth}px`;
-        drawerRef.style.height = `${textRef.offsetHeight}px`;
+      if (
+        localIsOpen() &&
+        drawerRef &&
+        textRef &&
+        leftStripeRef &&
+        rightStripeRef &&
+        upStripeRef &&
+        lowStripeRef
+      ) {
+        // Delay to allow layout reflow
+        setTimeout(() => {
+          const textWidth = textRef.offsetWidth;
+          const textHeight = textRef.offsetHeight;
+
+          // Update drawer size
+          drawerRef.style.width = `${textWidth}px`;
+          drawerRef.style.height = `${textHeight}px`;
+
+          // Ensure open state
+          gsap.set(drawerRef, { x: "0%", y: "0%" });
+          gsap.set(textRef, {
+            clipPath: "inset(0 0 0 0)",
+            visibility: "visible",
+          });
+
+          // Update stripe positions for current mode
+          const isMobileNow = window.innerWidth <= 1024;
+          if (isMobileNow) {
+            // Mobile stripes
+            gsap.set(upStripeRef, {
+              top: `${textHeight + 8}px`,
+              visibility: "visible",
+            });
+            gsap.set(lowStripeRef, {
+              top: `${textHeight + 24}px`,
+              visibility: "visible",
+            });
+            gsap.set(leftStripeRef, {
+              right: `${STRIPE_WIDTH}px`,
+              visibility: "hidden",
+            });
+            gsap.set(rightStripeRef, {
+              right: `${STRIPE_WIDTH}px`,
+              visibility: "hidden",
+            });
+          } else {
+            // Desktop stripes
+            gsap.set(leftStripeRef, {
+              right: `${textWidth + 24}px`,
+              visibility: "visible",
+            });
+            gsap.set(rightStripeRef, {
+              right: `${textWidth + 8}px`,
+              visibility: "visible",
+            });
+            gsap.set(upStripeRef, {
+              top: `-${STRIPE_WIDTH}px`,
+              visibility: "hidden",
+            });
+            gsap.set(lowStripeRef, {
+              top: `-${STRIPE_WIDTH}px`,
+              visibility: "hidden",
+            });
+          }
+        }, 0);
       }
     };
     window.addEventListener("resize", handleResize);
@@ -350,8 +412,10 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   createEffect(() => {
     setLocalIsOpen(props.isOpen);
     if (props.isOpen && drawerRef && textRef) {
-      drawerRef.style.width = `${textRef.offsetWidth}px`;
-      drawerRef.style.height = `${textRef.offsetHeight}px`;
+      setTimeout(() => {
+        drawerRef.style.width = `${textRef.offsetWidth}px`;
+        drawerRef.style.height = `${textRef.offsetHeight}px`;
+      }, 0);
     }
   });
 
@@ -376,69 +440,8 @@ export default function MenuDrawer(props: MenuDrawerProps) {
           ? "translateY(-100%)"
           : "translateX(100%)";
         gsap.set(drawerRef, { transform: newTransform });
-      } else if (
-        localIsOpen() &&
-        drawerRef &&
-        textRef &&
-        leftStripeRef &&
-        rightStripeRef &&
-        upStripeRef &&
-        lowStripeRef
-      ) {
-        const textWidth = textRef.offsetWidth;
-        const textHeight = textRef.offsetHeight;
-
-        // Update size
-        drawerRef.style.width = `${textWidth}px`;
-        drawerRef.style.height = `${textHeight}px`;
-
-        // Set to open transform
-        gsap.set(drawerRef, { x: "0%", y: "0%" });
-
-        // Set clip-path to open state
-        gsap.set(textRef, {
-          clipPath: "inset(0 0 0 0)",
-          visibility: "visible",
-        });
-
-        if (newMobile) {
-          // Mobile mode
-          gsap.set(upStripeRef, {
-            top: `${textHeight + 8}px`,
-            visibility: "visible",
-          });
-          gsap.set(lowStripeRef, {
-            top: `${textHeight + 24}px`,
-            visibility: "visible",
-          });
-          gsap.set(leftStripeRef, {
-            right: `${STRIPE_WIDTH}px`,
-            visibility: "hidden",
-          });
-          gsap.set(rightStripeRef, {
-            right: `${STRIPE_WIDTH}px`,
-            visibility: "hidden",
-          });
-        } else {
-          // Desktop mode
-          gsap.set(leftStripeRef, {
-            right: `${textWidth + 24}px`,
-            visibility: "visible",
-          });
-          gsap.set(rightStripeRef, {
-            right: `${textWidth + 8}px`,
-            visibility: "visible",
-          });
-          gsap.set(upStripeRef, {
-            top: `-${STRIPE_WIDTH}px`,
-            visibility: "hidden",
-          });
-          gsap.set(lowStripeRef, {
-            top: `-${STRIPE_WIDTH}px`,
-            visibility: "hidden",
-          });
-        }
       }
+      // Open state updates handled in resize handler
     })
   );
 
