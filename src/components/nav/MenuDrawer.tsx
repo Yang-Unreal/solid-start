@@ -92,6 +92,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   const [isMobile, setIsMobile] = createSignal(
     typeof window !== "undefined" ? window.innerWidth <= 1024 : false
   );
+  const [localIsOpen, setLocalIsOpen] = createSignal(false);
   let firstColumnRefs: HTMLDivElement[] = [];
   let secondColumnRefs: HTMLDivElement[] = [];
 
@@ -309,9 +310,49 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       gsap.set(textRef, { clipPath: "inset(0 0 0 100%)" });
     }
 
-    const handleResize = () => setIsMobile(window.innerWidth <= 1024);
+    // Set initial stripe positions
+    if (leftStripeRef) {
+      gsap.set(leftStripeRef, {
+        right: `${STRIPE_WIDTH}px`,
+        visibility: "hidden",
+      });
+    }
+    if (rightStripeRef) {
+      gsap.set(rightStripeRef, {
+        right: `${STRIPE_WIDTH}px`,
+        visibility: "hidden",
+      });
+    }
+    if (upStripeRef) {
+      gsap.set(upStripeRef, {
+        top: `-${STRIPE_WIDTH}px`,
+        visibility: "hidden",
+      });
+    }
+    if (lowStripeRef) {
+      gsap.set(lowStripeRef, {
+        top: `-${STRIPE_WIDTH}px`,
+        visibility: "hidden",
+      });
+    }
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1024);
+      if (localIsOpen() && drawerRef && textRef) {
+        drawerRef.style.width = `${textRef.offsetWidth}px`;
+        drawerRef.style.height = `${textRef.offsetHeight}px`;
+      }
+    };
     window.addEventListener("resize", handleResize);
     onCleanup(() => window.removeEventListener("resize", handleResize));
+  });
+
+  createEffect(() => {
+    setLocalIsOpen(props.isOpen);
+    if (props.isOpen && drawerRef && textRef) {
+      drawerRef.style.width = `${textRef.offsetWidth}px`;
+      drawerRef.style.height = `${textRef.offsetHeight}px`;
+    }
   });
 
   createEffect(
@@ -320,10 +361,6 @@ export default function MenuDrawer(props: MenuDrawerProps) {
       (isOpen) => {
         if (isOpen) {
           setHasBeenOpened(true);
-          if (drawerRef && textRef) {
-            drawerRef.style.width = textRef.offsetWidth + "px";
-            drawerRef.style.height = textRef.offsetHeight + "px";
-          }
         }
         const textWidth = textRef ? textRef.offsetWidth : 0;
         const textHeight = textRef ? textRef.offsetHeight : 0;
@@ -333,12 +370,74 @@ export default function MenuDrawer(props: MenuDrawerProps) {
   );
 
   createEffect(
-    on(isMobile, (isMobile) => {
-      if (drawerRef && !props.isOpen) {
-        const newTransform = isMobile
+    on(isMobile, (newMobile) => {
+      if (drawerRef && !localIsOpen()) {
+        const newTransform = newMobile
           ? "translateY(-100%)"
           : "translateX(100%)";
         gsap.set(drawerRef, { transform: newTransform });
+      } else if (
+        localIsOpen() &&
+        drawerRef &&
+        textRef &&
+        leftStripeRef &&
+        rightStripeRef &&
+        upStripeRef &&
+        lowStripeRef
+      ) {
+        const textWidth = textRef.offsetWidth;
+        const textHeight = textRef.offsetHeight;
+
+        // Update size
+        drawerRef.style.width = `${textWidth}px`;
+        drawerRef.style.height = `${textHeight}px`;
+
+        // Set to open transform
+        gsap.set(drawerRef, { x: "0%", y: "0%" });
+
+        // Set clip-path to open state
+        gsap.set(textRef, {
+          clipPath: "inset(0 0 0 0)",
+          visibility: "visible",
+        });
+
+        if (newMobile) {
+          // Mobile mode
+          gsap.set(upStripeRef, {
+            top: `${textHeight + 8}px`,
+            visibility: "visible",
+          });
+          gsap.set(lowStripeRef, {
+            top: `${textHeight + 24}px`,
+            visibility: "visible",
+          });
+          gsap.set(leftStripeRef, {
+            right: `${STRIPE_WIDTH}px`,
+            visibility: "hidden",
+          });
+          gsap.set(rightStripeRef, {
+            right: `${STRIPE_WIDTH}px`,
+            visibility: "hidden",
+          });
+        } else {
+          // Desktop mode
+          gsap.set(leftStripeRef, {
+            right: `${textWidth + 24}px`,
+            visibility: "visible",
+          });
+          gsap.set(rightStripeRef, {
+            right: `${textWidth + 8}px`,
+            visibility: "visible",
+          });
+          gsap.set(upStripeRef, {
+            top: `-${STRIPE_WIDTH}px`,
+            visibility: "hidden",
+          });
+          gsap.set(lowStripeRef, {
+            top: `-${STRIPE_WIDTH}px`,
+            visibility: "hidden",
+          });
+        }
       }
     })
   );
