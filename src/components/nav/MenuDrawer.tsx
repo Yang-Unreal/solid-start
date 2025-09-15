@@ -33,10 +33,11 @@ const BASE_NAV_LINKS = [
   { href: "/about", label: "About Us" },
   { href: "/news", label: "News" },
   { href: "/contact", label: "Contact" },
-  { href: "/sourcing", label: "Bespoke Sourcing" },
-  { href: "/inspection", label: "Inspection Before Shipment" },
-  { href: "/services", label: "After-sales Service" },
   { href: "/account", label: "Account" },
+  { href: "/sourcing", label: "Bespoke Sourcing" },
+
+  { href: "/services", label: "After-sales Service" },
+  { href: "/inspection", label: "Inspection Before Shipment" },
 ];
 
 const SOCIAL_LINKS = [
@@ -512,12 +513,12 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   isActive={location.pathname === link.href}
                   onNavigate={() => handleNavigation(link.href)}
                   ref={(el) => (firstColumnRefs[index()] = el)}
-                  class="text-left text-2xl md:text-6xl"
+                  class="text-left text-2xl md:text-5xl font-semibold"
                 />
               )}
             </For>
           </ul>
-          <ul class="space-y-1 md:space-y-4">
+          <ul class="space-y-1 md:space-y-3">
             <For each={navLinks().slice(4)}>
               {(link, index) => (
                 <NavLinkItem
@@ -525,7 +526,7 @@ export default function MenuDrawer(props: MenuDrawerProps) {
                   isActive={location.pathname === link.href}
                   onNavigate={() => handleNavigation(link.href)}
                   ref={(el) => (secondColumnRefs[index()] = el)}
-                  class="text-left text-md md:text-2xl"
+                  class="text-left text-md md:text-xl font-semibold"
                 />
               )}
             </For>

@@ -241,8 +241,8 @@ html::-webkit-scrollbar {
   .nav-links-container {
     flex-direction: row;
     padding-top: 7vw;
-    padding-right: clamp(1rem, 5vw, 4rem);
-    padding-left: clamp(1rem, 5vw, 4rem);
+    padding-right: clamp(1rem, 10vw, 10rem);
+    padding-left: clamp(1rem, 10vw, 10rem);
   }
 
   @media (max-width: 1024px) {
@@ -257,7 +257,7 @@ html::-webkit-scrollbar {
   .contact-container {
     padding-top: 7vw;
     padding-right: 24px;
-    padding-left: clamp(1rem, 5vw, 4rem);
+    padding-left: clamp(1rem, 10vw, 10rem);
   }
 
   @media (max-width: 1024px) {
