@@ -533,12 +533,15 @@ export default function MenuDrawer(props: MenuDrawerProps) {
         </div>
 
         <div class="contact-container flex flex-col gap-5 pb-6">
-          <div class="flex flex-col gap-3">
-            <div>
+          <div
+            id="contact-info"
+            class={`flex ${isMobile() ? "flex-row" : "flex-col"} gap-4`}
+          >
+            <div class="flex flex-col w-1/2">
               <p>Huangyan, Taizhou</p>
               <p>Zhejiang, China</p>
             </div>
-            <div>
+            <div class="flex flex-col w-1/2">
               <p>T: +86 133 3333 3333</p>
               <p>E: 5oU8S@example.com</p>
             </div>
