@@ -214,16 +214,6 @@ html::-webkit-scrollbar {
     font-family: "Inconsolata", monospace;
   }
 
-  .logo {
-    padding-left: 12px;
-  }
-
-  @media (max-width: 1024px) {
-    .logo {
-      padding-left: 0px;
-    }
-  }
-
   .text-container {
     width: auto;
     height: 100vh;
