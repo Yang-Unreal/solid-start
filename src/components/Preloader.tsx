@@ -13,20 +13,11 @@ export default function Preloader() {
   onMount(() => {
     if (typeof window === "undefined") return;
 
-    // Check if first visit
-    // const visited = localStorage.getItem("visited");
-    // if (visited) {
-    //   setShowPreloader(false);
-    //   lenis?.start();
-    //   return;
-    // }
-
     if (!preloaderRef || !logoContainerRef) return;
     lenis?.scrollTo(0);
 
     const tl = gsap.timeline({
       onComplete: () => {
-        // localStorage.setItem("visited", "true");
         lenis?.start();
         setShowPreloader(false);
       },
@@ -52,15 +43,56 @@ export default function Preloader() {
     // Animate columns slide up
     const columns = preloaderRef?.querySelectorAll(".column");
     if (columns) {
+      gsap.set(columns, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      });
       tl.to(
         columns,
         {
           y: "-100vh",
-          duration: 0.8,
+          duration: 0.4,
           ease: "power2.inOut",
           stagger: 0.02,
         },
         "1"
+      );
+      tl.to(
+        columns,
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 95%, 0% 100%)",
+          duration: 0.4,
+          ease: "power2.inOut",
+          stagger: 0.02,
+        },
+        "1"
+      );
+    }
+
+    // Animate second layer columns
+    const columns2 = preloaderRef?.querySelectorAll(".column2");
+    if (columns2) {
+      gsap.set(columns2, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      });
+      tl.to(
+        columns2,
+        {
+          y: "-100vh",
+          duration: 0.4,
+          ease: "power2.inOut",
+          stagger: 0.02,
+        },
+        "1.4"
+      );
+      tl.to(
+        columns2,
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 95%)",
+          duration: 0.4,
+          ease: "power2.inOut",
+          stagger: 0.02,
+        },
+        "1.4"
       );
     }
   });
@@ -72,11 +104,39 @@ export default function Preloader() {
         class="fixed left-0 top-0 z-[70] h-screen w-screen flex justify-center items-center overflow-hidden"
       >
         {/* Background columns */}
-        <div class="absolute inset-0 flex">
-          <div class="column w-1/4 bg-black"></div>
-          <div class="column w-1/4 bg-black"></div>
-          <div class="column w-1/4 bg-black"></div>
-          <div class="column w-1/4 bg-black"></div>
+        <div class="absolute inset-0">
+          <div
+            class="column absolute h-full bg-black z-10"
+            style="left: 0%; width: 26%;"
+          ></div>
+          <div
+            class="column absolute h-full bg-black z-10"
+            style="left: 25%; width: 26%;"
+          ></div>
+          <div
+            class="column absolute h-full bg-black z-10"
+            style="left: 50%; width: 26%;"
+          ></div>
+          <div
+            class="column absolute h-full bg-black z-10"
+            style="left: 75%; width: 26%;"
+          ></div>
+          <div
+            class="column2 absolute h-full bg-gray-700"
+            style="left: 0%; width: 26%;"
+          ></div>
+          <div
+            class="column2 absolute h-full bg-gray-700"
+            style="left: 25%; width: 26%;"
+          ></div>
+          <div
+            class="column2 absolute h-full bg-gray-700"
+            style="left: 50%; width: 26%;"
+          ></div>
+          <div
+            class="column2 absolute h-full bg-gray-700"
+            style="left: 75%; width: 26%;"
+          ></div>
         </div>
         <div ref={logoContainerRef} class="relative z-10">
           <YourLogo class="h-7 w-auto text-gray-400" />
