@@ -70,7 +70,7 @@ export default function Preloader() {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 95%, 0% 100%)",
           duration: 0.6,
           ease: "power4.in",
-          stagger: 0.02,
+          stagger: 0.03,
         },
         "1"
       );
@@ -89,7 +89,7 @@ export default function Preloader() {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 95%)",
           duration: 0.6,
           ease: "power4.in",
-          stagger: 0.02,
+          stagger: 0.03,
         },
         "1.4"
       );
@@ -121,19 +121,19 @@ export default function Preloader() {
             style="left: 75%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-gray-700"
+            class="column2 absolute h-full bg-yellow"
             style="left: 0%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-gray-700"
+            class="column2 absolute h-full bg-yellow"
             style="left: 25%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-gray-700"
+            class="column2 absolute h-full bg-yellow"
             style="left: 50%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-gray-700"
+            class="column2 absolute h-full bg-yellow"
             style="left: 75%; width: 26%;"
           ></div>
         </div>
