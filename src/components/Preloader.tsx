@@ -40,6 +40,23 @@ export default function Preloader() {
       });
     }
 
+    // Rotate and slide up logos
+    const grayLogoRef = logoContainerRef?.querySelector(
+      "svg:first-child"
+    ) as SVGSVGElement;
+    const whiteLogoRef2 = logoContainerRef?.querySelector(
+      "svg:last-child"
+    ) as SVGSVGElement;
+    if (grayLogoRef && whiteLogoRef2) {
+      tl.to([grayLogoRef, whiteLogoRef2], {
+        rotation: 3,
+        transformOrigin: "100% 50%",
+        y: "-170%",
+        duration: 0.5,
+        ease: "power4.in",
+      });
+    }
+
     // Animate columns slide up
     const columns = preloaderRef?.querySelectorAll(".column");
     if (columns) {
@@ -50,18 +67,9 @@ export default function Preloader() {
         columns,
         {
           y: "-100vh",
-          duration: 0.4,
-          ease: "power2.inOut",
-          stagger: 0.02,
-        },
-        "1"
-      );
-      tl.to(
-        columns,
-        {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 95%, 0% 100%)",
-          duration: 0.4,
-          ease: "power2.inOut",
+          duration: 0.6,
+          ease: "power4.in",
           stagger: 0.02,
         },
         "1"
@@ -78,18 +86,9 @@ export default function Preloader() {
         columns2,
         {
           y: "-100vh",
-          duration: 0.4,
-          ease: "power2.inOut",
-          stagger: 0.02,
-        },
-        "1.4"
-      );
-      tl.to(
-        columns2,
-        {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 95%)",
-          duration: 0.4,
-          ease: "power2.inOut",
+          duration: 0.6,
+          ease: "power4.in",
           stagger: 0.02,
         },
         "1.4"
@@ -138,9 +137,9 @@ export default function Preloader() {
             style="left: 75%; width: 26%;"
           ></div>
         </div>
-        <div ref={logoContainerRef} class="relative z-10">
+        <div ref={logoContainerRef} class="relative z-10 py-4 overflow-hidden">
           <YourLogo class="h-7 w-auto text-gray-400" />
-          <YourLogo class="h-7 w-auto text-white absolute top-0 left-0 invisible" />
+          <YourLogo class="h-7 w-auto text-white absolute top-4 left-0 invisible" />
         </div>
       </div>
     </Show>
