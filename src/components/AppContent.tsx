@@ -2,6 +2,7 @@ import { Suspense, createSignal } from "solid-js";
 import Nav from "./nav/Nav";
 import MenuDrawer from "./nav/MenuDrawer";
 import { useAuth } from "~/context/AuthContext";
+import Preloader from "./Preloader";
 
 export function AppContent(props: { children: any }) {
   const [isMenuOpen, setIsMenuOpen] = createSignal(false);
@@ -10,6 +11,7 @@ export function AppContent(props: { children: any }) {
 
   return (
     <>
+      <Preloader />
       <Nav
         isMenuOpen={isMenuOpen()}
         setIsMenuOpen={setIsMenuOpen}

@@ -1,119 +1,63 @@
-import { createSignal, onMount } from "solid-js";
+import { createSignal, onMount, Show } from "solid-js";
 import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
+import YourLogo from "./logo/YourLogo";
 
-const WORDS = [
-  "Hello",
-  "Bonjour",
-  "Ciao",
-  "Olà",
-  "やあ",
-  "Hallå",
-  "Guten tag",
-  "Hallo",
-];
-
-export default function Preloader(props: {
-  mainContainerRef: HTMLDivElement | undefined;
-}) {
-  const [index, setIndex] = createSignal(0);
+export default function Preloader() {
+  const [showPreloader, setShowPreloader] = createSignal(true);
 
   let preloaderRef: HTMLDivElement | undefined;
-  let wordsRef: HTMLParagraphElement | undefined;
-  let pathRef: SVGPathElement | undefined;
+  let logoContainerRef: HTMLDivElement | undefined;
   const lenis = useLenis();
 
   onMount(() => {
-    if (typeof window === "undefined" || !preloaderRef || !wordsRef || !pathRef)
-      return;
-    lenis?.scrollTo(0);
+    if (typeof window === "undefined") return;
 
-    pathRef.setAttribute(
-      "d",
-      `M0 0 L${window.innerWidth} 0 L${window.innerWidth} ${
-        window.innerHeight
-      } Q${window.innerWidth / 2} ${window.innerHeight * 1.2} 0 ${
-        window.innerHeight
-      } L0 0`
-    );
+    // Check if first visit
+    // const visited = localStorage.getItem("visited");
+    // if (visited) {
+    //   setShowPreloader(false);
+    //   lenis?.start();
+    //   return;
+    // }
+
+    if (!preloaderRef || !logoContainerRef) return;
+    lenis?.scrollTo(0);
 
     const tl = gsap.timeline({
       onComplete: () => {
+        // localStorage.setItem("visited", "true");
         lenis?.start();
+        setShowPreloader(false);
       },
     });
 
-    tl.to(wordsRef, {
-      duration: 0.8,
-      opacity: 1,
-      ease: "power2.inOut",
-    });
-
-    WORDS.forEach((_, i) => {
-      if (i > 0) {
-        tl.to(
-          {},
-          {
-            duration: 0.15,
-            onComplete: () => {
-              setIndex(i);
-            },
-          }
-        );
-      }
-    });
-
-    tl.to(
-      preloaderRef,
-      {
-        y: "-100vh",
-        duration: 0.8,
-        ease: "cubic-bezier(0.76, 0, 0.24, 1)",
-      },
-      "-=0.5"
-    );
-
-    if (props.mainContainerRef) {
-      gsap.set(props.mainContainerRef, { y: "100vh" });
-      tl.to(
-        props.mainContainerRef,
-        {
-          y: 0,
-          duration: 0.8,
-          ease: "cubic-bezier(0.76, 0, 0.24, 1)",
-        },
-        "-=0.8"
-      );
+    // Animate reveal from left to right using clip-path
+    const whiteLogoRef = logoContainerRef?.querySelector(
+      "svg:last-child"
+    ) as SVGSVGElement;
+    if (whiteLogoRef) {
+      gsap.set(whiteLogoRef, { clipPath: "inset(0 100% 0 0)", opacity: 0 });
+      tl.to(whiteLogoRef, {
+        clipPath: "inset(0 0% 0 0)",
+        opacity: 1,
+        duration: 1.5,
+        ease: "power2.inOut",
+      });
     }
-
-    tl.to(
-      pathRef,
-      {
-        attr: {
-          d: `M0 0 L${window.innerWidth} 0 L${window.innerWidth} ${
-            window.innerHeight
-          } Q${window.innerWidth / 2} ${window.innerHeight} 0 ${
-            window.innerHeight
-          } L0 0`,
-        },
-        duration: 0.7,
-        ease: "cubic-bezier(0.76, 0, 0.24, 1)",
-      },
-      "<0.3"
-    );
   });
 
   return (
-    <div
-      ref={preloaderRef}
-      class="fixed left-0 top-0 z-60 h-screen w-screen bg-black flex justify-center items-center text-white text-6xl"
-    >
-      <svg class="absolute top-0 left-0 w-full h-[120%] pointer-events-none">
-        <path ref={pathRef} d="" class="fill-black"></path>
-      </svg>
-      <p ref={wordsRef} class="relative z-61 w-96 text-center opacity-0">
-        {WORDS[index()]}
-      </p>
-    </div>
+    <Show when={showPreloader()}>
+      <div
+        ref={preloaderRef}
+        class="fixed left-0 top-0 z-[70] h-screen w-screen bg-black flex justify-center items-center"
+      >
+        <div ref={logoContainerRef} class="relative">
+          <YourLogo class="h-12 w-auto text-gray-400" />
+          <YourLogo class="h-12 w-auto text-white absolute top-0 left-0 opacity-0" />
+        </div>
+      </div>
+    </Show>
   );
 }
