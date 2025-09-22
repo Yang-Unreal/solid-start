@@ -48,15 +48,37 @@ export default function Preloader() {
         ease: "circ.inOut",
       });
     }
+
+    // Animate columns slide up
+    const columns = preloaderRef?.querySelectorAll(".column");
+    if (columns) {
+      tl.to(
+        columns,
+        {
+          y: "-100vh",
+          duration: 0.8,
+          ease: "power2.inOut",
+          stagger: 0.02,
+        },
+        "1"
+      );
+    }
   });
 
   return (
     <Show when={showPreloader()}>
       <div
         ref={preloaderRef}
-        class="fixed left-0 top-0 z-[70] h-screen w-screen bg-black flex justify-center items-center"
+        class="fixed left-0 top-0 z-[70] h-screen w-screen flex justify-center items-center overflow-hidden"
       >
-        <div ref={logoContainerRef} class="relative">
+        {/* Background columns */}
+        <div class="absolute inset-0 flex">
+          <div class="column w-1/4 bg-black"></div>
+          <div class="column w-1/4 bg-black"></div>
+          <div class="column w-1/4 bg-black"></div>
+          <div class="column w-1/4 bg-black"></div>
+        </div>
+        <div ref={logoContainerRef} class="relative z-10">
           <YourLogo class="h-7 w-auto text-gray-400" />
           <YourLogo class="h-7 w-auto text-white absolute top-0 left-0 invisible" />
         </div>
