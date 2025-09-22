@@ -37,12 +37,15 @@ export default function Preloader() {
       "svg:last-child"
     ) as SVGSVGElement;
     if (whiteLogoRef) {
-      gsap.set(whiteLogoRef, { clipPath: "inset(0 100% 0 0)", opacity: 0 });
+      gsap.set(whiteLogoRef, {
+        clipPath: "inset(0 100% 0 0)",
+        visibility: "hidden",
+      });
       tl.to(whiteLogoRef, {
         clipPath: "inset(0 0% 0 0)",
-        opacity: 1,
-        duration: 1.5,
-        ease: "power2.inOut",
+        visibility: "visible",
+        duration: 1,
+        ease: "circ.inOut",
       });
     }
   });
@@ -54,8 +57,8 @@ export default function Preloader() {
         class="fixed left-0 top-0 z-[70] h-screen w-screen bg-black flex justify-center items-center"
       >
         <div ref={logoContainerRef} class="relative">
-          <YourLogo class="h-12 w-auto text-gray-400" />
-          <YourLogo class="h-12 w-auto text-white absolute top-0 left-0 opacity-0" />
+          <YourLogo class="h-7 w-auto text-gray-400" />
+          <YourLogo class="h-7 w-auto text-white absolute top-0 left-0 invisible" />
         </div>
       </div>
     </Show>
