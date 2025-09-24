@@ -70,7 +70,7 @@ export default function Preloader() {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 95%, 0% 100%)",
           duration: 0.6,
           ease: "power4.in",
-          stagger: 0.03,
+          stagger: 0.01,
         },
         "1"
       );
@@ -89,7 +89,7 @@ export default function Preloader() {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 95%)",
           duration: 0.6,
           ease: "power4.in",
-          stagger: 0.03,
+          stagger: 0.01,
         },
         "1.4"
       );
