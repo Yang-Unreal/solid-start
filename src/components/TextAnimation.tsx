@@ -18,14 +18,16 @@ export default function TextAnimation(props: TextAnimationProps) {
 
   const handleMouseEnter = () => {
     gsap.to(originalRef!, {
-      y: "-110%",
+      y: "-100%",
       rotation: -12,
+      transformOrigin: "0% 100%",
       duration: 0.2,
       ease: "custom",
     });
     gsap.to(duplicateRef!, {
       y: "0%",
       rotation: 0,
+      transformOrigin: "100% 0%",
       duration: 0.2,
       ease: "custom",
     });
@@ -35,12 +37,14 @@ export default function TextAnimation(props: TextAnimationProps) {
     gsap.to(originalRef!, {
       y: "0%",
       rotation: 0,
+      transformOrigin: "0% 100%",
       duration: 0.2,
       ease: "custom",
     });
     gsap.to(duplicateRef!, {
-      y: "110%",
+      y: "100%",
       rotation: -12,
+      transformOrigin: "100% 0%",
       duration: 0.2,
       ease: "custom",
     });
@@ -62,7 +66,7 @@ export default function TextAnimation(props: TextAnimationProps) {
       <span
         ref={duplicateRef!}
         class="absolute top-0 left-0 block"
-        style={`transform: translateY(110%) rotate(-12deg); color: ${
+        style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%; color: ${
           props.duplicateColor || "inherit"
         }`}
       >

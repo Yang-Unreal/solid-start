@@ -63,7 +63,7 @@ export default function Nav(props: NavProps) {
     <>
       <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
         <div class={` relative flex h-screen  bg-transparent text-black`}>
-          <div class="absolute font-extrabold text-xl top-0 left-0 right-0 flex justify-between items-center px-4 py-4">
+          <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center px-6 py-6">
             <A
               href="/work"
               class="relative"
