@@ -13,7 +13,7 @@ export default function TextAnimation(props: TextAnimationProps) {
   let duplicateRef: HTMLSpanElement | undefined;
 
   onMount(() => {
-    CustomEase.create("custom", "0.25,0.1,0.24,1");
+    CustomEase.create("custom", "M0,0 C0.25,0.1 0.25,1 1,1");
   });
 
   const handleMouseEnter = () => {

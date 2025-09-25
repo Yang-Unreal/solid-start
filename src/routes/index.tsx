@@ -12,7 +12,9 @@ export default function Home() {
         name="description"
         content="LIMING offers bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
-      <div class="bg-white min-h-screen w-full"></div>
+      <div class="bg-white min-h-screen flex w-full justify-center">
+        {/* <div class="w-[1px] h-screen bg-black"></div> */}
+      </div>
       <Footer />
     </main>
   );
