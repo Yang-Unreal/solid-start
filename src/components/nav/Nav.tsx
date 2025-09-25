@@ -121,7 +121,7 @@ export default function Nav(props: NavProps) {
               ></div>
             </A>
             <A href="/" aria-label="Homepage" title="Homepage">
-              <YourLogo class="h-4 w-auto" />
+              <YourLogo class="h-5 w-auto" />
             </A>
             <A
               href="/about"
