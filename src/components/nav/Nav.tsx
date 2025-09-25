@@ -12,6 +12,8 @@ import SearchModal from "../search/SearchModal";
 import NavButton from "../NavButton";
 import MobileLogo from "../logo/MobileLogo";
 import YourLogo from "../logo/YourLogo";
+import TextAnimation from "../TextAnimation";
+import gsap from "gsap";
 import { isServer } from "solid-js/web";
 import { useAuth } from "~/context/AuthContext";
 import { useLenis } from "~/context/LenisContext";
@@ -44,6 +46,10 @@ export default function Nav(props: NavProps) {
   }
 
   let menuButtonRef: HTMLButtonElement | undefined;
+  let workUnderlineRef: HTMLDivElement | undefined;
+  let servicesUnderlineRef: HTMLDivElement | undefined;
+  let aboutUnderlineRef: HTMLDivElement | undefined;
+  let contactUnderlineRef: HTMLDivElement | undefined;
 
   createEffect(() => {
     if (props.isMenuOpen) {
@@ -57,33 +63,109 @@ export default function Nav(props: NavProps) {
     <>
       <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
         <div class={` relative flex h-screen  bg-transparent text-black`}>
-          <div class="absolute font-bold top-0 left-0 right-0 flex justify-between items-center px-4 py-4">
+          <div class="absolute font-extrabold text-xl top-0 left-0 right-0 flex justify-between items-center px-4 py-4">
             <A
               href="/work"
-              class="text-black hover:text-gray-600 transition-colors"
+              class="relative"
+              onMouseEnter={() =>
+                gsap.to(workUnderlineRef!, {
+                  scaleX: 1,
+                  transformOrigin: "0% 50%",
+                  duration: 0.3,
+                })
+              }
+              onMouseLeave={() =>
+                gsap.to(workUnderlineRef!, {
+                  scaleX: 0,
+                  transformOrigin: "100% 50%",
+                  duration: 0.3,
+                })
+              }
             >
-              WORK
+              <TextAnimation
+                originalColor="gray"
+                duplicateColor="black"
+                text="WORK"
+              />
+              <div
+                ref={workUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
             <A
               href="/services"
-              class="text-black hover:text-gray-600 transition-colors"
+              class="relative text-black hover:text-gray-600 transition-colors"
+              onMouseEnter={() =>
+                gsap.to(servicesUnderlineRef!, {
+                  scaleX: 1,
+                  transformOrigin: "0% 50%",
+                  duration: 0.3,
+                })
+              }
+              onMouseLeave={() =>
+                gsap.to(servicesUnderlineRef!, {
+                  scaleX: 0,
+                  transformOrigin: "100% 50%",
+                  duration: 0.3,
+                })
+              }
             >
               SERVICES
+              <div
+                ref={servicesUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
             <A href="/" aria-label="Homepage" title="Homepage">
               <YourLogo class="h-4 w-auto" />
             </A>
             <A
               href="/about"
-              class="text-black hover:text-gray-600 transition-colors"
+              class="relative text-black hover:text-gray-600 transition-colors"
+              onMouseEnter={() =>
+                gsap.to(aboutUnderlineRef!, {
+                  scaleX: 1,
+                  transformOrigin: "0% 50%",
+                  duration: 0.3,
+                })
+              }
+              onMouseLeave={() =>
+                gsap.to(aboutUnderlineRef!, {
+                  scaleX: 0,
+                  transformOrigin: "100% 50%",
+                  duration: 0.3,
+                })
+              }
             >
               ABOUT
+              <div
+                ref={aboutUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
             <A
               href="/contact"
-              class="text-black hover:text-gray-600 transition-colors"
+              class="relative text-black hover:text-gray-600 transition-colors"
+              onMouseEnter={() =>
+                gsap.to(contactUnderlineRef!, {
+                  scaleX: 1,
+                  transformOrigin: "0% 50%",
+                  duration: 0.3,
+                })
+              }
+              onMouseLeave={() =>
+                gsap.to(contactUnderlineRef!, {
+                  scaleX: 0,
+                  transformOrigin: "100% 50%",
+                  duration: 0.3,
+                })
+              }
             >
               CONTACT
+              <div
+                ref={contactUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
           </div>
           {/* <div class="h-screen w-[1px] absolute left-1/2 transform -translate-x-1/2 bg-black"></div> */}
