@@ -110,7 +110,11 @@ export default function Nav(props: NavProps) {
                 })
               }
             >
-              SERVICES
+              <TextAnimation
+                originalColor="gray"
+                duplicateColor="black"
+                text="SERVICES"
+              />
               <div
                 ref={servicesUnderlineRef!}
                 class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
@@ -137,7 +141,11 @@ export default function Nav(props: NavProps) {
                 })
               }
             >
-              ABOUT
+              <TextAnimation
+                originalColor="gray"
+                duplicateColor="black"
+                text="ABOUT"
+              />
               <div
                 ref={aboutUnderlineRef!}
                 class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
@@ -161,7 +169,11 @@ export default function Nav(props: NavProps) {
                 })
               }
             >
-              CONTACT
+              <TextAnimation
+                originalColor="gray"
+                duplicateColor="black"
+                text="CONTACT"
+              />
               <div
                 ref={contactUnderlineRef!}
                 class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
