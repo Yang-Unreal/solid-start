@@ -5,12 +5,12 @@ import * as path from "path";
 // Array of video files to upload
 const videosToUpload = [
   {
-    key: "gt2_pro.webm",
+    key: "byd.webm",
     contentType: "video/webm",
   },
   {
-    key: "gt2_pro.mp4",
-    contentType: "video/mp4",
+    key: "poster.webp",
+    contentType: "image/webp",
   },
 ];
 
@@ -21,7 +21,7 @@ async function uploadVideos() {
   // We wrap the entire loop in a try/catch. If any file fails, the script will exit.
   try {
     for (const video of videosToUpload) {
-      const filePath = path.join(process.cwd(), "public", video.key);
+      const filePath = path.join(process.cwd(), "public", "videos", video.key);
 
       console.log(`\n--- Processing: ${video.key} ---`);
       console.log(`Attempting to read file from: ${filePath}`);

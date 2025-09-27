@@ -22,7 +22,8 @@ export default function Home() {
           muted
           loop
           class="absolute inset-0 w-full h-full object-cover -z-10"
-          src="https://minio.limingcn.com/solid-start/gt2_pro.webm"
+          src="https://minio.limingcn.com/solid-start/byd.webm"
+          poster="https://minio.limingcn.com/solid-start/poster.webp"
         ></video>
         <div class="text-center z-10">
           <h1 class="text-4xl md:text-6xl font-bold mb-4 font-formula-bold">
