@@ -83,8 +83,8 @@ export default function Nav(props: NavProps) {
               }
             >
               <TextAnimation
-                originalColor="gray"
-                duplicateColor="black"
+                originalColor="rgba(192, 202, 201, 1)"
+                duplicateColor="white"
                 text="WORK"
               />
               <div
@@ -111,8 +111,8 @@ export default function Nav(props: NavProps) {
               }
             >
               <TextAnimation
-                originalColor="gray"
-                duplicateColor="black"
+                originalColor="rgba(192, 202, 201, 1)"
+                duplicateColor="white"
                 text="SERVICES"
               />
               <div
@@ -121,7 +121,7 @@ export default function Nav(props: NavProps) {
               ></div>
             </A>
             <A href="/" aria-label="Homepage" title="Homepage">
-              <YourLogo class="h-5 w-auto" />
+              <YourLogo class="h-5 w-auto text-dark-gray" />
             </A>
             <A
               href="/about"
@@ -142,8 +142,8 @@ export default function Nav(props: NavProps) {
               }
             >
               <TextAnimation
-                originalColor="gray"
-                duplicateColor="black"
+                originalColor="rgba(192, 202, 201, 1)"
+                duplicateColor="white"
                 text="ABOUT"
               />
               <div
@@ -170,8 +170,8 @@ export default function Nav(props: NavProps) {
               }
             >
               <TextAnimation
-                originalColor="gray"
-                duplicateColor="black"
+                originalColor="rgba(192, 202, 201, 1)"
+                duplicateColor="white"
                 text="CONTACT"
               />
               <div
