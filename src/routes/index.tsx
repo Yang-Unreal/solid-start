@@ -22,7 +22,7 @@ export default function Home() {
           muted
           loop
           class="absolute inset-0 w-full h-full object-cover -z-10"
-          src="https://minio.limingcn.com/solid-start/byd.webm"
+          src="https://minio.limingcn.com/solid-start/byd-3.webm"
           poster="https://minio.limingcn.com/solid-start/poster.webp"
         ></video>
         <div class="text-center z-10">

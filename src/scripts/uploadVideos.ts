@@ -5,7 +5,7 @@ import * as path from "path";
 // Array of video files to upload
 const videosToUpload = [
   {
-    key: "byd.webm",
+    key: "byd-3.webm",
     contentType: "video/webm",
   },
   {
