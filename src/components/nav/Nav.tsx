@@ -121,7 +121,7 @@ export default function Nav(props: NavProps) {
               ></div>
             </A>
             <A href="/" aria-label="Homepage" title="Homepage">
-              <YourLogo class="h-5 w-auto text-dark-gray" />
+              <YourLogo class="h-5 w-auto text-gray" />
             </A>
             <A
               href="/about"
@@ -182,28 +182,30 @@ export default function Nav(props: NavProps) {
           </div>
           {/* <div class="h-screen w-[1px] absolute left-1/2 transform -translate-x-1/2 bg-black"></div> */}
 
-          <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center justify-center">
+          <div class="absolute bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
             <button
               ref={(el) => {
                 menuButtonRef = el;
                 props.setMenuButtonRef(el);
               }}
               onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
-              class={`border rounded-sm bg-white ${
-                props.isMenuOpen ? "border-black" : "border-gray-200"
-              } transition-colors duration-600`}
+              class={`border rounded-m  border-gray transition-colors duration-600`}
             >
-              <div class="flex justify-center items-center gap-2 px-3 py-2">
-                <Menu
-                  stroke-width="2"
-                  size={20}
-                  class={`bg-transparent text-black`}
-                />
-                <p
-                  class={`hidden md:block  text-sm font-bold  relative bg-transparent text-black`}
-                >
-                  Menu
-                </p>
+              <div class="flex justify-center items-center">
+                <div class="bg-dark  px-2.5 h-10 flex justify-center items-center">
+                  <Menu
+                    stroke-width="2"
+                    size={20}
+                    class={`bg-transparent text-yellow-300`}
+                  />
+                </div>
+                <div class="bg-gray  px-2.5 h-10 flex justify-center items-center font-formula-bold text-xl">
+                  <TextAnimation
+                    originalColor="rgba(0, 21, 20, 1)"
+                    duplicateColor="rgba(0, 21, 20, 1)"
+                    text="MENU"
+                  />
+                </div>
               </div>
             </button>
           </div>

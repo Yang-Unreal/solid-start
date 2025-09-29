@@ -45,8 +45,19 @@ export default function Home() {
           <br />
           <span> FOR CHINA SOURCING</span>
         </h1>
+        <div class="absolute flex justify-between w-full bottom-16 px-25 text-center font-formula-bold">
+          <div>
+            <span class="text-xl text-gray">LIMING AGENCY</span>
+            <h4 class="text-3xl text-light-white">ELIMINATE THE RISK</h4>
+          </div>
+          <div>
+            <span class="text-xl text-gray">SINCE 2015</span>
+            <h4 class="text-3xl text-light-white">WORKING GLOBALLY</h4>
+          </div>
+        </div>
       </section>
-
+      <div class="h-screen bg-white w-full"></div>
+      <div class="h-screen bg-black w-full"></div>
       <Footer />
     </main>
   );
