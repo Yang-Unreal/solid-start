@@ -67,7 +67,7 @@ export default function Preloader() {
         columns,
         {
           y: "-100vh",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 95%, 0% 100%)",
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 90%, 0% 100%)",
           duration: 0.6,
           ease: "power4.in",
           stagger: 0.01,
@@ -86,7 +86,7 @@ export default function Preloader() {
         columns2,
         {
           y: "-100vh",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 95%)",
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 90%)",
           duration: 0.6,
           ease: "power4.in",
           stagger: 0.01,
@@ -105,35 +105,35 @@ export default function Preloader() {
         {/* Background columns */}
         <div class="absolute inset-0">
           <div
-            class="column absolute h-full bg-black z-10"
+            class="column absolute h-full bg-dark z-10"
             style="left: 0%; width: 26%;"
           ></div>
           <div
-            class="column absolute h-full bg-black z-10"
+            class="column absolute h-full bg-dark z-10"
             style="left: 25%; width: 26%;"
           ></div>
           <div
-            class="column absolute h-full bg-black z-10"
+            class="column absolute h-full bg-dark z-10"
             style="left: 50%; width: 26%;"
           ></div>
           <div
-            class="column absolute h-full bg-black z-10"
+            class="column absolute h-full bg-dark z-10"
             style="left: 75%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-yellow"
+            class="column2 absolute h-full bg-darkgray"
             style="left: 0%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-yellow"
+            class="column2 absolute h-full bg-darkgray"
             style="left: 25%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-yellow"
+            class="column2 absolute h-full bg-darkgray"
             style="left: 50%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-yellow"
+            class="column2 absolute h-full bg-darkgray"
             style="left: 75%; width: 26%;"
           ></div>
         </div>

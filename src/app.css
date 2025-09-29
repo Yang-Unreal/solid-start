@@ -50,8 +50,10 @@
   --color-light: hsl(0, 0%, 100%);
   --color-light-gray: hsl(0, 0%, 95%);
   --color-yellow: hsl(41, 87%, 57%);
-  --color-dark-gray: rgba(192, 202, 201, 1);
+  --color-gray: rgba(192, 202, 201, 1);
   --color-light-white: rgba(241, 241, 241, 1);
+  --color-darkgray: #182b2a;
+  --color-dark: rgba(0, 21, 20, 1);
 }
 
 :root {

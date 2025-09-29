@@ -14,7 +14,7 @@ export default function Home() {
       />
 
       <section
-        class="hero relative flex items-center justify-center text-light-white"
+        class="hero flex items-center justify-center relative text-light-white"
         style="height: 100dvh;"
       >
         <video
@@ -27,11 +27,23 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="absolute text-[150px] font-formula-bold leading-none bottom-40 text-center"
+          class="font-formula-bold leading-none text-[150px] absolute bottom-40 text-center"
           style="word-spacing: -0.12em;"
         >
-          THE BEST PARTNER <br />
-          FOR CHINA SOURCING
+          <span> THE BEST</span>
+          <span class="relative overflow-hidden pl-5 inline-block align-top">
+            <span>PARTNER</span>
+            <span
+              class="absolute top-5.5 left-5"
+              style={`transform: translateY(80%) rotate(12deg); transform-origin: 0% 0%; 
+
+              }`}
+            >
+              CHOICE
+            </span>
+          </span>
+          <br />
+          <span> FOR CHINA SOURCING</span>
         </h1>
       </section>
 
