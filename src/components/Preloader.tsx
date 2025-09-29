@@ -91,7 +91,7 @@ export default function Preloader() {
           ease: "power4.in",
           stagger: 0.01,
         },
-        "1.4"
+        "1.3"
       );
     }
   });

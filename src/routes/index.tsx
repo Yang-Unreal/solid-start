@@ -25,20 +25,6 @@ export default function Home() {
           src="https://minio.limingcn.com/solid-start/byd-3.webm"
           poster="https://minio.limingcn.com/solid-start/poster.webp"
         ></video>
-        <div class="text-center z-10">
-          <h1 class="text-4xl md:text-6xl font-bold mb-4 font-formula-bold">
-            LIMING
-          </h1>
-          <p class="text-lg md:text-xl mb-8">
-            Bespoke sourcing and product procurement from China
-          </p>
-          <a
-            href="/services"
-            class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded"
-          >
-            Explore Services
-          </a>
-        </div>
       </section>
 
       <Footer />

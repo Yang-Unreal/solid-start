@@ -62,7 +62,7 @@ export default function Nav(props: NavProps) {
   return (
     <>
       <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
-        <div class={` relative flex h-screen  bg-transparent text-black`}>
+        <div class={` relative flex h-screen  bg-transparent text-white`}>
           <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center px-6 py-6">
             <A
               href="/work"
@@ -94,7 +94,7 @@ export default function Nav(props: NavProps) {
             </A>
             <A
               href="/services"
-              class="relative text-black hover:text-gray-600 transition-colors"
+              class="relative"
               onMouseEnter={() =>
                 gsap.to(servicesUnderlineRef!, {
                   scaleX: 1,
@@ -125,7 +125,7 @@ export default function Nav(props: NavProps) {
             </A>
             <A
               href="/about"
-              class="relative text-black hover:text-gray-600 transition-colors"
+              class="relative"
               onMouseEnter={() =>
                 gsap.to(aboutUnderlineRef!, {
                   scaleX: 1,
@@ -153,7 +153,7 @@ export default function Nav(props: NavProps) {
             </A>
             <A
               href="/contact"
-              class="relative text-black hover:text-gray-600 transition-colors"
+              class="relative"
               onMouseEnter={() =>
                 gsap.to(contactUnderlineRef!, {
                   scaleX: 1,
