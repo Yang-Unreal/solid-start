@@ -48,13 +48,17 @@ export default function Preloader() {
       "svg:last-child"
     ) as SVGSVGElement;
     if (grayLogoRef && whiteLogoRef2) {
-      tl.to([grayLogoRef, whiteLogoRef2], {
-        rotation: 3,
-        transformOrigin: "100% 50%",
-        y: "-170%",
-        duration: 0.5,
-        ease: "power4.in",
-      });
+      tl.to(
+        [grayLogoRef, whiteLogoRef2],
+        {
+          rotation: 2,
+          transformOrigin: "100% 100%",
+          y: "-170%",
+          duration: 0.4,
+          ease: "power2.in",
+        },
+        "1"
+      );
     }
 
     // Animate columns slide up
@@ -71,7 +75,7 @@ export default function Preloader() {
           ease: "circ.inOut",
           stagger: 0.01,
         },
-        "1"
+        "1.1"
       );
       tl.to(
         columns,
@@ -81,7 +85,7 @@ export default function Preloader() {
           ease: "circ.inOut",
           stagger: 0.01,
         },
-        "1"
+        "1.1"
       );
     }
 
@@ -99,7 +103,7 @@ export default function Preloader() {
           ease: "circ.inOut",
           stagger: 0.01,
         },
-        "1.3"
+        "1.4"
       );
       tl.to(
         columns2,
@@ -109,7 +113,7 @@ export default function Preloader() {
           ease: "circ.inOut",
           stagger: 0.01,
         },
-        "1.3"
+        "1.4"
       );
     }
   });
