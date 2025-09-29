@@ -67,9 +67,18 @@ export default function Preloader() {
         columns,
         {
           y: "-100vh",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 90%, 0% 100%)",
           duration: 0.6,
-          ease: "power4.in",
+          ease: "circ.inOut",
+          stagger: 0.01,
+        },
+        "1"
+      );
+      tl.to(
+        columns,
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 92%, 0% 100%)",
+          duration: 0.4,
+          ease: "circ.inOut",
           stagger: 0.01,
         },
         "1"
@@ -86,9 +95,18 @@ export default function Preloader() {
         columns2,
         {
           y: "-100vh",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 90%)",
           duration: 0.6,
-          ease: "power4.in",
+          ease: "circ.inOut",
+          stagger: 0.01,
+        },
+        "1.3"
+      );
+      tl.to(
+        columns2,
+        {
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
+          duration: 0.4,
+          ease: "circ.inOut",
           stagger: 0.01,
         },
         "1.3"
