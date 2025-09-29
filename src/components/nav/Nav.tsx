@@ -84,7 +84,7 @@ export default function Nav(props: NavProps) {
             >
               <TextAnimation
                 originalColor="rgba(192, 202, 201, 1)"
-                duplicateColor="white"
+                duplicateColor="rgba(241, 241, 241, 1)"
                 text="WORK"
               />
               <div
@@ -112,7 +112,7 @@ export default function Nav(props: NavProps) {
             >
               <TextAnimation
                 originalColor="rgba(192, 202, 201, 1)"
-                duplicateColor="white"
+                duplicateColor="rgba(241, 241, 241, 1)"
                 text="SERVICES"
               />
               <div
@@ -143,7 +143,7 @@ export default function Nav(props: NavProps) {
             >
               <TextAnimation
                 originalColor="rgba(192, 202, 201, 1)"
-                duplicateColor="white"
+                duplicateColor="rgba(241, 241, 241, 1)"
                 text="ABOUT"
               />
               <div
@@ -171,7 +171,7 @@ export default function Nav(props: NavProps) {
             >
               <TextAnimation
                 originalColor="rgba(192, 202, 201, 1)"
-                duplicateColor="white"
+                duplicateColor="rgba(241, 241, 241, 1)"
                 text="CONTACT"
               />
               <div

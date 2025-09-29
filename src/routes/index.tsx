@@ -14,7 +14,7 @@ export default function Home() {
       />
 
       <section
-        class="hero relative flex items-center justify-center text-white"
+        class="hero relative flex items-center justify-center text-light-white"
         style="height: 100dvh;"
       >
         <video
@@ -25,6 +25,14 @@ export default function Home() {
           src="https://minio.limingcn.com/solid-start/byd-3.webm"
           poster="https://minio.limingcn.com/solid-start/poster.webp"
         ></video>
+        <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
+        <h1
+          class="absolute text-[150px] font-formula-bold leading-none bottom-40 text-center"
+          style="word-spacing: -0.12em;"
+        >
+          THE BEST PARTNER <br />
+          FOR CHINA SOURCING
+        </h1>
       </section>
 
       <Footer />
