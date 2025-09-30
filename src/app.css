@@ -270,4 +270,24 @@ html::-webkit-scrollbar {
       visibility: hidden;
     }
   } */
+
+  .menu-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .line {
+    width: 20px;
+    height: 2px;
+    background-color: currentColor;
+    transition: transform 0.3s ease;
+    transform-origin: center;
+  }
+
+  .menu-button:hover .line1,
+  .menu-button:hover .line3 {
+    transform: scaleX(0.5);
+  }
 }

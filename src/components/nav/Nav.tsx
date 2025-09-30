@@ -7,7 +7,7 @@ import {
   onMount,
 } from "solid-js";
 import MenuDrawer from "~/components/nav/MenuDrawer";
-import { ShoppingBag, Search, User, Menu } from "lucide-solid";
+import { ShoppingBag, Search, User } from "lucide-solid";
 import SearchModal from "../search/SearchModal";
 import NavButton from "../NavButton";
 import MobileLogo from "../logo/MobileLogo";
@@ -189,15 +189,15 @@ export default function Nav(props: NavProps) {
                 props.setMenuButtonRef(el);
               }}
               onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
-              class={`border rounded-m  border-gray transition-colors duration-600`}
+              class={`border rounded-m  border-gray transition-colors duration-600 menu-button`}
             >
               <div class="flex justify-center items-center">
                 <div class="bg-dark  px-2.5 h-10 flex justify-center items-center">
-                  <Menu
-                    stroke-width="2"
-                    size={20}
-                    class={`bg-transparent text-yellow-300`}
-                  />
+                  <div class="menu-icon text-yellow-300">
+                    <span class="line line1"></span>
+                    <span class="line line2"></span>
+                    <span class="line line3"></span>
+                  </div>
                 </div>
                 <div class="bg-gray  px-2.5 h-10 flex justify-center items-center font-formula-bold text-xl">
                   <TextAnimation
