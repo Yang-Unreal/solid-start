@@ -200,11 +200,13 @@ export default function Nav(props: NavProps) {
                   </div>
                 </div>
                 <div class="bg-gray  px-2.5 h-10 flex justify-center items-center font-formula-bold text-xl">
-                  <TextAnimation
-                    originalColor="rgba(0, 21, 20, 1)"
-                    duplicateColor="rgba(0, 21, 20, 1)"
-                    text="MENU"
-                  />
+                  <span class="transform translate-y-0.5">
+                    <TextAnimation
+                      originalColor="rgba(0, 21, 20, 1)"
+                      duplicateColor="rgba(0, 21, 20, 1)"
+                      text="MENU"
+                    />
+                  </span>
                 </div>
               </div>
             </button>
