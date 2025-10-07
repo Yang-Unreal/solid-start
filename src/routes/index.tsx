@@ -13,7 +13,6 @@ export default function Home() {
 
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
-    CustomEase.create("custom", "M0,0 C0.25,0.1 0.25,1 1,1");
 
     gsap.to(supplierRef!, {
       y: "-100%",
@@ -29,7 +28,7 @@ export default function Home() {
     });
 
     gsap.to(partnerRef!, {
-      y: "-100%",
+      y: "0%",
       rotation: 0,
       transformOrigin: "0% 0%",
       duration: 0.6,
@@ -64,28 +63,27 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[70px] md:text-[140px] absolute bottom-40 text-center"
+          class="font-formula-bold leading-none text-[60px] md:text-[140px] absolute bottom-40 text-center"
           style="word-spacing: -0.12em;"
         >
           <span class="block md:inline">THE LEADING </span>
-          <span class="relative overflow-hidden inline-block align-top md:inline-block">
-            <span ref={supplierRef} class="block">
+          <span class="relative overflow-hidden inline-block align-top">
+            <span ref={supplierRef} class="inline-block">
               SUPPLIER
             </span>
             <span
               ref={partnerRef}
-              class="absolute block"
-              style={`transform:  rotate(12deg); transform-origin: 0% 0%;
+              class="absolute inline"
+              style={`left: 0; transform: translateY(100%) rotate(12deg); transform-origin: 0% 0%;
 
               }`}
             >
               PARTNER
             </span>
           </span>
-          <span class="inline-block">
-            <span class="block md:inline">FOR CHINA </span>
-            <span class="block md:inline">AUTO IMPORTS</span>
-          </span>
+          <br />
+          <span class="block md:inline">FOR CHINA </span>
+          <span class="block md:inline">AUTO IMPORTS</span>
         </h1>
         <div class="absolute flex justify-between w-full bottom-16 px-3 md:px-25 text-center font-formula-bold">
           <div>
