@@ -1,10 +1,47 @@
 // src/routes/index.tsx
 
 import { Meta, Title } from "@solidjs/meta";
+import { onMount } from "solid-js";
+import gsap, { CustomEase } from "gsap/all";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import Footer from "~/components/Footer";
 
 export default function Home() {
+  let supplierRef: HTMLSpanElement | undefined;
+  let partnerRef: HTMLSpanElement | undefined;
+
+  onMount(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    CustomEase.create("custom", "M0,0 C0.25,0.1 0.25,1 1,1");
+
+    gsap.to(supplierRef!, {
+      y: "-100%",
+      rotation: 12,
+      transformOrigin: "100% 100%",
+      duration: 0.6,
+      ease: "circ.inOut",
+      scrollTrigger: {
+        trigger: ".hero",
+        start: "bottom 99%",
+        toggleActions: "play reverse play reverse",
+      },
+    });
+
+    gsap.to(partnerRef!, {
+      y: "-100%",
+      rotation: 0,
+      transformOrigin: "0% 0%",
+      duration: 0.6,
+      ease: "circ.inOut",
+      scrollTrigger: {
+        trigger: ".hero",
+        start: "bottom 99%",
+        toggleActions: "play reverse play reverse",
+      },
+    });
+  });
+
   return (
     <main>
       <Title>Official LIMING Website | LIMING</Title>
@@ -27,23 +64,26 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[150px] absolute bottom-40 text-center"
+          class="font-formula-bold leading-none text-[140px] absolute bottom-40 text-center"
           style="word-spacing: -0.12em;"
         >
-          <span> THE BEST</span>
+          <span> THE LEADING</span>
           <span class="relative overflow-hidden pl-5 inline-block align-top">
-            <span>PARTNER</span>
+            <span ref={supplierRef} class="block">
+              SUPPLIER
+            </span>
             <span
-              class="absolute top-5.5 left-5"
-              style={`transform: translateY(80%) rotate(12deg); transform-origin: 0% 0%; 
+              ref={partnerRef}
+              class="absolute block"
+              style={`transform:  rotate(12deg); transform-origin: 0% 0%;
 
               }`}
             >
-              CHOICE
+              PARTNER
             </span>
           </span>
           <br />
-          <span> FOR CHINA SOURCING</span>
+          <span> FOR CHINA AUTO IMPORTS</span>
         </h1>
         <div class="absolute flex justify-between w-full bottom-16 px-25 text-center font-formula-bold">
           <div>
