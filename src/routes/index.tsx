@@ -67,8 +67,8 @@ export default function Home() {
           class="font-formula-bold leading-none text-[70px] md:text-[140px] absolute bottom-40 text-center"
           style="word-spacing: -0.12em;"
         >
-          <span class="block md:inline">THE LEADING</span>
-          <span class="relative overflow-hidden md:pl-5 inline-block align-top  md:inline">
+          <span class="block md:inline">THE LEADING </span>
+          <span class="relative overflow-hidden inline-block align-top md:inline-block">
             <span ref={supplierRef} class="block">
               SUPPLIER
             </span>
@@ -82,8 +82,10 @@ export default function Home() {
               PARTNER
             </span>
           </span>
-          <span class="block md:inline">FOR CHINA</span>
-          <span class="block md:inline">AUTO IMPORTS</span>
+          <span class="inline-block">
+            <span class="block md:inline">FOR CHINA </span>
+            <span class="block md:inline">AUTO IMPORTS</span>
+          </span>
         </h1>
         <div class="absolute flex justify-between w-full bottom-16 px-3 md:px-25 text-center font-formula-bold">
           <div>
