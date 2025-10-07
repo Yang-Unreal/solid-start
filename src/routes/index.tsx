@@ -2,7 +2,7 @@
 
 import { Meta, Title } from "@solidjs/meta";
 import { onMount } from "solid-js";
-import gsap, { CustomEase } from "gsap/all";
+import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import Footer from "~/components/Footer";
