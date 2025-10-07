@@ -22,7 +22,7 @@ export default function Home() {
       ease: "circ.inOut",
       scrollTrigger: {
         trigger: ".hero",
-        start: "bottom 99%",
+        start: "bottom 90%",
         toggleActions: "play reverse play reverse",
       },
     });
@@ -35,7 +35,7 @@ export default function Home() {
       ease: "circ.inOut",
       scrollTrigger: {
         trigger: ".hero",
-        start: "bottom 99%",
+        start: "bottom 90%",
         toggleActions: "play reverse play reverse",
       },
     });
