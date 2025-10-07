@@ -64,11 +64,11 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[140px] absolute bottom-40 text-center"
+          class="font-formula-bold leading-none text-[70px] md:text-[140px] absolute bottom-40 text-center"
           style="word-spacing: -0.12em;"
         >
-          <span> THE LEADING</span>
-          <span class="relative overflow-hidden pl-5 inline-block align-top">
+          <span class="block md:inline">THE LEADING</span>
+          <span class="relative overflow-hidden md:pl-5 inline-block align-top  md:inline">
             <span ref={supplierRef} class="block">
               SUPPLIER
             </span>
@@ -82,17 +82,21 @@ export default function Home() {
               PARTNER
             </span>
           </span>
-          <br />
-          <span> FOR CHINA AUTO IMPORTS</span>
+          <span class="block md:inline">FOR CHINA</span>
+          <span class="block md:inline">AUTO IMPORTS</span>
         </h1>
-        <div class="absolute flex justify-between w-full bottom-16 px-25 text-center font-formula-bold">
+        <div class="absolute flex justify-between w-full bottom-16 px-3 md:px-25 text-center font-formula-bold">
           <div>
-            <span class="text-xl text-gray">LIMING AGENCY</span>
-            <h4 class="text-3xl text-light-white">ELIMINATE THE RISK</h4>
+            <span class="text-sm md:text-xl text-gray">LIMING AGENCY</span>
+            <h4 class="text-xl md:text-3xl text-light-white">
+              ELIMINATE THE RISK
+            </h4>
           </div>
           <div>
-            <span class="text-xl text-gray">SINCE 2015</span>
-            <h4 class="text-3xl text-light-white">WORKING GLOBALLY</h4>
+            <span class="text-sm md:text-xl text-gray">SINCE 2015</span>
+            <h4 class="text-xl md:text-3xl text-light-white">
+              WORKING GLOBALLY
+            </h4>
           </div>
         </div>
       </section>

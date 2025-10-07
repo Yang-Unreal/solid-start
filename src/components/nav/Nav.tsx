@@ -63,10 +63,10 @@ export default function Nav(props: NavProps) {
     <>
       <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
         <div class={` relative flex h-screen  bg-transparent text-white`}>
-          <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center px-6 py-6">
+          <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 md:px-6 md:py-6">
             <A
               href="/work"
-              class="relative"
+              class="relative text-xl md:text-2xl block"
               onMouseEnter={() =>
                 gsap.to(workUnderlineRef!, {
                   scaleX: 1,
@@ -94,7 +94,7 @@ export default function Nav(props: NavProps) {
             </A>
             <A
               href="/services"
-              class="relative"
+              class="relative text-2xl hidden md:block"
               onMouseEnter={() =>
                 gsap.to(servicesUnderlineRef!, {
                   scaleX: 1,
@@ -121,11 +121,11 @@ export default function Nav(props: NavProps) {
               ></div>
             </A>
             <A href="/" aria-label="Homepage" title="Homepage">
-              <YourLogo class="h-5 w-auto text-gray" />
+              <YourLogo class="h-4 md:h-5 w-auto text-gray" />
             </A>
             <A
               href="/about"
-              class="relative"
+              class="relative text-2xl hidden md:block"
               onMouseEnter={() =>
                 gsap.to(aboutUnderlineRef!, {
                   scaleX: 1,
@@ -153,7 +153,7 @@ export default function Nav(props: NavProps) {
             </A>
             <A
               href="/contact"
-              class="relative"
+              class="relative text-xl md:text-2xl block"
               onMouseEnter={() =>
                 gsap.to(contactUnderlineRef!, {
                   scaleX: 1,
@@ -182,7 +182,7 @@ export default function Nav(props: NavProps) {
           </div>
           {/* <div class="h-screen w-[1px] absolute left-1/2 transform -translate-x-1/2 bg-black"></div> */}
 
-          <div class="absolute bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
+          <div class="absolute bottom-3 *:md:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
             <button
               ref={(el) => {
                 menuButtonRef = el;
