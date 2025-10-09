@@ -30,21 +30,6 @@ export default function Nav(props: NavProps) {
   const { session, handleLogoutSuccess } = useAuth();
   const lenis = useLenis();
 
-  const [isScrolled, setIsScrolled] = createSignal(false);
-  const handleScrollForTransparent = () => {
-    setIsScrolled(window.scrollY > 100);
-  };
-
-  if (!isServer) {
-    onMount(() => {
-      window.addEventListener("scroll", handleScrollForTransparent);
-    });
-
-    onCleanup(() => {
-      window.removeEventListener("scroll", handleScrollForTransparent);
-    });
-  }
-
   let menuButtonRef: HTMLButtonElement | undefined;
   let workUnderlineRef: HTMLDivElement | undefined;
   let servicesUnderlineRef: HTMLDivElement | undefined;
@@ -182,7 +167,7 @@ export default function Nav(props: NavProps) {
           </div>
           {/* <div class="h-screen w-[1px] absolute left-1/2 transform -translate-x-1/2 bg-black"></div> */}
 
-          <div class="absolute bottom-3 *:md:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
+          <div class="absolute bottom-30 *:md:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
             <button
               ref={(el) => {
                 menuButtonRef = el;
