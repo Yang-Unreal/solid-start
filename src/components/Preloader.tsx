@@ -13,10 +13,6 @@ export default function Preloader() {
   onMount(() => {
     if (typeof window === "undefined") return;
 
-    if (preloaderRef) {
-      preloaderRef.style.height = `${window.innerHeight}px`;
-    }
-
     if (!preloaderRef || !logoContainerRef) return;
     lenis?.scrollTo(0);
 
@@ -126,7 +122,7 @@ export default function Preloader() {
     <Show when={showPreloader()}>
       <div
         ref={preloaderRef}
-        class="fixed left-0 top-0 z-[70] w-screen flex justify-center items-center overflow-hidden"
+        class="fixed left-0 top-0 z-[70] h-screen w-screen flex justify-center items-center overflow-hidden"
       >
         {/* Background columns */}
         <div class="absolute inset-0">
