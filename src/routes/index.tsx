@@ -1,7 +1,7 @@
 // src/routes/index.tsx
 
 import { Meta, Title } from "@solidjs/meta";
-import { onMount } from "solid-js";
+import { onCleanup, onMount } from "solid-js";
 import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -10,8 +10,17 @@ import Footer from "~/components/Footer";
 export default function Home() {
   let supplierRef: HTMLSpanElement | undefined;
   let partnerRef: HTMLSpanElement | undefined;
+  let heroRef: HTMLElement | undefined;
+
+  const setHeroHeight = () => {
+    if (heroRef) {
+      heroRef.style.height = `${window.innerHeight}px`;
+    }
+  };
 
   onMount(() => {
+    setHeroHeight();
+    window.addEventListener("resize", setHeroHeight);
     gsap.registerPlugin(ScrollTrigger);
 
     gsap.to(supplierRef!, {
@@ -41,6 +50,10 @@ export default function Home() {
     });
   });
 
+  onCleanup(() => {
+    window.removeEventListener("resize", setHeroHeight);
+  });
+
   return (
     <main>
       <Title>Official LIMING Website | LIMING</Title>
@@ -49,7 +62,10 @@ export default function Home() {
         content="LIMING offers bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
 
-      <section class="hero h-[100vh] flex items-center justify-center relative text-light-white">
+      <section
+        ref={heroRef}
+        class="hero flex items-center justify-center relative text-light-white"
+      >
         <video
           autoplay
           muted
