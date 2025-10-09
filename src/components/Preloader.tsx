@@ -122,7 +122,7 @@ export default function Preloader() {
     <Show when={showPreloader()}>
       <div
         ref={preloaderRef}
-        class="fixed left-0 top-0 z-[70] h-[100vh] w-screen flex justify-center items-center overflow-hidden"
+        class="fixed left-0 top-0 z-[70] h-[100svh] w-screen flex justify-center items-center overflow-hidden"
       >
         {/* Background columns */}
         <div class="absolute inset-0">

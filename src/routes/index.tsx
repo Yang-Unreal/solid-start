@@ -10,12 +10,8 @@ import Footer from "~/components/Footer";
 export default function Home() {
   let supplierRef: HTMLSpanElement | undefined;
   let partnerRef: HTMLSpanElement | undefined;
-  let heroRef: HTMLElement | undefined;
 
   onMount(() => {
-    if (heroRef) {
-      heroRef.style.height = `${window.innerHeight}px`;
-    }
     gsap.registerPlugin(ScrollTrigger);
 
     gsap.to(supplierRef!, {
@@ -53,10 +49,7 @@ export default function Home() {
         content="LIMING offers bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
 
-      <section
-        ref={heroRef}
-        class="hero flex items-center justify-center relative text-light-white"
-      >
+      <section class="hero h-[100svh] flex items-center justify-center relative text-light-white">
         <video
           autoplay
           muted
