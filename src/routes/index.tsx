@@ -13,13 +13,9 @@ export default function Home() {
   let heroRef: HTMLElement | undefined;
 
   onMount(() => {
-    const setHeroHeight = () => {
-      if (heroRef) {
-        heroRef.style.height = `${window.innerHeight}px`;
-      }
-    };
-    setHeroHeight();
-    window.addEventListener("resize", setHeroHeight);
+    if (heroRef) {
+      heroRef.style.height = `${window.innerHeight}px`;
+    }
     gsap.registerPlugin(ScrollTrigger);
 
     gsap.to(supplierRef!, {
@@ -47,10 +43,6 @@ export default function Home() {
         toggleActions: "play reverse play reverse",
       },
     });
-
-    return () => {
-      window.removeEventListener("resize", setHeroHeight);
-    };
   });
 
   return (
