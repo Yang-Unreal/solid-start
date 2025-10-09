@@ -47,7 +47,7 @@ export default function Nav(props: NavProps) {
   return (
     <>
       <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
-        <div class={` relative flex h-screen  bg-transparent text-white`}>
+        <div class={` relative flex h-[100svh]  bg-transparent text-white`}>
           <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 md:px-6 md:py-6">
             <A
               href="/work"
@@ -167,7 +167,7 @@ export default function Nav(props: NavProps) {
           </div>
           {/* <div class="h-screen w-[1px] absolute left-1/2 transform -translate-x-1/2 bg-black"></div> */}
 
-          <div class="absolute bottom-30 *:md:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
+          <div class="absolute bottom-3 md:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
             <button
               ref={(el) => {
                 menuButtonRef = el;
