@@ -1,7 +1,7 @@
 // src/routes/index.tsx
 
 import { Meta, Title } from "@solidjs/meta";
-import { onCleanup, onMount } from "solid-js";
+import { onMount } from "solid-js";
 import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -12,13 +12,12 @@ export default function Home() {
   let partnerRef: HTMLSpanElement | undefined;
   let heroRef: HTMLElement | undefined;
 
-  const setHeroHeight = () => {
-    if (heroRef) {
-      heroRef.style.height = `${window.innerHeight}px`;
-    }
-  };
-
   onMount(() => {
+    const setHeroHeight = () => {
+      if (heroRef) {
+        heroRef.style.height = `${window.innerHeight}px`;
+      }
+    };
     setHeroHeight();
     window.addEventListener("resize", setHeroHeight);
     gsap.registerPlugin(ScrollTrigger);
@@ -48,10 +47,10 @@ export default function Home() {
         toggleActions: "play reverse play reverse",
       },
     });
-  });
 
-  onCleanup(() => {
-    window.removeEventListener("resize", setHeroHeight);
+    return () => {
+      window.removeEventListener("resize", setHeroHeight);
+    };
   });
 
   return (
