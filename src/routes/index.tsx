@@ -1,7 +1,7 @@
 // src/routes/index.tsx
 
 import { Meta, Title } from "@solidjs/meta";
-import { onMount } from "solid-js";
+import { createSignal, onMount, onCleanup } from "solid-js";
 import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -11,7 +11,18 @@ export default function Home() {
   let supplierRef: HTMLSpanElement | undefined;
   let partnerRef: HTMLSpanElement | undefined;
 
+  const [heroHeight, setHeroHeight] = createSignal(window.innerHeight);
+
   onMount(() => {
+    const updateHeight = () => setHeroHeight(window.innerHeight);
+    window.addEventListener("resize", updateHeight);
+    window.addEventListener("orientationchange", updateHeight);
+
+    onCleanup(() => {
+      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener("orientationchange", updateHeight);
+    });
+
     gsap.registerPlugin(ScrollTrigger);
 
     gsap.to(supplierRef!, {
@@ -51,7 +62,7 @@ export default function Home() {
 
       <section
         class="hero flex items-center justify-center relative text-light-white"
-        style="height: 100dvh;"
+        style={`height: ${heroHeight()}px;`}
       >
         <video
           autoplay
