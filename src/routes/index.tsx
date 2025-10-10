@@ -59,7 +59,7 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[60px] md:text-[80px] lg:text-[140px] absolute bottom-40 md:bottom-30 lg:bottom-40 text-center"
+          class="font-formula-bold leading-none text-[clamp(1.5rem,15vw,10rem)] sm:text-[90px] lg:text-[110px] xl:text-[140px] absolute bottom-[20%] md:top-[50%] xl:top-[40%] text-center"
           style="word-spacing: -0.12em;"
         >
           <span class="block md:inline">THE LEADING </span>
@@ -81,16 +81,16 @@ export default function Home() {
           <span class="block md:inline">FOR CHINA </span>
           <span class="block md:inline">AUTO IMPORTS</span>
         </h1>
-        <div class="absolute flex justify-between w-full bottom-16 px-3  lg:px-25 text-center font-formula-bold">
+        <div class="absolute flex justify-between w-full bottom-16 px-3 lg:px-25 text-center font-formula-bold">
           <div>
-            <span class="text-sm lg:text-xl text-gray">LIMING AGENCY</span>
-            <h4 class="text-xl lg:text-3xl text-light-white">
+            <span class="text-sm xl:text-xl text-gray">LIMING AGENCY</span>
+            <h4 class="text-xl xl:text-3xl text-light-white">
               ELIMINATE THE RISK
             </h4>
           </div>
           <div>
-            <span class="text-sm lg:text-xl text-gray">SINCE 2015</span>
-            <h4 class="text-xl lg:text-3xl text-light-white">
+            <span class="text-sm xl:text-xl text-gray">SINCE 2015</span>
+            <h4 class="text-xl xl:text-3xl text-light-white">
               WORKING GLOBALLY
             </h4>
           </div>

@@ -51,7 +51,7 @@ export default function Nav(props: NavProps) {
           <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 lg:px-6 lg:py-6">
             <A
               href="/work"
-              class="relative text-xl lg:text-2xl block"
+              class="relative text-xl xl:text-2xl block"
               onMouseEnter={() =>
                 gsap.to(workUnderlineRef!, {
                   scaleX: 1,
@@ -79,7 +79,7 @@ export default function Nav(props: NavProps) {
             </A>
             <A
               href="/services"
-              class="relative text-xl lg:text-2xl hidden md:block"
+              class="relative text-xl xl:text-2xl hidden md:block"
               onMouseEnter={() =>
                 gsap.to(servicesUnderlineRef!, {
                   scaleX: 1,
@@ -106,11 +106,11 @@ export default function Nav(props: NavProps) {
               ></div>
             </A>
             <A href="/" aria-label="Homepage" title="Homepage">
-              <YourLogo class="h-4 lg:h-5 w-auto text-gray" />
+              <YourLogo class="h-4 xl:h-5 w-auto text-gray" />
             </A>
             <A
               href="/about"
-              class="relative text-xl lg:text-2xl hidden md:block"
+              class="relative text-xl xl:text-2xl hidden md:block"
               onMouseEnter={() =>
                 gsap.to(aboutUnderlineRef!, {
                   scaleX: 1,
@@ -138,7 +138,7 @@ export default function Nav(props: NavProps) {
             </A>
             <A
               href="/contact"
-              class="relative text-xl lg:text-2xl block"
+              class="relative text-xl xl:text-2xl block"
               onMouseEnter={() =>
                 gsap.to(contactUnderlineRef!, {
                   scaleX: 1,
@@ -177,14 +177,14 @@ export default function Nav(props: NavProps) {
               class={`border rounded-m  border-gray transition-colors duration-600 menu-button`}
             >
               <div class="flex justify-center items-center">
-                <div class="bg-dark  px-2.5 h-8.5 lg:h-10 flex justify-center items-center">
-                  <div class="menu-icon gap-0.5 lg:gap-1 text-yellow-300">
-                    <span class="line line1 w-3 lg:w-5"></span>
-                    <span class="line line2 w-3 lg:w-5"></span>
-                    <span class="line line3 w-3 lg:w-5"></span>
+                <div class="bg-dark  px-2.5 h-8.5 xl:h-10 flex justify-center items-center">
+                  <div class="menu-icon gap-0.5 xl:gap-1 text-yellow-300">
+                    <span class="line line1 w-3 xl:w-5"></span>
+                    <span class="line line2 w-3 xl:w-5"></span>
+                    <span class="line line3 w-3 xl:w-5"></span>
                   </div>
                 </div>
-                <div class="bg-gray  px-2 lg:px-2.5 h-8.5 lg:h-10 flex justify-center items-center font-formula-bold text-base lg:text-xl">
+                <div class="bg-gray  px-2 xl:px-2.5 h-8.5 xl:h-10 flex justify-center items-center font-formula-bold text-base xl:text-xl">
                   <span class="transform translate-y-0.25 ">
                     <TextAnimation
                       originalColor="rgba(0, 21, 20, 1)"
