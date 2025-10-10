@@ -10,13 +10,12 @@ import Footer from "~/components/Footer";
 export default function Home() {
   let supplierRef: HTMLSpanElement | undefined;
   let partnerRef: HTMLSpanElement | undefined;
-  let headingRef: HTMLHeadingElement | undefined;
 
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
 
     const commonScrollTrigger = {
-      trigger: headingRef!,
+      trigger: ".hero",
       start: "bottom 70%",
       toggleActions: "play reverse play reverse",
       invalidateOnRefresh: true,
@@ -60,7 +59,6 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          ref={headingRef}
           class="font-formula-bold leading-none text-[60px] md:text-[140px] absolute bottom-40 text-center"
           style="word-spacing: -0.12em;"
         >
