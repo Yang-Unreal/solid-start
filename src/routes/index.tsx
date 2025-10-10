@@ -81,7 +81,7 @@ export default function Home() {
           <span class="block md:inline">FOR CHINA </span>
           <span class="block md:inline">AUTO IMPORTS</span>
         </h1>
-        <div class="absolute flex justify-between w-full bottom-10 lg:bottom-16 px-3  lg:px-25 text-center font-formula-bold">
+        <div class="absolute flex justify-between w-full bottom-16 px-3  lg:px-25 text-center font-formula-bold">
           <div>
             <span class="text-sm lg:text-xl text-gray">LIMING AGENCY</span>
             <h4 class="text-xl lg:text-3xl text-light-white">
