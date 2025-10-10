@@ -30,14 +30,19 @@ export default function Home() {
       scrollTrigger: commonScrollTrigger,
     });
 
-    gsap.to(partnerRef!, {
-      y: "0%",
-      rotation: 0,
-      transformOrigin: "0% 0%",
-      duration: 0.6,
-      ease: "circ.inOut",
-      scrollTrigger: commonScrollTrigger,
-    });
+    gsap.fromTo(
+      partnerRef!,
+      { y: "100%", rotation: 12, transformOrigin: "0% 0%" },
+      {
+        y: "0%",
+        display: "inline",
+        rotation: 0,
+        transformOrigin: "0% 0%",
+        duration: 0.6,
+        ease: "circ.inOut",
+        scrollTrigger: commonScrollTrigger,
+      }
+    );
   });
 
   return (
@@ -59,27 +64,21 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[clamp(1.5rem,15vw,6rem)] absolute bottom-[25%] md:landscape:bottom-[25%] md:landscape:text-7xl xl:landscape:bottom-[20%] xl:landscape:text-[140px] text-center"
+          class="font-formula-bold leading-none text-[clamp(1.5rem,15vw,6rem)] absolute bottom-[25%] md:landscape:bottom-[25%] sm:landscape:text-6xl md:landscape:text-7xl xl:landscape:bottom-[20%] xl:landscape:text-[clamp(3rem,9vw,10rem)] 2xl:text-[140px] text-center"
           style="word-spacing: -0.12em;"
         >
-          <span class="block md:inline">THE LEADING </span>
+          <span class="block sm:inline">THE LEADING </span>
           <span class="relative overflow-hidden inline-block align-top">
             <span ref={supplierRef} class="inline-block">
               SUPPLIER
             </span>
-            <span
-              ref={partnerRef}
-              class="absolute inline"
-              style={`left: 0; transform: translateY(100%) rotate(12deg); transform-origin: 0% 0%;
-
-              }`}
-            >
+            <span ref={partnerRef} class="absolute left-0 hidden">
               PARTNER
             </span>
           </span>
           <br />
-          <span class="block md:inline">FOR CHINA </span>
-          <span class="block md:inline">AUTO IMPORTS</span>
+          <span class="block sm:inline">FOR CHINA </span>
+          <span class="block sm:inline">AUTO IMPORTS</span>
         </h1>
         <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold">
           <div>
