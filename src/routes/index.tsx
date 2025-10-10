@@ -59,7 +59,7 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[clamp(1.5rem,15vw,6rem)] xl:text-[140px] absolute bottom-[25%] xl:top-[40%] text-center"
+          class="font-formula-bold leading-none text-[clamp(1.5rem,15vw,6rem)] xl:text-[140px] absolute bottom-[25%] md:landscape:top-[25%] md:landscape:text-7xl xl:landscape:top-[40%] text-center"
           style="word-spacing: -0.12em;"
         >
           <span class="block md:inline">THE LEADING </span>
