@@ -14,17 +14,20 @@ export default function Home() {
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
 
+    const commonScrollTrigger = {
+      trigger: ".hero",
+      start: "bottom 90%",
+      toggleActions: "play reverse play reverse",
+      invalidateOnRefresh: true,
+    };
+
     gsap.to(supplierRef!, {
       y: "-100%",
       rotation: 12,
       transformOrigin: "100% 100%",
       duration: 0.6,
       ease: "circ.inOut",
-      scrollTrigger: {
-        trigger: ".hero",
-        start: "bottom 90%",
-        toggleActions: "play reverse play reverse",
-      },
+      scrollTrigger: commonScrollTrigger,
     });
 
     gsap.to(partnerRef!, {
@@ -33,11 +36,7 @@ export default function Home() {
       transformOrigin: "0% 0%",
       duration: 0.6,
       ease: "circ.inOut",
-      scrollTrigger: {
-        trigger: ".hero",
-        start: "bottom 90%",
-        toggleActions: "play reverse play reverse",
-      },
+      scrollTrigger: commonScrollTrigger,
     });
   });
 
