@@ -12,32 +12,34 @@ export default function Home() {
   let partnerRef: HTMLSpanElement | undefined;
 
   onMount(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    setTimeout(() => {
+      gsap.registerPlugin(ScrollTrigger);
 
-    const commonScrollTrigger = {
-      trigger: ".hero",
-      start: "bottom 90%",
-      toggleActions: "play reverse play reverse",
-      invalidateOnRefresh: true,
-    };
+      const commonScrollTrigger = {
+        trigger: ".hero",
+        start: "bottom 90%",
+        toggleActions: "play reverse play reverse",
+        invalidateOnRefresh: true,
+      };
 
-    gsap.to(supplierRef!, {
-      y: "-100%",
-      rotation: 12,
-      transformOrigin: "100% 100%",
-      duration: 0.6,
-      ease: "circ.inOut",
-      scrollTrigger: commonScrollTrigger,
-    });
+      gsap.to(supplierRef!, {
+        y: "-100%",
+        rotation: 12,
+        transformOrigin: "100% 100%",
+        duration: 0.6,
+        ease: "circ.inOut",
+        scrollTrigger: commonScrollTrigger,
+      });
 
-    gsap.to(partnerRef!, {
-      y: "0%",
-      rotation: 0,
-      transformOrigin: "0% 0%",
-      duration: 0.6,
-      ease: "circ.inOut",
-      scrollTrigger: commonScrollTrigger,
-    });
+      gsap.to(partnerRef!, {
+        y: "0%",
+        rotation: 0,
+        transformOrigin: "0% 0%",
+        duration: 0.6,
+        ease: "circ.inOut",
+        scrollTrigger: commonScrollTrigger,
+      });
+    }, 100);
   });
 
   return (
