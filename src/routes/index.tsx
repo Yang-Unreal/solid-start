@@ -16,7 +16,7 @@ export default function Home() {
 
     const commonScrollTrigger = {
       trigger: ".hero",
-      start: "bottom 70%",
+      start: "bottom 85%",
       toggleActions: "play reverse play reverse",
       invalidateOnRefresh: true,
     };
