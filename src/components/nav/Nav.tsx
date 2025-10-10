@@ -184,8 +184,8 @@ export default function Nav(props: NavProps) {
                     <span class="line line3 w-3 lg:w-5"></span>
                   </div>
                 </div>
-                <div class="bg-gray  px-2 lg:px-2.5 h-8.5 lg:h-10 flex justify-center items-center font-formula-bold text-xl">
-                  <span class="transform translate-y-0.5 text-base lg:text-xl">
+                <div class="bg-gray  px-2 lg:px-2.5 h-8.5 lg:h-10 flex justify-center items-center font-formula-bold text-base lg:text-xl">
+                  <span class="transform translate-y-0.25 ">
                     <TextAnimation
                       originalColor="rgba(0, 21, 20, 1)"
                       duplicateColor="rgba(0, 21, 20, 1)"
