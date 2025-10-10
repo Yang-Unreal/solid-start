@@ -274,12 +274,11 @@ html::-webkit-scrollbar {
   .menu-icon {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+
     align-items: center;
   }
 
   .line {
-    width: 20px;
     height: 2px;
     background-color: currentColor;
     transition: transform 0.3s ease;

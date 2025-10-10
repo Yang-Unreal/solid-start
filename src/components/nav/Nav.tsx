@@ -177,15 +177,15 @@ export default function Nav(props: NavProps) {
               class={`border rounded-m  border-gray transition-colors duration-600 menu-button`}
             >
               <div class="flex justify-center items-center">
-                <div class="bg-dark  px-2.5 h-10 flex justify-center items-center">
-                  <div class="menu-icon text-yellow-300">
-                    <span class="line line1"></span>
-                    <span class="line line2"></span>
-                    <span class="line line3"></span>
+                <div class="bg-dark  px-2.5 h-8.5 lg:h-10 flex justify-center items-center">
+                  <div class="menu-icon gap-0.5 lg:gap-1 text-yellow-300">
+                    <span class="line line1 w-3 lg:w-5"></span>
+                    <span class="line line2 w-3 lg:w-5"></span>
+                    <span class="line line3 w-3 lg:w-5"></span>
                   </div>
                 </div>
-                <div class="bg-gray  px-2.5 h-10 flex justify-center items-center font-formula-bold text-xl">
-                  <span class="transform translate-y-0.5">
+                <div class="bg-gray  px-2 lg:px-2.5 h-8.5 lg:h-10 flex justify-center items-center font-formula-bold text-xl">
+                  <span class="transform translate-y-0.5 text-base lg:text-xl">
                     <TextAnimation
                       originalColor="rgba(0, 21, 20, 1)"
                       duplicateColor="rgba(0, 21, 20, 1)"
