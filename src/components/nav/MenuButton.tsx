@@ -22,7 +22,7 @@ export default function MenuButton(props: MenuButtonProps) {
         // Animate to X
         gsap.to(line1Ref, {
           rotation: -135,
-          y: 5.5,
+          y: 6,
           duration: 0.05,
 
           transformOrigin: "center",
@@ -65,29 +65,46 @@ export default function MenuButton(props: MenuButtonProps) {
         onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
         onMouseEnter={() => {
           if (line1Ref && line3Ref) {
-            gsap.to(line1Ref, {
-              scaleX: 0.5,
-              duration: 0.05,
-              ease: "power2.out",
-            });
-            gsap.to(line3Ref, {
-              scaleX: 0.5,
-              duration: 0.05,
-              ease: "power2.out",
-            });
+            if (props.isMenuOpen) {
+              gsap.to(line1Ref, {
+                rotation: "-=90",
+                scaleX: 0.5,
+                duration: 0.05,
+              });
+              gsap.to(line3Ref, {
+                rotation: "-=90",
+                scaleX: 0.5,
+                duration: 0.05,
+              });
+            } else {
+              gsap.to(line1Ref, {
+                scaleX: 0.5,
+                duration: 0.05,
+              });
+              gsap.to(line3Ref, {
+                scaleX: 0.5,
+                duration: 0.05,
+              });
+            }
           }
         }}
         onMouseLeave={() => {
           if (line1Ref && line3Ref) {
-            gsap.to(line1Ref, {
-              scaleX: 1,
-
-              duration: 0.05,
-            });
-            gsap.to(line3Ref, {
-              scaleX: 1,
-              duration: 0.05,
-            });
+            if (props.isMenuOpen) {
+              gsap.to(line1Ref, {
+                rotation: "+=90",
+                scaleX: 1,
+                duration: 0.05,
+              });
+              gsap.to(line3Ref, {
+                rotation: "+=90",
+                scaleX: 1,
+                duration: 0.05,
+              });
+            } else {
+              gsap.to(line1Ref, { scaleX: 1, duration: 0.05 });
+              gsap.to(line3Ref, { scaleX: 1, duration: 0.05 });
+            }
           }
         }}
         class={`border rounded-m border-gray transition-colors duration-600 menu-button`}
