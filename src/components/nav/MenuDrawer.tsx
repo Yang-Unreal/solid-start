@@ -27,11 +27,15 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let underlineRefs: (HTMLDivElement | undefined)[] = new Array(
     navLinks.length
   ).fill(undefined);
+  let linkRefs: (HTMLLIElement | undefined)[] = new Array(navLinks.length).fill(
+    undefined
+  );
 
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
       gsap.set([column1, column2, column3, column4], { y: "100%" });
       gsap.set(menuContainer, { display: "none" });
+      gsap.set(linkRefs, { y: "100%" });
     }
   });
 
@@ -46,7 +50,20 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         stagger: 0.02,
         ease: "power3.inOut",
       });
+      gsap.to(linkRefs, {
+        y: "0%",
+        duration: 0.8,
+        stagger: 0.02,
+        ease: "power3.inOut",
+        delay: 0.1,
+      });
     } else {
+      gsap.to(linkRefs, {
+        y: "100%",
+        duration: 0.8,
+        stagger: 0.02,
+        ease: "power3.inOut",
+      });
       gsap.to([column1, column2, column3, column4], {
         y: "100%",
         duration: 0.8,
@@ -86,11 +103,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       </div>
 
       {/* Foreground Text */}
-      <div class="relative flex h-full items-center justify-center text-white">
-        <ul class="flex flex-col items-center  text-center md:flex-row md:space-x-20">
+      <div class="relative flex h-full items-center justify-center text-white ">
+        <ul class="flex flex-col items-center  text-center md:flex-row md:space-x-20 overflow-hidden">
           <For each={navLinks}>
             {(item, index) => (
-              <li>
+              <li ref={(el) => (linkRefs[index()] = el)}>
                 <a
                   href={item.href}
                   class="relative block text-8xl font-formula-bold"
