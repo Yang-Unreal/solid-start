@@ -8,7 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Footer from "~/components/Footer";
 
 export default function Home() {
-  let supplierRef: HTMLSpanElement | undefined;
+  let gatewayRef: HTMLSpanElement | undefined;
   let partnerRef: HTMLSpanElement | undefined;
 
   onMount(() => {
@@ -21,7 +21,7 @@ export default function Home() {
       invalidateOnRefresh: true,
     };
 
-    gsap.to(supplierRef!, {
+    gsap.to(gatewayRef!, {
       y: "-100%",
       rotation: 12,
       transformOrigin: "100% 100%",
@@ -64,13 +64,13 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[clamp(1.5rem,15vw,6rem)] absolute bottom-[25%] md:landscape:bottom-[25%] sm:landscape:text-6xl md:landscape:text-7xl xl:landscape:bottom-[20%] xl:landscape:text-[clamp(3rem,9vw,10rem)] 2xl:text-[140px] text-center"
+          class="font-formula-bold leading-none text-[clamp(1.5rem,18vw,6rem)] absolute bottom-[25%] md:landscape:bottom-[25%] sm:landscape:text-6xl md:landscape:text-7xl xl:landscape:bottom-[20%] xl:landscape:text-[clamp(3rem,9vw,10rem)] 2xl:text-[140px] text-center"
           style="word-spacing: -0.12em;"
         >
-          <span class="block sm:inline">THE LEADING </span>
+          <span class="block sm:inline">YOUR </span>
           <span class="relative overflow-hidden inline-block align-top">
-            <span ref={supplierRef} class="inline-block">
-              SUPPLIER
+            <span ref={gatewayRef} class="inline-block">
+              GATEWAY
             </span>
             <span ref={partnerRef} class="absolute left-0 hidden">
               PARTNER
@@ -78,7 +78,7 @@ export default function Home() {
           </span>
           <br />
           <span class="block sm:inline">FOR CHINA </span>
-          <span class="block sm:inline">AUTO IMPORTS</span>
+          <span class="block sm:inline">SOURCING</span>
         </h1>
         <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold">
           <div>
