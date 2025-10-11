@@ -68,12 +68,12 @@ export default function MenuButton(props: MenuButtonProps) {
           if (line1Ref && line3Ref) {
             if (props.isMenuOpen) {
               gsap.to(line1Ref, {
-                rotation: "-=90",
+                rotation: "-135",
                 scaleX: 0.7,
                 duration: 0.05,
               });
               gsap.to(line3Ref, {
-                rotation: "-=90",
+                rotation: "-45",
                 scaleX: 0.7,
                 duration: 0.05,
               });
@@ -94,12 +94,12 @@ export default function MenuButton(props: MenuButtonProps) {
           if (line1Ref && line3Ref) {
             if (props.isMenuOpen) {
               gsap.to(line1Ref, {
-                rotation: "+=90",
+                rotation: "-45",
                 scaleX: 1,
                 duration: 0.05,
               });
               gsap.to(line3Ref, {
-                rotation: "+=90",
+                rotation: "45",
                 scaleX: 1,
                 duration: 0.05,
               });

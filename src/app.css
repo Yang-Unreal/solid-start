@@ -284,9 +284,4 @@ html::-webkit-scrollbar {
     transition: transform 0.3s ease;
     transform-origin: center;
   }
-
-  .menu-button:hover .line1,
-  .menu-button:hover .line3 {
-    transform: scaleX(0.5);
-  }
 }
