@@ -64,7 +64,7 @@ export default function Home() {
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1
-          class="font-formula-bold leading-none text-[clamp(1.5rem,18vw,6rem)] absolute bottom-[25%] md:landscape:bottom-[25%] sm:landscape:text-6xl md:landscape:text-7xl xl:landscape:bottom-[20%] xl:landscape:text-[clamp(3rem,9vw,10rem)] 2xl:text-[140px] text-center"
+          class="font-formula-bold leading-none absolute bottom-[25%] md:landscape:bottom-[25%] xl:landscape:bottom-[20%] text-[clamp(1.5rem,18vw,6rem)] sm:landscape:text-6xl md:landscape:text-7xl lg:landscape:text-8xl xl:landscape:text-[clamp(3rem,9vw,10rem)] 2xl:text-[140px] text-center"
           style="word-spacing: -0.12em;"
         >
           <span class="block sm:inline">YOUR </span>
