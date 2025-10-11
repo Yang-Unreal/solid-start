@@ -64,31 +64,33 @@ export default function MenuButton(props: MenuButtonProps) {
         }}
         onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
         onMouseEnter={() => {
+          setExternalTrigger("enter");
           if (line1Ref && line3Ref) {
             if (props.isMenuOpen) {
               gsap.to(line1Ref, {
                 rotation: "-=90",
-                scaleX: 0.5,
+                scaleX: 0.7,
                 duration: 0.05,
               });
               gsap.to(line3Ref, {
                 rotation: "-=90",
-                scaleX: 0.5,
+                scaleX: 0.7,
                 duration: 0.05,
               });
             } else {
               gsap.to(line1Ref, {
-                scaleX: 0.5,
+                scaleX: 0.7,
                 duration: 0.05,
               });
               gsap.to(line3Ref, {
-                scaleX: 0.5,
+                scaleX: 0.7,
                 duration: 0.05,
               });
             }
           }
         }}
         onMouseLeave={() => {
+          setExternalTrigger("leave");
           if (line1Ref && line3Ref) {
             if (props.isMenuOpen) {
               gsap.to(line1Ref, {
@@ -111,11 +113,7 @@ export default function MenuButton(props: MenuButtonProps) {
       >
         <div class="flex justify-center items-center">
           <div class="bg-dark px-2.5 h-8.5 xl:h-10 flex justify-center items-center">
-            <div
-              class="menu-icon gap-0.5 xl:gap-1 text-yellow-300"
-              onMouseEnter={() => setExternalTrigger("enter")}
-              onMouseLeave={() => setExternalTrigger("leave")}
-            >
+            <div class="menu-icon gap-0.5 xl:gap-1 text-yellow-300">
               <span ref={line1Ref} class="line line1 w-3 xl:w-5"></span>
               <span ref={line2Ref} class="line line2 w-3 xl:w-5"></span>
               <span ref={line3Ref} class="line line3 w-3 xl:w-5"></span>
