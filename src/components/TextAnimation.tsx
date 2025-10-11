@@ -1,4 +1,4 @@
-import { onMount } from "solid-js";
+import { createEffect, onMount } from "solid-js";
 import gsap, { CustomEase } from "gsap/all";
 
 interface TextAnimationProps {
@@ -6,6 +6,7 @@ interface TextAnimationProps {
   class?: string;
   originalColor?: string;
   duplicateColor?: string;
+  externalTrigger?: "enter" | "leave" | null;
 }
 
 export default function TextAnimation(props: TextAnimationProps) {
@@ -16,7 +17,7 @@ export default function TextAnimation(props: TextAnimationProps) {
     CustomEase.create("custom", "M0,0 C0.25,0.1 0.25,1 1,1");
   });
 
-  const handleMouseEnter = () => {
+  const animateEnter = () => {
     gsap.to(originalRef!, {
       y: "-100%",
       rotation: -12,
@@ -33,7 +34,7 @@ export default function TextAnimation(props: TextAnimationProps) {
     });
   };
 
-  const handleMouseLeave = () => {
+  const animateLeave = () => {
     gsap.to(originalRef!, {
       y: "0%",
       rotation: 0,
@@ -49,6 +50,22 @@ export default function TextAnimation(props: TextAnimationProps) {
       ease: "custom",
     });
   };
+
+  const handleMouseEnter = () => {
+    animateEnter();
+  };
+
+  const handleMouseLeave = () => {
+    animateLeave();
+  };
+
+  createEffect(() => {
+    if (props.externalTrigger === "enter") {
+      animateEnter();
+    } else if (props.externalTrigger === "leave") {
+      animateLeave();
+    }
+  });
 
   return (
     <div

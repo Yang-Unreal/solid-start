@@ -47,7 +47,7 @@ export default function Nav(props: NavProps) {
   return (
     <>
       <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
-        <div class={` relative flex h-[100svh]  bg-transparent text-white`}>
+        <div class={` relative flex   bg-transparent text-white`}>
           <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 lg:px-6 lg:py-6">
             <A
               href="/product"
@@ -166,36 +166,6 @@ export default function Nav(props: NavProps) {
             </A>
           </div>
           {/* <div class="h-screen w-[1px] absolute left-1/2 transform -translate-x-1/2 bg-black"></div> */}
-
-          <div class="absolute bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center ">
-            <button
-              ref={(el) => {
-                menuButtonRef = el;
-                props.setMenuButtonRef(el);
-              }}
-              onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
-              class={`border rounded-m  border-gray transition-colors duration-600 menu-button`}
-            >
-              <div class="flex justify-center items-center">
-                <div class="bg-dark  px-2.5 h-8.5 xl:h-10 flex justify-center items-center">
-                  <div class="menu-icon gap-0.5 xl:gap-1 text-yellow-300">
-                    <span class="line line1 w-3 xl:w-5"></span>
-                    <span class="line line2 w-3 xl:w-5"></span>
-                    <span class="line line3 w-3 xl:w-5"></span>
-                  </div>
-                </div>
-                <div class="bg-gray  px-2 xl:px-2.5 h-8.5 xl:h-10 flex justify-center items-center font-formula-bold text-base xl:text-xl">
-                  <span class="transform translate-y-0.25 ">
-                    <TextAnimation
-                      originalColor="rgba(0, 21, 20, 1)"
-                      duplicateColor="rgba(0, 21, 20, 1)"
-                      text="MENU"
-                    />
-                  </span>
-                </div>
-              </div>
-            </button>
-          </div>
         </div>
       </nav>
     </>
