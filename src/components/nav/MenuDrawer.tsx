@@ -24,6 +24,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     { href: "/contact", label: "CONTACT" },
   ];
 
+  let underlineRefs: (HTMLDivElement | undefined)[] = new Array(
+    navLinks.length
+  ).fill(undefined);
+
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
       gsap.set([column1, column2, column3, column4], { y: "100%" });
@@ -85,14 +89,35 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       <div class="relative flex h-full items-center justify-center text-white">
         <ul class="flex flex-col items-center  text-center md:flex-row md:space-x-20">
           <For each={navLinks}>
-            {(item) => (
+            {(item, index) => (
               <li>
-                <a href={item.href} class="block text-8xl font-formula-bold">
+                <a
+                  href={item.href}
+                  class="relative block text-8xl font-formula-bold"
+                  onMouseEnter={() =>
+                    gsap.to(underlineRefs[index()]!, {
+                      scaleX: 1,
+                      transformOrigin: "0% 50%",
+                      duration: 0.3,
+                    })
+                  }
+                  onMouseLeave={() =>
+                    gsap.to(underlineRefs[index()]!, {
+                      scaleX: 0,
+                      transformOrigin: "100% 50%",
+                      duration: 0.3,
+                    })
+                  }
+                >
                   <TextAnimation
                     originalColor="rgba(192, 202, 201, 1)"
                     duplicateColor="rgba(241, 241, 241, 1)"
                     text={item.label}
                   />
+                  <div
+                    ref={(el) => (underlineRefs[index()] = el)}
+                    class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+                  ></div>
                 </a>
               </li>
             )}
