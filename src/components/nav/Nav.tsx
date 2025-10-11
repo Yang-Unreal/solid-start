@@ -50,7 +50,7 @@ export default function Nav(props: NavProps) {
         <div class={` relative flex h-[100svh]  bg-transparent text-white`}>
           <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 lg:px-6 lg:py-6">
             <A
-              href="/work"
+              href="/product"
               class="relative text-xl xl:text-2xl block"
               onMouseEnter={() =>
                 gsap.to(workUnderlineRef!, {
@@ -70,7 +70,7 @@ export default function Nav(props: NavProps) {
               <TextAnimation
                 originalColor="rgba(192, 202, 201, 1)"
                 duplicateColor="rgba(241, 241, 241, 1)"
-                text="WORK"
+                text="PRODUCT"
               />
               <div
                 ref={workUnderlineRef!}
