@@ -72,7 +72,7 @@ export default function Home() {
             <span ref={gatewayRef} class="inline-block">
               GATEWAY
             </span>
-            <span ref={partnerRef} class="absolute left-0 hidden">
+            <span ref={partnerRef} class="absolute hidden left-0">
               PARTNER
             </span>
           </span>
