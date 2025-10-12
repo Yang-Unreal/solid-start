@@ -35,7 +35,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
-      gsap.set([column1, column2, column3, column4], { y: "100%" });
+      gsap.set([column1, column2, column3, column4], {
+        y: "100%",
+        clipPath: "polygon(0% 8%, 100% 0%, 100% 100%, 0% 100%)",
+      });
       gsap.set(menuContainer, { display: "none" });
       gsap.set(linkRefs, { y: "100%" });
     }
@@ -51,9 +54,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       currentTl = gsap.timeline();
       currentTl.to([column1, column2, column3, column4], {
         y: "0%",
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
         duration: 0.4,
         stagger: 0.02,
-        ease: "power3.inOut",
+        ease: "circ.inOut",
       });
       currentTl.to(
         linkRefs,
@@ -81,9 +85,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         [column1, column2, column3, column4],
         {
           y: "100%",
+          clipPath: "polygon(0% 8%, 100% 0%, 100% 100%, 0% 100%)",
           duration: 0.4,
           stagger: 0.02,
-          ease: "power3.inOut",
+          ease: "circ.inOut",
         },
         "-=0.2"
       );
@@ -96,22 +101,22 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       <div class="absolute inset-0">
         <div
           ref={column1}
-          class="absolute h-full bg-black"
+          class="absolute h-full bg-dark"
           style="left: 0%; width: 26%;"
         ></div>
         <div
           ref={column2}
-          class="absolute h-full bg-black"
+          class="absolute h-full bg-dark"
           style="left: 25%; width: 26%;"
         ></div>
         <div
           ref={column3}
-          class="absolute h-full bg-black"
+          class="absolute h-full bg-dark"
           style="left: 50%; width: 26%;"
         ></div>
         <div
           ref={column4}
-          class="absolute h-full bg-black"
+          class="absolute h-full bg-dark"
           style="left: 75%; width: 26%;"
         ></div>
       </div>
