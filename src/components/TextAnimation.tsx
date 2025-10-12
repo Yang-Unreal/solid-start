@@ -1,4 +1,4 @@
-import { createEffect, onMount } from "solid-js";
+import { createEffect, onMount, createSignal } from "solid-js";
 import gsap, { CustomEase } from "gsap/all";
 
 interface TextAnimationProps {
@@ -8,11 +8,13 @@ interface TextAnimationProps {
   duplicateColor?: string;
   externalTrigger?: "enter" | "leave" | null;
   navSlideTrigger?: "up" | "down" | null;
+  isCopyable?: boolean;
 }
 
 export default function TextAnimation(props: TextAnimationProps) {
   let originalRef: HTMLSpanElement | undefined;
   let duplicateRef: HTMLSpanElement | undefined;
+  const [displayText, setDisplayText] = createSignal(props.text);
 
   onMount(() => {
     CustomEase.create("custom", "M0,0 C0.25,0.1 0.25,1 1,1");
@@ -58,6 +60,20 @@ export default function TextAnimation(props: TextAnimationProps) {
 
   const handleMouseLeave = () => {
     animateLeave();
+    if (props.isCopyable) {
+      setDisplayText(props.text);
+    }
+  };
+
+  const handleClick = async () => {
+    if (props.isCopyable) {
+      try {
+        await navigator.clipboard.writeText(props.text);
+        setDisplayText("ADDED TO CLIPBOARD");
+      } catch (err) {
+        console.error("Failed to copy text: ", err);
+      }
+    }
   };
 
   createEffect(() => {
@@ -91,16 +107,19 @@ export default function TextAnimation(props: TextAnimationProps) {
 
   return (
     <div
-      class={`relative overflow-hidden cursor-pointer ${props.class || ""}`}
+      class={`relative overflow-hidden ${
+        props.isCopyable ? "cursor-pointer" : "cursor-pointer"
+      } ${props.class || ""}`}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onClick={handleClick}
     >
       <span
         ref={originalRef!}
         class="block"
         style={`color: ${props.originalColor || "inherit"}`}
       >
-        {props.text}
+        {displayText()}
       </span>
       <span
         ref={duplicateRef!}
@@ -109,7 +128,7 @@ export default function TextAnimation(props: TextAnimationProps) {
           props.duplicateColor || "inherit"
         }`}
       >
-        {props.text}
+        {displayText()}
       </span>
     </div>
   );

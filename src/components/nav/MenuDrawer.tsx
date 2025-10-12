@@ -203,6 +203,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
             duplicateColor="rgba(241, 241, 241, 1)"
             text="YANG@LIMINGCN.COM"
             class="text-xl xl:text-2xl"
+            isCopyable={true}
           />
         </div>
       </div>
