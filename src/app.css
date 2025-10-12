@@ -54,6 +54,8 @@
   --color-light-white: rgba(241, 241, 241, 1);
   --color-darkgray: #182b2a;
   --color-dark: rgba(0, 21, 20, 1);
+  --color-dark-text: rgba(0, 21, 20, 0.8);
+  --color-gray-text: rgba(192, 202, 201, 0.45);
 }
 
 :root {

@@ -160,6 +160,16 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           </For>
         </ul>
       </div>
+      <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold">
+        <div class="overflow-hidden">
+          <span class="text-sm xl:text-xl text-gray-text">ADDRESS</span>
+          <h4 class="text-xl xl:text-2xl text-gray">TAIZHOU,ZHEJIANG,CHINA</h4>
+        </div>
+        <div class="overflow-hidden">
+          <span class="text-sm xl:text-xl text-gray-text">CONTACT</span>
+          <h4 class="text-xl xl:text-2xl text-gray">YANG@LIMINGCN.COM</h4>
+        </div>
+      </div>
     </div>
   );
 };

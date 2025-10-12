@@ -7,6 +7,7 @@ interface TextAnimationProps {
   originalColor?: string;
   duplicateColor?: string;
   externalTrigger?: "enter" | "leave" | null;
+  navSlideTrigger?: "up" | "down" | null;
 }
 
 export default function TextAnimation(props: TextAnimationProps) {
@@ -64,6 +65,26 @@ export default function TextAnimation(props: TextAnimationProps) {
       animateEnter();
     } else if (props.externalTrigger === "leave") {
       animateLeave();
+    }
+  });
+
+  createEffect(() => {
+    if (props.navSlideTrigger === "up") {
+      gsap.to(originalRef!, {
+        y: "-120%",
+        rotation: -12,
+        transformOrigin: "100% 0%",
+        duration: 0.4,
+        ease: "power3.inOut",
+      });
+    } else if (props.navSlideTrigger === "down") {
+      gsap.to(originalRef!, {
+        y: "0%",
+        rotation: 0,
+        transformOrigin: "100% 0%",
+        duration: 0.4,
+        ease: "power3.inOut",
+      });
     }
   });
 

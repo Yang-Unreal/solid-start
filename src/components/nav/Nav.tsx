@@ -35,12 +35,37 @@ export default function Nav(props: NavProps) {
   let servicesUnderlineRef: HTMLDivElement | undefined;
   let aboutUnderlineRef: HTMLDivElement | undefined;
   let contactUnderlineRef: HTMLDivElement | undefined;
+  let productTrigger: "up" | "down" | null = null;
+  let servicesTrigger: "up" | "down" | null = null;
+  let aboutTrigger: "up" | "down" | null = null;
+  let contactTrigger: "up" | "down" | null = null;
+
+  const [productTriggerSignal, setProductTrigger] = createSignal<
+    "up" | "down" | null
+  >(null);
+  const [servicesTriggerSignal, setServicesTrigger] = createSignal<
+    "up" | "down" | null
+  >(null);
+  const [aboutTriggerSignal, setAboutTrigger] = createSignal<
+    "up" | "down" | null
+  >(null);
+  const [contactTriggerSignal, setContactTrigger] = createSignal<
+    "up" | "down" | null
+  >(null);
 
   createEffect(() => {
     if (props.isMenuOpen) {
       lenis?.stop();
+      setProductTrigger("up");
+      setServicesTrigger("up");
+      setAboutTrigger("up");
+      setContactTrigger("up");
     } else {
       lenis?.start();
+      setProductTrigger("down");
+      setServicesTrigger("down");
+      setAboutTrigger("down");
+      setContactTrigger("down");
     }
   });
 
@@ -48,7 +73,7 @@ export default function Nav(props: NavProps) {
     <>
       <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
         <div class={` relative flex   bg-transparent text-white`}>
-          <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 lg:px-6 lg:py-6">
+          <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 lg:px-6 lg:py-6 overflow-hidden">
             <A
               href="/product"
               class="relative text-xl xl:text-2xl block"
@@ -71,6 +96,7 @@ export default function Nav(props: NavProps) {
                 originalColor="rgba(192, 202, 201, 1)"
                 duplicateColor="rgba(241, 241, 241, 1)"
                 text="PRODUCT"
+                navSlideTrigger={productTriggerSignal()}
               />
               <div
                 ref={workUnderlineRef!}
@@ -99,6 +125,7 @@ export default function Nav(props: NavProps) {
                 originalColor="rgba(192, 202, 201, 1)"
                 duplicateColor="rgba(241, 241, 241, 1)"
                 text="SERVICES"
+                navSlideTrigger={servicesTriggerSignal()}
               />
               <div
                 ref={servicesUnderlineRef!}
@@ -130,6 +157,7 @@ export default function Nav(props: NavProps) {
                 originalColor="rgba(192, 202, 201, 1)"
                 duplicateColor="rgba(241, 241, 241, 1)"
                 text="ABOUT"
+                navSlideTrigger={aboutTriggerSignal()}
               />
               <div
                 ref={aboutUnderlineRef!}
@@ -158,6 +186,7 @@ export default function Nav(props: NavProps) {
                 originalColor="rgba(192, 202, 201, 1)"
                 duplicateColor="rgba(241, 241, 241, 1)"
                 text="CONTACT"
+                navSlideTrigger={contactTriggerSignal()}
               />
               <div
                 ref={contactUnderlineRef!}
