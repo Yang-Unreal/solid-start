@@ -31,6 +31,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     undefined
   );
 
+  let currentTl: gsap.core.Timeline | undefined;
+
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
       gsap.set([column1, column2, column3, column4], { y: "100%" });
@@ -42,37 +44,49 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   createEffect(() => {
     if (!column1 || !column2 || !column3 || !column4 || !menuContainer) return;
 
+    if (currentTl) currentTl.kill();
+
     if (props.isOpen) {
       gsap.set(menuContainer, { display: "block" });
-      gsap.to([column1, column2, column3, column4], {
+      currentTl = gsap.timeline();
+      currentTl.to([column1, column2, column3, column4], {
         y: "0%",
-        duration: 0.8,
+        duration: 0.4,
         stagger: 0.02,
         ease: "power3.inOut",
       });
-      gsap.to(linkRefs, {
-        y: "0%",
-        duration: 0.8,
-        stagger: 0.02,
-        ease: "power3.inOut",
-        delay: 0.1,
-      });
+      currentTl.to(
+        linkRefs,
+        {
+          y: "0%",
+          duration: 0.4,
+          stagger: 0.02,
+          ease: "power3.inOut",
+        },
+        "-=0.2"
+      );
     } else {
-      gsap.to(linkRefs, {
-        y: "100%",
-        duration: 0.8,
-        stagger: 0.02,
-        ease: "power3.inOut",
-      });
-      gsap.to([column1, column2, column3, column4], {
-        y: "100%",
-        duration: 0.8,
-        stagger: 0.02,
-        ease: "power3.inOut",
+      currentTl = gsap.timeline({
         onComplete: () => {
           gsap.set(menuContainer, { display: "none" });
         },
       });
+      currentTl.to(linkRefs, {
+        y: "100%",
+        duration: 0.4,
+        stagger: 0.02,
+        ease: "power3.inOut",
+      });
+      currentTl.to(
+        [column1, column2, column3, column4],
+        {
+          y: "100%",
+          duration: 0.4,
+          stagger: 0.02,
+          ease: "power3.inOut",
+        },
+        "-=0.2"
+      );
     }
   });
 
