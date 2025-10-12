@@ -32,6 +32,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   );
 
   let currentTl: gsap.core.Timeline | undefined;
+  let addressRef: HTMLDivElement | undefined;
+  let contactRef: HTMLDivElement | undefined;
 
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
@@ -41,6 +43,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       });
       gsap.set(menuContainer, { display: "none" });
       gsap.set(linkRefs, { y: "100%" });
+      gsap.set([addressRef, contactRef], { y: "100%" });
     }
   });
 
@@ -63,11 +66,25 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         linkRefs,
         {
           y: "0%",
+          rotation: 0,
+          transformOrigin: "100% 0%",
           duration: 0.4,
-          stagger: 0.02,
+          stagger: 0.05,
           ease: "power3.inOut",
         },
         "-=0.2"
+      );
+      currentTl.to(
+        [addressRef, contactRef],
+        {
+          y: "0%",
+          rotation: 0,
+          transformOrigin: "0% 0%",
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power3.inOut",
+        },
+        "-=0.4"
       );
     } else {
       currentTl = gsap.timeline({
@@ -77,10 +94,24 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       });
       currentTl.to(linkRefs, {
         y: "100%",
+        rotation: -12,
+        transformOrigin: "100% 0%",
         duration: 0.4,
-        stagger: 0.02,
+        stagger: 0.05,
         ease: "power3.inOut",
       });
+      currentTl.to(
+        [addressRef, contactRef],
+        {
+          y: "100%",
+          rotation: 12,
+          transformOrigin: "0% 0%",
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "power3.inOut",
+        },
+        "-=0.4"
+      );
       currentTl.to(
         [column1, column2, column3, column4],
         {
@@ -90,7 +121,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           stagger: 0.02,
           ease: "circ.inOut",
         },
-        "-=0.2"
+        "-=0.4"
       );
     }
   });
@@ -160,14 +191,19 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           </For>
         </ul>
       </div>
-      <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold">
-        <div class="overflow-hidden">
+      <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold overflow-hidden">
+        <div ref={addressRef}>
           <span class="text-sm xl:text-xl text-gray-text">ADDRESS</span>
           <h4 class="text-xl xl:text-2xl text-gray">TAIZHOU,ZHEJIANG,CHINA</h4>
         </div>
-        <div class="overflow-hidden">
+        <div ref={contactRef}>
           <span class="text-sm xl:text-xl text-gray-text">CONTACT</span>
-          <h4 class="text-xl xl:text-2xl text-gray">YANG@LIMINGCN.COM</h4>
+          <TextAnimation
+            originalColor="rgba(192, 202, 201, 1)"
+            duplicateColor="rgba(241, 241, 241, 1)"
+            text="YANG@LIMINGCN.COM"
+            class="text-xl xl:text-2xl"
+          />
         </div>
       </div>
     </div>

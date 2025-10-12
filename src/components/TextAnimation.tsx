@@ -71,17 +71,18 @@ export default function TextAnimation(props: TextAnimationProps) {
   createEffect(() => {
     if (props.navSlideTrigger === "up") {
       gsap.to(originalRef!, {
-        y: "-120%",
+        y: "-100%",
         rotation: -12,
-        transformOrigin: "100% 0%",
+        transformOrigin: "0% 0%",
         duration: 0.4,
         ease: "power3.inOut",
+        delay: 0.1,
       });
     } else if (props.navSlideTrigger === "down") {
       gsap.to(originalRef!, {
         y: "0%",
         rotation: 0,
-        transformOrigin: "100% 0%",
+        transformOrigin: "0% 0%",
         duration: 0.4,
         ease: "power3.inOut",
       });
