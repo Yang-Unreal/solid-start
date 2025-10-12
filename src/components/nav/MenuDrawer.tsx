@@ -18,11 +18,15 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let menuContainer: HTMLDivElement | undefined;
 
   const navLinks = [
-    { href: "/product", label: "PRODUCT" },
-    { href: "/services", label: "SERVICES" },
-    { href: "/about", label: "ABOUT" },
-    { href: "/contact", label: "CONTACT" },
-  ];
+    { href: "/product", label: "PRODUCT", image: "/images/menu/PRODUCT.webp" },
+    {
+      href: "/services",
+      label: "SERVICES",
+      image: "/images/menu/SERVICES.webp",
+    },
+    { href: "/about", label: "ABOUT", image: "/images/menu/ABOUT.webp" },
+    { href: "/contact", label: "CONTACT", image: "/images/menu/CONTACT.webp" },
+  ] as const;
 
   let underlineRefs: (HTMLDivElement | undefined)[] = new Array(
     navLinks.length
@@ -34,6 +38,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let currentTl: gsap.core.Timeline | undefined;
   let addressRef: HTMLDivElement | undefined;
   let contactRef: HTMLDivElement | undefined;
+  let imageContainerRef: HTMLDivElement | undefined;
+  let currentImageRef: HTMLImageElement | undefined;
+  let nextImageRef: HTMLImageElement | undefined;
+  let imageTl: gsap.core.Timeline | undefined;
 
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
@@ -44,6 +52,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       gsap.set(menuContainer, { display: "none" });
       gsap.set(linkRefs, { y: "100%" });
       gsap.set([addressRef, contactRef], { y: "100%" });
+      if (currentImageRef) {
+        currentImageRef.src = navLinks[0].image;
+        currentImageRef.alt = navLinks[0].label;
+        gsap.set(currentImageRef, { opacity: 1 });
+      }
     }
   });
 
@@ -51,6 +64,15 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     if (!column1 || !column2 || !column3 || !column4 || !menuContainer) return;
 
     if (currentTl) currentTl.kill();
+
+    // Update default image based on current route
+    const currentPath = window.location.pathname;
+    const currentLink =
+      navLinks.find((link) => link.href === currentPath) || navLinks[0];
+    if (currentImageRef && currentLink) {
+      currentImageRef.src = currentLink.image;
+      currentImageRef.alt = currentLink.label;
+    }
 
     if (props.isOpen) {
       gsap.set(menuContainer, { display: "block" });
@@ -152,6 +174,25 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         ></div>
       </div>
 
+      {/* Image Container */}
+      <div
+        ref={imageContainerRef}
+        class="absolute left-1/2 top-1/2 w-[20vw] h-[calc(20vw*1.33)] flex items-center justify-center overflow-hidden transform -translate-x-1/2 -translate-y-1/2"
+      >
+        <img
+          ref={currentImageRef}
+          src={navLinks[0].image}
+          alt={navLinks[0].label}
+          class="absolute w-full h-full object-cover"
+        />
+        <img
+          ref={nextImageRef}
+          src=""
+          alt=""
+          class="absolute w-full h-full object-cover opacity-0"
+        />
+      </div>
+
       {/* Foreground Text */}
       <div class="relative flex h-full items-center justify-center text-white ">
         <ul class="flex flex-col items-center  text-center md:flex-row md:space-x-20 overflow-hidden">
@@ -161,20 +202,59 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                 <a
                   href={item.href}
                   class="relative block text-8xl font-formula-bold"
-                  onMouseEnter={() =>
+                  onMouseEnter={() => {
                     gsap.to(underlineRefs[index()]!, {
                       scaleX: 1,
                       transformOrigin: "0% 50%",
                       duration: 0.3,
-                    })
-                  }
-                  onMouseLeave={() =>
+                    });
+                    if (
+                      nextImageRef &&
+                      currentImageRef &&
+                      !imageTl?.isActive()
+                    ) {
+                      if (imageTl) imageTl.kill();
+                      nextImageRef.src = item.image;
+                      nextImageRef.alt = item.label;
+                      gsap.set(nextImageRef, { y: "100%" });
+                      imageTl = gsap.timeline();
+                      imageTl.to(nextImageRef, {
+                        y: "0%",
+                        opacity: 1,
+                        duration: 0.2,
+                        ease: "power3.inOut",
+                      });
+                      imageTl.to(
+                        currentImageRef,
+                        {
+                          y: "-100%",
+                          opacity: 0,
+                          duration: 0.2,
+                          ease: "power3.inOut",
+                        },
+                        0
+                      );
+                      imageTl.add(() => {
+                        // Swap images
+                        const tempSrc = currentImageRef.src;
+                        const tempAlt = currentImageRef.alt;
+                        currentImageRef.src = nextImageRef.src;
+                        currentImageRef.alt = nextImageRef.alt;
+                        nextImageRef.src = tempSrc;
+                        nextImageRef.alt = tempAlt;
+                        gsap.set(currentImageRef, { y: "0%", opacity: 1 });
+                        gsap.set(nextImageRef, { y: "100%", opacity: 0 });
+                      });
+                    }
+                  }}
+                  onMouseLeave={() => {
                     gsap.to(underlineRefs[index()]!, {
                       scaleX: 0,
                       transformOrigin: "100% 50%",
                       duration: 0.3,
-                    })
-                  }
+                    });
+                    // Keep the hovered image visible
+                  }}
                 >
                   <TextAnimation
                     originalColor="rgba(192, 202, 201, 1)"
