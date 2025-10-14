@@ -113,7 +113,6 @@ export default function Nav(props: NavProps) {
                   duplicateColor="rgba(241, 241, 241, 1)"
                   text="PRODUCT"
                   navSlideTrigger={productTriggerSignal()}
-                  disableHover={props.isMenuOpen}
                 />
                 <div
                   ref={workUnderlineRef!}
@@ -148,7 +147,6 @@ export default function Nav(props: NavProps) {
                   duplicateColor="rgba(241, 241, 241, 1)"
                   text="SERVICES"
                   navSlideTrigger={servicesTriggerSignal()}
-                  disableHover={props.isMenuOpen}
                 />
                 <div
                   ref={servicesUnderlineRef!}
@@ -186,7 +184,6 @@ export default function Nav(props: NavProps) {
                   duplicateColor="rgba(241, 241, 241, 1)"
                   text="ABOUT"
                   navSlideTrigger={aboutTriggerSignal()}
-                  disableHover={props.isMenuOpen}
                 />
                 <div
                   ref={aboutUnderlineRef!}
@@ -221,7 +218,6 @@ export default function Nav(props: NavProps) {
                   duplicateColor="rgba(241, 241, 241, 1)"
                   text="CONTACT"
                   navSlideTrigger={contactTriggerSignal()}
-                  disableHover={props.isMenuOpen}
                 />
                 <div
                   ref={contactUnderlineRef!}
