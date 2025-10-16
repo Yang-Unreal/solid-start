@@ -211,6 +211,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     if (
                       nextImageRef &&
                       currentImageRef &&
+                      new URL(currentImageRef.src).pathname !== item.image &&
                       !imageTl?.isActive()
                     ) {
                       if (imageTl) imageTl.kill();
