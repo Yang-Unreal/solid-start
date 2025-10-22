@@ -1,5 +1,6 @@
 import { For, createEffect, onMount } from "solid-js";
 import gsap from "gsap";
+import { CustomEase } from "gsap/CustomEase";
 import TextAnimation from "../TextAnimation";
 
 type MenuDrawerProps = {
@@ -47,6 +48,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let hoverTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let currentIsFinal = false;
 
+  CustomEase.create("custom", "M0,0 C0.343,0.923 0.137,1.011 1,1 ");
+
   const startTransition = (isFinal = false) => {
     if (imageQueue.length === 0 && !lastQueued) return;
     if (!currentImageRef || !nextImageRef) return;
@@ -71,7 +74,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     nextImageRef.alt = itemToAnimate.alt;
     gsap.set(nextImageRef, { y: "100%", opacity: 0 });
 
-    const duration = isFinal ? 0.4 : 0.1; // faster for queued, normal for final
+    const duration = 0.3; // faster for queued, normal for final
 
     imageTl = gsap.timeline({
       onComplete: () => {
@@ -99,7 +102,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         y: "0%",
         opacity: 1,
         duration,
-        ease: "power3.inOut",
+        ease: "custom",
       })
       .to(
         currentImageRef,
@@ -107,7 +110,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           y: "-100%",
           opacity: 0,
           duration,
-          ease: "power3.inOut",
+          ease: "custom",
         },
         "<"
       );
