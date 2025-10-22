@@ -42,7 +42,76 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let currentImageRef: HTMLImageElement | undefined;
   let nextImageRef: HTMLImageElement | undefined;
   let imageTl: gsap.core.Timeline | undefined;
+  let imageQueue: { image: string; alt: string }[] = [];
+  let lastQueued: { image: string; alt: string } | null = null;
+  let hoverTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  let currentIsFinal = false;
 
+  const startTransition = (isFinal = false) => {
+    if (imageQueue.length === 0 && !lastQueued) return;
+    if (!currentImageRef || !nextImageRef) return;
+
+    currentIsFinal = isFinal;
+
+    // Kill any active timeline for final animation to ensure normal speed
+    if (isFinal && imageTl) {
+      imageTl.kill();
+    }
+
+    const itemToAnimate =
+      imageQueue.length > 0 ? imageQueue.shift()! : lastQueued!;
+    lastQueued = null;
+
+    if (new URL(currentImageRef.src).pathname === itemToAnimate.image) {
+      startTransition(isFinal); // skip if same, process next
+      return;
+    }
+
+    nextImageRef.src = itemToAnimate.image;
+    nextImageRef.alt = itemToAnimate.alt;
+    gsap.set(nextImageRef, { y: "100%", opacity: 0 });
+
+    const duration = isFinal ? 0.4 : 0.1; // faster for queued, normal for final
+
+    imageTl = gsap.timeline({
+      onComplete: () => {
+        const tempSrc = currentImageRef!.src;
+        const tempAlt = currentImageRef!.alt;
+        currentImageRef!.src = nextImageRef!.src;
+        currentImageRef!.alt = nextImageRef!.alt;
+        nextImageRef!.src = tempSrc;
+        nextImageRef!.alt = tempAlt;
+
+        gsap.set(currentImageRef, { y: "0%", opacity: 1 });
+        gsap.set(nextImageRef, {
+          y: "100%",
+          opacity: 0,
+        });
+
+        if (imageQueue.length > 0) {
+          startTransition(false); // continue with fast speed
+        }
+      },
+    });
+
+    imageTl
+      .to(nextImageRef, {
+        y: "0%",
+        opacity: 1,
+        duration,
+        ease: "power3.inOut",
+      })
+      .to(
+        currentImageRef,
+        {
+          y: "-100%",
+          opacity: 0,
+          duration,
+          ease: "power3.inOut",
+        },
+        "<"
+      );
+  };
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
       gsap.set([column1, column2, column3, column4], {
@@ -208,44 +277,34 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       transformOrigin: "0% 50%",
                       duration: 0.3,
                     });
+
+                    if (!currentImageRef) return;
+
+                    const isAlreadyQueued = imageQueue.some(
+                      (queued) => queued.image === item.image
+                    );
+                    const isCurrentImage =
+                      new URL(currentImageRef.src).pathname === item.image;
+
                     if (
-                      nextImageRef &&
-                      currentImageRef &&
-                      new URL(currentImageRef.src).pathname !== item.image &&
-                      !imageTl?.isActive()
+                      isAlreadyQueued ||
+                      (isCurrentImage && (!imageTl || !imageTl.isActive()))
                     ) {
-                      if (imageTl) imageTl.kill();
-                      nextImageRef.src = item.image;
-                      nextImageRef.alt = item.label;
-                      gsap.set(nextImageRef, { y: "100%" });
-                      imageTl = gsap.timeline();
-                      imageTl.to(nextImageRef, {
-                        y: "0%",
-                        opacity: 1,
-                        duration: 0.2,
-                        ease: "power3.inOut",
-                      });
-                      imageTl.to(
-                        currentImageRef,
-                        {
-                          y: "-100%",
-                          opacity: 0,
-                          duration: 0.2,
-                          ease: "power3.inOut",
-                        },
-                        0
-                      );
-                      imageTl.add(() => {
-                        // Swap images
-                        const tempSrc = currentImageRef.src;
-                        const tempAlt = currentImageRef.alt;
-                        currentImageRef.src = nextImageRef.src;
-                        currentImageRef.alt = nextImageRef.alt;
-                        nextImageRef.src = tempSrc;
-                        nextImageRef.alt = tempAlt;
-                        gsap.set(currentImageRef, { y: "0%", opacity: 1 });
-                        gsap.set(nextImageRef, { y: "100%", opacity: 0 });
-                      });
+                      return;
+                    }
+
+                    imageQueue.push({ image: item.image, alt: item.label });
+
+                    // Clear any pending final animation
+                    if (hoverTimeoutId) {
+                      clearTimeout(hoverTimeoutId);
+                      hoverTimeoutId = null;
+                    }
+
+                    if (imageTl && imageTl.isActive() && !currentIsFinal) {
+                      imageTl.timeScale(5); // speed up more, but not if it's the final animation
+                    } else {
+                      startTransition();
                     }
                   }}
                   onMouseLeave={() => {
@@ -254,7 +313,16 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       transformOrigin: "100% 50%",
                       duration: 0.3,
                     });
-                    // Keep the hovered image visible
+
+                    // On leave, schedule final animation if queue has items
+                    if (imageQueue.length > 0 && !hoverTimeoutId) {
+                      lastQueued = imageQueue[imageQueue.length - 1]!;
+                      imageQueue = [];
+                      hoverTimeoutId = setTimeout(() => {
+                        startTransition(true); // final with normal speed
+                        hoverTimeoutId = null;
+                      }, 100); // small delay to allow for quick re-hover
+                    }
                   }}
                 >
                   <TextAnimation
