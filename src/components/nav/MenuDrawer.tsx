@@ -48,7 +48,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let hoverTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let currentIsFinal = false;
 
-  CustomEase.create("custom", "M0,0 C0.343,0.923 0.137,1.011 1,1 ");
+  CustomEase.create("slideUp", "M0,0 C0.343,0.923 0.137,1.011 1,1 ");
 
   const startTransition = (isFinal = false) => {
     if (imageQueue.length === 0 && !lastQueued) return;
@@ -74,7 +74,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     nextImageRef.alt = itemToAnimate.alt;
     gsap.set(nextImageRef, { y: "100%", opacity: 0 });
 
-    const duration = 0.3; // faster for queued, normal for final
+    const duration = 0.3;
 
     imageTl = gsap.timeline({
       onComplete: () => {
@@ -102,7 +102,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         y: "0%",
         opacity: 1,
         duration,
-        ease: "custom",
+        ease: "slideUp",
       })
       .to(
         currentImageRef,
@@ -110,7 +110,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           y: "-100%",
           opacity: 0,
           duration,
-          ease: "custom",
+          ease: "slideUp",
         },
         "<"
       );
