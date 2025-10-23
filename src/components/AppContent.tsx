@@ -1,14 +1,26 @@
-import { Suspense, createSignal } from "solid-js";
+import { Suspense, createSignal, onMount } from "solid-js";
 import Nav from "./nav/Nav";
 import MenuDrawer from "./nav/MenuDrawer";
 import MenuButton from "./nav/MenuButton";
 import { useAuth } from "~/context/AuthContext";
 import Preloader from "./Preloader";
+import gsap from "gsap/all";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { CustomEase } from "gsap/CustomEase";
 
 export function AppContent(props: { children: any }) {
   const [isMenuOpen, setIsMenuOpen] = createSignal(false);
   const [menuButtonRef, setMenuButtonRef] = createSignal<HTMLElement>();
   const { session, handleLogoutSuccess } = useAuth();
+
+  onMount(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(CustomEase);
+
+    // Create custom easings
+    CustomEase.create("custom", "M0,0 C0.25,0.1 0.25,1 1,1");
+    CustomEase.create("slideUp", "M0,0 C0.343,0.923 0.137,1.011 1,1 ");
+  });
 
   return (
     <>
@@ -37,7 +49,7 @@ export function AppContent(props: { children: any }) {
         onClick={() => setIsMenuOpen(false)}
         aria-hidden={!isMenuOpen()}
       />
-      <main class="flex-grow">
+      <main class="grow">
         <Suspense fallback={null}>{props.children}</Suspense>
       </main>
     </>

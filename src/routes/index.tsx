@@ -3,7 +3,6 @@
 import { Meta, Title } from "@solidjs/meta";
 import { onMount } from "solid-js";
 import gsap from "gsap/all";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import Footer from "~/components/Footer";
 
@@ -12,8 +11,6 @@ export default function Home() {
   let partnerRef: HTMLSpanElement | undefined;
 
   onMount(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
     const commonScrollTrigger = {
       trigger: ".hero",
       start: "top -1%",

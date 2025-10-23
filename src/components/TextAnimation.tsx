@@ -16,10 +16,6 @@ export default function TextAnimation(props: TextAnimationProps) {
   let duplicateRef: HTMLSpanElement | undefined;
   const [displayText, setDisplayText] = createSignal(props.text);
 
-  onMount(() => {
-    CustomEase.create("custom", "M0,0 C0.25,0.1 0.25,1 1,1");
-  });
-
   const animateEnter = () => {
     gsap.to(originalRef!, {
       y: "-100%",

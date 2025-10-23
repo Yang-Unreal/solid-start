@@ -48,8 +48,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let hoverTimeoutId: ReturnType<typeof setTimeout> | null = null;
   let currentIsFinal = false;
 
-  CustomEase.create("slideUp", "M0,0 C0.343,0.923 0.137,1.011 1,1 ");
-
   const startTransition = (isFinal = false) => {
     if (imageQueue.length === 0 && !lastQueued) return;
     if (!currentImageRef || !nextImageRef) return;
