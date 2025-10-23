@@ -60,7 +60,7 @@ export default function Home() {
           loop
           class="absolute inset-0 w-full h-full object-cover -z-10"
           src="https://minio.limingcn.com/solid-start/byd-3.webm"
-          poster="https://minio.limingcn.com/solid-start/poster.webp"
+          poster="https://minio.limingcn.com/solid-start/poster-1.webp"
         ></video>
         <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
         <h1

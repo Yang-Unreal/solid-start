@@ -9,7 +9,7 @@ const videosToUpload = [
     contentType: "video/webm",
   },
   {
-    key: "poster.webp",
+    key: "poster-1.webp",
     contentType: "image/webp",
   },
 ];
