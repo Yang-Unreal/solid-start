@@ -225,10 +225,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
             y: "100%",
             rotation: -12,
             transformOrigin: "100% 0%",
-            duration: 0.4,
+            duration: 0.3,
             ease: "slideUp",
           },
-          "-=0.4"
+          "-=0.4.5"
         );
       }
       currentTl.to(
@@ -299,6 +299,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                 <a
                   href={item.href}
                   class="relative block text-8xl font-formula-bold"
+                  onClick={() => props.onClose?.()}
                   onMouseEnter={() => {
                     gsap.to(underlineRefs[index()]!, {
                       scaleX: 1,

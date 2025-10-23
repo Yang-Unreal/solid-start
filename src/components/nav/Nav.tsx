@@ -83,7 +83,7 @@ export default function Nav(props: NavProps) {
 
   return (
     <>
-      <nav class={` fixed  w-full z-[60]  transition-all duration-200    `}>
+      <nav class={` fixed  w-full z-60  transition-all duration-200    `}>
         <div class={` relative flex   bg-transparent text-white`}>
           <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 lg:px-6 lg:py-6 overflow-hidden">
             <div class="overflow-hidden">
@@ -154,7 +154,18 @@ export default function Nav(props: NavProps) {
                 ></div>
               </A>
             </div>
-            <A href="/" aria-label="Homepage" title="Homepage">
+            <A
+              href="/"
+              aria-label="Homepage"
+              title="Homepage"
+              onClick={(e) => {
+                if (props.isMenuOpen) {
+                  e.preventDefault();
+                  props.setIsMenuOpen(false);
+                  navigate("/");
+                }
+              }}
+            >
               <YourLogo class="h-4 xl:h-5 w-auto text-gray" />
             </A>
             <div class="overflow-hidden">
