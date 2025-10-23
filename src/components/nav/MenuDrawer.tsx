@@ -127,7 +127,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       if (currentImageRef) {
         currentImageRef.src = navLinks[0].image;
         currentImageRef.alt = navLinks[0].label;
-        gsap.set(currentImageRef, { opacity: 1 });
+        gsap.set(currentImageRef, { y: "100%", opacity: 1 });
       }
     }
   });
@@ -137,16 +137,15 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
     if (currentTl) currentTl.kill();
 
-    // Update default image based on current route
-    const currentPath = window.location.pathname;
-    const currentLink =
-      navLinks.find((link) => link.href === currentPath) || navLinks[0];
-    if (currentImageRef && currentLink) {
-      currentImageRef.src = currentLink.image;
-      currentImageRef.alt = currentLink.label;
-    }
-
     if (props.isOpen) {
+      // Update default image based on current route when opening
+      const currentPath = window.location.pathname;
+      const currentLink =
+        navLinks.find((link) => link.href === currentPath) || navLinks[0];
+      if (currentImageRef && currentLink) {
+        currentImageRef.src = currentLink.image;
+        currentImageRef.alt = currentLink.label;
+      }
       gsap.set(menuContainer, { display: "block" });
       currentTl = gsap.timeline();
       currentTl.to([column1, column2, column3, column4], {
@@ -164,10 +163,23 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           transformOrigin: "100% 0%",
           duration: 0.4,
           stagger: 0.05,
-          ease: "power3.inOut",
+          ease: "back.out(1)",
         },
         "-=0.2"
       );
+      if (currentImageRef) {
+        currentTl.to(
+          currentImageRef,
+          {
+            y: "0%",
+            rotation: 0,
+            transformOrigin: "100% 0%",
+            duration: 0.3,
+            ease: "slideUp",
+          },
+          "<-0.05"
+        );
+      }
       currentTl.to(
         [addressRef, contactRef],
         {
@@ -176,7 +188,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           transformOrigin: "0% 0%",
           duration: 0.4,
           stagger: 0.05,
-          ease: "power3.inOut",
+          ease: "back.out(1)",
         },
         "-=0.4"
       );
@@ -192,7 +204,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         transformOrigin: "100% 0%",
         duration: 0.4,
         stagger: 0.05,
-        ease: "power3.inOut",
+        ease: "back.out(1)",
       });
       currentTl.to(
         [addressRef, contactRef],
@@ -202,10 +214,23 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           transformOrigin: "0% 0%",
           duration: 0.4,
           stagger: 0.05,
-          ease: "power3.inOut",
+          ease: "back.out(1)",
         },
         "-=0.4"
       );
+      if (currentImageRef) {
+        currentTl.to(
+          currentImageRef,
+          {
+            y: "100%",
+            rotation: -12,
+            transformOrigin: "100% 0%",
+            duration: 0.4,
+            ease: "slideUp",
+          },
+          "-=0.4"
+        );
+      }
       currentTl.to(
         [column1, column2, column3, column4],
         {
