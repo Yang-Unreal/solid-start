@@ -221,7 +221,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   });
 
   return (
-    <div ref={menuContainer} class="fixed inset-0 z-[50]">
+    <div ref={menuContainer} class="fixed inset-0 z-50">
       {/* Background Columns */}
       <div class="absolute inset-0">
         <div
