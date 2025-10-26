@@ -42,64 +42,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let currentImageRef: HTMLImageElement | undefined;
   let nextImageRef: HTMLImageElement | undefined;
   let imageTl: gsap.core.Timeline | undefined;
-  let pendingItem: { image: string; alt: string } | undefined;
-
-  const startTransition = () => {
-    if (!pendingItem) return;
-    if (!currentImageRef || !nextImageRef) return;
-
-    const itemToAnimate = pendingItem;
-    pendingItem = undefined;
-
-    if (new URL(currentImageRef.src).pathname === itemToAnimate.image) {
-      return;
-    }
-
-    nextImageRef.src = itemToAnimate.image;
-    nextImageRef.alt = itemToAnimate.alt;
-    gsap.set(nextImageRef, { y: "100%", opacity: 0 });
-
-    const duration = 0.4;
-
-    imageTl = gsap.timeline({
-      onComplete: () => {
-        const tempSrc = currentImageRef!.src;
-        const tempAlt = currentImageRef!.alt;
-        currentImageRef!.src = nextImageRef!.src;
-        currentImageRef!.alt = nextImageRef!.alt;
-        nextImageRef!.src = tempSrc;
-        nextImageRef!.alt = tempAlt;
-
-        gsap.set(currentImageRef, { y: "0%", opacity: 1 });
-        gsap.set(nextImageRef, {
-          y: "100%",
-          opacity: 0,
-        });
-
-        if (pendingItem) {
-          startTransition();
-        }
-      },
-    });
-
-    imageTl
-      .to(nextImageRef, {
-        y: "0%",
-        opacity: 1,
-        duration,
-        ease: "slideUp",
-      })
-      .to(
-        currentImageRef,
-        {
-          y: "-100%",
-          opacity: 0,
-          duration,
-          ease: "slideUp",
-        },
-        "<"
-      );
-  };
   onMount(() => {
     if (column1 && column2 && column3 && column4 && menuContainer) {
       gsap.set([column1, column2, column3, column4], {
@@ -292,27 +234,58 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       duration: 0.3,
                     });
 
-                    if (!currentImageRef) return;
+                    if (!currentImageRef || !nextImageRef) return;
+
+                    if (imageTl && imageTl.isActive()) {
+                      imageTl.progress(1);
+                    }
 
                     const targetItem = { image: item.image, alt: item.label };
-                    const isCurrentImage =
-                      new URL(currentImageRef.src).pathname ===
-                      targetItem.image;
 
-                    if (isCurrentImage && (!imageTl || !imageTl.isActive())) {
+                    if (
+                      new URL(currentImageRef.src).pathname === targetItem.image
+                    ) {
                       return;
                     }
 
-                    if (imageTl && imageTl.isActive()) {
-                      const fastScale = 10;
-                      imageTl.timeScale(fastScale);
-                    }
+                    nextImageRef.src = targetItem.image;
+                    nextImageRef.alt = targetItem.alt;
+                    gsap.set(nextImageRef, { y: "100%", opacity: 0 });
 
-                    pendingItem = targetItem;
+                    const duration = 0.4;
 
-                    if (!imageTl || !imageTl.isActive()) {
-                      startTransition();
-                    }
+                    imageTl = gsap.timeline({
+                      onComplete: () => {
+                        currentImageRef!.src = nextImageRef!.src;
+                        currentImageRef!.alt = nextImageRef!.alt;
+
+                        gsap.set(currentImageRef, { y: "0%", opacity: 1 });
+                        gsap.set(nextImageRef, {
+                          y: "100%",
+                          opacity: 0,
+                          src: "",
+                          alt: "",
+                        });
+                      },
+                    });
+
+                    imageTl
+                      .to(nextImageRef, {
+                        y: "0%",
+                        opacity: 1,
+                        duration,
+                        ease: "slideUp",
+                      })
+                      .to(
+                        currentImageRef,
+                        {
+                          y: "-100%",
+                          opacity: 0,
+                          duration,
+                          ease: "slideUp",
+                        },
+                        "<"
+                      );
                   }}
                   onMouseLeave={() => {
                     gsap.to(underlineRefs[index()]!, {
