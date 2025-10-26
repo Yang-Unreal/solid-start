@@ -56,7 +56,7 @@ export default function MenuButton(props: MenuButtonProps) {
     }
   });
   return (
-    <div class="fixed bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-[80]">
+    <div class="fixed bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-80">
       <button
         ref={(el) => {
           menuButtonRef = el;
@@ -120,7 +120,7 @@ export default function MenuButton(props: MenuButtonProps) {
             </div>
           </div>
           <div class="bg-gray px-2 xl:px-2.5 h-8.5 xl:h-10 flex justify-center items-center font-formula-bold text-base xl:text-xl">
-            <span class="transform translate-y-0.25 transition-opacity duration-300">
+            <span class="transform translate-y-px transition-opacity duration-300">
               <Show when={!props.isMenuOpen}>
                 <TextAnimation
                   originalColor="rgba(0, 21, 20, 1)"

@@ -43,28 +43,18 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let currentImageRef: HTMLImageElement | undefined;
   let nextImageRef: HTMLImageElement | undefined;
   let imageTl: gsap.core.Timeline | undefined;
-  let imageQueue: { image: string; alt: string }[] = [];
-  let lastQueued: { image: string; alt: string } | null = null;
+  let imageQueue: { image: string; alt: string; speed: number }[] = [];
   let hoverTimeoutId: ReturnType<typeof setTimeout> | null = null;
-  let currentIsFinal = false;
+  let lastHoverTime = 0;
 
-  const startTransition = (isFinal = false) => {
-    if (imageQueue.length === 0 && !lastQueued) return;
+  const startTransition = () => {
+    if (imageQueue.length === 0) return;
     if (!currentImageRef || !nextImageRef) return;
 
-    currentIsFinal = isFinal;
-
-    // Kill any active timeline for final animation to ensure normal speed
-    if (isFinal && imageTl) {
-      imageTl.kill();
-    }
-
-    const itemToAnimate =
-      imageQueue.length > 0 ? imageQueue.shift()! : lastQueued!;
-    lastQueued = null;
+    const itemToAnimate = imageQueue.shift()!;
 
     if (new URL(currentImageRef.src).pathname === itemToAnimate.image) {
-      startTransition(isFinal); // skip if same, process next
+      if (imageQueue.length > 0) startTransition(); // skip if same, process next
       return;
     }
 
@@ -90,10 +80,14 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         });
 
         if (imageQueue.length > 0) {
-          startTransition(false); // continue with fast speed
+          startTransition(); // continue with next item in queue
+        } else {
+          lastHoverTime = 0; // Reset for the next interaction
         }
       },
     });
+
+    imageTl.timeScale(itemToAnimate.speed);
 
     imageTl
       .to(nextImageRef, {
@@ -290,7 +284,23 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
       {/* Foreground Text */}
       <div class="relative flex h-full items-center justify-center text-white ">
-        <ul class="flex flex-col items-center  text-center md:flex-row md:space-x-20 overflow-hidden">
+        <ul
+          class="flex flex-col items-center  text-center md:flex-row md:space-x-20 overflow-hidden"
+          onMouseLeave={() => {
+            if (hoverTimeoutId) clearTimeout(hoverTimeoutId);
+
+            hoverTimeoutId = setTimeout(() => {
+              if (imageQueue.length > 0) {
+                // Mark the last item in the queue to run at normal speed.
+                const lastItem = imageQueue[imageQueue.length - 1];
+                if (lastItem) {
+                  lastItem.speed = 1;
+                }
+              }
+              hoverTimeoutId = null;
+            }, 100);
+          }}
+        >
           <For each={navLinks}>
             {(item, index) => (
               <li ref={(el) => (linkRefs[index()] = el)}>
@@ -320,16 +330,37 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       return;
                     }
 
-                    imageQueue.push({ image: item.image, alt: item.label });
-
                     // Clear any pending final animation
                     if (hoverTimeoutId) {
                       clearTimeout(hoverTimeoutId);
                       hoverTimeoutId = null;
                     }
 
-                    if (imageTl && imageTl.isActive() && !currentIsFinal) {
-                      imageTl.timeScale(5); // speed up more, but not if it's the final animation
+                    const now = Date.now();
+                    const delta = lastHoverTime > 0 ? now - lastHoverTime : 500;
+                    lastHoverTime = now;
+
+                    const minDelta = 50;
+                    const maxDelta = 300;
+                    const minTimeScale = 1;
+                    const maxTimeScale = 10;
+
+                    const clampedDelta = Math.max(
+                      minDelta,
+                      Math.min(delta, maxDelta)
+                    );
+                    const t = (clampedDelta - minDelta) / (maxDelta - minDelta);
+                    const timeScale =
+                      maxTimeScale + (minTimeScale - maxTimeScale) * t;
+
+                    imageQueue.push({
+                      image: item.image,
+                      alt: item.label,
+                      speed: timeScale,
+                    });
+
+                    if (imageTl && imageTl.isActive()) {
+                      imageTl.timeScale(timeScale);
                     } else {
                       startTransition();
                     }
@@ -340,16 +371,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       transformOrigin: "100% 50%",
                       duration: 0.3,
                     });
-
-                    // On leave, schedule final animation if queue has items
-                    if (imageQueue.length > 0 && !hoverTimeoutId) {
-                      lastQueued = imageQueue[imageQueue.length - 1]!;
-                      imageQueue = [];
-                      hoverTimeoutId = setTimeout(() => {
-                        startTransition(true); // final with normal speed
-                        hoverTimeoutId = null;
-                      }, 100); // small delay to allow for quick re-hover
-                    }
                   }}
                 >
                   <TextAnimation
