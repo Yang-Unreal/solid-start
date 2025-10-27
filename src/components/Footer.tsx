@@ -2,7 +2,7 @@ import type { Component } from "solid-js";
 
 const Footer: Component = () => {
   return (
-    <footer class="bg-black text-white py-12 container-padding">
+    <footer class="bg-dark text-white py-12 container-padding">
       <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
         {/* Company Info */}
         <div>

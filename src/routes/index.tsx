@@ -50,18 +50,18 @@ export default function Home() {
         content="LIMING offers bespoke sourcing and product procurement from China. We simplify the process, eliminate risk, and offer the Apex Collection of curated products."
       />
 
-      <section class="hero h-svh flex items-center justify-center relative text-light-white">
+      <section class="hero h-svh flex items-center justify-center relative text-light-white bg-dark">
         <video
           autoplay
           muted
           loop
-          class="absolute inset-0 w-full h-full object-cover -z-10"
+          class="absolute inset-0 w-full h-full object-cover "
           src="https://minio.limingcn.com/solid-start/byd-3.webm"
           poster="https://minio.limingcn.com/solid-start/poster-1.webp"
         ></video>
-        <div class="absolute inset-0 bg-gray-800 opacity-30 mix-blend-multiply -z-5"></div>
+        <div class="absolute inset-0 bg-gray-800 opacity-30 mix-blend-multiply z-1"></div>
         <h1
-          class="font-formula-bold leading-none absolute bottom-[25%] md:landscape:bottom-[25%] xl:landscape:bottom-[20%] text-[clamp(1.5rem,17vw,5rem)] sm:landscape:text-[clamp(2rem,8vw,4rem)] md:landscape:text-[clamp(2rem,10vw,6rem)] lg:landscape:text-[clamp(2rem,9vw,10rem)] 2xl:text-[10rem] text-center"
+          class="font-formula-bold leading-none absolute bottom-[25%] md:landscape:bottom-[25%] xl:landscape:bottom-[20%] text-[clamp(1.5rem,17vw,5rem)] sm:landscape:text-[clamp(2rem,8vw,4rem)] md:landscape:text-[clamp(2rem,10vw,6rem)] lg:landscape:text-[clamp(2rem,9vw,10rem)] 2xl:text-[10rem] text-center z-2"
           style="word-spacing: -0.12em;"
         >
           <span class="block sm:inline">YOUR </span>
@@ -77,7 +77,7 @@ export default function Home() {
           <span class="block sm:inline">FOR CHINA </span>
           <span class="block sm:inline">SOURCING</span>
         </h1>
-        <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold">
+        <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold z-2">
           <div>
             <span class="text-sm xl:text-xl text-gray">LIMING AGENCY</span>
             <h4 class="text-xl xl:text-3xl text-light-white">
@@ -92,8 +92,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <div class="h-screen bg-white w-full"></div>
-      <div class="h-screen bg-black w-full"></div>
+      <section class="h-screen bg-dark w-full"></section>
+      <section class="h-screen bg-light w-full"></section>
       <Footer />
     </main>
   );

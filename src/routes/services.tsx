@@ -1,3 +1,9 @@
 export default function Services() {
-  return <main class=" bg-white min-h-screen"></main>;
+  return (
+    <main>
+      <section class=" bg-light min-h-screen"></section>
+      <section class=" bg-dark min-h-screen"></section>
+      <section class=" bg-light min-h-screen"></section>
+    </main>
+  );
 }
