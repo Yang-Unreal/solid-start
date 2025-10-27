@@ -59,9 +59,9 @@ export default function Home() {
           src="https://minio.limingcn.com/solid-start/byd-3.webm"
           poster="https://minio.limingcn.com/solid-start/poster-1.webp"
         ></video>
-        <div class="absolute inset-0 bg-black opacity-30 -z-5"></div>
+        <div class="absolute inset-0 bg-gray-800 opacity-30 mix-blend-multiply -z-5"></div>
         <h1
-          class="font-formula-bold leading-none absolute bottom-[25%] md:landscape:bottom-[25%] xl:landscape:bottom-[20%] text-[clamp(1.5rem,17vw,5rem)] sm:landscape:text-[clamp(2rem,8vw,4rem)] md:landscape:text-[clamp(2rem,10vw,6rem)] lg:landscape:text-[clamp(2rem,10vw,10rem)] 2xl:text-[10rem] text-center"
+          class="font-formula-bold leading-none absolute bottom-[25%] md:landscape:bottom-[25%] xl:landscape:bottom-[20%] text-[clamp(1.5rem,17vw,5rem)] sm:landscape:text-[clamp(2rem,8vw,4rem)] md:landscape:text-[clamp(2rem,10vw,6rem)] lg:landscape:text-[clamp(2rem,9vw,10rem)] 2xl:text-[10rem] text-center"
           style="word-spacing: -0.12em;"
         >
           <span class="block sm:inline">YOUR </span>
