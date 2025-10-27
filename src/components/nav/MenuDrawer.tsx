@@ -213,7 +213,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           ref={nextImageRef}
           src=""
           alt=""
-          class="absolute w-full h-full object-cover opacity-0"
+          class="absolute w-full h-full object-cover translate-y-full"
         />
       </div>
 
@@ -250,19 +250,18 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
                     nextImageRef.src = targetItem.image;
                     nextImageRef.alt = targetItem.alt;
-                    gsap.set(nextImageRef, { y: "100%", opacity: 0 });
+                    gsap.set(nextImageRef, { y: "100%" });
 
-                    const duration = 0.4;
+                    const duration = 0.6;
 
                     imageTl = gsap.timeline({
                       onComplete: () => {
                         currentImageRef!.src = nextImageRef!.src;
                         currentImageRef!.alt = nextImageRef!.alt;
 
-                        gsap.set(currentImageRef, { y: "0%", opacity: 1 });
+                        gsap.set(currentImageRef, { y: "0%" });
                         gsap.set(nextImageRef, {
                           y: "100%",
-                          opacity: 0,
                           src: "",
                           alt: "",
                         });
@@ -272,7 +271,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     imageTl
                       .to(nextImageRef, {
                         y: "0%",
-                        opacity: 1,
                         duration,
                         ease: "slideUp",
                       })
@@ -280,7 +278,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                         currentImageRef,
                         {
                           y: "-100%",
-                          opacity: 0,
                           duration,
                           ease: "slideUp",
                         },
