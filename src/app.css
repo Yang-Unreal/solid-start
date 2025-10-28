@@ -179,7 +179,17 @@ html::-webkit-scrollbar {
   }
 
   .container-padding {
-    @apply px-4;
+    @apply mx-auto my-0;
+    padding-left: calc(clamp(5em, 7.5vw, 7.5em) * 0.2);
+    padding-right: calc(clamp(5em, 7.5vw, 7.5em) * 0.2);
+  }
+
+  .nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: calc(clamp(5em, 7.5vw, 7.5em) * 0.2);
   }
 
   .font-formula-bold {

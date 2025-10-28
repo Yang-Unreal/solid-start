@@ -182,7 +182,7 @@ export default function Nav(props: NavProps) {
   return (
     <nav class={`fixed w-full z-60 transition-all duration-200`}>
       <div class={`relative flex bg-transparent text-white`}>
-        <div class="absolute font-formula-bold text-2xl leading-none top-0 left-0 right-0 flex justify-between items-center p-3 lg:px-6 lg:py-6 overflow-hidden">
+        <div class="font-formula-bold text-2xl leading-none flex justify-between items-center nav overflow-hidden">
           <div class="overflow-hidden">
             <A
               ref={productLinkRef}
