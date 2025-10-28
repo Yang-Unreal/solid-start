@@ -141,6 +141,7 @@ export default function Nav(props: NavProps) {
   createEffect(() => {
     if (props.isMenuOpen) {
       lenisControls?.stop();
+      setLogoColorClass("text-gray");
       gsap.to([productLinkRef, servicesLinkRef, aboutLinkRef, contactLinkRef], {
         y: "-100%",
         rotate: -12,
@@ -161,6 +162,19 @@ export default function Nav(props: NavProps) {
         duration: 0.4,
         ease: "power3.inOut",
         stagger: 0.05,
+      });
+
+      // Reset logo color based on current section
+      const sections = document.querySelectorAll("main section");
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top <= 0 && rect.bottom > 0) {
+          if (section.classList.contains("bg-light")) {
+            setLogoColorClass("text-darkgray");
+          } else {
+            setLogoColorClass("text-gray");
+          }
+        }
       });
     }
   });

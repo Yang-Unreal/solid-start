@@ -25,13 +25,6 @@ export default createHandler((event) => {
               media="(prefers-color-scheme: dark)"
             />
 
-            {/* <link
-              rel="preload"
-              href="https://minio.limingcn.com/solid-start/fonts/PermanentMarker-Regular.woff2"
-              as="font"
-              type="font/woff2"
-              crossorigin=""
-            /> */}
             <link
               rel="preload"
               href="https://minio.limingcn.com/solid-start/fonts/Inconsolata-Regular.woff2"

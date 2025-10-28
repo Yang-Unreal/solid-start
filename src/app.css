@@ -1,23 +1,6 @@
-/* src/app.css */
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-/* @import url("https://fonts.googleapis.com/css2?family=Inconsolata&display=swap"); */
 @import "tailwindcss";
 @import "lenis/dist/lenis.css";
 
-/* @font-face {
-  font-family: "Permanent Marker";
-  src: url("https://minio.limingcn.com/solid-start/fonts/PermanentMarker-Regular.woff2")
-    format("woff2");
-  font-weight: normal;
-  font-style: normal;
-  font-display: block;
-} */
 @font-face {
   font-family: "Inconsolata";
   src: url("https://minio.limingcn.com/solid-start/fonts/Inconsolata-Regular.woff2")
@@ -199,11 +182,6 @@ html::-webkit-scrollbar {
     @apply px-4;
   }
 
-  /* .nav-container::before {
-    content: "";
-    @apply absolute inset-0 -z-10 backdrop-blur-lg rounded-full;
-  } */
-
   .font-formula-bold {
     font-family: "FormulaCondensed-Bold", sans-serif;
   }
@@ -211,10 +189,7 @@ html::-webkit-scrollbar {
   /* .font-formula-light {
     font-family: "FormulaCondensed-Light", sans-serif;
   }
-
-  .font-permanent-marker {
-    font-family: "Permanent Marker", cursive;
-  } */
+*/
 
   .font-inconsolata {
     font-family: "Inconsolata", monospace;
@@ -262,16 +237,6 @@ html::-webkit-scrollbar {
       padding-right: 16px;
     }
   }
-
-  /* .stripe-container {
-    visibility: visible;
-  }
-
-  @media (max-width: 1024px) {
-    .stripe-container {
-      visibility: hidden;
-    }
-  } */
 
   .menu-icon {
     display: flex;

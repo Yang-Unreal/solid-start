@@ -42,13 +42,6 @@ export function AppContent(props: { children: any }) {
         session={session}
         menuButtonRef={menuButtonRef()}
       />
-      <div
-        class={`fixed inset-0 bg-black/80 z-30 transition-opacity duration-300 ${
-          isMenuOpen() ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
-        onClick={() => setIsMenuOpen(false)}
-        aria-hidden={!isMenuOpen()}
-      />
       <main class="grow">
         <Suspense fallback={null}>{props.children}</Suspense>
       </main>
