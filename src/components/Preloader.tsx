@@ -142,6 +142,8 @@ export default function Preloader() {
             class="column absolute h-full bg-dark z-10"
             style="left: 75%; width: 26%;"
           ></div>
+        </div>
+        <div class="absolute inset-0">
           <div
             class="column2 absolute h-full bg-darkgray"
             style="left: 0%; width: 26%;"
