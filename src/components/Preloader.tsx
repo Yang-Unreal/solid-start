@@ -14,7 +14,7 @@ export default function Preloader() {
     if (typeof window === "undefined") return;
 
     if (!preloaderRef || !logoContainerRef) return;
-    lenis?.scrollTo(0);
+    lenis?.lenis.scrollTo(0);
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -122,7 +122,7 @@ export default function Preloader() {
     <Show when={showPreloader()}>
       <div
         ref={preloaderRef}
-        class="fixed left-0 top-0 z-[90] h-[100svh] w-screen flex justify-center items-center overflow-hidden"
+        class="fixed left-0 top-0 z-90 h-svh w-screen flex justify-center items-center overflow-hidden"
       >
         {/* Background columns */}
         <div class="absolute inset-0">

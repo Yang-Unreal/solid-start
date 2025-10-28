@@ -1,6 +1,7 @@
 import { For, createEffect, onMount } from "solid-js";
 import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
+import { useLenis } from "~/context/LenisContext";
 
 type MenuDrawerProps = {
   isOpen: boolean;
@@ -11,6 +12,7 @@ type MenuDrawerProps = {
 };
 
 const MenuDrawer = (props: MenuDrawerProps) => {
+  const lenis = useLenis();
   let column1: HTMLDivElement | undefined;
   let column2: HTMLDivElement | undefined;
   let column3: HTMLDivElement | undefined;
@@ -62,6 +64,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   createEffect(() => {
     if (!column1 || !column2 || !column3 || !column4 || !menuContainer) return;
 
+    console.log("Lenis instance:", lenis);
+
     if (currentTl) currentTl.kill();
 
     if (props.isOpen) {
@@ -74,6 +78,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         currentImageRef.alt = currentLink.label;
       }
       gsap.set(menuContainer, { display: "block" });
+      console.log("Stopping lenis scroll");
+      lenis?.stop();
       currentTl = gsap.timeline();
       currentTl.to([column1, column2, column3, column4], {
         y: "0%",
@@ -123,6 +129,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       currentTl = gsap.timeline({
         onComplete: () => {
           gsap.set(menuContainer, { display: "none" });
+          console.log("Starting lenis scroll");
+          lenis?.start();
         },
       });
       currentTl.to(linkRefs, {

@@ -1,34 +1,63 @@
+// src/context/LenisContext.tsx
+
 import { createContext, onMount, useContext } from "solid-js";
 import Lenis from "lenis";
 import { isServer } from "solid-js/web";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-export const LenisContext = createContext<Lenis | undefined>();
+// Define a type for our context value for better type safety
+interface LenisContextValue {
+  lenis: Lenis;
+  start: () => void;
+  stop: () => void;
+}
+
+// Create the context with the new type
+export const LenisContext = createContext<LenisContextValue | undefined>();
 
 export function useLenis() {
   return useContext(LenisContext);
 }
 
 export function LenisProvider(props: { children: any }) {
-  let lenis: Lenis | undefined;
+  let lenisInstance: LenisContextValue | undefined;
+
+  if (!isServer) {
+    const instance = new Lenis();
+
+    // Define the ticker function separately so we can add/remove it by reference
+    const raf = (time: number) => {
+      instance.raf(time * 1000);
+    };
+
+    // Create the robust control functions
+    const start = () => {
+      gsap.ticker.add(raf);
+    };
+
+    const stop = () => {
+      gsap.ticker.remove(raf);
+    };
+
+    instance.on("scroll", ScrollTrigger.update);
+    gsap.ticker.lagSmoothing(0);
+
+    // Build the object that our context will provide
+    lenisInstance = {
+      lenis: instance,
+      start,
+      stop,
+    };
+  }
 
   onMount(() => {
-    if (!isServer) {
-      lenis = new Lenis();
-
-      lenis.on("scroll", ScrollTrigger.update);
-
-      gsap.ticker.add((time) => {
-        lenis!.raf(time * 1000);
-      });
-
-      gsap.ticker.lagSmoothing(0);
-    }
+    // Start the animation loop when the component mounts
+    lenisInstance?.start();
   });
 
   return (
-    <LenisContext.Provider value={lenis}>
+    <LenisContext.Provider value={lenisInstance}>
       {props.children}
     </LenisContext.Provider>
   );
