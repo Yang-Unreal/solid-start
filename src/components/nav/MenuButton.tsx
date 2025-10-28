@@ -113,7 +113,7 @@ export default function MenuButton(props: MenuButtonProps) {
       >
         <div class="flex justify-center items-center">
           <div class="bg-dark px-2.5 h-8.5 xl:h-10 flex justify-center items-center">
-            <div class="menu-icon gap-0.5 xl:gap-1 text-yellow-300">
+            <div class="menu-icon gap-0.5 xl:gap-1 text-primary">
               <span ref={line1Ref} class="line line1 w-3 xl:w-5"></span>
               <span ref={line2Ref} class="line line2 w-3 xl:w-5"></span>
               <span ref={line3Ref} class="line line3 w-3 xl:w-5"></span>
