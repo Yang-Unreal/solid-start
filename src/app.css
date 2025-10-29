@@ -211,6 +211,32 @@ html::-webkit-scrollbar {
     display: flex;
   }
 
+  .loading-container .logo {
+    width: calc(var(--title-size) * 2);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    opacity: 1;
+    z-index: 550;
+  }
+
+  .transition-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 100;
+    pointer-events: none;
+    display: flex;
+  }
+
   .product-grid {
     justify-content: center;
   }
