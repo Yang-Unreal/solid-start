@@ -1,65 +1,118 @@
-import { createSignal, createEffect } from "solid-js";
+// src/components/TransitionContainer.tsx
+
+import { createEffect } from "solid-js";
+import { useNavigate } from "@solidjs/router";
 import gsap from "gsap";
 import { useTransition } from "~/context/TransitionContext";
 
 export default function TransitionContainer() {
-  const { trigger, setTrigger, isAnimating, setIsAnimating } = useTransition();
+  const {
+    isAnimating,
+    setIsAnimating,
+    pendingPath,
+    setPendingPath,
+    transitionType,
+  } = useTransition();
+  const navigate = useNavigate();
   let containerRef: HTMLDivElement | undefined;
 
-  const animateTransition = () => {
-    if (!containerRef || isAnimating()) return;
-
-    setIsAnimating(true);
-    const columns2 = containerRef.querySelectorAll(".column2");
-
-    if (columns2) {
+  const animatePreloader = () => {
+    if (!containerRef) return;
+    const columns = containerRef.querySelectorAll(".column");
+    if (columns) {
+      gsap.set(columns, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        y: "0%",
+      });
       const tl = gsap.timeline({
         onComplete: () => {
           setIsAnimating(false);
-          setTrigger(false);
+        },
+      });
+      tl.to(columns, {
+        y: "-100%",
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
+        duration: 0.6,
+        ease: "circ.inOut",
+        stagger: 0.03,
+      });
+    }
+  };
+
+  const animateNavigation = (path: string) => {
+    if (!containerRef) return;
+    const columns = containerRef.querySelectorAll(".column");
+    if (columns) {
+      // FIX: Instantly set the columns to their starting position to prevent flash
+      gsap.set(columns, { y: "100%" });
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setIsAnimating(false);
+          setPendingPath(null);
         },
       });
 
+      // Animate IN
       tl.fromTo(
-        columns2,
+        columns,
         {
-          y: 0,
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+          clipPath: "polygon(0% 8%, 100% 0%, 100% 100%, 0% 100%)",
         },
         {
-          y: "-100vh",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
+          y: "0%",
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
           duration: 0.6,
           ease: "circ.inOut",
           stagger: 0.03,
         }
-      );
+      )
+        .call(() => {
+          navigate(path);
+        })
+        // Animate OUT
+        .to(columns, {
+          y: "-100%",
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
+          duration: 0.6,
+          ease: "circ.inOut",
+          stagger: 0.03,
+        });
     }
   };
 
   createEffect(() => {
-    if (trigger()) {
-      animateTransition();
-      setTrigger(false);
+    if (isAnimating()) {
+      if (transitionType() === "preloader") {
+        animatePreloader();
+      } else {
+        const path = pendingPath();
+        if (path) {
+          animateNavigation(path);
+        }
+      }
     }
   });
 
   return (
-    <div ref={containerRef} class="transition-container absolute inset-0">
+    <div
+      ref={containerRef}
+      class="transition-container pointer-events-none fixed inset-0 z-50"
+    >
       <div
-        class="column2 absolute h-full bg-darkgray rounded"
+        class="column absolute h-full bg-darkgray"
         style="left: 0%; width: 26%;"
       ></div>
       <div
-        class="column2 absolute h-full bg-darkgray rounded"
+        class="column absolute h-full bg-darkgray"
         style="left: 25%; width: 26%;"
       ></div>
       <div
-        class="column2 absolute h-full bg-darkgray rounded"
+        class="column absolute h-full bg-darkgray"
         style="left: 50%; width: 26%;"
       ></div>
       <div
-        class="column2 absolute h-full bg-darkgray rounded"
+        class="column absolute h-full bg-darkgray"
         style="left: 75%; width: 26%;"
       ></div>
     </div>
