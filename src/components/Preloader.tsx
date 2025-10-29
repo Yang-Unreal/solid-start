@@ -137,10 +137,22 @@ export default function Preloader() {
       >
         {/* Background columns */}
         <div class="loading-container absolute inset-0">
-          <div class="column relative h-full w-full bg-dark z-10"></div>
-          <div class="column relative h-full w-full bg-dark z-10"></div>
-          <div class="column relative h-full w-full bg-dark z-10"></div>
-          <div class="column relative h-full w-full bg-dark z-10"></div>
+          <div
+            class="column absolute h-full bg-dark z-10"
+            style="left: 0%; width: 26%;"
+          ></div>
+          <div
+            class="column absolute h-full bg-dark z-10"
+            style="left: 25%; width: 26%;"
+          ></div>
+          <div
+            class="column absolute h-full bg-dark z-10"
+            style="left: 50%; width: 26%;"
+          ></div>
+          <div
+            class="column absolute h-full bg-dark z-10"
+            style="left: 75%; width: 26%;"
+          ></div>
           <div ref={logoContainerRef} class="logo">
             <YourLogo class="h-auto w-full text-gray" />
             <YourLogo class="h-auto w-full text-light absolute invisible" />
@@ -173,10 +185,22 @@ export default function Preloader() {
           </div>
         </div>
         <div class="transition-container absolute inset-0">
-          <div class="column2 relative h-full w-full bg-darkgray"></div>
-          <div class="column2 relative h-full w-full bg-darkgray"></div>
-          <div class="column2 relative h-full w-full bg-darkgray"></div>
-          <div class="column2 relative h-full w-full bg-darkgray"></div>
+          <div
+            class="column2 absolute h-full bg-darkgray"
+            style="left: 0%; width: 26%;"
+          ></div>
+          <div
+            class="column2 absolute h-full bg-darkgray"
+            style="left: 25%; width: 26%;"
+          ></div>
+          <div
+            class="column2 absolute h-full bg-darkgray"
+            style="left: 50%; width: 26%;"
+          ></div>
+          <div
+            class="column2 absolute h-full bg-darkgray"
+            style="left: 75%; width: 26%;"
+          ></div>
         </div>
       </div>
     </Show>
