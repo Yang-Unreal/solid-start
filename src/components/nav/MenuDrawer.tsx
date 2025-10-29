@@ -64,8 +64,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   createEffect(() => {
     if (!column1 || !column2 || !column3 || !column4 || !menuContainer) return;
 
-    console.log("Lenis instance:", lenis);
-
     if (currentTl) currentTl.kill();
 
     if (props.isOpen) {
@@ -78,7 +76,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         currentImageRef.alt = currentLink.label;
       }
       gsap.set(menuContainer, { display: "block" });
-      console.log("Stopping lenis scroll");
+
       lenis?.stop();
       currentTl = gsap.timeline();
       currentTl.to([column1, column2, column3, column4], {
@@ -129,7 +127,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       currentTl = gsap.timeline({
         onComplete: () => {
           gsap.set(menuContainer, { display: "none" });
-          console.log("Starting lenis scroll");
+
           lenis?.start();
         },
       });
