@@ -224,6 +224,23 @@ html::-webkit-scrollbar {
     opacity: 1;
     z-index: 550;
   }
+  .loading-container .copyright-row {
+    position: absolute;
+    display: flex;
+    bottom: calc(var(--gap) * 2);
+    left: 0px;
+    width: 100%;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 550;
+  }
+  .copyright-visual {
+    display: flex;
+    position: relative;
+    justify-content: flex-start;
+    max-width: 14em;
+    width: 14em;
+  }
 
   .transition-container {
     position: fixed;

@@ -2,7 +2,7 @@ import { createSignal, onMount, Show } from "solid-js";
 import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
 import YourLogo from "./logo/YourLogo";
-
+import MobileLogo from "./logo/MobileLogo";
 export default function Preloader() {
   const [showPreloader, setShowPreloader] = createSignal(true);
 
@@ -139,8 +139,34 @@ export default function Preloader() {
             style="left: 75%; width: 26%;"
           ></div>
           <div ref={logoContainerRef} class="logo">
-            <YourLogo class="h-auto w-full text-gray-400" />
-            <YourLogo class="h-auto w-full text-white absolute invisible" />
+            <YourLogo class="h-auto w-full text-gray" />
+            <YourLogo class="h-auto w-full text-light absolute invisible" />
+          </div>
+          <div class="copyright-row">
+            <div class="copyright-visual">
+              <div
+                class="aspect-square h-full border border-gray/25 flex justify-center items-center"
+                style="border-radius: 0 var(--border-radius) var(--border-radius) 0;"
+              >
+                <MobileLogo class="text-gray/25 w-10 h-auto" />
+              </div>
+              <div
+                class="flex flex-col border border-gray/25 border-l-0 text-gray/25"
+                style="border-radius: 0 var(--border-radius) var(--border-radius) 0;"
+              >
+                <div class="flex border-b border-gray/25  justify-center items-center py-[0.3em] px-[0.35em] font-formula-bold uppercase">
+                  <h4 class="text-[1rem] leading-[1.1] tracking-[0.02em]">
+                    2025 © All rights reserved
+                  </h4>
+                </div>
+                <div class="flex  justify-center items-center py-[0.4em] px-[0.3em] text-center overflow-hidden min-h-[1.72em]">
+                  <p class="text-[0.425em]">
+                    LIMING is a Export Company specializing in Used Car Parallel
+                    Exports from China.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="transition-container absolute inset-0">
