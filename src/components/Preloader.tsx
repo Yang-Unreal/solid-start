@@ -8,6 +8,7 @@ export default function Preloader() {
 
   let preloaderRef: HTMLDivElement | undefined;
   let logoContainerRef: HTMLDivElement | undefined;
+  let copyrightRef: HTMLDivElement | undefined;
   const lenis = useLenis();
 
   onMount(() => {
@@ -51,10 +52,24 @@ export default function Preloader() {
       tl.to([grayLogoRef, whiteLogoRef2], {
         rotation: 2,
         transformOrigin: "100% 100%",
-        y: "-170%",
-        duration: 0.6,
-        ease: "circ.inOut",
+        y: "-100%",
+        duration: 0.4,
+        ease: "circ.in",
       });
+    }
+
+    // Animate copyright container
+    if (copyrightRef) {
+      tl.to(
+        copyrightRef,
+        {
+          scale: 0.9,
+          opacity: 0,
+          duration: 0.6,
+          ease: "circ.inOut",
+        },
+        "<"
+      );
     }
 
     // Animate columns slide up
@@ -69,7 +84,7 @@ export default function Preloader() {
           y: "-100vh",
           duration: 0.6,
           ease: "circ.inOut",
-          stagger: 0.02,
+          stagger: 0.03,
         },
         "<0.2"
       );
@@ -79,7 +94,7 @@ export default function Preloader() {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 92%, 0% 100%)",
           duration: 0.6,
           ease: "circ.inOut",
-          stagger: 0.02,
+          stagger: 0.03,
         },
         "<"
       );
@@ -97,7 +112,7 @@ export default function Preloader() {
           y: "-100vh",
           duration: 0.6,
           ease: "circ.inOut",
-          stagger: 0.02,
+          stagger: 0.03,
         },
         ">-0.4"
       );
@@ -107,7 +122,7 @@ export default function Preloader() {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
           duration: 0.6,
           ease: "circ.inOut",
-          stagger: 0.02,
+          stagger: 0.03,
         },
         "<"
       );
@@ -142,7 +157,7 @@ export default function Preloader() {
             <YourLogo class="h-auto w-full text-gray" />
             <YourLogo class="h-auto w-full text-light absolute invisible" />
           </div>
-          <div class="copyright-row">
+          <div ref={copyrightRef} class="copyright-row">
             <div class="copyright-visual">
               <div
                 class="aspect-square h-full border border-gray/25 flex justify-center items-center"
