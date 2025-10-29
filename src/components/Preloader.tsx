@@ -138,19 +138,19 @@ export default function Preloader() {
         {/* Background columns */}
         <div class="loading-container absolute inset-0">
           <div
-            class="column absolute h-full bg-dark z-10"
+            class="column absolute h-full bg-dark rounded"
             style="left: 0%; width: 26%;"
           ></div>
           <div
-            class="column absolute h-full bg-dark z-10"
+            class="column absolute h-full bg-dark rounded"
             style="left: 25%; width: 26%;"
           ></div>
           <div
-            class="column absolute h-full bg-dark z-10"
+            class="column absolute h-full bg-dark rounded"
             style="left: 50%; width: 26%;"
           ></div>
           <div
-            class="column absolute h-full bg-dark z-10"
+            class="column absolute h-full bg-dark rounded"
             style="left: 75%; width: 26%;"
           ></div>
           <div ref={logoContainerRef} class="logo">
@@ -186,19 +186,19 @@ export default function Preloader() {
         </div>
         <div class="transition-container absolute inset-0">
           <div
-            class="column2 absolute h-full bg-darkgray"
+            class="column2 absolute h-full bg-darkgray rounded"
             style="left: 0%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-darkgray"
+            class="column2 absolute h-full bg-darkgray rounded"
             style="left: 25%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-darkgray"
+            class="column2 absolute h-full bg-darkgray rounded"
             style="left: 50%; width: 26%;"
           ></div>
           <div
-            class="column2 absolute h-full bg-darkgray"
+            class="column2 absolute h-full bg-darkgray rounded"
             style="left: 75%; width: 26%;"
           ></div>
         </div>
