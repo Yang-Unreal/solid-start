@@ -5,47 +5,24 @@ import {
   type ParentComponent,
 } from "solid-js";
 
-type TransitionType = "preloader" | "navigation";
-
 interface TransitionContextType {
+  trigger: () => boolean;
+  setTrigger: (value: boolean) => void;
   isAnimating: () => boolean;
-  pendingPath: () => string | null;
-  transitionType: () => TransitionType;
-  startTransition: (path: string) => void;
-  triggerPreloader: () => void;
   setIsAnimating: (value: boolean) => void;
-  setPendingPath: (path: string | null) => void;
 }
 
 const TransitionContext = createContext<TransitionContextType>();
 
 export const TransitionProvider: ParentComponent = (props) => {
+  const [trigger, setTrigger] = createSignal(false);
   const [isAnimating, setIsAnimating] = createSignal(false);
-  const [pendingPath, setPendingPath] = createSignal<string | null>(null);
-  const [transitionType, setTransitionType] =
-    createSignal<TransitionType>("preloader");
-
-  const startTransition = (path: string) => {
-    if (isAnimating()) return;
-    setTransitionType("navigation");
-    setIsAnimating(true);
-    setPendingPath(path);
-  };
-
-  const triggerPreloader = () => {
-    if (isAnimating()) return;
-    setTransitionType("preloader");
-    setIsAnimating(true);
-  };
 
   const value: TransitionContextType = {
+    trigger,
+    setTrigger,
     isAnimating,
-    pendingPath,
-    transitionType,
-    startTransition,
-    triggerPreloader,
     setIsAnimating,
-    setPendingPath,
   };
 
   return (

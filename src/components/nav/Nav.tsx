@@ -2,7 +2,6 @@
 
 import { A, useLocation, useNavigate, useIsRouting } from "@solidjs/router";
 import { createEffect, createSignal, onMount } from "solid-js";
-import { useTransition } from "~/context/TransitionContext";
 import YourLogo from "~/components/logo/YourLogo";
 import TextAnimation from "~/components/TextAnimation";
 import gsap from "gsap";
@@ -17,7 +16,6 @@ interface NavProps {
 }
 
 export default function Nav(props: NavProps) {
-  const { startTransition } = useTransition();
   const navigate = useNavigate();
   const lenisControls = useLenis();
   const isRouting = useIsRouting();
@@ -190,10 +188,6 @@ export default function Nav(props: NavProps) {
               ref={productLinkRef}
               href="/product"
               class="relative text-xl xl:text-2xl block"
-              onClick={(e) => {
-                e.preventDefault();
-                startTransition("/product");
-              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(workUnderlineRef!, {
@@ -227,10 +221,6 @@ export default function Nav(props: NavProps) {
               ref={servicesLinkRef}
               href="/services"
               class="relative text-xl xl:text-2xl hidden md:block"
-              onClick={(e) => {
-                e.preventDefault();
-                startTransition("/services");
-              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(servicesUnderlineRef!, {
@@ -264,12 +254,10 @@ export default function Nav(props: NavProps) {
             aria-label="Homepage"
             title="Homepage"
             onClick={(e) => {
-              e.preventDefault();
               if (props.isMenuOpen) {
+                e.preventDefault();
                 props.setIsMenuOpen(false);
-                startTransition("/");
-              } else {
-                startTransition("/");
+                navigate("/");
               }
             }}
           >
@@ -282,10 +270,6 @@ export default function Nav(props: NavProps) {
               ref={aboutLinkRef}
               href="/about"
               class="relative text-xl xl:text-2xl hidden md:block"
-              onClick={(e) => {
-                e.preventDefault();
-                startTransition("/about");
-              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(aboutUnderlineRef!, {
@@ -319,10 +303,6 @@ export default function Nav(props: NavProps) {
               ref={contactLinkRef}
               href="/contact"
               class="relative text-xl xl:text-2xl block"
-              onClick={(e) => {
-                e.preventDefault();
-                startTransition("/contact");
-              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(contactUnderlineRef!, {

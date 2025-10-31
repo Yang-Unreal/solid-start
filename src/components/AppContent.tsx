@@ -7,7 +7,6 @@ import Preloader from "./Preloader";
 import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
-import TransitionContainer from "./TransitionContainer";
 
 export function AppContent(props: { children: any }) {
   const [isMenuOpen, setIsMenuOpen] = createSignal(false);
@@ -26,7 +25,6 @@ export function AppContent(props: { children: any }) {
   return (
     <>
       <Preloader />
-      <TransitionContainer />
       <Nav
         isMenuOpen={isMenuOpen()}
         setIsMenuOpen={setIsMenuOpen}
