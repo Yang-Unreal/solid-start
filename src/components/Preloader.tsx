@@ -159,19 +159,19 @@ export default function Preloader() {
       <div class="absolute inset-0 z-10">
         <div
           class="transition-column absolute h-full bg-darkgray"
-          style="left: 0%; width: 26%;"
+          style="left: 0%; width: 26%; transform: translateY(100%);"
         ></div>
         <div
           class="transition-column absolute h-full bg-darkgray"
-          style="left: 25%; width: 26%;"
+          style="left: 25%; width: 26%; transform: translateY(100%);"
         ></div>
         <div
           class="transition-column absolute h-full bg-darkgray"
-          style="left: 50%; width: 26%;"
+          style="left: 50%; width: 26%; transform: translateY(100%);"
         ></div>
         <div
           class="transition-column absolute h-full bg-darkgray"
-          style="left: 75%; width: 26%;"
+          style="left: 75%; width: 26%; transform: translateY(100%);"
         ></div>
       </div>
 
