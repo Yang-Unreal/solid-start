@@ -16,33 +16,6 @@ export default function TransitionContainer() {
   const navigate = useNavigate();
   let containerRef: HTMLDivElement | undefined;
 
-  const animatePreloader = () => {
-    if (!containerRef) return;
-    const columns = containerRef.querySelectorAll(".column");
-    if (columns) {
-      // Set initial state immediately
-      gsap.set(columns, {
-        y: "0%",
-      });
-
-      // Delay the animation start by one frame to prevent race condition
-      gsap.delayedCall(0.02, () => {
-        const tl = gsap.timeline({
-          onComplete: () => {
-            setIsAnimating(false);
-          },
-        });
-        // TEST: Animate only the 'y' property to isolate the problem.
-        tl.to(columns, {
-          y: "-100%",
-          duration: 2,
-          ease: "circ.inOut",
-          stagger: 0.03,
-        });
-      });
-    }
-  };
-
   const animateNavigation = (path: string) => {
     if (!containerRef) return;
     const columns = containerRef.querySelectorAll(".column");
@@ -88,7 +61,9 @@ export default function TransitionContainer() {
   createEffect(() => {
     if (isAnimating()) {
       if (transitionType() === "preloader") {
-        animatePreloader();
+        // This is now handled by Preloader.tsx to avoid race conditions.
+        // We just need to signal that the animation is complete.
+        setIsAnimating(false);
       } else {
         const path = pendingPath();
         if (path) {
@@ -99,7 +74,11 @@ export default function TransitionContainer() {
   });
 
   return (
-    <div ref={containerRef} class="transition-container">
+    <div
+      id="transition-container"
+      ref={containerRef}
+      class="transition-container"
+    >
       <div class="column absolute h-full bg-darkgray top-0 left-0 w-[26%]"></div>
       <div class="column absolute h-full bg-darkgray top-0 left-[25%] w-[26%]"></div>
       <div class="column absolute h-full bg-darkgray top-0 left-[50%] w-[26%]"></div>
