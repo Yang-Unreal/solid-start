@@ -348,4 +348,8 @@ html::-webkit-scrollbar {
     transition: transform 0.3s ease;
     transform-origin: center;
   }
+
+  .initially-in-place {
+    transform: translateY(0%);
+  }
 }
