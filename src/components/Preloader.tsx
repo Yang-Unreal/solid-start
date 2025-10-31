@@ -4,12 +4,11 @@ import { useLenis } from "~/context/LenisContext";
 import { useTransition } from "~/context/TransitionContext";
 import YourLogo from "./logo/YourLogo";
 import MobileLogo from "./logo/MobileLogo";
-// import TransitionContainer from "./TransitionContainer";
+import TransitionContainer from "./TransitionContainer";
 export default function Preloader() {
   const { triggerPreloader, isAnimating } = useTransition();
 
   let preloaderRef: HTMLDivElement | undefined;
-  let containerRef: HTMLDivElement | undefined;
   let logoContainerRef: HTMLDivElement | undefined;
   let copyrightRef: HTMLDivElement | undefined;
   const lenis = useLenis();
@@ -105,7 +104,7 @@ export default function Preloader() {
     // Trigger transition container 0.4 seconds before completion
 
     const transitionColumns = document.querySelectorAll(
-      "#transition-container .column2"
+      "#transition-container .column"
     );
     if (transitionColumns.length > 0) {
       gsap.set(transitionColumns, {
@@ -188,16 +187,6 @@ export default function Preloader() {
             </div>
           </div>
         </div>
-      </div>
-      <div
-        id="transition-container"
-        ref={containerRef}
-        class="transition-container"
-      >
-        <div class="column2 absolute h-full bg-darkgray top-0 left-0 w-[26%]"></div>
-        <div class="column2 absolute h-full bg-darkgray top-0 left-[25%] w-[26%]"></div>
-        <div class="column2 absolute h-full bg-darkgray top-0 left-[50%] w-[26%]"></div>
-        <div class="column2 absolute h-full bg-darkgray top-0 left-[75%] w-[26%]"></div>
       </div>
     </div>
   );
