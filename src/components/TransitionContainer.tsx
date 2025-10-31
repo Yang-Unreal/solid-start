@@ -23,7 +23,6 @@ export default function TransitionContainer() {
       // Set initial state immediately
       gsap.set(columns, {
         y: "0%",
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
       });
 
       // Delay the animation start by one frame to prevent race condition
@@ -33,9 +32,9 @@ export default function TransitionContainer() {
             setIsAnimating(false);
           },
         });
+        // TEST: Animate only the 'y' property to isolate the problem.
         tl.to(columns, {
           y: "-100%",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
           duration: 2,
           ease: "circ.inOut",
           stagger: 0.03,
