@@ -32,7 +32,7 @@ export default function TransitionContainer() {
       tl.to(columns, {
         y: "-100%",
         clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
-        duration: 6,
+        duration: 0.6,
         ease: "circ.inOut",
         stagger: 0.03,
       });
