@@ -98,11 +98,26 @@ export default function TransitionContainer() {
   });
 
   return (
-    <div ref={containerRef} class="transition-container">
-      <div class="column absolute h-full bg-darkgray top-0 left-0 w-[26%]"></div>
-      <div class="column absolute h-full bg-darkgray top-0 left-[25%] w-[26%]"></div>
-      <div class="column absolute h-full bg-darkgray top-0 left-[50%] w-[26%]"></div>
-      <div class="column absolute h-full bg-darkgray top-0 left-[75%] w-[26%]"></div>
+    <div
+      ref={containerRef}
+      class="transition-container pointer-events-none fixed inset-0 z-50"
+    >
+      <div
+        class="column absolute h-full bg-darkgray"
+        style="left: 0%; width: 26%;"
+      ></div>
+      <div
+        class="column absolute h-full bg-darkgray"
+        style="left: 25%; width: 26%;"
+      ></div>
+      <div
+        class="column absolute h-full bg-darkgray"
+        style="left: 50%; width: 26%;"
+      ></div>
+      <div
+        class="column absolute h-full bg-darkgray"
+        style="left: 75%; width: 26%;"
+      ></div>
     </div>
   );
 }
