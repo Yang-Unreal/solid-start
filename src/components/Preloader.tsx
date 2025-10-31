@@ -73,29 +73,20 @@ export default function Preloader() {
     const columns = preloaderRef?.querySelectorAll(".column");
     if (columns) {
       gsap.set(columns, {
-        scale: 1.1,
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        scaleX: 1.1,
+        scaleY: 1.05,
+        transformOrigin: "0% 100%",
       });
       tl.to(
         columns,
         {
-          scale: 1,
           y: "-100vh",
+          rotate: -6,
           duration: 0.6,
           ease: "circ.inOut",
           stagger: 0.03,
         },
         "<0.2"
-      );
-      tl.to(
-        columns,
-        {
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 94%, 0% 100%)",
-          duration: 0.6,
-          ease: "circ.inOut",
-          stagger: 0.03,
-        },
-        "<"
       );
     }
 
@@ -103,29 +94,20 @@ export default function Preloader() {
     const columns2 = preloaderRef?.querySelectorAll(".column2");
     if (columns2) {
       gsap.set(columns2, {
-        scale: 1.1,
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        scaleX: 1.1,
+        scaleY: 1.05,
+        transformOrigin: "100% 100%",
       });
       tl.to(
         columns2,
         {
-          scale: 1,
           y: "-100vh",
+          rotate: 6,
           duration: 0.6,
           ease: "circ.inOut",
           stagger: 0.03,
         },
         ">-0.4"
-      );
-      tl.to(
-        columns2,
-        {
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 94%)",
-          duration: 0.6,
-          ease: "circ.inOut",
-          stagger: 0.03,
-        },
-        "<"
       );
     }
   });
