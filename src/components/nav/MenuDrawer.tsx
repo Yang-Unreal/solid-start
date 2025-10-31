@@ -13,10 +13,7 @@ type MenuDrawerProps = {
 
 const MenuDrawer = (props: MenuDrawerProps) => {
   const lenis = useLenis();
-  let column1: HTMLDivElement | undefined;
-  let column2: HTMLDivElement | undefined;
-  let column3: HTMLDivElement | undefined;
-  let column4: HTMLDivElement | undefined;
+
   let menuContainer: HTMLDivElement | undefined;
 
   const navLinks = [
@@ -45,11 +42,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let nextImageRef: HTMLImageElement | undefined;
   let imageTl: gsap.core.Timeline | undefined;
   onMount(() => {
-    if (column1 && column2 && column3 && column4 && menuContainer) {
-      gsap.set([column1, column2, column3, column4], {
-        y: "100%",
-        clipPath: "polygon(0% 8%, 100% 0%, 100% 100%, 0% 100%)",
-      });
+    if (menuContainer) {
       gsap.set(menuContainer, { display: "none" });
       gsap.set(linkRefs, { y: "100%" });
       gsap.set([addressRef, contactRef], { y: "100%" });
@@ -62,9 +55,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   });
 
   createEffect(() => {
-    if (!column1 || !column2 || !column3 || !column4 || !menuContainer) return;
-
-    console.log("Lenis instance:", lenis);
+    const columns = menuContainer?.querySelectorAll(".column");
+    if (!columns || !menuContainer) return;
 
     if (currentTl) currentTl.kill();
 
@@ -78,12 +70,19 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         currentImageRef.alt = currentLink.label;
       }
       gsap.set(menuContainer, { display: "block" });
-      console.log("Stopping lenis scroll");
+
       lenis?.stop();
+      gsap.set(columns, {
+        scaleX: 1.1,
+        scaleY: 1.05,
+        rotate: -6,
+        y: "100%",
+        transformOrigin: "100% 0%",
+      });
       currentTl = gsap.timeline();
-      currentTl.to([column1, column2, column3, column4], {
+      currentTl.to(columns, {
         y: "0%",
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        rotate: 0,
         duration: 0.4,
         stagger: 0.02,
         ease: "circ.inOut",
@@ -128,8 +127,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     } else {
       currentTl = gsap.timeline({
         onComplete: () => {
-          gsap.set(menuContainer, { display: "none" });
-          console.log("Starting lenis scroll");
           lenis?.start();
         },
       });
@@ -167,10 +164,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         );
       }
       currentTl.to(
-        [column1, column2, column3, column4],
+        columns,
         {
           y: "100%",
-          clipPath: "polygon(0% 8%, 100% 0%, 100% 100%, 0% 100%)",
+          rotate: -6,
           duration: 0.4,
           stagger: 0.02,
           ease: "circ.inOut",
@@ -183,27 +180,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   return (
     <div ref={menuContainer} class="fixed inset-0 z-50">
       {/* Background Columns */}
-      <div class="absolute inset-0">
-        <div
-          ref={column1}
-          class="absolute h-full bg-dark"
-          style="left: 0%; width: 26%;"
-        ></div>
-        <div
-          ref={column2}
-          class="absolute h-full bg-dark"
-          style="left: 25%; width: 26%;"
-        ></div>
-        <div
-          ref={column3}
-          class="absolute h-full bg-dark"
-          style="left: 50%; width: 26%;"
-        ></div>
-        <div
-          ref={column4}
-          class="absolute h-full bg-dark"
-          style="left: 75%; width: 26%;"
-        ></div>
+      <div class="menu-columns">
+        <div class="column flex w-full h-full bg-dark rounded"></div>
+        <div class="column flex w-full h-full bg-dark rounded"></div>
+        <div class="column w-full h-full bg-dark rounded hidden sm:block"></div>
+        <div class="column w-full h-full bg-dark rounded hidden sm:block"></div>
       </div>
 
       {/* Image Container */}

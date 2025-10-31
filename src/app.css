@@ -211,6 +211,17 @@ html::-webkit-scrollbar {
     display: flex;
   }
 
+  .menu-columns {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+  }
+
   .loading-container .logo {
     width: calc(var(--title-size) * 2);
     position: absolute;
