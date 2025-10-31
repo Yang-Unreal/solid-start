@@ -137,22 +137,10 @@ export default function Preloader() {
       >
         {/* Background columns */}
         <div class="loading-container absolute inset-0">
-          <div
-            class="column absolute h-full bg-dark rounded"
-            style="left: 0%; width: 26%;"
-          ></div>
-          <div
-            class="column absolute h-full bg-dark rounded"
-            style="left: 25%; width: 26%;"
-          ></div>
-          <div
-            class="column absolute h-full bg-dark rounded"
-            style="left: 50%; width: 26%;"
-          ></div>
-          <div
-            class="column absolute h-full bg-dark rounded"
-            style="left: 75%; width: 26%;"
-          ></div>
+          <div class="column flex h-full w-full bg-dark rounded"></div>
+          <div class="column flex h-full w-full bg-dark rounded"></div>
+          <div class="column flex h-full w-full bg-dark rounded"></div>
+          <div class="column flex h-full w-full bg-dark rounded"></div>
           <div ref={logoContainerRef} class="logo">
             <YourLogo class="h-auto w-full text-gray" />
             <YourLogo class="h-auto w-full text-light absolute invisible" />
@@ -184,23 +172,11 @@ export default function Preloader() {
             </div>
           </div>
         </div>
-        <div class="transition-container absolute inset-0">
-          <div
-            class="column2 absolute h-full bg-darkgray rounded"
-            style="left: 0%; width: 26%;"
-          ></div>
-          <div
-            class="column2 absolute h-full bg-darkgray rounded"
-            style="left: 25%; width: 26%;"
-          ></div>
-          <div
-            class="column2 absolute h-full bg-darkgray rounded"
-            style="left: 50%; width: 26%;"
-          ></div>
-          <div
-            class="column2 absolute h-full bg-darkgray rounded"
-            style="left: 75%; width: 26%;"
-          ></div>
+        <div class="transition-container">
+          <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
+          <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
+          <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
+          <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
         </div>
       </div>
     </Show>
