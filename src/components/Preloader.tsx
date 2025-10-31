@@ -1,4 +1,4 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { onMount } from "solid-js";
 import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
 import YourLogo from "./logo/YourLogo";
@@ -133,11 +133,11 @@ export default function Preloader() {
   return (
     <div ref={preloaderRef}>
       {/* Background columns */}
-      <div class="loading-container absolute inset-0">
+      <div class="loading-container">
         <div class="column flex h-full w-full bg-dark rounded"></div>
         <div class="column flex h-full w-full bg-dark rounded"></div>
-        <div class="column flex h-full w-full bg-dark rounded"></div>
-        <div class="column flex h-full w-full bg-dark rounded"></div>
+        <div class="column h-full w-full bg-dark rounded hidden sm:block"></div>
+        <div class="column  h-full w-full bg-dark rounded hidden sm:block"></div>
         <div ref={logoContainerRef} class="logo">
           <YourLogo class="h-auto w-full text-gray" />
           <YourLogo class="h-auto w-full text-light absolute invisible" />
@@ -172,8 +172,8 @@ export default function Preloader() {
       <div class="transition-container">
         <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
         <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
-        <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
-        <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
+        <div class="column2 h-full w-full bg-darkgray rounded hidden sm:block"></div>
+        <div class="column2 h-full w-full bg-darkgray rounded hidden sm:block"></div>
       </div>
     </div>
   );

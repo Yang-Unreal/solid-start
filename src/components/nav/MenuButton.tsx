@@ -1,4 +1,4 @@
-import { createSignal, Show, createEffect, onMount } from "solid-js";
+import { createSignal, Show, createEffect } from "solid-js";
 import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
 
@@ -56,7 +56,7 @@ export default function MenuButton(props: MenuButtonProps) {
     }
   });
   return (
-    <div class="fixed bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-80">
+    <div class="fixed bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-200">
       <button
         ref={(el) => {
           menuButtonRef = el;
