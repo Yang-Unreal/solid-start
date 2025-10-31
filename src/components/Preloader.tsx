@@ -1,12 +1,11 @@
 import { createSignal, onMount, Show } from "solid-js";
 import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
-import { useTransition } from "~/context/TransitionContext";
 import YourLogo from "./logo/YourLogo";
 import MobileLogo from "./logo/MobileLogo";
 import TransitionContainer from "./TransitionContainer";
 export default function Preloader() {
-  const { setTrigger, isAnimating } = useTransition();
+  const [triggerTransition, setTriggerTransition] = createSignal(false);
 
   let preloaderRef: HTMLDivElement | undefined;
   let logoContainerRef: HTMLDivElement | undefined;
@@ -103,9 +102,7 @@ export default function Preloader() {
 
     // Trigger transition container 0.4 seconds before completion
     tl.add(() => {
-      if (!isAnimating()) {
-        setTrigger(true);
-      }
+      setTriggerTransition(true);
     }, tl.duration() - 0.4);
   });
 
@@ -163,7 +160,7 @@ export default function Preloader() {
           </div>
         </div>
       </div>
-      <TransitionContainer />
+      <TransitionContainer trigger={triggerTransition} />
     </div>
   );
 }

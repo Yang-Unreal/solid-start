@@ -1,9 +1,12 @@
 import { createSignal, createEffect } from "solid-js";
 import gsap from "gsap";
-import { useTransition } from "~/context/TransitionContext";
 
-export default function TransitionContainer() {
-  const { trigger, setTrigger, isAnimating, setIsAnimating } = useTransition();
+interface TransitionContainerProps {
+  trigger: () => boolean;
+}
+
+export default function TransitionContainer(props: TransitionContainerProps) {
+  const [isAnimating, setIsAnimating] = createSignal(false);
   let containerRef: HTMLDivElement | undefined;
 
   const animateTransition = () => {
@@ -13,34 +16,38 @@ export default function TransitionContainer() {
     const columns2 = containerRef.querySelectorAll(".column2");
 
     if (columns2) {
+      gsap.set(columns2, {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      });
+
       const tl = gsap.timeline({
         onComplete: () => {
           setIsAnimating(false);
-          setTrigger(false);
         },
       });
 
-      tl.fromTo(
+      tl.to(columns2, {
+        y: "-100vh",
+        duration: 0.6,
+        ease: "circ.inOut",
+        stagger: 0.03,
+      });
+      tl.to(
         columns2,
         {
-          y: 0,
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        },
-        {
-          y: "-100vh",
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
           duration: 0.6,
           ease: "circ.inOut",
           stagger: 0.03,
-        }
+        },
+        "<"
       );
     }
   };
 
   createEffect(() => {
-    if (trigger()) {
+    if (props.trigger()) {
       animateTransition();
-      setTrigger(false);
     }
   });
 
