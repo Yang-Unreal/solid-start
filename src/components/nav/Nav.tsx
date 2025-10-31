@@ -23,6 +23,10 @@ export default function Nav(props: NavProps) {
   const isRouting = useIsRouting();
 
   // Refs for animations
+  let workUnderlineRef: HTMLDivElement | undefined;
+  let servicesUnderlineRef: HTMLDivElement | undefined;
+  let aboutUnderlineRef: HTMLDivElement | undefined;
+  let contactUnderlineRef: HTMLDivElement | undefined;
   let productLinkRef: HTMLAnchorElement | undefined;
   let servicesLinkRef: HTMLAnchorElement | undefined;
   let aboutLinkRef: HTMLAnchorElement | undefined;
@@ -190,12 +194,32 @@ export default function Nav(props: NavProps) {
                 e.preventDefault();
                 startTransition("/product");
               }}
+              onMouseEnter={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(workUnderlineRef!, {
+                    scaleX: 1,
+                    transformOrigin: "0% 50%",
+                    duration: 0.3,
+                  });
+              }}
+              onMouseLeave={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(workUnderlineRef!, {
+                    scaleX: 0,
+                    transformOrigin: "100% 50%",
+                    duration: 0.3,
+                  });
+              }}
             >
               <TextAnimation
                 originalColor={navColors().originalColor}
                 duplicateColor={navColors().duplicateColor}
                 text="PRODUCT"
               />
+              <div
+                ref={workUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
           </div>
           <div class="overflow-hidden">
@@ -207,12 +231,32 @@ export default function Nav(props: NavProps) {
                 e.preventDefault();
                 startTransition("/services");
               }}
+              onMouseEnter={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(servicesUnderlineRef!, {
+                    scaleX: 1,
+                    transformOrigin: "0% 50%",
+                    duration: 0.3,
+                  });
+              }}
+              onMouseLeave={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(servicesUnderlineRef!, {
+                    scaleX: 0,
+                    transformOrigin: "100% 50%",
+                    duration: 0.3,
+                  });
+              }}
             >
               <TextAnimation
                 originalColor={navColors().originalColor}
                 duplicateColor={navColors().duplicateColor}
                 text="SERVICES"
               />
+              <div
+                ref={servicesUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
           </div>
           <A
@@ -242,12 +286,32 @@ export default function Nav(props: NavProps) {
                 e.preventDefault();
                 startTransition("/about");
               }}
+              onMouseEnter={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(aboutUnderlineRef!, {
+                    scaleX: 1,
+                    transformOrigin: "0% 50%",
+                    duration: 0.3,
+                  });
+              }}
+              onMouseLeave={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(aboutUnderlineRef!, {
+                    scaleX: 0,
+                    transformOrigin: "100% 50%",
+                    duration: 0.3,
+                  });
+              }}
             >
               <TextAnimation
                 originalColor={navColors().originalColor}
                 duplicateColor={navColors().duplicateColor}
                 text="ABOUT"
               />
+              <div
+                ref={aboutUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
           </div>
           <div class="overflow-hidden">
@@ -259,12 +323,32 @@ export default function Nav(props: NavProps) {
                 e.preventDefault();
                 startTransition("/contact");
               }}
+              onMouseEnter={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(contactUnderlineRef!, {
+                    scaleX: 1,
+                    transformOrigin: "0% 50%",
+                    duration: 0.3,
+                  });
+              }}
+              onMouseLeave={() => {
+                if (!props.isMenuOpen)
+                  gsap.to(contactUnderlineRef!, {
+                    scaleX: 0,
+                    transformOrigin: "100% 50%",
+                    duration: 0.3,
+                  });
+              }}
             >
               <TextAnimation
                 originalColor={navColors().originalColor}
                 duplicateColor={navColors().duplicateColor}
                 text="CONTACT"
               />
+              <div
+                ref={contactUnderlineRef!}
+                class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+              ></div>
             </A>
           </div>
         </div>
