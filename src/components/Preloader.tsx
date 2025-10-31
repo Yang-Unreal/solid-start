@@ -102,36 +102,45 @@ export default function Preloader() {
     }
 
     // Trigger transition container 0.4 seconds before completion
-
-    const transitionColumns = document.querySelectorAll(
-      "#transition-container .column"
-    );
-    if (transitionColumns.length > 0) {
-      gsap.set(transitionColumns, {
-        y: "0%",
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      });
-      tl.to(
-        transitionColumns,
-        {
+    tl.add(() => {
+      const transitionColumns = document.querySelectorAll(
+        "#transition-container .column"
+      );
+      if (transitionColumns.length > 0) {
+        gsap.set(transitionColumns, {
+          y: "0%",
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        });
+        const transitionTl = gsap.timeline({
+          onComplete: () => {
+            if (!isAnimating()) {
+              triggerPreloader(); // Signal completion
+            }
+          },
+        });
+        transitionTl.to(transitionColumns, {
           y: "-100%",
-          duration: 0.6,
+          duration: 2,
           ease: "circ.inOut",
           stagger: 0.03,
-        },
-        ">-0.4"
-      );
-      tl.to(
-        transitionColumns,
-        {
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
-          duration: 0.6,
-          ease: "circ.inOut",
-          stagger: 0.03,
-        },
-        "<"
-      );
-    }
+        });
+        transitionTl.to(
+          transitionColumns,
+          {
+            clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
+            duration: 2,
+            ease: "circ.inOut",
+            stagger: 0.03,
+          },
+          "<"
+        );
+      } else {
+        // Fallback if columns not found
+        if (!isAnimating()) {
+          triggerPreloader();
+        }
+      }
+    }, tl.duration() - 0.4);
   });
 
   return (
