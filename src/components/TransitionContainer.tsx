@@ -20,26 +20,26 @@ export default function TransitionContainer() {
     if (!containerRef) return;
     const columns = containerRef.querySelectorAll(".column");
     if (columns) {
-      // Set initial state immediately
+      // Explicitly set the initial state to ensure the browser has it.
       gsap.set(columns, {
         y: "0%",
         clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
       });
 
-      // Delay the animation start by one frame to prevent race condition
-      gsap.delayedCall(0.02, () => {
-        const tl = gsap.timeline({
-          onComplete: () => {
-            setIsAnimating(false);
-          },
-        });
-        tl.to(columns, {
-          y: "-100%",
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
-          duration: 2,
-          ease: "circ.inOut",
-          stagger: 0.03,
-        });
+      const tl = gsap.timeline({
+        // Add a minimal delay to allow the browser to paint the initial state.
+        delay: 0.02,
+        onComplete: () => {
+          setIsAnimating(false);
+        },
+      });
+
+      tl.to(columns, {
+        y: "-100%",
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
+        duration: 2,
+        ease: "circ.inOut",
+        stagger: 0.03,
       });
     }
   };
@@ -89,7 +89,7 @@ export default function TransitionContainer() {
   createEffect(() => {
     if (isAnimating()) {
       if (transitionType() === "preloader") {
-        animatePreloader();
+        // animatePreloader();
       } else {
         const path = pendingPath();
         if (path) {
