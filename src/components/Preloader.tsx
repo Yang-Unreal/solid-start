@@ -1,33 +1,33 @@
-import { createSignal, onMount, Show } from "solid-js";
+import { onMount } from "solid-js";
 import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
 import { useTransition } from "~/context/TransitionContext";
 import YourLogo from "./logo/YourLogo";
 import MobileLogo from "./logo/MobileLogo";
-// import TransitionContainer from "./TransitionContainer";
+
 export default function Preloader() {
-  const { triggerPreloader, isAnimating } = useTransition();
+  const { triggerPreloader } = useTransition();
 
   let preloaderRef: HTMLDivElement | undefined;
-  let containerRef: HTMLDivElement | undefined;
   let logoContainerRef: HTMLDivElement | undefined;
   let copyrightRef: HTMLDivElement | undefined;
   const lenis = useLenis();
 
   onMount(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || !preloaderRef || !logoContainerRef)
+      return;
 
-    if (!preloaderRef || !logoContainerRef) return;
     lenis?.lenis.scrollTo(0);
 
-    const tl = gsap.timeline({
+    const masterTl = gsap.timeline({
       onComplete: () => {
         lenis?.start();
+        triggerPreloader(); // Signal that the entire preloader sequence is complete
       },
     });
 
-    // Animate reveal from left to right using clip-path
-    const whiteLogoRef = logoContainerRef?.querySelector(
+    // --- Logo Animation ---
+    const whiteLogoRef = logoContainerRef.querySelector(
       "svg:last-child"
     ) as SVGSVGElement;
     if (whiteLogoRef) {
@@ -35,7 +35,7 @@ export default function Preloader() {
         clipPath: "inset(0 100% 0 0)",
         visibility: "hidden",
       });
-      tl.to(whiteLogoRef, {
+      masterTl.to(whiteLogoRef, {
         clipPath: "inset(0 0% 0 0)",
         visibility: "visible",
         duration: 1,
@@ -43,15 +43,11 @@ export default function Preloader() {
       });
     }
 
-    // Rotate and slide up logos
-    const grayLogoRef = logoContainerRef?.querySelector(
+    const grayLogoRef = logoContainerRef.querySelector(
       "svg:first-child"
     ) as SVGSVGElement;
-    const whiteLogoRef2 = logoContainerRef?.querySelector(
-      "svg:last-child"
-    ) as SVGSVGElement;
-    if (grayLogoRef && whiteLogoRef2) {
-      tl.to([grayLogoRef, whiteLogoRef2], {
+    if (grayLogoRef && whiteLogoRef) {
+      masterTl.to([grayLogoRef, whiteLogoRef], {
         rotation: 2,
         transformOrigin: "100% 100%",
         y: "-100%",
@@ -60,9 +56,8 @@ export default function Preloader() {
       });
     }
 
-    // Animate copyright container
     if (copyrightRef) {
-      tl.to(
+      masterTl.to(
         copyrightRef,
         {
           scale: 0.9,
@@ -74,14 +69,18 @@ export default function Preloader() {
       );
     }
 
-    // Animate columns slide up
-    const columns = preloaderRef?.querySelectorAll(".column");
-    if (columns) {
-      gsap.set(columns, {
+    // --- Column Animations ---
+    const loadingColumns = preloaderRef.querySelectorAll(".loading-column");
+    const transitionColumns =
+      preloaderRef.querySelectorAll(".transition-column");
+
+    // Animate loading columns (dark)
+    if (loadingColumns.length > 0) {
+      gsap.set(loadingColumns, {
         clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
       });
-      tl.to(
-        columns,
+      masterTl.to(
+        loadingColumns,
         {
           y: "-100vh",
           duration: 0.6,
@@ -90,8 +89,8 @@ export default function Preloader() {
         },
         "<0.2"
       );
-      tl.to(
-        columns,
+      masterTl.to(
+        loadingColumns,
         {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 92%, 0% 100%)",
           duration: 0.6,
@@ -102,17 +101,13 @@ export default function Preloader() {
       );
     }
 
-    // Trigger transition container 0.4 seconds before completion
-
-    const transitionColumns = document.querySelectorAll(
-      "#transition-container .column2"
-    );
+    // Animate transition columns (darkgray)
     if (transitionColumns.length > 0) {
       gsap.set(transitionColumns, {
         y: "0%",
         clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
       });
-      tl.to(
+      masterTl.to(
         transitionColumns,
         {
           y: "-100%",
@@ -120,9 +115,9 @@ export default function Preloader() {
           ease: "circ.inOut",
           stagger: 0.03,
         },
-        ">-0.4"
+        "-=0.4" // Overlap with the end of the previous animation
       );
-      tl.to(
+      masterTl.to(
         transitionColumns,
         {
           clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
@@ -138,31 +133,55 @@ export default function Preloader() {
   return (
     <div
       ref={preloaderRef}
-      class="loading-container justify-center items-center"
+      class="loading-container justify-center items-center pointer-events-auto"
     >
-      {/* Background columns */}
-      <div class="loading-container absolute inset-0">
+      {/* Dark Loading Columns (from original Preloader) */}
+      <div class="absolute inset-0 z-20">
         <div
-          class="column absolute h-full bg-dark rounded"
+          class="loading-column absolute h-full bg-dark rounded"
           style="left: 0%; width: 26%;"
         ></div>
         <div
-          class="column absolute h-full bg-dark rounded"
+          class="loading-column absolute h-full bg-dark rounded"
           style="left: 25%; width: 26%;"
         ></div>
         <div
-          class="column absolute h-full bg-dark rounded"
+          class="loading-column absolute h-full bg-dark rounded"
           style="left: 50%; width: 26%;"
         ></div>
         <div
-          class="column absolute h-full bg-dark rounded"
+          class="loading-column absolute h-full bg-dark rounded"
           style="left: 75%; width: 26%;"
         ></div>
+      </div>
+
+      {/* Darkgray Transition Columns (from original TransitionContainer) */}
+      <div class="absolute inset-0 z-10">
+        <div
+          class="transition-column absolute h-full bg-darkgray"
+          style="left: 0%; width: 26%; transform: translateY(100%);"
+        ></div>
+        <div
+          class="transition-column absolute h-full bg-darkgray"
+          style="left: 25%; width: 26%; transform: translateY(100%);"
+        ></div>
+        <div
+          class="transition-column absolute h-full bg-darkgray"
+          style="left: 50%; width: 26%; transform: translateY(100%);"
+        ></div>
+        <div
+          class="transition-column absolute h-full bg-darkgray"
+          style="left: 75%; width: 26%; transform: translateY(100%);"
+        ></div>
+      </div>
+
+      {/* UI Elements */}
+      <div class="absolute z-21">
         <div ref={logoContainerRef} class="logo">
           <YourLogo class="h-auto w-full text-gray" />
           <YourLogo class="h-auto w-full text-light absolute invisible" />
         </div>
-        <div ref={copyrightRef} class="copyright-row">
+        <div ref={copyrightRef} class="copyright-row absolute z-50">
           <div class="copyright-visual">
             <div
               class="aspect-square h-full border border-gray/25 flex justify-center items-center"
@@ -174,12 +193,12 @@ export default function Preloader() {
               class="flex flex-col border border-gray/25 border-l-0 text-gray/25"
               style="border-radius: 0 var(--border-radius) var(--border-radius) 0;"
             >
-              <div class="flex border-b border-gray/25  justify-center items-center py-[0.3em] px-[0.35em] font-formula-bold uppercase">
+              <div class="flex border-b border-gray/25 justify-center items-center py-[0.3em] px-[0.35em] font-formula-bold uppercase">
                 <h4 class="text-[1rem] leading-[1.1] tracking-[0.02em]">
                   2025 © All rights reserved
                 </h4>
               </div>
-              <div class="flex  justify-center items-center py-[0.4em] px-[0.3em] text-center overflow-hidden min-h-[1.72em]">
+              <div class="flex justify-center items-center py-[0.4em] px-[0.3em] text-center overflow-hidden min-h-[1.72em]">
                 <p class="text-[0.425em]">
                   LIMING is a Export Company specializing in Used Car Parallel
                   Exports from China.
@@ -188,16 +207,6 @@ export default function Preloader() {
             </div>
           </div>
         </div>
-      </div>
-      <div
-        id="transition-container"
-        ref={containerRef}
-        class="transition-container"
-      >
-        <div class="column2 absolute h-full bg-darkgray top-0 left-0 w-[26%]"></div>
-        <div class="column2 absolute h-full bg-darkgray top-0 left-[25%] w-[26%]"></div>
-        <div class="column2 absolute h-full bg-darkgray top-0 left-[50%] w-[26%]"></div>
-        <div class="column2 absolute h-full bg-darkgray top-0 left-[75%] w-[26%]"></div>
       </div>
     </div>
   );
