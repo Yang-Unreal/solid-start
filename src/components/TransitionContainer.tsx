@@ -89,7 +89,7 @@ export default function TransitionContainer() {
   createEffect(() => {
     if (isAnimating()) {
       if (transitionType() === "preloader") {
-        // animatePreloader();
+        animatePreloader();
       } else {
         const path = pendingPath();
         if (path) {

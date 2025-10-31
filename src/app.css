@@ -254,6 +254,10 @@ html::-webkit-scrollbar {
     display: flex;
   }
 
+  .transition-container .column {
+    will-change: transform, clip-path;
+  }
+
   .product-grid {
     justify-content: center;
   }
