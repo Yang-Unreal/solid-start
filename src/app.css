@@ -254,6 +254,10 @@ html::-webkit-scrollbar {
     display: flex;
   }
 
+  .transition-container .column {
+    will-change: transform, clip-path;
+  }
+
   .product-grid {
     justify-content: center;
   }
@@ -347,9 +351,5 @@ html::-webkit-scrollbar {
     background-color: currentColor;
     transition: transform 0.3s ease;
     transform-origin: center;
-  }
-
-  .initially-in-place {
-    transform: translateY(0%);
   }
 }
