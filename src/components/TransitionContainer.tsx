@@ -20,27 +20,25 @@ export default function TransitionContainer() {
     if (!containerRef) return;
     const columns = containerRef.querySelectorAll(".column");
     if (columns) {
-      // Explicitly set the initial state to ensure the browser has it.
-      gsap.set(columns, {
-        y: "0%",
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-      });
-
       const tl = gsap.timeline({
-        // Add a minimal delay to allow the browser to paint the initial state.
-        delay: 0.02,
         onComplete: () => {
           setIsAnimating(false);
         },
       });
-
-      tl.to(columns, {
-        y: "-100%",
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
-        duration: 2,
-        ease: "circ.inOut",
-        stagger: 0.03,
-      });
+      tl.fromTo(
+        columns,
+        {
+          y: "0%",
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+        },
+        {
+          y: "-100%",
+          clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 92%)",
+          duration: 2,
+          ease: "circ.inOut",
+          stagger: 0.03,
+        }
+      );
     }
   };
 
