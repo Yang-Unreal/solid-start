@@ -13,7 +13,11 @@ export default createHandler((event) => {
               name="viewport"
               content="width=device-width, initial-scale=1"
             />
-
+            <title>LIMING© - YOUR GATEWAY FOR CHINA SOURCING</title>
+            <meta
+              name="description"
+              content="We are an export company based in China, specializing in parallel exports of used cars, as well as new motorcycles and prefabricated modular homes."
+            />
             <link
               rel="icon"
               href="/icon.svg"
@@ -40,13 +44,6 @@ export default createHandler((event) => {
               type="font/woff2"
               crossorigin=""
             />
-            {/* <link
-              rel="preload"
-              href="https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Light.woff2"
-              as="font"
-              type="font/woff2"
-              crossorigin=""
-            /> */}
             {assets}
           </head>
           <body>

@@ -19,11 +19,6 @@ export default function App() {
               <SearchProvider>
                 <QueryClientProvider client={queryClient}>
                   <MetaProvider>
-                    <Title>Liming</Title>
-                    <Meta
-                      name="description"
-                      content="Let the hidden pears shine for the world"
-                    />
                     <AppContent children={props.children} />
                   </MetaProvider>
                 </QueryClientProvider>
