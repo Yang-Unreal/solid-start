@@ -4,6 +4,7 @@ import MenuDrawer from "./nav/MenuDrawer";
 import MenuButton from "./nav/MenuButton";
 import { useAuth } from "~/context/AuthContext";
 import Preloader from "./Preloader";
+import PageTransition from "./PageTransition";
 import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
@@ -25,6 +26,7 @@ export function AppContent(props: { children: any }) {
   return (
     <>
       <Preloader />
+      <PageTransition />
       <Nav
         isMenuOpen={isMenuOpen()}
         setIsMenuOpen={setIsMenuOpen}

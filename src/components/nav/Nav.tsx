@@ -188,6 +188,12 @@ export default function Nav(props: NavProps) {
               ref={productLinkRef}
               href="/product"
               class="relative text-xl xl:text-2xl block"
+              onClick={(e) => {
+                e.preventDefault();
+                if ((window as any).triggerPageTransition) {
+                  (window as any).triggerPageTransition("/product");
+                }
+              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(workUnderlineRef!, {
@@ -222,6 +228,12 @@ export default function Nav(props: NavProps) {
               ref={servicesLinkRef}
               href="/services"
               class="relative text-xl xl:text-2xl hidden md:block"
+              onClick={(e) => {
+                e.preventDefault();
+                if ((window as any).triggerPageTransition) {
+                  (window as any).triggerPageTransition("/services");
+                }
+              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(servicesUnderlineRef!, {
@@ -260,6 +272,11 @@ export default function Nav(props: NavProps) {
                 e.preventDefault();
                 props.setIsMenuOpen(false);
                 navigate("/");
+              } else {
+                e.preventDefault();
+                if ((window as any).triggerPageTransition) {
+                  (window as any).triggerPageTransition("/");
+                }
               }
             }}
           >
@@ -272,6 +289,12 @@ export default function Nav(props: NavProps) {
               ref={aboutLinkRef}
               href="/about"
               class="relative text-xl xl:text-2xl hidden md:block"
+              onClick={(e) => {
+                e.preventDefault();
+                if ((window as any).triggerPageTransition) {
+                  (window as any).triggerPageTransition("/about");
+                }
+              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(aboutUnderlineRef!, {
@@ -306,6 +329,12 @@ export default function Nav(props: NavProps) {
               ref={contactLinkRef}
               href="/contact"
               class="relative text-xl xl:text-2xl block"
+              onClick={(e) => {
+                e.preventDefault();
+                if ((window as any).triggerPageTransition) {
+                  (window as any).triggerPageTransition("/contact");
+                }
+              }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
                   gsap.to(contactUnderlineRef!, {
