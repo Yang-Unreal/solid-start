@@ -1,10 +1,8 @@
-import { onMount, createEffect, createSignal } from "solid-js";
+import { onMount, createSignal } from "solid-js";
 import gsap from "gsap";
-import { useIsRouting, useNavigate } from "@solidjs/router";
+import { useNavigate } from "@solidjs/router";
 
 export default function PageTransition() {
-  let transitionRef: HTMLDivElement | undefined;
-  const isRouting = useIsRouting();
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = createSignal(false);
   const [pendingNavigation, setPendingNavigation] = createSignal<string | null>(
@@ -22,7 +20,8 @@ export default function PageTransition() {
     setPendingNavigation(href);
     setIsVisible(true);
 
-    const columns = transitionRef!.querySelectorAll(".transition-column");
+    // Use the preloader columns for transition
+    const columns = document.querySelectorAll(".column2");
 
     // Start transition: columns slide from bottom (100vh) to cover (0%)
     gsap.set(columns, {
@@ -66,18 +65,5 @@ export default function PageTransition() {
     (window as any).triggerPageTransition = triggerTransition;
   }
 
-  return (
-    <div
-      ref={transitionRef}
-      class="fixed inset-0 z-100 pointer-events-none"
-      style={{ display: isVisible() ? "block" : "none" }}
-    >
-      <div class="flex h-full w-full">
-        <div class="transition-column flex h-full w-full bg-darkgray rounded"></div>
-        <div class="transition-column flex h-full w-full bg-darkgray rounded"></div>
-        <div class="transition-column h-full w-full bg-darkgray rounded hidden sm:block"></div>
-        <div class="transition-column h-full w-full bg-darkgray rounded hidden sm:block"></div>
-      </div>
-    </div>
-  );
+  return null; // No JSX needed since we're reusing preloader columns
 }
