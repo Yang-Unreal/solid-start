@@ -51,6 +51,8 @@ export function PageTransitionProvider(props: { children: any }) {
       transformOrigin: "100% 0%",
     });
 
+    // Set nav colors to gray during transition 0.02s before columns reach 0%
+
     // Start transition: columns slide from bottom (100vh) to cover (0%)
     tl.to(columns, {
       y: "0%",
@@ -60,12 +62,15 @@ export function PageTransitionProvider(props: { children: any }) {
       stagger: 0.03,
     });
 
-    // Set nav colors to gray during transition and scroll to top
     tl.add(() => {
       setNavColors({
         originalColor: "rgba(192, 202, 201, 1)",
         duplicateColor: "rgba(241, 241, 241, 1)",
       });
+    }, ">-0.2");
+
+    // Scroll to top using Lenis
+    tl.add(() => {
       lenis?.lenis.scrollTo(0, { immediate: true });
     });
 
@@ -108,7 +113,7 @@ export function PageTransitionProvider(props: { children: any }) {
           }
         });
       }
-    });
+    }, ">-0.2");
   };
 
   return (
