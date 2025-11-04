@@ -20,7 +20,11 @@ export default function Nav(props: NavProps) {
   const navigate = useNavigate();
   const lenisControls = useLenis();
   const isRouting = useIsRouting();
-  const { triggerTransition } = usePageTransition();
+  const {
+    triggerTransition,
+    navColors: contextNavColors,
+    setNavColors: setContextNavColors,
+  } = usePageTransition();
 
   // Refs for animations
   let workUnderlineRef: HTMLDivElement | undefined;
@@ -39,6 +43,9 @@ export default function Nav(props: NavProps) {
   });
   const [logoColorClass, setLogoColorClass] = createSignal("text-gray");
 
+  // Use context nav colors instead of local ones
+  const currentNavColors = () => contextNavColors();
+
   let scrollTriggers: ScrollTrigger[] = [];
 
   const setupNavTriggers = () => {
@@ -54,13 +61,13 @@ export default function Nav(props: NavProps) {
       const rect = section.getBoundingClientRect();
       if (rect.top <= 0 && rect.bottom > 0) {
         if (section.classList.contains("bg-light")) {
-          setNavColors({
+          setContextNavColors({
             originalColor: "#182b2a",
             duplicateColor: "rgba(0, 21, 20, 1)",
           });
           setLogoColorClass("text-darkgray");
         } else {
-          setNavColors({
+          setContextNavColors({
             originalColor: "rgba(192, 202, 201, 1)",
             duplicateColor: "rgba(241, 241, 241, 1)",
           });
@@ -79,13 +86,13 @@ export default function Nav(props: NavProps) {
         onToggle: (self) => {
           if (self.isActive) {
             if (section.classList.contains("bg-light")) {
-              setNavColors({
+              setContextNavColors({
                 originalColor: "#182b2a",
                 duplicateColor: "rgba(0, 21, 20, 1)",
               });
               setLogoColorClass("text-darkgray");
             } else {
-              setNavColors({
+              setContextNavColors({
                 originalColor: "rgba(192, 202, 201, 1)",
                 duplicateColor: "rgba(241, 241, 241, 1)",
               });
@@ -132,10 +139,8 @@ export default function Nav(props: NavProps) {
     if (!isServer) {
       gsap.registerPlugin(ScrollTrigger);
       // Run on initial page load
-      setTimeout(() => {
-        ScrollTrigger.refresh();
-        setupNavTriggers();
-      }, 100);
+      ScrollTrigger.refresh();
+      setupNavTriggers();
     }
   });
 
@@ -212,14 +217,14 @@ export default function Nav(props: NavProps) {
               }}
             >
               <TextAnimation
-                originalColor={navColors().originalColor}
-                duplicateColor={navColors().duplicateColor}
+                originalColor={currentNavColors().originalColor}
+                duplicateColor={currentNavColors().duplicateColor}
                 text="PRODUCT"
               />
               <div
                 ref={workUnderlineRef!}
                 class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": navColors().originalColor }}
+                style={{ "background-color": currentNavColors().originalColor }}
               ></div>
             </A>
           </div>
@@ -250,14 +255,14 @@ export default function Nav(props: NavProps) {
               }}
             >
               <TextAnimation
-                originalColor={navColors().originalColor}
-                duplicateColor={navColors().duplicateColor}
+                originalColor={currentNavColors().originalColor}
+                duplicateColor={currentNavColors().duplicateColor}
                 text="SERVICES"
               />
               <div
                 ref={servicesUnderlineRef!}
                 class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": navColors().originalColor }}
+                style={{ "background-color": currentNavColors().originalColor }}
               ></div>
             </A>
           </div>
@@ -307,14 +312,14 @@ export default function Nav(props: NavProps) {
               }}
             >
               <TextAnimation
-                originalColor={navColors().originalColor}
-                duplicateColor={navColors().duplicateColor}
+                originalColor={currentNavColors().originalColor}
+                duplicateColor={currentNavColors().duplicateColor}
                 text="ABOUT"
               />
               <div
                 ref={aboutUnderlineRef!}
                 class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": navColors().originalColor }}
+                style={{ "background-color": currentNavColors().originalColor }}
               ></div>
             </A>
           </div>
@@ -345,14 +350,14 @@ export default function Nav(props: NavProps) {
               }}
             >
               <TextAnimation
-                originalColor={navColors().originalColor}
-                duplicateColor={navColors().duplicateColor}
+                originalColor={currentNavColors().originalColor}
+                duplicateColor={currentNavColors().duplicateColor}
                 text="CONTACT"
               />
               <div
                 ref={contactUnderlineRef!}
                 class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": navColors().originalColor }}
+                style={{ "background-color": currentNavColors().originalColor }}
               ></div>
             </A>
           </div>
