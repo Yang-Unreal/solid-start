@@ -8,6 +8,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { isServer } from "solid-js/web";
 import { useLenis } from "~/context/LenisContext";
+import { usePageTransition } from "~/context/PageTransitionContext";
 
 interface NavProps {
   isMenuOpen: boolean;
@@ -19,6 +20,7 @@ export default function Nav(props: NavProps) {
   const navigate = useNavigate();
   const lenisControls = useLenis();
   const isRouting = useIsRouting();
+  const { triggerTransition } = usePageTransition();
 
   // Refs for animations
   let workUnderlineRef: HTMLDivElement | undefined;
@@ -190,9 +192,7 @@ export default function Nav(props: NavProps) {
               class="relative text-xl xl:text-2xl block"
               onClick={(e) => {
                 e.preventDefault();
-                if ((window as any).triggerPageTransition) {
-                  (window as any).triggerPageTransition("/product");
-                }
+                triggerTransition("/product");
               }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
@@ -230,9 +230,7 @@ export default function Nav(props: NavProps) {
               class="relative text-xl xl:text-2xl hidden md:block"
               onClick={(e) => {
                 e.preventDefault();
-                if ((window as any).triggerPageTransition) {
-                  (window as any).triggerPageTransition("/services");
-                }
+                triggerTransition("/services");
               }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
@@ -274,9 +272,7 @@ export default function Nav(props: NavProps) {
                 navigate("/");
               } else {
                 e.preventDefault();
-                if ((window as any).triggerPageTransition) {
-                  (window as any).triggerPageTransition("/");
-                }
+                triggerTransition("/");
               }
             }}
           >
@@ -291,9 +287,7 @@ export default function Nav(props: NavProps) {
               class="relative text-xl xl:text-2xl hidden md:block"
               onClick={(e) => {
                 e.preventDefault();
-                if ((window as any).triggerPageTransition) {
-                  (window as any).triggerPageTransition("/about");
-                }
+                triggerTransition("/about");
               }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
@@ -331,9 +325,7 @@ export default function Nav(props: NavProps) {
               class="relative text-xl xl:text-2xl block"
               onClick={(e) => {
                 e.preventDefault();
-                if ((window as any).triggerPageTransition) {
-                  (window as any).triggerPageTransition("/contact");
-                }
+                triggerTransition("/contact");
               }}
               onMouseEnter={() => {
                 if (!props.isMenuOpen)
