@@ -10,6 +10,8 @@ interface PageTransitionContextType {
     duplicateColor: string;
   }) => void;
   navColors: () => { originalColor: string; duplicateColor: string };
+  setSetupNavTriggers: (callback: () => void) => void;
+  setKillScrollTriggers: (callback: () => void) => void;
 }
 
 const PageTransitionContext = createContext<PageTransitionContextType>();
@@ -25,6 +27,12 @@ export function PageTransitionProvider(props: { children: any }) {
     originalColor: "rgba(192, 202, 201, 1)",
     duplicateColor: "rgba(241, 241, 241, 1)",
   });
+  const [setupNavTriggers, setSetupNavTriggers] = createSignal<() => void>(
+    () => {}
+  );
+  const [killScrollTriggers, setKillScrollTriggers] = createSignal<() => void>(
+    () => {}
+  );
 
   // Function to trigger transition and navigation
   const triggerTransition = (href: string) => {
@@ -33,12 +41,17 @@ export function PageTransitionProvider(props: { children: any }) {
     setPendingNavigation(href);
     setIsVisible(true);
 
+    // Kill old scroll triggers before transition
+    killScrollTriggers()();
+
     // Use the preloader columns for transition
     const columns = document.querySelectorAll(".column2");
 
     const tl = gsap.timeline({
       onComplete: () => {
         setIsVisible(false);
+        // Set up new triggers after transition completes
+        setupNavTriggers()();
       },
     });
 
@@ -118,7 +131,13 @@ export function PageTransitionProvider(props: { children: any }) {
 
   return (
     <PageTransitionContext.Provider
-      value={{ triggerTransition, setNavColors, navColors }}
+      value={{
+        triggerTransition,
+        setNavColors,
+        navColors,
+        setSetupNavTriggers,
+        setKillScrollTriggers,
+      }}
     >
       {props.children}
     </PageTransitionContext.Provider>

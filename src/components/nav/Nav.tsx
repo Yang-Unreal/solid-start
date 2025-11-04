@@ -24,6 +24,8 @@ export default function Nav(props: NavProps) {
     triggerTransition,
     navColors: contextNavColors,
     setNavColors: setContextNavColors,
+    setSetupNavTriggers,
+    setKillScrollTriggers,
   } = usePageTransition();
 
   // Refs for animations
@@ -115,23 +117,11 @@ export default function Nav(props: NavProps) {
       // 1. Force scroll to top while Lenis is stopped.
       lenisControls?.lenis.scrollTo(0, { immediate: true });
 
-      // 2. Kill all old scroll triggers.
-      scrollTriggers.forEach((trigger) => trigger.kill());
-      scrollTriggers = [];
+      // 2. Force GSAP to re-read the DOM.
+      ScrollTrigger.refresh();
 
-      // 3. Wait for the next browser paint cycle.
-      setTimeout(() => {
-        if (isServer) return;
-
-        // 4. Force GSAP to re-read the DOM.
-        ScrollTrigger.refresh();
-
-        // 5. Set up new triggers for the current page.
-        setupNavTriggers();
-
-        // 6. Give scrolling control back to the user.
-        lenisControls?.start();
-      }, 50);
+      // 3. Give scrolling control back to the user.
+      lenisControls?.start();
     }
   });
 
@@ -141,6 +131,12 @@ export default function Nav(props: NavProps) {
       // Run on initial page load
       ScrollTrigger.refresh();
       setupNavTriggers();
+      // Register callbacks with context
+      setSetupNavTriggers(() => setupNavTriggers);
+      setKillScrollTriggers(() => () => {
+        scrollTriggers.forEach((trigger) => trigger.kill());
+        scrollTriggers = [];
+      });
     }
   });
 
