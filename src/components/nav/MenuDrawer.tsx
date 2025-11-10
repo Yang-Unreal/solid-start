@@ -2,6 +2,7 @@ import { For, createEffect, onMount } from "solid-js";
 import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
 import { useLenis } from "~/context/LenisContext";
+import { usePageTransition } from "~/context/PageTransitionContext";
 
 type MenuDrawerProps = {
   isOpen: boolean;
@@ -13,6 +14,7 @@ type MenuDrawerProps = {
 
 const MenuDrawer = (props: MenuDrawerProps) => {
   const lenis = useLenis();
+  const { triggerTransition } = usePageTransition();
 
   let menuContainer: HTMLDivElement | undefined;
 
@@ -215,7 +217,19 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                 <a
                   href={item.href}
                   class="relative block text-8xl font-formula-bold"
-                  onClick={() => props.onClose?.()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    triggerTransition(item.href, () => {
+                      // Hide menu immediately when columns reach 0%
+                      const menuContainer = document.querySelector(
+                        ".fixed.inset-0.z-50"
+                      ) as HTMLElement;
+                      if (menuContainer) {
+                        menuContainer.style.display = "none";
+                      }
+                      props.onClose?.();
+                    });
+                  }}
                   onMouseEnter={() => {
                     gsap.to(underlineRefs[index()]!, {
                       scaleX: 1,

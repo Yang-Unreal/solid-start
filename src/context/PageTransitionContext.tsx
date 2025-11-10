@@ -4,14 +4,18 @@ import { useNavigate } from "@solidjs/router";
 import { useLenis } from "~/context/LenisContext";
 
 interface PageTransitionContextType {
-  triggerTransition: (href: string) => void;
+  triggerTransition: (href: string, onMenuHide?: () => void) => void;
   setNavColors: (colors: {
     originalColor: string;
     duplicateColor: string;
   }) => void;
   navColors: () => { originalColor: string; duplicateColor: string };
+  logoColor: () => string;
+  setLogoColor: (color: string) => void;
   setSetupNavTriggers: (callback: () => void) => void;
   setKillScrollTriggers: (callback: () => void) => void;
+  setMenuClosedCallback: (callback: () => void) => void;
+  setMenuVisibility: (callback: () => void) => void;
 }
 
 const PageTransitionContext = createContext<PageTransitionContextType>();
@@ -27,15 +31,22 @@ export function PageTransitionProvider(props: { children: any }) {
     originalColor: "rgba(192, 202, 201, 1)",
     duplicateColor: "rgba(241, 241, 241, 1)",
   });
+  const [logoColor, setLogoColor] = createSignal("text-gray");
   const [setupNavTriggers, setSetupNavTriggers] = createSignal<() => void>(
     () => {}
   );
   const [killScrollTriggers, setKillScrollTriggers] = createSignal<() => void>(
     () => {}
   );
+  const [menuClosedCallback, setMenuClosedCallback] = createSignal<() => void>(
+    () => {}
+  );
+  const [menuVisibility, setMenuVisibility] = createSignal<() => void>(
+    () => {}
+  );
 
   // Function to trigger transition and navigation
-  const triggerTransition = (href: string) => {
+  const triggerTransition = (href: string, onMenuHide?: () => void) => {
     if (isVisible()) return; // Prevent multiple transitions
 
     setPendingNavigation(href);
@@ -52,6 +63,9 @@ export function PageTransitionProvider(props: { children: any }) {
         setIsVisible(false);
         // Set up new triggers after transition completes
         setupNavTriggers()();
+        // Call menu closed callback if set
+        const callback = menuClosedCallback();
+        if (callback) callback();
       },
     });
 
@@ -73,6 +87,10 @@ export function PageTransitionProvider(props: { children: any }) {
       duration: 0.6,
       ease: "circ.inOut",
       stagger: 0.03,
+      onComplete: () => {
+        // Call menu hide callback when columns reach 0%
+        if (onMenuHide) onMenuHide();
+      },
     });
 
     tl.add(() => {
@@ -80,6 +98,7 @@ export function PageTransitionProvider(props: { children: any }) {
         originalColor: "rgba(192, 202, 201, 1)",
         duplicateColor: "rgba(241, 241, 241, 1)",
       });
+      setLogoColor("text-gray");
     }, ">-0.2");
 
     // Scroll to top using Lenis
@@ -105,7 +124,7 @@ export function PageTransitionProvider(props: { children: any }) {
       stagger: 0.03,
     });
 
-    // Reset nav colors to be dynamic again after transition
+    // Reset nav colors and logo color to be dynamic again after transition
     tl.add(() => {
       if (typeof window !== "undefined") {
         const sections = document.querySelectorAll("main section");
@@ -117,16 +136,45 @@ export function PageTransitionProvider(props: { children: any }) {
                 originalColor: "#182b2a",
                 duplicateColor: "rgba(0, 21, 20, 1)",
               });
+              setLogoColor("text-darkgray");
             } else {
               setNavColors({
                 originalColor: "rgba(192, 202, 201, 1)",
                 duplicateColor: "rgba(241, 241, 241, 1)",
               });
+              setLogoColor("text-gray");
             }
           }
         });
       }
     }, ">-0.2");
+
+    // For menu transitions, set colors 0.2s before columns move to -100%
+    if (onMenuHide) {
+      tl.add(() => {
+        if (typeof window !== "undefined") {
+          const sections = document.querySelectorAll("main section");
+          sections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= 0 && rect.bottom > 0) {
+              if (section.classList.contains("bg-light")) {
+                setNavColors({
+                  originalColor: "#182b2a",
+                  duplicateColor: "rgba(0, 21, 20, 1)",
+                });
+                setLogoColor("text-darkgray");
+              } else {
+                setNavColors({
+                  originalColor: "rgba(192, 202, 201, 1)",
+                  duplicateColor: "rgba(241, 241, 241, 1)",
+                });
+                setLogoColor("text-gray");
+              }
+            }
+          });
+        }
+      }, ">-0.2");
+    }
   };
 
   return (
@@ -135,8 +183,12 @@ export function PageTransitionProvider(props: { children: any }) {
         triggerTransition,
         setNavColors,
         navColors,
+        logoColor,
+        setLogoColor,
         setSetupNavTriggers,
         setKillScrollTriggers,
+        setMenuClosedCallback,
+        setMenuVisibility,
       }}
     >
       {props.children}

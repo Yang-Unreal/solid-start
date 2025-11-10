@@ -24,8 +24,11 @@ export default function Nav(props: NavProps) {
     triggerTransition,
     navColors: contextNavColors,
     setNavColors: setContextNavColors,
+    logoColor: contextLogoColor,
+    setLogoColor: setContextLogoColor,
     setSetupNavTriggers,
     setKillScrollTriggers,
+    setMenuClosedCallback,
   } = usePageTransition();
 
   // Refs for animations
@@ -38,15 +41,9 @@ export default function Nav(props: NavProps) {
   let aboutLinkRef: HTMLAnchorElement | undefined;
   let contactLinkRef: HTMLAnchorElement | undefined;
 
-  // Signals for dynamic colors
-  const [navColors, setNavColors] = createSignal({
-    originalColor: "rgba(192, 202, 201, 1)",
-    duplicateColor: "rgba(241, 241, 241, 1)",
-  });
-  const [logoColorClass, setLogoColorClass] = createSignal("text-gray");
-
-  // Use context nav colors instead of local ones
+  // Use context nav colors and logo color
   const currentNavColors = () => contextNavColors();
+  const currentLogoColor = () => contextLogoColor();
 
   let scrollTriggers: ScrollTrigger[] = [];
 
@@ -67,13 +64,13 @@ export default function Nav(props: NavProps) {
             originalColor: "#182b2a",
             duplicateColor: "rgba(0, 21, 20, 1)",
           });
-          setLogoColorClass("text-darkgray");
+          setContextLogoColor("text-darkgray");
         } else {
           setContextNavColors({
             originalColor: "rgba(192, 202, 201, 1)",
             duplicateColor: "rgba(241, 241, 241, 1)",
           });
-          setLogoColorClass("text-gray");
+          setContextLogoColor("text-gray");
         }
         initialSectionFound = true;
       }
@@ -92,13 +89,13 @@ export default function Nav(props: NavProps) {
                 originalColor: "#182b2a",
                 duplicateColor: "rgba(0, 21, 20, 1)",
               });
-              setLogoColorClass("text-darkgray");
+              setContextLogoColor("text-darkgray");
             } else {
               setContextNavColors({
                 originalColor: "rgba(192, 202, 201, 1)",
                 duplicateColor: "rgba(241, 241, 241, 1)",
               });
-              setLogoColorClass("text-gray");
+              setContextLogoColor("text-gray");
             }
           }
         },
@@ -137,6 +134,20 @@ export default function Nav(props: NavProps) {
         scrollTriggers.forEach((trigger) => trigger.kill());
         scrollTriggers = [];
       });
+      setMenuClosedCallback(() => {
+        // Reset logo color based on current section after transition
+        const sections = document.querySelectorAll("main section");
+        sections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= 0 && rect.bottom > 0) {
+            if (section.classList.contains("bg-light")) {
+              setContextLogoColor("text-darkgray");
+            } else {
+              setContextLogoColor("text-gray");
+            }
+          }
+        });
+      });
     }
   });
 
@@ -144,7 +155,7 @@ export default function Nav(props: NavProps) {
   createEffect(() => {
     if (props.isMenuOpen) {
       lenisControls?.stop();
-      setLogoColorClass("text-gray");
+      setContextLogoColor("text-gray");
       gsap.to([productLinkRef, servicesLinkRef, aboutLinkRef, contactLinkRef], {
         y: "-100%",
         rotate: -12,
@@ -167,15 +178,15 @@ export default function Nav(props: NavProps) {
         stagger: 0.05,
       });
 
-      // Reset logo color based on current section
+      // Reset logo color based on current section immediately when menu closes
       const sections = document.querySelectorAll("main section");
       sections.forEach((section) => {
         const rect = section.getBoundingClientRect();
         if (rect.top <= 0 && rect.bottom > 0) {
           if (section.classList.contains("bg-light")) {
-            setLogoColorClass("text-darkgray");
+            setContextLogoColor("text-darkgray");
           } else {
-            setLogoColorClass("text-gray");
+            setContextLogoColor("text-gray");
           }
         }
       });
@@ -267,18 +278,25 @@ export default function Nav(props: NavProps) {
             aria-label="Homepage"
             title="Homepage"
             onClick={(e) => {
+              e.preventDefault();
               if (props.isMenuOpen) {
-                e.preventDefault();
-                props.setIsMenuOpen(false);
-                navigate("/");
+                triggerTransition("/", () => {
+                  // Hide menu immediately when columns reach 0%
+                  const menuContainer = document.querySelector(
+                    ".fixed.inset-0.z-50"
+                  ) as HTMLElement;
+                  if (menuContainer) {
+                    menuContainer.style.display = "none";
+                  }
+                  props.setIsMenuOpen(false);
+                });
               } else {
-                e.preventDefault();
                 triggerTransition("/");
               }
             }}
           >
             <YourLogo
-              class={`h-4 xl:h-5 w-auto transition-colors duration-300 ${logoColorClass()}`}
+              class={`h-4 xl:h-5 w-auto transition-colors duration-300 ${currentLogoColor()}`}
             />
           </A>
           <div class="overflow-hidden">
