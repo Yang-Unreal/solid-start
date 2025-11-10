@@ -299,9 +299,7 @@ export default function Nav(props: NavProps) {
               }
             }}
           >
-            <YourLogo
-              class={`h-4 xl:h-5 w-auto transition-colors duration-300 ${currentLogoColor()}`}
-            />
+            <YourLogo class={`h-4 xl:h-5 w-auto ${currentLogoColor()}`} />
           </A>
           <div class="overflow-hidden">
             <A
