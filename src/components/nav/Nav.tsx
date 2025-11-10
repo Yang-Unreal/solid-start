@@ -29,6 +29,7 @@ export default function Nav(props: NavProps) {
     setSetupNavTriggers,
     setKillScrollTriggers,
     setMenuClosedCallback,
+    isVisible,
   } = usePageTransition();
 
   // Refs for animations
@@ -178,18 +179,21 @@ export default function Nav(props: NavProps) {
         stagger: 0.05,
       });
 
-      // Reset logo color based on current section immediately when menu closes
-      const sections = document.querySelectorAll("main section");
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= 0 && rect.bottom > 0) {
-          if (section.classList.contains("bg-light")) {
-            setContextLogoColor("text-darkgray");
-          } else {
-            setContextLogoColor("text-gray");
+      // Reset logo color based on current section immediately when menu closes,
+      // but only if a page transition is not currently active.
+      if (!isVisible()) {
+        const sections = document.querySelectorAll("main section");
+        sections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= 0 && rect.bottom > 0) {
+            if (section.classList.contains("bg-light")) {
+              setContextLogoColor("text-darkgray");
+            } else {
+              setContextLogoColor("text-gray");
+            }
           }
-        }
-      });
+        });
+      }
     }
   });
 

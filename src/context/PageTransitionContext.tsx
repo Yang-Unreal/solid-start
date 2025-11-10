@@ -16,6 +16,7 @@ interface PageTransitionContextType {
   setKillScrollTriggers: (callback: () => void) => void;
   setMenuClosedCallback: (callback: () => void) => void;
   setMenuVisibility: (callback: () => void) => void;
+  isVisible: () => boolean;
 }
 
 const PageTransitionContext = createContext<PageTransitionContextType>();
@@ -148,33 +149,6 @@ export function PageTransitionProvider(props: { children: any }) {
         });
       }
     }, ">-0.2");
-
-    // For menu transitions, set colors 0.2s before columns move to -100%
-    if (onMenuHide) {
-      tl.add(() => {
-        if (typeof window !== "undefined") {
-          const sections = document.querySelectorAll("main section");
-          sections.forEach((section) => {
-            const rect = section.getBoundingClientRect();
-            if (rect.top <= 0 && rect.bottom > 0) {
-              if (section.classList.contains("bg-light")) {
-                setNavColors({
-                  originalColor: "#182b2a",
-                  duplicateColor: "rgba(0, 21, 20, 1)",
-                });
-                setLogoColor("text-darkgray");
-              } else {
-                setNavColors({
-                  originalColor: "rgba(192, 202, 201, 1)",
-                  duplicateColor: "rgba(241, 241, 241, 1)",
-                });
-                setLogoColor("text-gray");
-              }
-            }
-          });
-        }
-      }, ">-0.2");
-    }
   };
 
   return (
@@ -189,6 +163,7 @@ export function PageTransitionProvider(props: { children: any }) {
         setKillScrollTriggers,
         setMenuClosedCallback,
         setMenuVisibility,
+        isVisible,
       }}
     >
       {props.children}
