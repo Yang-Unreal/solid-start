@@ -1,5 +1,3 @@
-// src/components/Nav.tsx
-
 import { A, useLocation, useNavigate, useIsRouting } from "@solidjs/router";
 import { createEffect, createSignal, onMount } from "solid-js";
 import YourLogo from "~/components/logo/YourLogo";
@@ -126,9 +124,6 @@ export default function Nav(props: NavProps) {
   onMount(() => {
     if (!isServer) {
       gsap.registerPlugin(ScrollTrigger);
-      // Run on initial page load
-      ScrollTrigger.refresh();
-      setupNavTriggers();
       // Register callbacks with context
       setSetupNavTriggers(() => setupNavTriggers);
       setKillScrollTriggers(() => () => {

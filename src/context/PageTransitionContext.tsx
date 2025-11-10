@@ -12,11 +12,14 @@ interface PageTransitionContextType {
   navColors: () => { originalColor: string; duplicateColor: string };
   logoColor: () => string;
   setLogoColor: (color: string) => void;
+  setupNavTriggers: () => () => void;
   setSetupNavTriggers: (callback: () => void) => void;
   setKillScrollTriggers: (callback: () => void) => void;
   setMenuClosedCallback: (callback: () => void) => void;
   setMenuVisibility: (callback: () => void) => void;
   isVisible: () => boolean;
+  isPreloaderFinished: () => boolean;
+  setIsPreloaderFinished: (value: boolean) => void;
 }
 
 const PageTransitionContext = createContext<PageTransitionContextType>();
@@ -45,8 +48,8 @@ export function PageTransitionProvider(props: { children: any }) {
   const [menuVisibility, setMenuVisibility] = createSignal<() => void>(
     () => {}
   );
+  const [isPreloaderFinished, setIsPreloaderFinished] = createSignal(false);
 
-  // Function to trigger transition and navigation
   const triggerTransition = (href: string, onMenuHide?: () => void) => {
     if (isVisible()) return; // Prevent multiple transitions
 
@@ -78,8 +81,6 @@ export function PageTransitionProvider(props: { children: any }) {
       rotate: -6,
       transformOrigin: "100% 0%",
     });
-
-    // Set nav colors to gray during transition 0.02s before columns reach 0%
 
     // Start transition: columns slide from bottom (100vh) to cover (0%)
     tl.to(columns, {
@@ -159,11 +160,14 @@ export function PageTransitionProvider(props: { children: any }) {
         navColors,
         logoColor,
         setLogoColor,
+        setupNavTriggers,
         setSetupNavTriggers,
         setKillScrollTriggers,
         setMenuClosedCallback,
         setMenuVisibility,
         isVisible,
+        isPreloaderFinished,
+        setIsPreloaderFinished,
       }}
     >
       {props.children}

@@ -43,6 +43,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let currentImageRef: HTMLImageElement | undefined;
   let nextImageRef: HTMLImageElement | undefined;
   let imageTl: gsap.core.Timeline | undefined;
+
   onMount(() => {
     if (menuContainer) {
       gsap.set(menuContainer, { display: "none" });
@@ -136,6 +137,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         },
       });
 
+      // --- START OF FIX ---
+      // REMOVED the conflicting color setting logic from here.
+      // The PageTransitionContext will now handle it exclusively.
+      /*
       const setColorCallback = () => {
         const sections = document.querySelectorAll("main section");
         sections.forEach((section) => {
@@ -150,6 +155,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         });
       };
       currentTl.add(setColorCallback, 0.1);
+      */
+      // --- END OF FIX ---
 
       currentTl.to(
         linkRefs,

@@ -3,11 +3,14 @@ import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
 import YourLogo from "./logo/YourLogo";
 import MobileLogo from "./logo/MobileLogo";
+import { usePageTransition } from "~/context/PageTransitionContext";
+
 export default function Preloader() {
   let preloaderRef: HTMLDivElement | undefined;
   let logoContainerRef: HTMLDivElement | undefined;
   let copyrightRef: HTMLDivElement | undefined;
   const lenis = useLenis();
+  const { setIsPreloaderFinished, setupNavTriggers } = usePageTransition();
 
   onMount(() => {
     if (typeof window === "undefined") return;
@@ -110,6 +113,15 @@ export default function Preloader() {
         ">-0.4"
       );
     }
+
+    // Call dynamic nav color setup and signal that the preloader is finished
+    tl.add(() => {
+      const setupFunc = setupNavTriggers();
+      if (setupFunc) {
+        setupFunc();
+      }
+      setIsPreloaderFinished(true);
+    }, ">-0.2");
   });
 
   return (
