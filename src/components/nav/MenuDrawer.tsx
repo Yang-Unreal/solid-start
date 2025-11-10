@@ -135,14 +135,34 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           lenis?.start();
         },
       });
-      currentTl.to(linkRefs, {
-        y: "100%",
-        rotation: -12,
-        transformOrigin: "100% 0%",
-        duration: 0.4,
-        stagger: 0.05,
-        ease: "back.out(1)",
-      });
+
+      const setColorCallback = () => {
+        const sections = document.querySelectorAll("main section");
+        sections.forEach((section) => {
+          const rect = section.getBoundingClientRect();
+          if (rect.top <= 0 && rect.bottom > 0) {
+            if (section.classList.contains("bg-light")) {
+              setLogoColor("text-darkgray");
+            } else {
+              setLogoColor("text-gray");
+            }
+          }
+        });
+      };
+      currentTl.add(setColorCallback, 0.1);
+
+      currentTl.to(
+        linkRefs,
+        {
+          y: "100%",
+          rotation: -12,
+          transformOrigin: "100% 0%",
+          duration: 0.4,
+          stagger: 0.05,
+          ease: "back.out(1)",
+        },
+        0
+      );
       currentTl.to(
         [addressRef, contactRef],
         {
@@ -153,7 +173,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           stagger: 0.05,
           ease: "back.out(1)",
         },
-        "-=0.4"
+        0
       );
       if (currentImageRef) {
         currentTl.to(
@@ -165,7 +185,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
             duration: 0.3,
             ease: "slideUp",
           },
-          "-=0.4.5"
+          0
         );
       }
       currentTl.to(
@@ -177,7 +197,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           stagger: 0.02,
           ease: "circ.inOut",
         },
-        "-=0.4"
+        0
       );
     }
   });
