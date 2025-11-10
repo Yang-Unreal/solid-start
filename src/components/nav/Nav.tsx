@@ -156,7 +156,6 @@ export default function Nav(props: NavProps) {
   createEffect(() => {
     if (props.isMenuOpen) {
       lenisControls?.stop();
-      setContextLogoColor("text-gray");
       gsap.to([productLinkRef, servicesLinkRef, aboutLinkRef, contactLinkRef], {
         y: "-100%",
         rotate: -12,

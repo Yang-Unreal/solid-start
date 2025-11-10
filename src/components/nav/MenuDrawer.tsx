@@ -14,7 +14,7 @@ type MenuDrawerProps = {
 
 const MenuDrawer = (props: MenuDrawerProps) => {
   const lenis = useLenis();
-  const { triggerTransition } = usePageTransition();
+  const { triggerTransition, setLogoColor } = usePageTransition();
 
   let menuContainer: HTMLDivElement | undefined;
 
@@ -89,6 +89,9 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         stagger: 0.02,
         ease: "circ.inOut",
       });
+      currentTl.add(() => {
+        setLogoColor("text-gray");
+      }, ">-0.1");
       currentTl.to(
         linkRefs,
         {
