@@ -137,10 +137,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         },
       });
 
-      // --- START OF FIX ---
-      // REMOVED the conflicting color setting logic from here.
-      // The PageTransitionContext will now handle it exclusively.
-      /*
+      // Set logo color based on current section when closing menu
       const setColorCallback = () => {
         const sections = document.querySelectorAll("main section");
         sections.forEach((section) => {
@@ -155,8 +152,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         });
       };
       currentTl.add(setColorCallback, 0.1);
-      */
-      // --- END OF FIX ---
 
       currentTl.to(
         linkRefs,
