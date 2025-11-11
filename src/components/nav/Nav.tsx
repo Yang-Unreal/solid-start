@@ -28,6 +28,7 @@ export default function Nav(props: NavProps) {
     setKillScrollTriggers,
     setMenuClosedCallback,
     isVisible,
+    isPreloaderFinished, // Import the preloader state
   } = usePageTransition();
 
   // Refs for animations
@@ -40,15 +41,30 @@ export default function Nav(props: NavProps) {
   let aboutLinkRef: HTMLAnchorElement | undefined;
   let contactLinkRef: HTMLAnchorElement | undefined;
 
-  // Use context nav colors and logo color
-  const currentNavColors = () => contextNavColors();
-  const currentLogoColor = () => contextLogoColor();
+  // Local signals for colors that default to a safe, visible value.
+  const [currentNavColors, setCurrentNavColors] = createSignal({
+    originalColor: "rgba(192, 202, 201, 1)",
+    duplicateColor: "rgba(241, 241, 241, 1)",
+  });
+  const [currentLogoColor, setCurrentLogoColor] = createSignal("text-gray");
+
+  // Sync the context state to our local state ONLY when the preloader is finished.
+  createEffect(() => {
+    if (isPreloaderFinished()) {
+      setCurrentNavColors(contextNavColors());
+      setCurrentLogoColor(contextLogoColor());
+    }
+  });
 
   let scrollTriggers: ScrollTrigger[] = [];
 
   const setupNavTriggers = () => {
-    if (isServer) return;
+    // GUARD CLAUSE: The entire function does nothing until the preloader is finished.
+    if (isServer || !isPreloaderFinished()) {
+      return;
+    }
 
+    // This logic now runs only after the preloader is done.
     const sections = document.querySelectorAll("main section");
     if (sections.length === 0) return;
 
@@ -106,17 +122,10 @@ export default function Nav(props: NavProps) {
   // Master effect to control navigation lifecycle
   createEffect(() => {
     if (isRouting()) {
-      // Navigation has started. Stop the animation loop.
       lenisControls?.stop();
     } else {
-      // Navigation has finished.
-      // 1. Force scroll to top while Lenis is stopped.
       lenisControls?.lenis.scrollTo(0, { immediate: true });
-
-      // 2. Force GSAP to re-read the DOM.
       ScrollTrigger.refresh();
-
-      // 3. Give scrolling control back to the user.
       lenisControls?.start();
     }
   });
@@ -124,14 +133,12 @@ export default function Nav(props: NavProps) {
   onMount(() => {
     if (!isServer) {
       gsap.registerPlugin(ScrollTrigger);
-      // Register callbacks with context
       setSetupNavTriggers(() => setupNavTriggers);
       setKillScrollTriggers(() => () => {
         scrollTriggers.forEach((trigger) => trigger.kill());
         scrollTriggers = [];
       });
       setMenuClosedCallback(() => {
-        // Reset logo color based on current section after transition
         const sections = document.querySelectorAll("main section");
         sections.forEach((section) => {
           const rect = section.getBoundingClientRect();
@@ -160,7 +167,6 @@ export default function Nav(props: NavProps) {
         stagger: 0.05,
       });
     } else {
-      // Only start Lenis if not in the middle of a route change.
       if (!isRouting()) {
         lenisControls?.start();
       }
@@ -172,9 +178,6 @@ export default function Nav(props: NavProps) {
         ease: "power3.inOut",
         stagger: 0.05,
       });
-
-      // Reset logo color is handled in the MenuDrawer.tsx timeline
-      // to sync with the closing animation.
     }
   });
 
@@ -266,7 +269,6 @@ export default function Nav(props: NavProps) {
               e.preventDefault();
               if (props.isMenuOpen) {
                 triggerTransition("/", () => {
-                  // Hide menu immediately when columns reach 0%
                   const menuContainer = document.querySelector(
                     ".fixed.inset-0.z-50"
                   ) as HTMLElement;

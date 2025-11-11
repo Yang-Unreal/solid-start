@@ -116,11 +116,13 @@ export default function Preloader() {
 
     // Call dynamic nav color setup and signal that the preloader is finished
     tl.add(() => {
+      // First, signal that the preloader is done.
+      setIsPreloaderFinished(true);
+      // Now, call the setup function, which is now safe to run.
       const setupFunc = setupNavTriggers();
       if (setupFunc) {
         setupFunc();
       }
-      setIsPreloaderFinished(true);
     }, ">-0.2");
   });
 
