@@ -176,7 +176,7 @@ export default function Nav() {
   });
 
   return (
-    <nav class={`fixed w-full z-200 transition-all duration-200`}>
+    <nav class={`fixed w-full z-200 pointer-events-auto`}>
       <div class={`relative flex bg-transparent text-white`}>
         <div class="font-formula-bold text-2xl leading-none flex justify-between items-center nav overflow-hidden">
           <div class="overflow-hidden">

@@ -52,7 +52,7 @@ export default function MenuButton() {
     }
   });
   return (
-    <div class="fixed bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-200">
+    <div class="fixed bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-200 pointer-events-auto">
       <button
         ref={(el) => {
           menuButtonRef = el;
