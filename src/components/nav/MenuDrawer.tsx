@@ -14,7 +14,8 @@ type MenuDrawerProps = {
 
 const MenuDrawer = (props: MenuDrawerProps) => {
   const lenis = useLenis();
-  const { triggerTransition, setLogoColor } = usePageTransition();
+  // Destructure isVisible to check for active transitions
+  const { triggerTransition, setLogoColor, isVisible } = usePageTransition();
 
   let menuContainer: HTMLDivElement | undefined;
 
@@ -131,76 +132,80 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         "-=0.4"
       );
     } else {
-      currentTl = gsap.timeline({
-        onComplete: () => {
-          lenis?.start();
-        },
-      });
-
-      // Set logo color based on current section when closing menu
-      const setColorCallback = () => {
-        const sections = document.querySelectorAll("main section");
-        sections.forEach((section) => {
-          const rect = section.getBoundingClientRect();
-          if (rect.top <= 0 && rect.bottom > 0) {
-            if (section.classList.contains("bg-light")) {
-              setLogoColor("text-darkgray");
-            } else {
-              setLogoColor("text-gray");
-            }
-          }
+      // --- MODIFICATION ---
+      // Only run the closing animation if a page transition is NOT active.
+      if (!isVisible()) {
+        currentTl = gsap.timeline({
+          onComplete: () => {
+            lenis?.start();
+          },
         });
-      };
-      currentTl.add(setColorCallback, 0.1);
 
-      currentTl.to(
-        linkRefs,
-        {
-          y: "100%",
-          rotation: -12,
-          transformOrigin: "100% 0%",
-          duration: 0.4,
-          stagger: 0.05,
-          ease: "back.out(1)",
-        },
-        0
-      );
-      currentTl.to(
-        [addressRef, contactRef],
-        {
-          y: "100%",
-          rotation: 12,
-          transformOrigin: "0% 0%",
-          duration: 0.4,
-          stagger: 0.05,
-          ease: "back.out(1)",
-        },
-        0
-      );
-      if (currentImageRef) {
+        // Set logo color based on current section when closing menu
+        const setColorCallback = () => {
+          const sections = document.querySelectorAll("main section");
+          sections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            if (rect.top <= 0 && rect.bottom > 0) {
+              if (section.classList.contains("bg-light")) {
+                setLogoColor("text-darkgray");
+              } else {
+                setLogoColor("text-gray");
+              }
+            }
+          });
+        };
+        currentTl.add(setColorCallback, 0.1);
+
         currentTl.to(
-          currentImageRef,
+          linkRefs,
           {
             y: "100%",
             rotation: -12,
             transformOrigin: "100% 0%",
-            duration: 0.3,
-            ease: "slideUp",
+            duration: 0.4,
+            stagger: 0.05,
+            ease: "back.out(1)",
+          },
+          0
+        );
+        currentTl.to(
+          [addressRef, contactRef],
+          {
+            y: "100%",
+            rotation: 12,
+            transformOrigin: "0% 0%",
+            duration: 0.4,
+            stagger: 0.05,
+            ease: "back.out(1)",
+          },
+          0
+        );
+        if (currentImageRef) {
+          currentTl.to(
+            currentImageRef,
+            {
+              y: "100%",
+              rotation: -12,
+              transformOrigin: "100% 0%",
+              duration: 0.3,
+              ease: "slideUp",
+            },
+            0
+          );
+        }
+        currentTl.to(
+          columns,
+          {
+            y: "100%",
+            rotate: -6,
+            duration: 0.4,
+            stagger: 0.02,
+            ease: "circ.inOut",
           },
           0
         );
       }
-      currentTl.to(
-        columns,
-        {
-          y: "100%",
-          rotate: -6,
-          duration: 0.4,
-          stagger: 0.02,
-          ease: "circ.inOut",
-        },
-        0
-      );
     }
   });
 
@@ -246,9 +251,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     e.preventDefault();
                     triggerTransition(item.href, () => {
                       // Hide menu immediately when columns reach 0%
-                      const menuContainer = document.querySelector(
-                        ".fixed.inset-0.z-50"
-                      ) as HTMLElement;
                       if (menuContainer) {
                         menuContainer.style.display = "none";
                       }
