@@ -151,7 +151,7 @@ export default function Preloader() {
               style="border-radius: 0 var(--border-radius) var(--border-radius) 0;"
             >
               <div class="flex border-b border-gray/25  justify-center items-center py-[0.3em] px-[0.35em] font-formula-bold uppercase">
-                <h4 class="text-[1rem] leading-[1.1] tracking-[0.02em]">
+                <h4 class="text-[1rem] leading-[1.1] tracking-[0.02em] text-nowrap text-center">
                   2025 © All rights reserved
                 </h4>
               </div>
