@@ -1,14 +1,10 @@
 import { createSignal, Show, createEffect } from "solid-js";
 import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
+import { useMenu } from "~/context/MenuContext";
 
-interface MenuButtonProps {
-  isMenuOpen: boolean;
-  setIsMenuOpen: (value: boolean) => void;
-  setMenuButtonRef: (el: HTMLElement | undefined) => void;
-}
-
-export default function MenuButton(props: MenuButtonProps) {
+export default function MenuButton() {
+  const { isMenuOpen, setIsMenuOpen, setMenuButtonRef } = useMenu();
   let menuButtonRef: HTMLButtonElement | undefined;
   let line1Ref: HTMLSpanElement | undefined;
   let line2Ref: HTMLSpanElement | undefined;
@@ -18,7 +14,7 @@ export default function MenuButton(props: MenuButtonProps) {
   >(null);
   createEffect(() => {
     if (line1Ref && line2Ref && line3Ref) {
-      if (props.isMenuOpen) {
+      if (isMenuOpen()) {
         // Animate to X
         gsap.to(line1Ref, {
           rotation: -135,
@@ -60,13 +56,13 @@ export default function MenuButton(props: MenuButtonProps) {
       <button
         ref={(el) => {
           menuButtonRef = el;
-          props.setMenuButtonRef(el);
+          setMenuButtonRef(el);
         }}
-        onClick={() => props.setIsMenuOpen(!props.isMenuOpen)}
+        onClick={() => setIsMenuOpen(!isMenuOpen())}
         onMouseEnter={() => {
           setExternalTrigger("enter");
           if (line1Ref && line3Ref) {
-            if (props.isMenuOpen) {
+            if (isMenuOpen()) {
               gsap.to(line1Ref, {
                 rotation: "-135",
                 scaleX: 0.7,
@@ -92,7 +88,7 @@ export default function MenuButton(props: MenuButtonProps) {
         onMouseLeave={() => {
           setExternalTrigger("leave");
           if (line1Ref && line3Ref) {
-            if (props.isMenuOpen) {
+            if (isMenuOpen()) {
               gsap.to(line1Ref, {
                 rotation: "-45",
                 scaleX: 1,
@@ -121,7 +117,7 @@ export default function MenuButton(props: MenuButtonProps) {
           </div>
           <div class="bg-gray px-2 xl:px-2.5 h-8.5 xl:h-10 flex justify-center items-center font-formula-bold text-base xl:text-xl">
             <span class="transform translate-y-px transition-opacity duration-300">
-              <Show when={!props.isMenuOpen}>
+              <Show when={!isMenuOpen()}>
                 <TextAnimation
                   originalColor="rgba(0, 21, 20, 1)"
                   duplicateColor="rgba(0, 21, 20, 1)"
@@ -129,7 +125,7 @@ export default function MenuButton(props: MenuButtonProps) {
                   externalTrigger={externalTrigger()}
                 />
               </Show>
-              <Show when={props.isMenuOpen}>
+              <Show when={isMenuOpen()}>
                 <TextAnimation
                   originalColor="rgba(0, 21, 20, 1)"
                   duplicateColor="rgba(0, 21, 20, 1)"

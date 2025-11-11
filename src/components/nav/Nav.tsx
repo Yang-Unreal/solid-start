@@ -1,4 +1,4 @@
-import { A, useLocation, useNavigate, useIsRouting } from "@solidjs/router";
+import { A, useIsRouting } from "@solidjs/router";
 import { createEffect, createSignal, onMount } from "solid-js";
 import YourLogo from "~/components/logo/YourLogo";
 import TextAnimation from "~/components/TextAnimation";
@@ -7,15 +7,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { isServer } from "solid-js/web";
 import { useLenis } from "~/context/LenisContext";
 import { usePageTransition } from "~/context/PageTransitionContext";
+import { useMenu } from "~/context/MenuContext";
 
-interface NavProps {
-  isMenuOpen: boolean;
-  setIsMenuOpen: (value: boolean) => void;
-  setMenuButtonRef: (el: HTMLElement | undefined) => void;
-}
-
-export default function Nav(props: NavProps) {
-  const navigate = useNavigate();
+export default function Nav() {
+  const { isMenuOpen, setIsMenuOpen } = useMenu();
   const lenisControls = useLenis();
   const isRouting = useIsRouting();
   const {
@@ -27,7 +22,6 @@ export default function Nav(props: NavProps) {
     setSetupNavTriggers,
     setKillScrollTriggers,
     setMenuClosedCallback,
-    isVisible,
     isPreloaderFinished, // Import the preloader state
   } = usePageTransition();
 
@@ -156,7 +150,7 @@ export default function Nav(props: NavProps) {
 
   // Effect for menu drawer to prevent conflicts
   createEffect(() => {
-    if (props.isMenuOpen) {
+    if (isMenuOpen()) {
       lenisControls?.stop();
       gsap.to([productLinkRef, servicesLinkRef, aboutLinkRef, contactLinkRef], {
         y: "-100%",
@@ -195,7 +189,7 @@ export default function Nav(props: NavProps) {
                 triggerTransition("/product");
               }}
               onMouseEnter={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(workUnderlineRef!, {
                     scaleX: 1,
                     transformOrigin: "0% 50%",
@@ -203,7 +197,7 @@ export default function Nav(props: NavProps) {
                   });
               }}
               onMouseLeave={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(workUnderlineRef!, {
                     scaleX: 0,
                     transformOrigin: "100% 50%",
@@ -233,7 +227,7 @@ export default function Nav(props: NavProps) {
                 triggerTransition("/services");
               }}
               onMouseEnter={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(servicesUnderlineRef!, {
                     scaleX: 1,
                     transformOrigin: "0% 50%",
@@ -241,7 +235,7 @@ export default function Nav(props: NavProps) {
                   });
               }}
               onMouseLeave={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(servicesUnderlineRef!, {
                     scaleX: 0,
                     transformOrigin: "100% 50%",
@@ -267,7 +261,7 @@ export default function Nav(props: NavProps) {
             title="Homepage"
             onClick={(e) => {
               e.preventDefault();
-              if (props.isMenuOpen) {
+              if (isMenuOpen()) {
                 triggerTransition("/", () => {
                   const menuContainer = document.querySelector(
                     ".fixed.inset-0.z-50"
@@ -275,7 +269,7 @@ export default function Nav(props: NavProps) {
                   if (menuContainer) {
                     menuContainer.style.display = "none";
                   }
-                  props.setIsMenuOpen(false);
+                  setIsMenuOpen(false);
                 });
               } else {
                 triggerTransition("/");
@@ -294,7 +288,7 @@ export default function Nav(props: NavProps) {
                 triggerTransition("/about");
               }}
               onMouseEnter={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(aboutUnderlineRef!, {
                     scaleX: 1,
                     transformOrigin: "0% 50%",
@@ -302,7 +296,7 @@ export default function Nav(props: NavProps) {
                   });
               }}
               onMouseLeave={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(aboutUnderlineRef!, {
                     scaleX: 0,
                     transformOrigin: "100% 50%",
@@ -332,7 +326,7 @@ export default function Nav(props: NavProps) {
                 triggerTransition("/contact");
               }}
               onMouseEnter={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(contactUnderlineRef!, {
                     scaleX: 1,
                     transformOrigin: "0% 50%",
@@ -340,7 +334,7 @@ export default function Nav(props: NavProps) {
                   });
               }}
               onMouseLeave={() => {
-                if (!props.isMenuOpen)
+                if (!isMenuOpen())
                   gsap.to(contactUnderlineRef!, {
                     scaleX: 0,
                     transformOrigin: "100% 50%",

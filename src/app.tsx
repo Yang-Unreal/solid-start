@@ -6,8 +6,8 @@ import { LenisProvider } from "~/context/LenisContext";
 import { AppContent } from "~/components/AppContent";
 import { AuthProvider } from "~/context/AuthContext";
 import { PageTransitionProvider } from "~/context/PageTransitionContext";
+import { MenuProvider } from "~/context/MenuContext";
 import { QueryClientProvider } from "@tanstack/solid-query";
-import { Meta, MetaProvider, Title } from "@solidjs/meta";
 import { queryClient } from "~/lib/query-client";
 
 export default function App() {
@@ -19,11 +19,11 @@ export default function App() {
             <AuthProvider>
               <SearchProvider>
                 <PageTransitionProvider>
-                  <QueryClientProvider client={queryClient}>
-                    <MetaProvider>
+                  <MenuProvider>
+                    <QueryClientProvider client={queryClient}>
                       <AppContent children={props.children} />
-                    </MetaProvider>
-                  </QueryClientProvider>
+                    </QueryClientProvider>
+                  </MenuProvider>
                 </PageTransitionProvider>
               </SearchProvider>
             </AuthProvider>

@@ -1,18 +1,12 @@
-import { Suspense, createSignal, onMount } from "solid-js";
-import Nav from "./nav/Nav";
+import { Suspense, onMount } from "solid-js";
+import Header from "./Header";
 import MenuDrawer from "./nav/MenuDrawer";
-import MenuButton from "./nav/MenuButton";
-import { useAuth } from "~/context/AuthContext";
 import Preloader from "./Preloader";
 import gsap from "gsap/all";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { CustomEase } from "gsap/CustomEase";
 
 export function AppContent(props: { children: any }) {
-  const [isMenuOpen, setIsMenuOpen] = createSignal(false);
-  const [menuButtonRef, setMenuButtonRef] = createSignal<HTMLElement>();
-  const { session, handleLogoutSuccess } = useAuth();
-
   onMount(() => {
     gsap.registerPlugin(ScrollTrigger);
     gsap.registerPlugin(CustomEase);
@@ -25,23 +19,8 @@ export function AppContent(props: { children: any }) {
   return (
     <>
       <Preloader />
-      <Nav
-        isMenuOpen={isMenuOpen()}
-        setIsMenuOpen={setIsMenuOpen}
-        setMenuButtonRef={setMenuButtonRef}
-      />
-      <MenuButton
-        isMenuOpen={isMenuOpen()}
-        setIsMenuOpen={setIsMenuOpen}
-        setMenuButtonRef={setMenuButtonRef}
-      />
-      <MenuDrawer
-        isOpen={isMenuOpen()}
-        onClose={() => setIsMenuOpen(false)}
-        onLogoutSuccess={handleLogoutSuccess}
-        session={session}
-        menuButtonRef={menuButtonRef()}
-      />
+      <Header />
+      <MenuDrawer />
       <main class="grow">
         <Suspense fallback={null}>{props.children}</Suspense>
       </main>

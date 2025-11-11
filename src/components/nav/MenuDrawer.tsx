@@ -3,19 +3,17 @@ import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
 import { useLenis } from "~/context/LenisContext";
 import { usePageTransition } from "~/context/PageTransitionContext";
+import { useMenu } from "~/context/MenuContext";
 
 type MenuDrawerProps = {
-  isOpen: boolean;
   onClose?: () => void;
-  onLogoutSuccess?: () => void;
-  session?: any;
-  menuButtonRef?: HTMLElement;
 };
 
 const MenuDrawer = (props: MenuDrawerProps) => {
   const lenis = useLenis();
   // Destructure isVisible to check for active transitions
   const { triggerTransition, setLogoColor, isVisible } = usePageTransition();
+  const { isMenuOpen, setIsMenuOpen, menuButtonRef } = useMenu();
 
   let menuContainer: HTMLDivElement | undefined;
 
@@ -64,7 +62,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
     if (currentTl) currentTl.kill();
 
-    if (props.isOpen) {
+    if (isMenuOpen()) {
       // Update default image based on current route when opening
       const currentPath = window.location.pathname;
       const currentLink =
@@ -254,7 +252,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                       if (menuContainer) {
                         menuContainer.style.display = "none";
                       }
-                      props.onClose?.();
+                      setIsMenuOpen(false);
                     });
                   }}
                   onMouseEnter={() => {
