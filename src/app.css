@@ -19,15 +19,6 @@
   font-display: block;
 }
 
-/* @font-face {
-  font-family: "FormulaCondensed-Light";
-  src: url("https://minio.limingcn.com/solid-start/fonts/FormulaCondensed-Light.woff2")
-    format("woff2");
-  font-weight: 300;
-  font-style: normal;
-  font-display: block;
-} */
-
 @theme {
   --color-primary-rgb: 255, 255, 0;
   --color-primary: rgba(var(--color-primary-rgb), 1);
@@ -70,7 +61,12 @@
   --btn-height: 2.25em;
 }
 
+html,
 body {
+  width: 100%;
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
   background-color: var(--color-dark);
   color: var(--color-text-light);
   font-family: sans-serif;
@@ -80,34 +76,16 @@ body {
   font-size: clamp(16px, 1.2vw, 19px);
   overscroll-behavior-y: none;
   margin: 0;
-}
-
-/* Hide scrollbar for WebKit browsers (Chrome, Safari, Brave) */
-body::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for Firefox */
-body {
-  scrollbar-width: none; /* Firefox */
-}
-
-html,
-body {
-  width: 100%;
-  min-height: 100%;
-  -webkit-font-smoothing: antialiased;
-  position: relative;
-}
-/* For other browsers that might not support the above, or for a more aggressive hide */
-html {
   scroll-behavior: smooth; /* Smooth scrolling for the entire page */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
   overflow-x: hidden;
 }
-html::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Brave */
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Brave) */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
 }
 
 @layer components {
@@ -182,21 +160,6 @@ html::-webkit-scrollbar {
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border-width: 0;
-  }
-
-  /* Custom scrollbar styling (optional, adjust as needed) */
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-neutral-200 rounded-full;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-neutral-400 rounded-full;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-neutral-500;
   }
 
   .loading-container {
@@ -293,11 +256,6 @@ html::-webkit-scrollbar {
   .font-formula-bold {
     font-family: "FormulaCondensed-Bold", sans-serif;
   }
-
-  /* .font-formula-light {
-    font-family: "FormulaCondensed-Light", sans-serif;
-  }
-*/
 
   .font-inconsolata {
     font-family: "Inconsolata", monospace;
