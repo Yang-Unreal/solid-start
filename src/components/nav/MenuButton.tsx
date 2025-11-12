@@ -6,9 +6,9 @@ import { useMenu } from "~/context/MenuContext";
 export default function MenuButton() {
   const { isMenuOpen, setIsMenuOpen, setMenuButtonRef } = useMenu();
   let menuButtonRef: HTMLButtonElement | undefined;
-  let line1Ref: HTMLSpanElement | undefined;
-  let line2Ref: HTMLSpanElement | undefined;
-  let line3Ref: HTMLSpanElement | undefined;
+  let line1Ref: HTMLDivElement | undefined;
+  let line2Ref: HTMLDivElement | undefined;
+  let line3Ref: HTMLDivElement | undefined;
   const [externalTrigger, setExternalTrigger] = createSignal<
     "enter" | "leave" | null
   >(null);
@@ -52,7 +52,7 @@ export default function MenuButton() {
     }
   });
   return (
-    <div class="fixed bottom-3 md:bottom-3 lg:bottom-7 left-1/2 transform -translate-x-1/2 flex items-center justify-center z-200 pointer-events-auto">
+    <div class="btn-hamburger">
       <button
         ref={(el) => {
           menuButtonRef = el;
@@ -105,36 +105,34 @@ export default function MenuButton() {
             }
           }
         }}
-        class={`border rounded-m border-gray transition-colors duration-600 menu-button`}
+        class={`btn-click`}
       >
-        <div class="flex justify-center items-center">
-          <div class="bg-dark px-2.5 h-8.5 xl:h-10 flex justify-center items-center">
-            <div class="menu-icon gap-0.5 xl:gap-1 text-primary">
-              <span ref={line1Ref} class="line line1 w-3 xl:w-5"></span>
-              <span ref={line2Ref} class="line line2 w-3 xl:w-5"></span>
-              <span ref={line3Ref} class="line line3 w-3 xl:w-5"></span>
-            </div>
+        <div class="btn-icon">
+          <div class="hamburger">
+            <div ref={line1Ref} class="bar before line1"></div>
+            <div ref={line2Ref} class="bar line2 "></div>
+            <div ref={line3Ref} class="bar after line3 "></div>
           </div>
-          <div class="bg-gray px-2 xl:px-2.5 h-8.5 xl:h-10 flex justify-center items-center font-formula-bold text-base xl:text-xl">
-            <span class="transform translate-y-px transition-opacity duration-300">
-              <Show when={!isMenuOpen()}>
-                <TextAnimation
-                  originalColor="rgba(0, 21, 20, 1)"
-                  duplicateColor="rgba(0, 21, 20, 1)"
-                  text="MENU"
-                  externalTrigger={externalTrigger()}
-                />
-              </Show>
-              <Show when={isMenuOpen()}>
-                <TextAnimation
-                  originalColor="rgba(0, 21, 20, 1)"
-                  duplicateColor="rgba(0, 21, 20, 1)"
-                  text="CLOSE"
-                  externalTrigger={externalTrigger()}
-                />
-              </Show>
-            </span>
-          </div>
+        </div>
+        <div class="bg-gray px-2 xl:px-2.5 h-8.5 xl:h-10 flex justify-center items-center font-formula-bold text-base xl:text-xl">
+          <span class="transform translate-y-px transition-opacity duration-300">
+            <Show when={!isMenuOpen()}>
+              <TextAnimation
+                originalColor="rgba(0, 21, 20, 1)"
+                duplicateColor="rgba(0, 21, 20, 1)"
+                text="MENU"
+                externalTrigger={externalTrigger()}
+              />
+            </Show>
+            <Show when={isMenuOpen()}>
+              <TextAnimation
+                originalColor="rgba(0, 21, 20, 1)"
+                duplicateColor="rgba(0, 21, 20, 1)"
+                text="CLOSE"
+                externalTrigger={externalTrigger()}
+              />
+            </Show>
+          </span>
         </div>
       </button>
     </div>

@@ -2,7 +2,7 @@ import type { Component } from "solid-js";
 
 const YourLogo: Component<{ class?: string }> = (props) => (
   <svg
-    class={props.class || "h-6 w-auto"}
+    class={props.class}
     viewBox="0 0 450 42.44"
     xmlns="http://www.w3.org/2000/svg"
     role="img"

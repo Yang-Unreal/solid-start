@@ -176,186 +176,198 @@ export default function Nav() {
   });
 
   return (
-    <nav class={`fixed w-full z-200 pointer-events-auto`}>
-      <div class={`relative flex bg-transparent text-white`}>
-        <div class="font-formula-bold text-2xl leading-none flex justify-between items-center nav overflow-hidden">
-          <div class="overflow-hidden">
-            <A
-              ref={productLinkRef}
-              href="/product"
-              class="relative text-xl xl:text-2xl block"
-              onClick={(e) => {
-                e.preventDefault();
-                triggerTransition("/product");
-              }}
-              onMouseEnter={() => {
-                if (!isMenuOpen())
-                  gsap.to(workUnderlineRef!, {
-                    scaleX: 1,
-                    transformOrigin: "0% 50%",
-                    duration: 0.3,
-                  });
-              }}
-              onMouseLeave={() => {
-                if (!isMenuOpen())
-                  gsap.to(workUnderlineRef!, {
-                    scaleX: 0,
-                    transformOrigin: "100% 50%",
-                    duration: 0.3,
-                  });
-              }}
-            >
-              <TextAnimation
-                originalColor={currentNavColors().originalColor}
-                duplicateColor={currentNavColors().duplicateColor}
-                text="PRODUCT"
-              />
-              <div
-                ref={workUnderlineRef!}
-                class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": currentNavColors().originalColor }}
-              ></div>
-            </A>
-          </div>
-          <div class="overflow-hidden">
-            <A
-              ref={servicesLinkRef}
-              href="/services"
-              class="relative text-xl xl:text-2xl hidden md:block"
-              onClick={(e) => {
-                e.preventDefault();
-                triggerTransition("/services");
-              }}
-              onMouseEnter={() => {
-                if (!isMenuOpen())
-                  gsap.to(servicesUnderlineRef!, {
-                    scaleX: 1,
-                    transformOrigin: "0% 50%",
-                    duration: 0.3,
-                  });
-              }}
-              onMouseLeave={() => {
-                if (!isMenuOpen())
-                  gsap.to(servicesUnderlineRef!, {
-                    scaleX: 0,
-                    transformOrigin: "100% 50%",
-                    duration: 0.3,
-                  });
-              }}
-            >
-              <TextAnimation
-                originalColor={currentNavColors().originalColor}
-                duplicateColor={currentNavColors().duplicateColor}
-                text="SERVICES"
-              />
-              <div
-                ref={servicesUnderlineRef!}
-                class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": currentNavColors().originalColor }}
-              ></div>
-            </A>
-          </div>
-          <A
-            href="/"
-            aria-label="Homepage"
-            title="Homepage"
-            onClick={(e) => {
-              e.preventDefault();
-              if (isMenuOpen()) {
-                triggerTransition("/", () => {
-                  const menuContainer = document.querySelector(
-                    ".fixed.inset-0.z-50"
-                  ) as HTMLElement;
-                  if (menuContainer) {
-                    menuContainer.style.display = "none";
+    <div class="main-nav-bar">
+      <div class="w-full relative flex items-center justify-between">
+        <nav class="w-full flex" aria-label="Navigation Desktop">
+          <ul class="w-full font-formula-bold flex flex-row justify-between items-center overflow-hidden pointer-events-auto p-0 m-0  ">
+            <li class="relative">
+              <A
+                ref={productLinkRef}
+                href="/product"
+                class="relative text-[1.25em] block bg-transparent overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  triggerTransition("/product");
+                }}
+                onMouseEnter={() => {
+                  if (!isMenuOpen())
+                    gsap.to(workUnderlineRef!, {
+                      scaleX: 1,
+                      transformOrigin: "0% 50%",
+                      duration: 0.3,
+                    });
+                }}
+                onMouseLeave={() => {
+                  if (!isMenuOpen())
+                    gsap.to(workUnderlineRef!, {
+                      scaleX: 0,
+                      transformOrigin: "100% 50%",
+                      duration: 0.3,
+                    });
+                }}
+              >
+                <TextAnimation
+                  originalColor={currentNavColors().originalColor}
+                  duplicateColor={currentNavColors().duplicateColor}
+                  text="PRODUCT"
+                />
+                <div
+                  ref={workUnderlineRef!}
+                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
+                  style={{
+                    "background-color": currentNavColors().originalColor,
+                  }}
+                ></div>
+              </A>
+            </li>
+            <li class="relative">
+              <A
+                ref={servicesLinkRef}
+                href="/services"
+                class="relative text-[1.25em] hidden md:block bg-transparent overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  triggerTransition("/services");
+                }}
+                onMouseEnter={() => {
+                  if (!isMenuOpen())
+                    gsap.to(servicesUnderlineRef!, {
+                      scaleX: 1,
+                      transformOrigin: "0% 50%",
+                      duration: 0.3,
+                    });
+                }}
+                onMouseLeave={() => {
+                  if (!isMenuOpen())
+                    gsap.to(servicesUnderlineRef!, {
+                      scaleX: 0,
+                      transformOrigin: "100% 50%",
+                      duration: 0.3,
+                    });
+                }}
+              >
+                <TextAnimation
+                  originalColor={currentNavColors().originalColor}
+                  duplicateColor={currentNavColors().duplicateColor}
+                  text="SERVICES"
+                />
+                <div
+                  ref={servicesUnderlineRef!}
+                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
+                  style={{
+                    "background-color": currentNavColors().originalColor,
+                  }}
+                ></div>
+              </A>
+            </li>
+            <li class="relative flex items-center justify-center">
+              <A
+                href="/"
+                aria-label="Homepage"
+                title="Homepage"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (isMenuOpen()) {
+                    triggerTransition("/", () => {
+                      const menuContainer = document.querySelector(
+                        ".fixed.inset-0.z-50"
+                      ) as HTMLElement;
+                      if (menuContainer) {
+                        menuContainer.style.display = "none";
+                      }
+                      setIsMenuOpen(false);
+                    });
+                  } else {
+                    triggerTransition("/");
                   }
-                  setIsMenuOpen(false);
-                });
-              } else {
-                triggerTransition("/");
-              }
-            }}
-          >
-            <YourLogo class={`h-4 xl:h-5 w-auto ${currentLogoColor()}`} />
-          </A>
-          <div class="overflow-hidden">
-            <A
-              ref={aboutLinkRef}
-              href="/about"
-              class="relative text-xl xl:text-2xl hidden md:block"
-              onClick={(e) => {
-                e.preventDefault();
-                triggerTransition("/about");
-              }}
-              onMouseEnter={() => {
-                if (!isMenuOpen())
-                  gsap.to(aboutUnderlineRef!, {
-                    scaleX: 1,
-                    transformOrigin: "0% 50%",
-                    duration: 0.3,
-                  });
-              }}
-              onMouseLeave={() => {
-                if (!isMenuOpen())
-                  gsap.to(aboutUnderlineRef!, {
-                    scaleX: 0,
-                    transformOrigin: "100% 50%",
-                    duration: 0.3,
-                  });
-              }}
-            >
-              <TextAnimation
-                originalColor={currentNavColors().originalColor}
-                duplicateColor={currentNavColors().duplicateColor}
-                text="ABOUT"
-              />
-              <div
-                ref={aboutUnderlineRef!}
-                class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": currentNavColors().originalColor }}
-              ></div>
-            </A>
-          </div>
-          <div class="overflow-hidden">
-            <A
-              ref={contactLinkRef}
-              href="/contact"
-              class="relative text-xl xl:text-2xl block"
-              onClick={(e) => {
-                e.preventDefault();
-                triggerTransition("/contact");
-              }}
-              onMouseEnter={() => {
-                if (!isMenuOpen())
-                  gsap.to(contactUnderlineRef!, {
-                    scaleX: 1,
-                    transformOrigin: "0% 50%",
-                    duration: 0.3,
-                  });
-              }}
-              onMouseLeave={() => {
-                if (!isMenuOpen())
-                  gsap.to(contactUnderlineRef!, {
-                    scaleX: 0,
-                    transformOrigin: "100% 50%",
-                    duration: 0.3,
-                  });
-              }}
-            >
-              <TextAnimation
-                originalColor={currentNavColors().originalColor}
-                duplicateColor={currentNavColors().duplicateColor}
-                text="CONTACT"
-              />
-              <div
-                ref={contactUnderlineRef!}
-                class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                style={{ "background-color": currentNavColors().originalColor }}
-              ></div>
-            </A>
-          </div>
-        </div>
+                }}
+              >
+                <YourLogo class={`h-auto w-[11em] ${currentLogoColor()}`} />
+              </A>
+            </li>
+            <li class="relative">
+              <A
+                ref={aboutLinkRef}
+                href="/about"
+                class="relative text-[1.25em] hidden md:block bg-transparent overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  triggerTransition("/about");
+                }}
+                onMouseEnter={() => {
+                  if (!isMenuOpen())
+                    gsap.to(aboutUnderlineRef!, {
+                      scaleX: 1,
+                      transformOrigin: "0% 50%",
+                      duration: 0.3,
+                    });
+                }}
+                onMouseLeave={() => {
+                  if (!isMenuOpen())
+                    gsap.to(aboutUnderlineRef!, {
+                      scaleX: 0,
+                      transformOrigin: "100% 50%",
+                      duration: 0.3,
+                    });
+                }}
+              >
+                <TextAnimation
+                  originalColor={currentNavColors().originalColor}
+                  duplicateColor={currentNavColors().duplicateColor}
+                  text="ABOUT"
+                />
+                <div
+                  ref={aboutUnderlineRef!}
+                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
+                  style={{
+                    "background-color": currentNavColors().originalColor,
+                  }}
+                ></div>
+              </A>
+            </li>
+            <li class="relative">
+              <A
+                ref={contactLinkRef}
+                href="/contact"
+                class="relative text-[1.25em] block bg-transparent overflow-hidden"
+                onClick={(e) => {
+                  e.preventDefault();
+                  triggerTransition("/contact");
+                }}
+                onMouseEnter={() => {
+                  if (!isMenuOpen())
+                    gsap.to(contactUnderlineRef!, {
+                      scaleX: 1,
+                      transformOrigin: "0% 50%",
+                      duration: 0.3,
+                    });
+                }}
+                onMouseLeave={() => {
+                  if (!isMenuOpen())
+                    gsap.to(contactUnderlineRef!, {
+                      scaleX: 0,
+                      transformOrigin: "100% 50%",
+                      duration: 0.3,
+                    });
+                }}
+              >
+                <TextAnimation
+                  originalColor={currentNavColors().originalColor}
+                  duplicateColor={currentNavColors().duplicateColor}
+                  text="CONTACT"
+                />
+                <div
+                  ref={contactUnderlineRef!}
+                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
+                  style={{
+                    "background-color": currentNavColors().originalColor,
+                  }}
+                ></div>
+              </A>
+            </li>
+          </ul>
+        </nav>
       </div>
-    </nav>
+    </div>
   );
 }
