@@ -9,26 +9,27 @@ interface TextAnimationProps {
   externalTrigger?: "enter" | "leave" | null;
   navSlideTrigger?: "up" | "down" | null;
   isCopyable?: boolean;
+  textStyle?: string;
 }
 
 export default function TextAnimation(props: TextAnimationProps) {
   let originalRef: HTMLSpanElement | undefined;
   let duplicateRef: HTMLSpanElement | undefined;
   const [displayText, setDisplayText] = createSignal(props.text);
-
+  const duration = 0.2;
   const animateEnter = () => {
     gsap.to(originalRef!, {
       y: "-100%",
       rotation: -12,
       transformOrigin: "0% 100%",
-      duration: 0.2,
+      duration: duration,
       ease: "custom",
     });
     gsap.to(duplicateRef!, {
       y: "0%",
       rotation: 0,
       transformOrigin: "100% 0%",
-      duration: 0.2,
+      duration: duration,
       ease: "custom",
     });
   };
@@ -38,14 +39,14 @@ export default function TextAnimation(props: TextAnimationProps) {
       y: "0%",
       rotation: 0,
       transformOrigin: "0% 100%",
-      duration: 0.2,
+      duration: duration,
       ease: "custom",
     });
     gsap.to(duplicateRef!, {
       y: "100%",
       rotation: -12,
       transformOrigin: "100% 0%",
-      duration: 0.2,
+      duration: duration,
       ease: "custom",
     });
   };
@@ -112,17 +113,17 @@ export default function TextAnimation(props: TextAnimationProps) {
     >
       <span
         ref={originalRef!}
-        class="block"
-        style={`color: ${props.originalColor || "inherit"}`}
+        class={`block ${props.textStyle}`}
+        style={`color: ${props.originalColor || "inherit"} ;`}
       >
         {displayText()}
       </span>
       <span
         ref={duplicateRef!}
-        class="absolute top-0 left-0 block"
+        class={`absolute top-0 left-0 block ${props.textStyle}`}
         style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%; color: ${
           props.duplicateColor || "inherit"
-        }`}
+        }; `}
       >
         {displayText()}
       </span>

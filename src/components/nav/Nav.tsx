@@ -210,6 +210,7 @@ export default function Nav() {
                   originalColor={currentNavColors().originalColor}
                   duplicateColor={currentNavColors().duplicateColor}
                   text="PRODUCT"
+                  textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={workUnderlineRef!}
@@ -250,6 +251,7 @@ export default function Nav() {
                   originalColor={currentNavColors().originalColor}
                   duplicateColor={currentNavColors().duplicateColor}
                   text="SERVICES"
+                  textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={servicesUnderlineRef!}
@@ -315,6 +317,7 @@ export default function Nav() {
                   originalColor={currentNavColors().originalColor}
                   duplicateColor={currentNavColors().duplicateColor}
                   text="ABOUT"
+                  textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={aboutUnderlineRef!}
@@ -355,6 +358,7 @@ export default function Nav() {
                   originalColor={currentNavColors().originalColor}
                   duplicateColor={currentNavColors().duplicateColor}
                   text="CONTACT"
+                  textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={contactUnderlineRef!}

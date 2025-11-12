@@ -12,6 +12,8 @@ export default function MenuButton() {
   const [externalTrigger, setExternalTrigger] = createSignal<
     "enter" | "leave" | null
   >(null);
+
+  const barDuration = 0.1;
   createEffect(() => {
     if (line1Ref && line2Ref && line3Ref) {
       if (isMenuOpen()) {
@@ -19,15 +21,14 @@ export default function MenuButton() {
         gsap.to(line1Ref, {
           rotation: -135,
           y: "0%",
-          duration: 0.05,
-
+          duration: barDuration,
           transformOrigin: "center",
         });
-        gsap.to(line2Ref, { scaleX: 0, duration: 0.05 });
+        gsap.to(line2Ref, { scaleX: 0, duration: barDuration });
         gsap.to(line3Ref, {
           rotation: -45,
           y: "0%",
-          duration: 0.05,
+          duration: barDuration,
 
           transformOrigin: "center",
         });
@@ -36,14 +37,17 @@ export default function MenuButton() {
         gsap.to(line1Ref, {
           rotation: 0,
           y: "-250%",
-          duration: 0.05,
+          duration: barDuration,
           transformOrigin: "center",
         });
-        gsap.to(line2Ref, { scaleX: 1, duration: 0.05 });
+        gsap.to(line2Ref, {
+          scaleX: 1,
+          duration: barDuration,
+        });
         gsap.to(line3Ref, {
           rotation: 0,
           y: "250%",
-          duration: 0.05,
+          duration: barDuration,
           transformOrigin: "center",
         });
       }
@@ -113,14 +117,14 @@ export default function MenuButton() {
           </div>
         </div>
         <div class="btn-content font-formula-bold">
-          <span class="btn-text text-[1em]">
+          <div class="btn-text text-[1em]">
             <Show when={!isMenuOpen()}>
               <TextAnimation
                 originalColor="rgba(0, 21, 20, 1)"
                 duplicateColor="rgba(0, 21, 20, 1)"
                 text="MENU"
                 externalTrigger={externalTrigger()}
-                class="pt-[0.2em]"
+                textStyle="pt-[0.2em] leading-[0.86em] tracking-wide"
               />
             </Show>
             <Show when={isMenuOpen()}>
@@ -129,10 +133,10 @@ export default function MenuButton() {
                 duplicateColor="rgba(0, 21, 20, 1)"
                 text="CLOSE"
                 externalTrigger={externalTrigger()}
-                class="pt-[0.2em]"
+                textStyle="pt-[0.2em] leading-[0.86em] tracking-wide"
               />
             </Show>
-          </span>
+          </div>
         </div>
       </button>
     </div>
