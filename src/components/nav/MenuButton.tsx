@@ -13,7 +13,7 @@ export default function MenuButton() {
     "enter" | "leave" | null
   >(null);
 
-  const barDuration = 0.1;
+  const barDuration = 0.3;
   createEffect(() => {
     if (line1Ref && line2Ref && line3Ref) {
       if (isMenuOpen()) {
@@ -68,21 +68,21 @@ export default function MenuButton() {
               gsap.to(line1Ref, {
                 rotation: "-135",
                 scaleX: 0.7,
-                duration: 0.05,
+                duration: barDuration,
               });
               gsap.to(line3Ref, {
                 rotation: "-45",
                 scaleX: 0.7,
-                duration: 0.05,
+                duration: barDuration,
               });
             } else {
               gsap.to(line1Ref, {
                 scaleX: 0.7,
-                duration: 0.05,
+                duration: barDuration,
               });
               gsap.to(line3Ref, {
                 scaleX: 0.7,
-                duration: 0.05,
+                duration: barDuration,
               });
             }
           }
@@ -94,16 +94,16 @@ export default function MenuButton() {
               gsap.to(line1Ref, {
                 rotation: "-45",
                 scaleX: 1,
-                duration: 0.05,
+                duration: barDuration,
               });
               gsap.to(line3Ref, {
                 rotation: "45",
                 scaleX: 1,
-                duration: 0.05,
+                duration: barDuration,
               });
             } else {
-              gsap.to(line1Ref, { scaleX: 1, duration: 0.05 });
-              gsap.to(line3Ref, { scaleX: 1, duration: 0.05 });
+              gsap.to(line1Ref, { scaleX: 1, duration: barDuration });
+              gsap.to(line3Ref, { scaleX: 1, duration: barDuration });
             }
           }
         }}

@@ -338,7 +338,6 @@ header {
     width: 50%;
     height: 0.1em;
     background-color: var(--color-primary);
-    transition: transform 0.3s ease;
     transform-origin: center;
   }
 
