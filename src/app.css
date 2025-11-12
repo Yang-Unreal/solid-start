@@ -48,12 +48,6 @@
   --color-light-white: rgba(241, 241, 241, 1);
   --color-dark-text: rgba(0, 21, 20, 0.8);
   --color-gray-text: rgba(192, 202, 201, 0.45);
-
-  /* Tailwind color classes */
-  gray: var(--color-gray);
-  light: var(--color-light);
-  dark: var(--color-dark);
-  darkgray: var(--color-darkgray);
 }
 
 :root {
@@ -202,17 +196,6 @@ header {
     bottom: 0;
     overflow: hidden;
     z-index: 500;
-    pointer-events: none;
-    display: flex;
-  }
-
-  .menu-columns {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow: hidden;
     pointer-events: none;
     display: flex;
   }
@@ -375,6 +358,30 @@ header {
     align-items: center;
     justify-content: center;
     padding: 0 0.6em;
+    overflow: hidden;
+  }
+
+  .navigation-full {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    z-index: 50;
+  }
+
+  .navigation-full .navigation-tile {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: var(--color-dark);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--border-radius-medium);
     overflow: hidden;
   }
 }

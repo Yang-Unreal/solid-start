@@ -71,7 +71,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         currentImageRef.src = currentLink.image;
         currentImageRef.alt = currentLink.label;
       }
-      gsap.set(menuContainer, { display: "block" });
+      gsap.set(menuContainer, { display: "flex" });
 
       lenis?.stop();
       gsap.set(columns, {
@@ -208,14 +208,16 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   });
 
   return (
-    <div ref={menuContainer} class="fixed inset-0 z-50">
+    <nav
+      ref={menuContainer}
+      aria-label="Navigation Overlay and Mobile"
+      class="navigation-full"
+    >
       {/* Background Columns */}
-      <div class="menu-columns">
-        <div class="column flex w-full h-full bg-dark rounded"></div>
-        <div class="column flex w-full h-full bg-dark rounded"></div>
-        <div class="column w-full h-full bg-dark rounded hidden sm:block"></div>
-        <div class="column w-full h-full bg-dark rounded hidden sm:block"></div>
-      </div>
+      <div class="column navigation-tile"></div>
+      <div class="column navigation-tile"></div>
+      <div class="column navigation-tile hidden sm:block"></div>
+      <div class="column navigation-tile hidden sm:block"></div>
 
       {/* Image Container */}
       <div
@@ -237,7 +239,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       </div>
 
       {/* Foreground Text */}
-      <div class="relative flex h-full items-center justify-center text-white ">
+      <div class="absolute inset-0 flex h-full items-center justify-center text-white pointer-events-auto">
         <ul class="flex flex-col items-center  text-center md:flex-row md:space-x-20 overflow-hidden">
           <For each={navLinks}>
             {(item, index) => (
@@ -335,7 +337,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           </For>
         </ul>
       </div>
-      <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold overflow-hidden">
+      <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold overflow-hidden pointer-events-auto">
         <div ref={addressRef}>
           <span class="text-sm xl:text-xl text-gray-text">ADDRESS</span>
           <h4 class="text-xl xl:text-2xl text-gray">TAIZHOU,ZHEJIANG,CHINA</h4>
@@ -351,7 +353,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           />
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 
