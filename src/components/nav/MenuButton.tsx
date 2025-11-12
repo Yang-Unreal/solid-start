@@ -18,7 +18,7 @@ export default function MenuButton() {
         // Animate to X
         gsap.to(line1Ref, {
           rotation: -135,
-          y: 6,
+          y: "0%",
           duration: 0.05,
 
           transformOrigin: "center",
@@ -26,7 +26,7 @@ export default function MenuButton() {
         gsap.to(line2Ref, { scaleX: 0, duration: 0.05 });
         gsap.to(line3Ref, {
           rotation: -45,
-          y: -6,
+          y: "0%",
           duration: 0.05,
 
           transformOrigin: "center",
@@ -35,17 +35,15 @@ export default function MenuButton() {
         // Animate to hamburger
         gsap.to(line1Ref, {
           rotation: 0,
-          y: 0,
+          y: "-250%",
           duration: 0.05,
-
           transformOrigin: "center",
         });
         gsap.to(line2Ref, { scaleX: 1, duration: 0.05 });
         gsap.to(line3Ref, {
           rotation: 0,
-          y: 0,
+          y: "250%",
           duration: 0.05,
-
           transformOrigin: "center",
         });
       }
@@ -114,14 +112,15 @@ export default function MenuButton() {
             <div ref={line3Ref} class="bar after line3 "></div>
           </div>
         </div>
-        <div class="bg-gray px-2 xl:px-2.5 h-8.5 xl:h-10 flex justify-center items-center font-formula-bold text-base xl:text-xl">
-          <span class="transform translate-y-px transition-opacity duration-300">
+        <div class="btn-content font-formula-bold">
+          <span class="btn-text text-[1em]">
             <Show when={!isMenuOpen()}>
               <TextAnimation
                 originalColor="rgba(0, 21, 20, 1)"
                 duplicateColor="rgba(0, 21, 20, 1)"
                 text="MENU"
                 externalTrigger={externalTrigger()}
+                class="pt-[0.2em]"
               />
             </Show>
             <Show when={isMenuOpen()}>
@@ -130,6 +129,7 @@ export default function MenuButton() {
                 duplicateColor="rgba(0, 21, 20, 1)"
                 text="CLOSE"
                 externalTrigger={externalTrigger()}
+                class="pt-[0.2em]"
               />
             </Show>
           </span>
