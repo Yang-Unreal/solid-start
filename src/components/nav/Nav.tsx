@@ -35,17 +35,17 @@ export default function Nav() {
   let aboutLinkRef: HTMLAnchorElement | undefined;
   let contactLinkRef: HTMLAnchorElement | undefined;
 
-  // Local signals for colors that default to a safe, visible value.
-  const [currentNavColors, setCurrentNavColors] = createSignal({
-    originalColor: "rgba(192, 202, 201, 1)",
-    duplicateColor: "rgba(241, 241, 241, 1)",
+  // Local signals for classes that default to a safe, visible value.
+  const [currentNavClasses, setCurrentNavClasses] = createSignal({
+    originalClass: "text-gray",
+    duplicateClass: "text-light",
   });
   const [currentLogoColor, setCurrentLogoColor] = createSignal("text-gray");
 
   // Sync the context state to our local state ONLY when the preloader is finished.
   createEffect(() => {
     if (isPreloaderFinished()) {
-      setCurrentNavColors(contextNavColors());
+      setCurrentNavClasses(contextNavColors());
       setCurrentLogoColor(contextLogoColor());
     }
   });
@@ -70,14 +70,14 @@ export default function Nav() {
       if (rect.top <= 0 && rect.bottom > 0) {
         if (section.classList.contains("bg-light")) {
           setContextNavColors({
-            originalColor: "#182b2a",
-            duplicateColor: "rgba(0, 21, 20, 1)",
+            originalClass: "text-darkgray",
+            duplicateClass: "text-dark",
           });
           setContextLogoColor("text-darkgray");
         } else {
           setContextNavColors({
-            originalColor: "rgba(192, 202, 201, 1)",
-            duplicateColor: "rgba(241, 241, 241, 1)",
+            originalClass: "text-gray",
+            duplicateClass: "text-light",
           });
           setContextLogoColor("text-gray");
         }
@@ -95,14 +95,14 @@ export default function Nav() {
           if (self.isActive) {
             if (section.classList.contains("bg-light")) {
               setContextNavColors({
-                originalColor: "#182b2a",
-                duplicateColor: "rgba(0, 21, 20, 1)",
+                originalClass: "text-darkgray",
+                duplicateClass: "text-dark",
               });
               setContextLogoColor("text-darkgray");
             } else {
               setContextNavColors({
-                originalColor: "rgba(192, 202, 201, 1)",
-                duplicateColor: "rgba(241, 241, 241, 1)",
+                originalClass: "text-gray",
+                duplicateClass: "text-light",
               });
               setContextLogoColor("text-gray");
             }
@@ -138,8 +138,16 @@ export default function Nav() {
           const rect = section.getBoundingClientRect();
           if (rect.top <= 0 && rect.bottom > 0) {
             if (section.classList.contains("bg-light")) {
+              setContextNavColors({
+                originalClass: "text-darkgray",
+                duplicateClass: "text-dark",
+              });
               setContextLogoColor("text-darkgray");
             } else {
+              setContextNavColors({
+                originalClass: "text-gray",
+                duplicateClass: "text-light",
+              });
               setContextLogoColor("text-gray");
             }
           }
@@ -207,17 +215,17 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalColor={currentNavColors().originalColor}
-                  duplicateColor={currentNavColors().duplicateColor}
+                  originalClass={currentNavClasses().originalClass}
+                  duplicateClass={currentNavClasses().duplicateClass}
                   text="PRODUCT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={workUnderlineRef!}
-                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                  style={{
-                    "background-color": currentNavColors().originalColor,
-                  }}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                    "text-",
+                    "bg-"
+                  )}`}
                 ></div>
               </A>
             </li>
@@ -248,17 +256,17 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalColor={currentNavColors().originalColor}
-                  duplicateColor={currentNavColors().duplicateColor}
+                  originalClass={currentNavClasses().originalClass}
+                  duplicateClass={currentNavClasses().duplicateClass}
                   text="SERVICES"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={servicesUnderlineRef!}
-                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                  style={{
-                    "background-color": currentNavColors().originalColor,
-                  }}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                    "text-",
+                    "bg-"
+                  )}`}
                 ></div>
               </A>
             </li>
@@ -314,17 +322,17 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalColor={currentNavColors().originalColor}
-                  duplicateColor={currentNavColors().duplicateColor}
+                  originalClass={currentNavClasses().originalClass}
+                  duplicateClass={currentNavClasses().duplicateClass}
                   text="ABOUT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={aboutUnderlineRef!}
-                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                  style={{
-                    "background-color": currentNavColors().originalColor,
-                  }}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                    "text-",
+                    "bg-"
+                  )}`}
                 ></div>
               </A>
             </li>
@@ -355,17 +363,17 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalColor={currentNavColors().originalColor}
-                  duplicateColor={currentNavColors().duplicateColor}
+                  originalClass={currentNavClasses().originalClass}
+                  duplicateClass={currentNavClasses().duplicateClass}
                   text="CONTACT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={contactUnderlineRef!}
-                  class="absolute bottom-0 left-0 w-full h-px scale-x-0"
-                  style={{
-                    "background-color": currentNavColors().originalColor,
-                  }}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                    "text-",
+                    "bg-"
+                  )}`}
                 ></div>
               </A>
             </li>

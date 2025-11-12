@@ -4,8 +4,8 @@ import gsap, { CustomEase } from "gsap/all";
 interface TextAnimationProps {
   text: string;
   class?: string;
-  originalColor?: string;
-  duplicateColor?: string;
+  originalClass?: string;
+  duplicateClass?: string;
   externalTrigger?: "enter" | "leave" | null;
   navSlideTrigger?: "up" | "down" | null;
   isCopyable?: boolean;
@@ -113,17 +113,16 @@ export default function TextAnimation(props: TextAnimationProps) {
     >
       <span
         ref={originalRef!}
-        class={`block ${props.textStyle}`}
-        style={`color: ${props.originalColor || "inherit"} ;`}
+        class={`block ${props.textStyle} ${props.originalClass || ""}`}
       >
         {displayText()}
       </span>
       <span
         ref={duplicateRef!}
-        class={`absolute top-0 left-0 block ${props.textStyle}`}
-        style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%; color: ${
-          props.duplicateColor || "inherit"
-        }; `}
+        class={`absolute top-0 left-0 block ${props.textStyle} ${
+          props.duplicateClass || ""
+        }`}
+        style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%;`}
       >
         {displayText()}
       </span>

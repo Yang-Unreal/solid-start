@@ -120,8 +120,8 @@ export default function MenuButton() {
           <div class="btn-text text-[1em]">
             <Show when={!isMenuOpen()}>
               <TextAnimation
-                originalColor="rgba(0, 21, 20, 1)"
-                duplicateColor="rgba(0, 21, 20, 1)"
+                originalClass="text-dark"
+                duplicateClass="text-dark"
                 text="MENU"
                 externalTrigger={externalTrigger()}
                 textStyle="pt-[0.2em] leading-[0.86em] tracking-wide"
@@ -129,8 +129,8 @@ export default function MenuButton() {
             </Show>
             <Show when={isMenuOpen()}>
               <TextAnimation
-                originalColor="rgba(0, 21, 20, 1)"
-                duplicateColor="rgba(0, 21, 20, 1)"
+                originalClass="text-dark"
+                duplicateClass="text-dark"
                 text="CLOSE"
                 externalTrigger={externalTrigger()}
                 textStyle="pt-[0.2em] leading-[0.86em] tracking-wide"

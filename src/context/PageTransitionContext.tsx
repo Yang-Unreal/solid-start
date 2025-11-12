@@ -5,11 +5,11 @@ import { useLenis } from "~/context/LenisContext";
 
 interface PageTransitionContextType {
   triggerTransition: (href: string, onMenuHide?: () => void) => void;
-  setNavColors: (colors: {
-    originalColor: string;
-    duplicateColor: string;
+  setNavColors: (classes: {
+    originalClass: string;
+    duplicateClass: string;
   }) => void;
-  navColors: () => { originalColor: string; duplicateColor: string };
+  navColors: () => { originalClass: string; duplicateClass: string };
   logoColor: () => string;
   setLogoColor: (color: string) => void;
   setupNavTriggers: () => () => void;
@@ -32,8 +32,8 @@ export function PageTransitionProvider(props: { children: any }) {
     null
   );
   const [navColors, setNavColors] = createSignal({
-    originalColor: "rgba(192, 202, 201, 1)",
-    duplicateColor: "rgba(241, 241, 241, 1)",
+    originalClass: "text-gray",
+    duplicateClass: "text-light",
   });
   const [logoColor, setLogoColor] = createSignal("text-gray");
   const [setupNavTriggers, setSetupNavTriggers] = createSignal<() => void>(
@@ -97,8 +97,8 @@ export function PageTransitionProvider(props: { children: any }) {
 
     tl.add(() => {
       setNavColors({
-        originalColor: "rgba(192, 202, 201, 1)",
-        duplicateColor: "rgba(241, 241, 241, 1)",
+        originalClass: "text-gray",
+        duplicateClass: "text-light",
       });
       setLogoColor("text-gray");
     }, ">-0.2");
@@ -135,14 +135,14 @@ export function PageTransitionProvider(props: { children: any }) {
           if (rect.top <= 0 && rect.bottom > 0) {
             if (section.classList.contains("bg-light")) {
               setNavColors({
-                originalColor: "#182b2a",
-                duplicateColor: "rgba(0, 21, 20, 1)",
+                originalClass: "text-darkgray",
+                duplicateClass: "text-dark",
               });
               setLogoColor("text-darkgray");
             } else {
               setNavColors({
-                originalColor: "rgba(192, 202, 201, 1)",
-                duplicateColor: "rgba(241, 241, 241, 1)",
+                originalClass: "text-gray",
+                duplicateClass: "text-light",
               });
               setLogoColor("text-gray");
             }

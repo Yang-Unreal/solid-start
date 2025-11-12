@@ -321,8 +321,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                   }}
                 >
                   <TextAnimation
-                    originalColor="rgba(192, 202, 201, 1)"
-                    duplicateColor="rgba(241, 241, 241, 1)"
+                    originalClass="text-gray"
+                    duplicateClass="text-light"
                     text={item.label}
                   />
                   <div
@@ -343,8 +343,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         <div ref={contactRef}>
           <span class="text-sm xl:text-xl text-gray-text">CONTACT</span>
           <TextAnimation
-            originalColor="rgba(192, 202, 201, 1)"
-            duplicateColor="rgba(241, 241, 241, 1)"
+            originalClass="text-gray"
+            duplicateClass="text-light"
             text="YANG@LIMINGCN.COM"
             class="text-xl xl:text-2xl"
             isCopyable={true}
