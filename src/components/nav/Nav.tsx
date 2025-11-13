@@ -222,7 +222,7 @@ export default function Nav() {
                 />
                 <div
                   ref={workUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
                     "text-",
                     "bg-"
                   )}`}
@@ -263,7 +263,7 @@ export default function Nav() {
                 />
                 <div
                   ref={servicesUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
                     "text-",
                     "bg-"
                   )}`}
@@ -329,7 +329,7 @@ export default function Nav() {
                 />
                 <div
                   ref={aboutUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
                     "text-",
                     "bg-"
                   )}`}
@@ -370,7 +370,7 @@ export default function Nav() {
                 />
                 <div
                   ref={contactUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().originalClass.replace(
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
                     "text-",
                     "bg-"
                   )}`}
