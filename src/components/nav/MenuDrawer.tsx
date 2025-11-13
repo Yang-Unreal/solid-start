@@ -225,13 +225,13 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           ref={currentImageRef}
           src={navLinks[0].image}
           alt={navLinks[0].label}
-          class="absolute w-full h-full object-cover aspect-3/4"
+          class="absolute w-full h-full object-cover"
         />
         <img
           ref={nextImageRef}
           src=""
           alt=""
-          class="absolute w-full h-full object-cover translate-y-full aspect-3/4"
+          class="absolute w-full h-full object-cover translate-y-full"
         />
       </div>
 
@@ -243,7 +243,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
             <li ref={(el) => (linkRefs[index()] = el)}>
               <a
                 href={item.href}
-                class="relative flex text-[5.8vw] font-formula-bold  pointer-events-auto tracking-wide uppercase py-[0.2em] leading-[0.86]"
+                class="relative flex text-[1.25em] font-formula-bold  pointer-events-auto tracking-wide uppercase py-[0.2em] leading-[0.86]"
                 onClick={(e) => {
                   e.preventDefault();
                   triggerTransition(item.href, () => {
