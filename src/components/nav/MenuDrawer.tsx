@@ -46,6 +46,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let currentImageRef: HTMLImageElement | undefined;
   let nextImageRef: HTMLImageElement | undefined;
   let imageTl: gsap.core.Timeline | undefined;
+  let currentIndex = -1;
 
   onMount(() => {
     if (menuContainer) {
@@ -74,6 +75,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       if (currentImageRef && currentLink) {
         currentImageRef.src = currentLink.image;
         currentImageRef.alt = currentLink.label;
+      }
+      // Set current underline
+      currentIndex = navLinks.findIndex((link) => link.href === currentPath);
+      if (currentIndex !== -1 && underlineRefs[currentIndex]) {
+        gsap.set(underlineRefs[currentIndex]!, { scaleX: 1 });
       }
       gsap.set(menuContainer, { display: "flex" });
 
@@ -134,6 +140,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         "-=0.4"
       );
     } else {
+      // Reset underlines
+      gsap.set(
+        underlineRefs.filter((ref) => ref),
+        { scaleX: 0 }
+      );
       // --- MODIFICATION ---
       // Only run the closing animation if a page transition is NOT active.
       if (!isVisible()) {
@@ -220,8 +231,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       {/* Background Columns */}
       <div class="column navigation-tile"></div>
       <div class="column navigation-tile"></div>
-      <div class="column navigation-tile hidden sm:block"></div>
-      <div class="column navigation-tile hidden sm:block"></div>
+      <div class="column navigation-tile last"></div>
+      <div class="column navigation-tile last"></div>
 
       {/* Image Container */}
       <div ref={imageContainerRef} class="navigation-images">
@@ -244,7 +255,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       <ul class="navigation-center overflow-hidden">
         <For each={navLinks}>
           {(item, index) => (
-            <li ref={(el) => (linkRefs[index()] = el)}>
+            <li class="" ref={(el) => (linkRefs[index()] = el)}>
               <a
                 href={item.href}
                 class="relative flex text-[1.25em] font-formula-bold  pointer-events-auto tracking-wide uppercase py-[0.2em] leading-[0.86]"
@@ -261,10 +272,15 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                 onMouseEnter={() => {
                   hoverSignals[index()]![1]("enter");
 
-                  gsap.to(underlineRefs[index()]!, {
-                    scaleX: 1,
-                    transformOrigin: "0% 50%",
-                    duration: 0.3,
+                  // Set hovered underline to 1, others to 0
+                  underlineRefs.forEach((ref, i) => {
+                    if (ref) {
+                      gsap.to(ref, {
+                        scaleX: i === index() ? 1 : 0,
+                        transformOrigin: i === index() ? "0% 50%" : "100% 50%",
+                        duration: 0.3,
+                      });
+                    }
                   });
 
                   if (!currentImageRef || !nextImageRef) return;
@@ -320,18 +336,27 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                 onMouseLeave={() => {
                   hoverSignals[index()]![1]("leave");
 
-                  gsap.to(underlineRefs[index()]!, {
-                    scaleX: 0,
-                    transformOrigin: "100% 50%",
-                    duration: 0.3,
-                  });
+                  // If leaving the current page link, set it back to 1, else set to 0
+                  if (index() === currentIndex && underlineRefs[index()]) {
+                    gsap.to(underlineRefs[index()]!, {
+                      scaleX: 1,
+                      transformOrigin: "0% 50%",
+                      duration: 0.3,
+                    });
+                  } else if (underlineRefs[index()]) {
+                    gsap.to(underlineRefs[index()]!, {
+                      scaleX: 0,
+                      transformOrigin: "100% 50%",
+                      duration: 0.3,
+                    });
+                  }
                 }}
               >
                 <TextAnimation
                   originalClass="text-light"
                   duplicateClass="text-light"
                   text={item.label}
-                  textStyle="pt-[0.1em]"
+                  textStyle="pt-[0.1em] "
                   externalTrigger={hoverSignals[index()]![0]()}
                 />
                 <div
