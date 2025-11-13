@@ -220,123 +220,121 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       <div class="column navigation-tile hidden sm:block"></div>
 
       {/* Image Container */}
-      <div
-        ref={imageContainerRef}
-        class="absolute left-1/2 top-1/2 w-[20vw] h-[calc(20vw*1.33)] flex items-center justify-center overflow-hidden transform -translate-x-1/2 -translate-y-1/2"
-      >
+      <div ref={imageContainerRef} class="navigation-images">
         <img
           ref={currentImageRef}
           src={navLinks[0].image}
           alt={navLinks[0].label}
-          class="absolute w-full h-full object-cover"
+          class="absolute w-full h-full object-cover aspect-3/4"
         />
         <img
           ref={nextImageRef}
           src=""
           alt=""
-          class="absolute w-full h-full object-cover translate-y-full"
+          class="absolute w-full h-full object-cover translate-y-full aspect-3/4"
         />
       </div>
 
       {/* Foreground Text */}
-      <div class="absolute inset-0 flex h-full items-center justify-center text-white pointer-events-auto">
-        <ul class="flex flex-col items-center  text-center md:flex-row md:space-x-20 overflow-hidden">
-          <For each={navLinks}>
-            {(item, index) => (
-              <li ref={(el) => (linkRefs[index()] = el)}>
-                <a
-                  href={item.href}
-                  class="relative block text-8xl font-formula-bold"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    triggerTransition(item.href, () => {
-                      // Hide menu immediately when columns reach 0%
-                      if (menuContainer) {
-                        menuContainer.style.display = "none";
-                      }
-                      setIsMenuOpen(false);
-                    });
-                  }}
-                  onMouseEnter={() => {
-                    gsap.to(underlineRefs[index()]!, {
-                      scaleX: 1,
-                      transformOrigin: "0% 50%",
-                      duration: 0.3,
-                    });
 
-                    if (!currentImageRef || !nextImageRef) return;
-
-                    if (imageTl && imageTl.isActive()) {
-                      imageTl.progress(1);
+      <ul class="navigation-center overflow-hidden">
+        <For each={navLinks}>
+          {(item, index) => (
+            <li ref={(el) => (linkRefs[index()] = el)}>
+              <a
+                href={item.href}
+                class="relative flex text-[5.8vw] font-formula-bold  pointer-events-auto tracking-wide uppercase py-[0.2em] leading-[0.86]"
+                onClick={(e) => {
+                  e.preventDefault();
+                  triggerTransition(item.href, () => {
+                    // Hide menu immediately when columns reach 0%
+                    if (menuContainer) {
+                      menuContainer.style.display = "none";
                     }
+                    setIsMenuOpen(false);
+                  });
+                }}
+                onMouseEnter={() => {
+                  gsap.to(underlineRefs[index()]!, {
+                    scaleX: 1,
+                    transformOrigin: "0% 50%",
+                    duration: 0.3,
+                  });
 
-                    const targetItem = { image: item.image, alt: item.label };
+                  if (!currentImageRef || !nextImageRef) return;
 
-                    if (
-                      new URL(currentImageRef.src).pathname === targetItem.image
-                    ) {
-                      return;
-                    }
+                  if (imageTl && imageTl.isActive()) {
+                    imageTl.progress(1);
+                  }
 
-                    nextImageRef.src = targetItem.image;
-                    nextImageRef.alt = targetItem.alt;
-                    gsap.set(nextImageRef, { y: "100%" });
+                  const targetItem = { image: item.image, alt: item.label };
 
-                    const duration = 0.6;
+                  if (
+                    new URL(currentImageRef.src).pathname === targetItem.image
+                  ) {
+                    return;
+                  }
 
-                    imageTl = gsap.timeline({
-                      onComplete: () => {
-                        currentImageRef!.src = nextImageRef!.src;
-                        currentImageRef!.alt = nextImageRef!.alt;
+                  nextImageRef.src = targetItem.image;
+                  nextImageRef.alt = targetItem.alt;
+                  gsap.set(nextImageRef, { y: "100%" });
 
-                        gsap.set(currentImageRef, { y: "0%" });
-                        gsap.set(nextImageRef, {
-                          y: "100%",
-                          src: "",
-                          alt: "",
-                        });
-                      },
-                    });
+                  const duration = 0.6;
 
-                    imageTl
-                      .to(nextImageRef, {
-                        y: "0%",
+                  imageTl = gsap.timeline({
+                    onComplete: () => {
+                      currentImageRef!.src = nextImageRef!.src;
+                      currentImageRef!.alt = nextImageRef!.alt;
+
+                      gsap.set(currentImageRef, { y: "0%" });
+                      gsap.set(nextImageRef, {
+                        y: "100%",
+                        src: "",
+                        alt: "",
+                      });
+                    },
+                  });
+
+                  imageTl
+                    .to(nextImageRef, {
+                      y: "0%",
+                      duration,
+                      ease: "slideUp",
+                    })
+                    .to(
+                      currentImageRef,
+                      {
+                        y: "-100%",
                         duration,
                         ease: "slideUp",
-                      })
-                      .to(
-                        currentImageRef,
-                        {
-                          y: "-100%",
-                          duration,
-                          ease: "slideUp",
-                        },
-                        "<"
-                      );
-                  }}
-                  onMouseLeave={() => {
-                    gsap.to(underlineRefs[index()]!, {
-                      scaleX: 0,
-                      transformOrigin: "100% 50%",
-                      duration: 0.3,
-                    });
-                  }}
-                >
-                  <TextAnimation
-                    originalClass="text-gray"
-                    duplicateClass="text-light"
-                    text={item.label}
-                  />
-                  <div
-                    ref={(el) => (underlineRefs[index()] = el)}
-                    class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
-                  ></div>
-                </a>
-              </li>
-            )}
-          </For>
-        </ul>
-      </div>
+                      },
+                      "<"
+                    );
+                }}
+                onMouseLeave={() => {
+                  gsap.to(underlineRefs[index()]!, {
+                    scaleX: 0,
+                    transformOrigin: "100% 50%",
+                    duration: 0.3,
+                  });
+                }}
+              >
+                <TextAnimation
+                  originalClass="text-gray"
+                  duplicateClass="text-light"
+                  text={item.label}
+                  textStyle="pt-[0.1em]"
+                />
+                <div
+                  ref={(el) => (underlineRefs[index()] = el)}
+                  class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+                ></div>
+              </a>
+            </li>
+          )}
+        </For>
+      </ul>
+
       <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold overflow-hidden pointer-events-auto">
         <div ref={addressRef}>
           <span class="text-sm xl:text-xl text-gray-text">ADDRESS</span>

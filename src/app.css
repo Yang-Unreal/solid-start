@@ -403,6 +403,30 @@ header {
     overflow: hidden;
   }
 
+  .navigation-images {
+    position: absolute;
+    width: calc(var(--title-size) * 2.5);
+    height: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    overflow: hidden;
+    border-radius: var(--border-radius-medium);
+    opacity: 0.9;
+  }
+
+  .navigation-full .navigation-center {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    left: 0px;
+    justify-content: space-evenly;
+    width: 100%;
+    transform: translateY(-50%);
+    padding: 0px 7.5vw;
+  }
+
   .font-formula-bold {
     font-family: "FormulaCondensed-Bold", sans-serif;
   }
@@ -438,6 +462,13 @@ header {
 @media screen and (max-width: 540px) {
   :root {
     --container-padding: clamp(10px, 4vw, 2.5em);
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .navigation-images {
+    width: 40vw;
+    top: 90%;
   }
 }
 
