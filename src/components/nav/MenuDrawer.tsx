@@ -1,4 +1,4 @@
-import { For, createEffect, onMount } from "solid-js";
+import { For, createEffect, onMount, createSignal } from "solid-js";
 import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
 import { useLenis } from "~/context/LenisContext";
@@ -27,6 +27,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     { href: "/about", label: "ABOUT", image: "/images/menu/ABOUT.webp" },
     { href: "/contact", label: "CONTACT", image: "/images/menu/CONTACT.webp" },
   ] as const;
+
+  const hoverSignals = navLinks.map(() =>
+    createSignal<"enter" | "leave" | null>(null)
+  );
 
   let underlineRefs: (HTMLDivElement | undefined)[] = new Array(
     navLinks.length
@@ -255,6 +259,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                   });
                 }}
                 onMouseEnter={() => {
+                  hoverSignals[index()]![1]("enter");
+
                   gsap.to(underlineRefs[index()]!, {
                     scaleX: 1,
                     transformOrigin: "0% 50%",
@@ -312,6 +318,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     );
                 }}
                 onMouseLeave={() => {
+                  hoverSignals[index()]![1]("leave");
+
                   gsap.to(underlineRefs[index()]!, {
                     scaleX: 0,
                     transformOrigin: "100% 50%",
@@ -324,10 +332,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                   duplicateClass="text-light"
                   text={item.label}
                   textStyle="pt-[0.1em]"
+                  externalTrigger={hoverSignals[index()]![0]()}
                 />
                 <div
                   ref={(el) => (underlineRefs[index()] = el)}
-                  class="absolute bottom-0 left-0 w-full h-px bg-current scale-x-0"
+                  class="absolute bottom-0 left-0 w-full h-0.5 bg-light scale-x-0"
                 ></div>
               </a>
             </li>
