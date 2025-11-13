@@ -328,7 +328,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                 }}
               >
                 <TextAnimation
-                  originalClass="text-gray"
+                  originalClass="text-light"
                   duplicateClass="text-light"
                   text={item.label}
                   textStyle="pt-[0.1em]"
