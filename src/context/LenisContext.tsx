@@ -24,7 +24,7 @@ export function LenisProvider(props: { children: any }) {
   let lenisInstance: LenisContextValue | undefined;
 
   if (!isServer) {
-    const instance = new Lenis();
+    const instance = new Lenis({ autoRaf: false });
 
     // Define the ticker function separately so we can add/remove it by reference
     const raf = (time: number) => {
@@ -33,10 +33,12 @@ export function LenisProvider(props: { children: any }) {
 
     // Create the robust control functions
     const start = () => {
+      instance.start();
       gsap.ticker.add(raf);
     };
 
     const stop = () => {
+      instance.stop();
       gsap.ticker.remove(raf);
     };
 

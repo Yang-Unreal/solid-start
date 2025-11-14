@@ -218,6 +218,9 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           },
           0
         );
+      } else {
+        // When closing due to page transition, just re-enable scroll
+        lenis?.start();
       }
     }
   });
