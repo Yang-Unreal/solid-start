@@ -255,10 +255,13 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       <ul class="navigation-center overflow-hidden">
         <For each={navLinks}>
           {(item, index) => (
-            <li class="" ref={(el) => (linkRefs[index()] = el)}>
+            <li
+              class="link overflow-hidden"
+              ref={(el) => (linkRefs[index()] = el)}
+            >
               <a
                 href={item.href}
-                class="relative flex text-[1.25em] font-formula-bold  pointer-events-auto tracking-wide uppercase py-[0.2em] leading-[0.86]"
+                class="relative flex  font-formula-bold  pointer-events-auto tracking-wide uppercase py-[0.2em] leading-[0.86]"
                 onClick={(e) => {
                   e.preventDefault();
                   triggerTransition(item.href, () => {
@@ -356,7 +359,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                   originalClass="text-light"
                   duplicateClass="text-light"
                   text={item.label}
-                  textStyle="pt-[0.1em] "
+                  class="overflow-hidden"
+                  textStyle="pt-[0.1em] text-[1.25em]"
                   externalTrigger={hoverSignals[index()]![0]()}
                 />
                 <div
