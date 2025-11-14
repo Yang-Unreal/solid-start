@@ -118,27 +118,10 @@ header {
   pointer-events: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-a,
-li,
-ul,
-ol,
-span,
-strong,
-em,
-figcaption {
-  padding: 0;
-  margin: 0;
-  font-style: normal;
-  letter-spacing: normal;
-  font-weight: unset;
-  line-height: unset;
+.link {
+  position: relative;
+  border: 0;
+  outline: 0;
 }
 
 /* ==========================================================================
@@ -450,8 +433,23 @@ figcaption {
     padding: 0px 7.5vw;
   }
 
+  .navigation-full .navigation-center .link-wrap {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+
   .navigation-full .navigation-center .link {
     font-size: 4.75vw;
+  }
+
+  .link .link-click {
+    pointer-events: all;
+    background-color: transparent;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+    padding: 0.2em 0;
   }
 
   .font-formula-bold {
@@ -510,6 +508,10 @@ figcaption {
 
   .navigation-full .navigation-center .link {
     font-size: 12vw;
+  }
+
+  .navigation-full .navigation-center .link .link-click {
+    padding: 0.025em 0;
   }
 }
 

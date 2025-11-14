@@ -252,123 +252,123 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
       {/* Foreground Text */}
 
-      <ul class="navigation-center overflow-hidden">
+      <ul class="navigation-center">
         <For each={navLinks}>
           {(item, index) => (
-            <li
-              class="link overflow-hidden"
-              ref={(el) => (linkRefs[index()] = el)}
-            >
-              <a
-                href={item.href}
-                class="relative flex  font-formula-bold  pointer-events-auto tracking-wide uppercase py-[0.2em] leading-[0.86]"
-                onClick={(e) => {
-                  e.preventDefault();
-                  triggerTransition(item.href, () => {
-                    // Hide menu immediately when columns reach 0%
-                    if (menuContainer) {
-                      menuContainer.style.display = "none";
-                    }
-                    setIsMenuOpen(false);
-                  });
-                }}
-                onMouseEnter={() => {
-                  hoverSignals[index()]![1]("enter");
+            <div class="link-wrap">
+              <li class="link" ref={(el) => (linkRefs[index()] = el)}>
+                <a
+                  href={item.href}
+                  class="link-click"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    triggerTransition(item.href, () => {
+                      // Hide menu immediately when columns reach 0%
+                      if (menuContainer) {
+                        menuContainer.style.display = "none";
+                      }
+                      setIsMenuOpen(false);
+                    });
+                  }}
+                  onMouseEnter={() => {
+                    hoverSignals[index()]![1]("enter");
 
-                  // Set hovered underline to 1, others to 0
-                  underlineRefs.forEach((ref, i) => {
-                    if (ref) {
-                      gsap.to(ref, {
-                        scaleX: i === index() ? 1 : 0,
-                        transformOrigin: i === index() ? "0% 50%" : "100% 50%",
+                    // Set hovered underline to 1, others to 0
+                    underlineRefs.forEach((ref, i) => {
+                      if (ref) {
+                        gsap.to(ref, {
+                          scaleX: i === index() ? 1 : 0,
+                          transformOrigin:
+                            i === index() ? "0% 50%" : "100% 50%",
+                          duration: 0.3,
+                        });
+                      }
+                    });
+
+                    if (!currentImageRef || !nextImageRef) return;
+
+                    if (imageTl && imageTl.isActive()) {
+                      imageTl.progress(1);
+                    }
+
+                    const targetItem = { image: item.image, alt: item.label };
+
+                    if (
+                      new URL(currentImageRef.src).pathname === targetItem.image
+                    ) {
+                      return;
+                    }
+
+                    nextImageRef.src = targetItem.image;
+                    nextImageRef.alt = targetItem.alt;
+                    gsap.set(nextImageRef, { y: "100%" });
+
+                    const duration = 0.6;
+
+                    imageTl = gsap.timeline({
+                      onComplete: () => {
+                        currentImageRef!.src = nextImageRef!.src;
+                        currentImageRef!.alt = nextImageRef!.alt;
+
+                        gsap.set(currentImageRef, { y: "0%" });
+                        gsap.set(nextImageRef, {
+                          y: "100%",
+                          src: "",
+                          alt: "",
+                        });
+                      },
+                    });
+
+                    imageTl
+                      .to(nextImageRef, {
+                        y: "0%",
+                        duration,
+                        ease: "slideUp",
+                      })
+                      .to(
+                        currentImageRef,
+                        {
+                          y: "-100%",
+                          duration,
+                          ease: "slideUp",
+                        },
+                        "<"
+                      );
+                  }}
+                  onMouseLeave={() => {
+                    hoverSignals[index()]![1]("leave");
+
+                    // If leaving the current page link, set it back to 1, else set to 0
+                    if (index() === currentIndex && underlineRefs[index()]) {
+                      gsap.to(underlineRefs[index()]!, {
+                        scaleX: 1,
+                        transformOrigin: "0% 50%",
+                        duration: 0.3,
+                      });
+                    } else if (underlineRefs[index()]) {
+                      gsap.to(underlineRefs[index()]!, {
+                        scaleX: 0,
+                        transformOrigin: "100% 50%",
                         duration: 0.3,
                       });
                     }
-                  });
-
-                  if (!currentImageRef || !nextImageRef) return;
-
-                  if (imageTl && imageTl.isActive()) {
-                    imageTl.progress(1);
-                  }
-
-                  const targetItem = { image: item.image, alt: item.label };
-
-                  if (
-                    new URL(currentImageRef.src).pathname === targetItem.image
-                  ) {
-                    return;
-                  }
-
-                  nextImageRef.src = targetItem.image;
-                  nextImageRef.alt = targetItem.alt;
-                  gsap.set(nextImageRef, { y: "100%" });
-
-                  const duration = 0.6;
-
-                  imageTl = gsap.timeline({
-                    onComplete: () => {
-                      currentImageRef!.src = nextImageRef!.src;
-                      currentImageRef!.alt = nextImageRef!.alt;
-
-                      gsap.set(currentImageRef, { y: "0%" });
-                      gsap.set(nextImageRef, {
-                        y: "100%",
-                        src: "",
-                        alt: "",
-                      });
-                    },
-                  });
-
-                  imageTl
-                    .to(nextImageRef, {
-                      y: "0%",
-                      duration,
-                      ease: "slideUp",
-                    })
-                    .to(
-                      currentImageRef,
-                      {
-                        y: "-100%",
-                        duration,
-                        ease: "slideUp",
-                      },
-                      "<"
-                    );
-                }}
-                onMouseLeave={() => {
-                  hoverSignals[index()]![1]("leave");
-
-                  // If leaving the current page link, set it back to 1, else set to 0
-                  if (index() === currentIndex && underlineRefs[index()]) {
-                    gsap.to(underlineRefs[index()]!, {
-                      scaleX: 1,
-                      transformOrigin: "0% 50%",
-                      duration: 0.3,
-                    });
-                  } else if (underlineRefs[index()]) {
-                    gsap.to(underlineRefs[index()]!, {
-                      scaleX: 0,
-                      transformOrigin: "100% 50%",
-                      duration: 0.3,
-                    });
-                  }
-                }}
-              >
-                <TextAnimation
-                  originalClass="text-light"
-                  duplicateClass="text-light"
-                  text={item.label}
-                  class="overflow-hidden"
-                  textStyle="pt-[0.1em] text-[1.25em]"
-                  externalTrigger={hoverSignals[index()]![0]()}
-                />
-                <div
-                  ref={(el) => (underlineRefs[index()] = el)}
-                  class="absolute bottom-0 left-0 w-full h-0.5 bg-light scale-x-0"
-                ></div>
-              </a>
-            </li>
+                  }}
+                >
+                  <TextAnimation
+                    originalClass="text-light"
+                    duplicateClass="text-light"
+                    text={item.label}
+                    class="overflow-hidden"
+                    textStyle="pt-[0.1em] text-[1.25em] leading-[0.86] tracking-wide uppercase font-formula-bold"
+                    externalTrigger={hoverSignals[index()]![0]()}
+                  />
+                  <div
+                    ref={(el) => (underlineRefs[index()] = el)}
+                    class="absolute bottom-0 left-0 w-full h-0.5 bg-light scale-x-0"
+                  ></div>
+                </a>
+              </li>
+            </div>
           )}
         </For>
       </ul>
