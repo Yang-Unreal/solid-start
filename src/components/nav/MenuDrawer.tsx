@@ -373,20 +373,31 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         </For>
       </ul>
 
-      <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold overflow-hidden pointer-events-auto">
-        <div ref={addressRef}>
-          <span class="text-sm xl:text-xl text-gray-text">ADDRESS</span>
-          <h4 class="text-xl xl:text-2xl text-gray">TAIZHOU,ZHEJIANG,CHINA</h4>
-        </div>
-        <div ref={contactRef}>
-          <span class="text-sm xl:text-xl text-gray-text">CONTACT</span>
-          <TextAnimation
-            originalClass="text-gray"
-            duplicateClass="text-light"
-            text="YANG@LIMINGCN.COM"
-            class="text-xl xl:text-2xl"
-            isCopyable={true}
-          />
+      <div class="navigation-bottom-usps">
+        <div class="container large">
+          <div class="col-row" ref={addressRef}>
+            <span class="font-formula-bold text-[1em] text-gray opacity-50 tracking-wide leading-[0.86] uppercase">
+              Address
+            </span>
+            <h4 class="font-formula-bold text-[1.25em] py-[0.1em] text-gray leading-[1.1] tracking-wide uppercase">
+              Taizhou, Zhejiang, China
+            </h4>
+          </div>
+          <div class="col-row" ref={contactRef}>
+            <span class="font-formula-bold text-[1em] text-gray opacity-50 tracking-wide leading-[0.86] uppercase">
+              CONTACT
+            </span>
+            <div class="flex items-center justify-center py-[0.2em] relative">
+              <TextAnimation
+                originalClass="text-gray"
+                duplicateClass="text-light"
+                text="yang@limingcn.com"
+                class="overflow-hidden"
+                textStyle="leading-[0.86] font-formula-bold text-[1.25em] pt-[0.1em] text-gray tracking-wide uppercase"
+                isCopyable={true}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </nav>
