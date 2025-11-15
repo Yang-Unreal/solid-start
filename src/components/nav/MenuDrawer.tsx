@@ -1,4 +1,5 @@
 import { For, createEffect, onMount, createSignal } from "solid-js";
+import { useLocation } from "@solidjs/router";
 import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
 import { useLenis } from "~/context/LenisContext";
@@ -14,6 +15,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   // Destructure isVisible to check for active transitions
   const { triggerTransition, setLogoColor, isVisible } = usePageTransition();
   const { isMenuOpen, setIsMenuOpen, menuButtonRef } = useMenu();
+  const location = useLocation();
 
   let menuContainer: HTMLDivElement | undefined;
 
@@ -48,6 +50,12 @@ const MenuDrawer = (props: MenuDrawerProps) => {
   let imageTl: gsap.core.Timeline | undefined;
   let currentIndex = -1;
 
+  createEffect(() => {
+    currentIndex = navLinks.findIndex(
+      (link) => link.href === location.pathname
+    );
+  });
+
   onMount(() => {
     if (menuContainer) {
       gsap.set(menuContainer, { display: "none" });
@@ -69,17 +77,14 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
     if (isMenuOpen()) {
       // Update default image based on current route when opening
-      const currentPath = window.location.pathname;
-      const currentLink =
-        navLinks.find((link) => link.href === currentPath) || navLinks[0];
+      const currentLink = navLinks[currentIndex] || navLinks[0];
       if (currentImageRef && currentLink) {
         currentImageRef.src = currentLink.image;
         currentImageRef.alt = currentLink.label;
       }
       // Set current underline
-      currentIndex = navLinks.findIndex((link) => link.href === currentPath);
       if (currentIndex !== -1 && underlineRefs[currentIndex]) {
-        gsap.set(underlineRefs[currentIndex]!, { scaleX: 1 });
+        gsap.to(underlineRefs[currentIndex]!, { scaleX: 1, duration: 0 });
       }
       gsap.set(menuContainer, { display: "flex" });
 
@@ -141,9 +146,9 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       );
     } else {
       // Reset underlines
-      gsap.set(
+      gsap.to(
         underlineRefs.filter((ref) => ref),
-        { scaleX: 0 }
+        { scaleX: 0, duration: 0 }
       );
       // --- MODIFICATION ---
       // Only run the closing animation if a page transition is NOT active.
