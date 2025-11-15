@@ -280,7 +280,7 @@ export default function Nav() {
                   if (isMenuOpen()) {
                     triggerTransition("/", () => {
                       const menuContainer = document.querySelector(
-                        ".fixed.inset-0.z-50"
+                        ".navigation-full"
                       ) as HTMLElement;
                       if (menuContainer) {
                         menuContainer.style.display = "none";
