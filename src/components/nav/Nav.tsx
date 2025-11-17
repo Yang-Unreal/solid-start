@@ -15,8 +15,8 @@ export default function Nav() {
   const isRouting = useIsRouting();
   const {
     triggerTransition,
-    navColors: contextNavColors,
-    setNavColors: setContextNavColors,
+    navLinkColors: contextNavLinkColors,
+    setNavLinkColors: setContextNavLinkColors,
     logoColor: contextLogoColor,
     setLogoColor: setContextLogoColor,
     setSetupNavTriggers,
@@ -34,18 +34,21 @@ export default function Nav() {
   let servicesLinkRef: HTMLAnchorElement | undefined;
   let aboutLinkRef: HTMLAnchorElement | undefined;
   let contactLinkRef: HTMLAnchorElement | undefined;
+  let logoRef: HTMLAnchorElement | undefined;
 
   // Local signals for classes that default to a safe, visible value.
-  const [currentNavClasses, setCurrentNavClasses] = createSignal({
-    originalClass: "text-gray",
-    duplicateClass: "text-light",
-  });
+  const [currentNavClasses, setCurrentNavClasses] = createSignal([
+    { originalClass: "text-gray", duplicateClass: "text-light" },
+    { originalClass: "text-gray", duplicateClass: "text-light" },
+    { originalClass: "text-gray", duplicateClass: "text-light" },
+    { originalClass: "text-gray", duplicateClass: "text-light" },
+  ]);
   const [currentLogoColor, setCurrentLogoColor] = createSignal("text-gray");
 
   // Sync the context state to our local state ONLY when the preloader is finished.
   createEffect(() => {
     if (isPreloaderFinished()) {
-      setCurrentNavClasses(contextNavColors());
+      setCurrentNavClasses(contextNavLinkColors());
       setCurrentLogoColor(contextLogoColor());
     }
   });
@@ -68,19 +71,15 @@ export default function Nav() {
       if (initialSectionFound) return;
       const rect = section.getBoundingClientRect();
       if (rect.top <= 0 && rect.bottom > 0) {
-        if (section.classList.contains("bg-light")) {
-          setContextNavColors({
-            originalClass: "text-darkgray",
-            duplicateClass: "text-dark",
-          });
-          setContextLogoColor("text-darkgray");
-        } else {
-          setContextNavColors({
-            originalClass: "text-gray",
-            duplicateClass: "text-light",
-          });
-          setContextLogoColor("text-gray");
-        }
+        const newColors = section.classList.contains("bg-light")
+          ? { originalClass: "text-darkgray", duplicateClass: "text-dark" }
+          : { originalClass: "text-gray", duplicateClass: "text-light" };
+        const newLogoColor = section.classList.contains("bg-light")
+          ? "text-darkgray"
+          : "text-gray";
+
+        setContextNavLinkColors(Array(4).fill(newColors));
+        setContextLogoColor(newLogoColor);
         initialSectionFound = true;
       }
     });
@@ -93,19 +92,15 @@ export default function Nav() {
         end: "bottom 60px",
         onToggle: (self) => {
           if (self.isActive) {
-            if (section.classList.contains("bg-light")) {
-              setContextNavColors({
-                originalClass: "text-darkgray",
-                duplicateClass: "text-dark",
-              });
-              setContextLogoColor("text-darkgray");
-            } else {
-              setContextNavColors({
-                originalClass: "text-gray",
-                duplicateClass: "text-light",
-              });
-              setContextLogoColor("text-gray");
-            }
+            const newColors = section.classList.contains("bg-light")
+              ? { originalClass: "text-darkgray", duplicateClass: "text-dark" }
+              : { originalClass: "text-gray", duplicateClass: "text-light" };
+            const newLogoColor = section.classList.contains("bg-light")
+              ? "text-darkgray"
+              : "text-gray";
+
+            setContextNavLinkColors(Array(4).fill(newColors));
+            setContextLogoColor(newLogoColor);
           }
         },
       });
@@ -137,19 +132,15 @@ export default function Nav() {
         sections.forEach((section) => {
           const rect = section.getBoundingClientRect();
           if (rect.top <= 0 && rect.bottom > 0) {
-            if (section.classList.contains("bg-light")) {
-              setContextNavColors({
-                originalClass: "text-darkgray",
-                duplicateClass: "text-dark",
-              });
-              setContextLogoColor("text-darkgray");
-            } else {
-              setContextNavColors({
-                originalClass: "text-gray",
-                duplicateClass: "text-light",
-              });
-              setContextLogoColor("text-gray");
-            }
+            const newColors = section.classList.contains("bg-light")
+              ? { originalClass: "text-darkgray", duplicateClass: "text-dark" }
+              : { originalClass: "text-gray", duplicateClass: "text-light" };
+            const newLogoColor = section.classList.contains("bg-light")
+              ? "text-darkgray"
+              : "text-gray";
+
+            setContextNavLinkColors(Array(4).fill(newColors));
+            setContextLogoColor(newLogoColor);
           }
         });
       });
@@ -183,6 +174,21 @@ export default function Nav() {
     }
   });
 
+  const handleTransition = (href: string, onMenuHide?: () => void) => {
+    const navElements = {
+      links: [productLinkRef, servicesLinkRef, aboutLinkRef, contactLinkRef],
+      logo: logoRef,
+    };
+
+    const linkPositions = navElements.links.map((el) => {
+      if (!el) return { x: 0, width: 0 };
+      const rect = el.getBoundingClientRect();
+      return { x: rect.x, width: rect.width };
+    });
+
+    triggerTransition(href, navElements, linkPositions, onMenuHide);
+  };
+
   return (
     <div class="main-nav-bar">
       <div class="w-full relative flex items-center justify-between">
@@ -195,7 +201,7 @@ export default function Nav() {
                 class="relative text-[1.25em] block bg-transparent overflow-hidden"
                 onClick={(e) => {
                   e.preventDefault();
-                  triggerTransition("/product");
+                  handleTransition("/product");
                 }}
                 onMouseEnter={() => {
                   if (!isMenuOpen())
@@ -215,17 +221,20 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalClass={currentNavClasses().originalClass}
-                  duplicateClass={currentNavClasses().duplicateClass}
+                  originalClass={
+                    currentNavClasses()[0]?.originalClass ?? "text-gray"
+                  }
+                  duplicateClass={
+                    currentNavClasses()[0]?.duplicateClass ?? "text-light"
+                  }
                   text="PRODUCT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={workUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
-                    "text-",
-                    "bg-"
-                  )}`}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
+                    currentNavClasses()[0]?.duplicateClass ?? "text-light"
+                  ).replace("text-", "bg-")}`}
                 ></div>
               </A>
             </li>
@@ -236,7 +245,7 @@ export default function Nav() {
                 class="relative text-[1.25em] hidden md:block bg-transparent overflow-hidden"
                 onClick={(e) => {
                   e.preventDefault();
-                  triggerTransition("/services");
+                  handleTransition("/services");
                 }}
                 onMouseEnter={() => {
                   if (!isMenuOpen())
@@ -256,29 +265,33 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalClass={currentNavClasses().originalClass}
-                  duplicateClass={currentNavClasses().duplicateClass}
+                  originalClass={
+                    currentNavClasses()[1]?.originalClass ?? "text-gray"
+                  }
+                  duplicateClass={
+                    currentNavClasses()[1]?.duplicateClass ?? "text-light"
+                  }
                   text="SERVICES"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={servicesUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
-                    "text-",
-                    "bg-"
-                  )}`}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
+                    currentNavClasses()[1]?.duplicateClass ?? "text-light"
+                  ).replace("text-", "bg-")}`}
                 ></div>
               </A>
             </li>
             <li class="relative flex items-center justify-center">
               <A
+                ref={logoRef}
                 href="/"
                 aria-label="Homepage"
                 title="Homepage"
                 onClick={(e) => {
                   e.preventDefault();
                   if (isMenuOpen()) {
-                    triggerTransition("/", () => {
+                    handleTransition("/", () => {
                       const menuContainer = document.querySelector(
                         ".navigation-full"
                       ) as HTMLElement;
@@ -288,7 +301,7 @@ export default function Nav() {
                       setIsMenuOpen(false);
                     });
                   } else {
-                    triggerTransition("/");
+                    handleTransition("/");
                   }
                 }}
               >
@@ -302,7 +315,7 @@ export default function Nav() {
                 class="relative text-[1.25em] hidden md:block bg-transparent overflow-hidden"
                 onClick={(e) => {
                   e.preventDefault();
-                  triggerTransition("/about");
+                  handleTransition("/about");
                 }}
                 onMouseEnter={() => {
                   if (!isMenuOpen())
@@ -322,17 +335,20 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalClass={currentNavClasses().originalClass}
-                  duplicateClass={currentNavClasses().duplicateClass}
+                  originalClass={
+                    currentNavClasses()[2]?.originalClass ?? "text-gray"
+                  }
+                  duplicateClass={
+                    currentNavClasses()[2]?.duplicateClass ?? "text-light"
+                  }
                   text="ABOUT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={aboutUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
-                    "text-",
-                    "bg-"
-                  )}`}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
+                    currentNavClasses()[2]?.duplicateClass ?? "text-light"
+                  ).replace("text-", "bg-")}`}
                 ></div>
               </A>
             </li>
@@ -343,7 +359,7 @@ export default function Nav() {
                 class="relative text-[1.25em] block bg-transparent overflow-hidden"
                 onClick={(e) => {
                   e.preventDefault();
-                  triggerTransition("/contact");
+                  handleTransition("/contact");
                 }}
                 onMouseEnter={() => {
                   if (!isMenuOpen())
@@ -363,17 +379,20 @@ export default function Nav() {
                 }}
               >
                 <TextAnimation
-                  originalClass={currentNavClasses().originalClass}
-                  duplicateClass={currentNavClasses().duplicateClass}
+                  originalClass={
+                    currentNavClasses()[3]?.originalClass ?? "text-gray"
+                  }
+                  duplicateClass={
+                    currentNavClasses()[3]?.duplicateClass ?? "text-light"
+                  }
                   text="CONTACT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
                 />
                 <div
                   ref={contactUnderlineRef!}
-                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${currentNavClasses().duplicateClass.replace(
-                    "text-",
-                    "bg-"
-                  )}`}
+                  class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
+                    currentNavClasses()[3]?.duplicateClass ?? "text-light"
+                  ).replace("text-", "bg-")}`}
                 ></div>
               </A>
             </li>

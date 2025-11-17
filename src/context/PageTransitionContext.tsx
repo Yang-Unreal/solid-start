@@ -4,12 +4,19 @@ import { useNavigate } from "@solidjs/router";
 import { useLenis } from "~/context/LenisContext";
 
 interface PageTransitionContextType {
-  triggerTransition: (href: string, onMenuHide?: () => void) => void;
-  setNavColors: (classes: {
-    originalClass: string;
-    duplicateClass: string;
-  }) => void;
-  navColors: () => { originalClass: string; duplicateClass: string };
+  triggerTransition: (
+    href: string,
+    navElements?: {
+      links: (HTMLElement | undefined)[];
+      logo: HTMLElement | undefined;
+    },
+    linkPositions?: { x: number; width: number }[],
+    onMenuHide?: () => void
+  ) => void;
+  setNavLinkColors: (
+    colors: { originalClass: string; duplicateClass: string }[]
+  ) => void;
+  navLinkColors: () => { originalClass: string; duplicateClass: string }[];
   logoColor: () => string;
   setLogoColor: (color: string) => void;
   setupNavTriggers: () => () => void;
@@ -31,10 +38,12 @@ export function PageTransitionProvider(props: { children: any }) {
   const [pendingNavigation, setPendingNavigation] = createSignal<string | null>(
     null
   );
-  const [navColors, setNavColors] = createSignal({
-    originalClass: "text-gray",
-    duplicateClass: "text-light",
-  });
+  const [navLinkColors, setNavLinkColors] = createSignal(
+    Array(4).fill({
+      originalClass: "text-gray",
+      duplicateClass: "text-light",
+    })
+  );
   const [logoColor, setLogoColor] = createSignal("text-gray");
   const [setupNavTriggers, setSetupNavTriggers] = createSignal<() => void>(
     () => {}
@@ -50,8 +59,42 @@ export function PageTransitionProvider(props: { children: any }) {
   );
   const [isPreloaderFinished, setIsPreloaderFinished] = createSignal(false);
 
-  const triggerTransition = (href: string, onMenuHide?: () => void) => {
+  const triggerTransition = (
+    href: string,
+    navElements?: {
+      links: (HTMLElement | undefined)[];
+      logo: HTMLElement | undefined;
+    },
+    linkPositions?: { x: number; width: number }[],
+    onMenuHide?: () => void
+  ) => {
     if (isVisible()) return; // Prevent multiple transitions
+
+    // Fallback to query DOM if elements are not provided
+    if (!navElements || !linkPositions) {
+      const productLink =
+        document.querySelector<HTMLElement>('a[href="/product"]');
+      const servicesLink = document.querySelector<HTMLElement>(
+        'a[href="/services"]'
+      );
+      const aboutLink = document.querySelector<HTMLElement>('a[href="/about"]');
+      const contactLink =
+        document.querySelector<HTMLElement>('a[href="/contact"]');
+      const logoEl = document.querySelector<HTMLElement>('a[href="/"]');
+
+      const queriedLinks = [productLink, servicesLink, aboutLink, contactLink];
+
+      navElements = {
+        links: queriedLinks.map((el) => el || undefined),
+        logo: logoEl || undefined,
+      };
+
+      linkPositions = queriedLinks.map((el) => {
+        if (!el) return { x: 0, width: 0 };
+        const rect = el.getBoundingClientRect();
+        return { x: rect.x, width: rect.width };
+      });
+    }
 
     setPendingNavigation(href);
     setIsVisible(true);
@@ -86,22 +129,62 @@ export function PageTransitionProvider(props: { children: any }) {
     tl.to(columns, {
       y: "0%",
       rotate: 0,
-      duration: 0.6,
+      duration: 0.5,
       ease: "circ.inOut",
-      stagger: 0.03,
+      stagger: 0.02,
       onComplete: () => {
         // Call menu hide callback when columns reach 0%
         if (onMenuHide) onMenuHide();
       },
-    });
+      onUpdate: function () {
+        const navBar = document.querySelector(".main-nav-bar");
+        if (!navBar || !navElements || !linkPositions) return;
 
-    tl.add(() => {
-      setNavColors({
-        originalClass: "text-gray",
-        duplicateClass: "text-light",
-      });
-      setLogoColor("text-gray");
-    }, ">-0.2");
+        const navBarTop = navBar.getBoundingClientRect().top;
+        const resetColors = {
+          originalClass: "text-gray",
+          duplicateClass: "text-light",
+        };
+        const resetLogoColor = "text-gray";
+
+        const currentLinkColors = navLinkColors();
+        const newLinkColors = [...currentLinkColors];
+        let colorsChanged = false;
+
+        columns.forEach((column) => {
+          const colRect = column.getBoundingClientRect();
+          if (colRect.top <= navBarTop) {
+            // Check against nav links
+            linkPositions.forEach((linkPos, index) => {
+              if (
+                linkPos.x < colRect.right &&
+                linkPos.x + linkPos.width > colRect.left &&
+                JSON.stringify(newLinkColors[index]) !==
+                  JSON.stringify(resetColors)
+              ) {
+                newLinkColors[index] = resetColors;
+                colorsChanged = true;
+              }
+            });
+
+            // Check against logo
+            if (navElements.logo && logoColor() !== resetLogoColor) {
+              const logoRect = navElements.logo.getBoundingClientRect();
+              if (
+                logoRect.x < colRect.right &&
+                logoRect.x + logoRect.width > colRect.left
+              ) {
+                setLogoColor(resetLogoColor);
+              }
+            }
+          }
+        });
+
+        if (colorsChanged) {
+          setNavLinkColors(newLinkColors);
+        }
+      },
+    });
 
     // Scroll to top using Lenis
     tl.add(() => {
@@ -121,43 +204,84 @@ export function PageTransitionProvider(props: { children: any }) {
       y: "-100vh",
       rotate: 6,
       transformOrigin: "100% 100%",
-      duration: 0.6,
+      duration: 0.5,
       ease: "circ.inOut",
-      stagger: 0.03,
-    });
+      stagger: 0.02,
+      onUpdate: function () {
+        const navBar = document.querySelector(".main-nav-bar");
+        if (!navBar || !navElements) return;
 
-    // Reset nav colors and logo color to be dynamic again after transition
-    tl.add(() => {
-      if (typeof window !== "undefined") {
+        const navBarBottom = navBar.getBoundingClientRect().bottom;
+
+        // Determine target colors from the new page's section
         const sections = document.querySelectorAll("main section");
+        let targetLinkColors = {
+          originalClass: "text-gray",
+          duplicateClass: "text-light",
+        };
+        let targetLogoColor = "text-gray";
+        let sectionFound = false;
         sections.forEach((section) => {
+          if (sectionFound) return;
           const rect = section.getBoundingClientRect();
-          if (rect.top <= 0 && rect.bottom > 0) {
+          if (rect.top <= 1 && rect.bottom > 0) {
             if (section.classList.contains("bg-light")) {
-              setNavColors({
+              targetLinkColors = {
                 originalClass: "text-darkgray",
                 duplicateClass: "text-dark",
-              });
-              setLogoColor("text-darkgray");
-            } else {
-              setNavColors({
-                originalClass: "text-gray",
-                duplicateClass: "text-light",
-              });
-              setLogoColor("text-gray");
+              };
+              targetLogoColor = "text-darkgray";
+            }
+            sectionFound = true;
+          }
+        });
+
+        const currentLinkColors = navLinkColors();
+        const newLinkColors = [...currentLinkColors];
+        let colorsChanged = false;
+
+        columns.forEach((column) => {
+          const colRect = column.getBoundingClientRect();
+          if (colRect.bottom <= navBarBottom) {
+            // Check against nav links
+            linkPositions.forEach((linkPos, index) => {
+              if (
+                linkPos.x < colRect.right &&
+                linkPos.x + linkPos.width > colRect.left &&
+                JSON.stringify(newLinkColors[index]) !==
+                  JSON.stringify(targetLinkColors)
+              ) {
+                newLinkColors[index] = targetLinkColors;
+                colorsChanged = true;
+              }
+            });
+
+            // Check against logo
+            if (navElements.logo && logoColor() !== targetLogoColor) {
+              const logoRect = navElements.logo.getBoundingClientRect();
+              if (
+                logoRect.x < colRect.right &&
+                logoRect.x + logoRect.width > colRect.left
+              ) {
+                setLogoColor(targetLogoColor);
+              }
             }
           }
         });
-      }
-    }, ">-0.2");
+
+        if (colorsChanged) {
+          setNavLinkColors(newLinkColors);
+        }
+      },
+    });
   };
 
   return (
     <PageTransitionContext.Provider
       value={{
         triggerTransition,
-        setNavColors,
-        navColors,
+        setNavLinkColors,
+        navLinkColors,
         logoColor,
         setLogoColor,
         setupNavTriggers,

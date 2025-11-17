@@ -270,7 +270,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                   class="link-click"
                   onClick={(e) => {
                     e.preventDefault();
-                    triggerTransition(item.href, () => {
+                    triggerTransition(item.href, undefined, undefined, () => {
                       // Hide menu immediately when columns reach 0%
                       if (menuContainer) {
                         menuContainer.style.display = "none";
