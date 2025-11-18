@@ -10,7 +10,14 @@ export default function Preloader() {
   let logoContainerRef: HTMLDivElement | undefined;
   let copyrightRef: HTMLDivElement | undefined;
   const lenis = useLenis();
-  const { setIsPreloaderFinished, setupNavTriggers } = usePageTransition();
+  const {
+    setIsPreloaderFinished,
+    setupNavTriggers,
+    navLinkColors,
+    setNavLinkColors,
+    logoColor,
+    setLogoColor,
+  } = usePageTransition();
 
   onMount(() => {
     if (typeof window === "undefined") return;
@@ -21,6 +28,11 @@ export default function Preloader() {
     const tl = gsap.timeline({
       onComplete: () => {
         lenis?.start();
+        setIsPreloaderFinished(true);
+        const setupFunc = setupNavTriggers();
+        if (setupFunc) {
+          setupFunc();
+        }
       },
     });
 
@@ -109,21 +121,132 @@ export default function Preloader() {
           duration: 0.6,
           ease: "circ.inOut",
           stagger: 0.03,
+          onUpdate: function () {
+            const navElements = {
+              links: [
+                document.querySelector('a[href="/product"]'),
+                document.querySelector('a[href="/services"]'),
+                document.querySelector('a[href="/about"]'),
+                document.querySelector('a[href="/contact"]'),
+              ],
+              logo: document.querySelector('a[href="/"]'),
+            };
+
+            const sections = document.querySelectorAll("main section");
+            if (sections.length === 0) return;
+
+            const currentLinkColors = navLinkColors();
+            const newLinkColors = [...currentLinkColors];
+            let linkColorsChanged = false;
+
+            // Handle Nav Links
+            navElements.links.forEach((link, index) => {
+              if (!link) return;
+              const linkRect = link.getBoundingClientRect();
+
+              const currentColor = newLinkColors[index];
+              if (!currentColor) return; // Fix for potential undefined
+              let targetLinkColors = currentColor;
+
+              let isCrossed = false;
+              columns2.forEach((column) => {
+                const colRect = column.getBoundingClientRect();
+                const isOverlappingHorizontally =
+                  linkRect.left < colRect.right &&
+                  linkRect.right > colRect.left;
+                if (
+                  isOverlappingHorizontally &&
+                  colRect.bottom <= linkRect.top + linkRect.height / 2 // Check against vertical center
+                ) {
+                  isCrossed = true;
+                }
+              });
+
+              if (isCrossed) {
+                let determinedColors = {
+                  originalClass: "text-gray",
+                  duplicateClass: "text-light",
+                };
+                let sectionFound = false;
+                sections.forEach((section) => {
+                  if (sectionFound) return;
+                  const sectionRect = section.getBoundingClientRect();
+                  if (
+                    sectionRect.top < linkRect.bottom &&
+                    sectionRect.bottom > linkRect.top
+                  ) {
+                    if (section.classList.contains("bg-light")) {
+                      determinedColors = {
+                        originalClass: "text-darkgray",
+                        duplicateClass: "text-dark",
+                      };
+                    }
+                    sectionFound = true;
+                  }
+                });
+                targetLinkColors = determinedColors;
+              }
+
+              if (
+                JSON.stringify(newLinkColors[index]) !==
+                JSON.stringify(targetLinkColors)
+              ) {
+                newLinkColors[index] = targetLinkColors;
+                linkColorsChanged = true;
+              }
+            });
+
+            if (linkColorsChanged) {
+              setNavLinkColors(newLinkColors);
+            }
+
+            // Handle Logo
+            if (navElements.logo) {
+              const logoRect = navElements.logo.getBoundingClientRect();
+              let targetLogoColor = logoColor();
+              let isCrossed = false;
+
+              columns2.forEach((column) => {
+                const colRect = column.getBoundingClientRect();
+                const isOverlappingHorizontally =
+                  logoRect.left < colRect.right &&
+                  logoRect.right > colRect.left;
+                if (
+                  isOverlappingHorizontally &&
+                  colRect.bottom <= logoRect.top + logoRect.height / 2 // Check against vertical center
+                ) {
+                  isCrossed = true;
+                }
+              });
+
+              if (isCrossed) {
+                let determinedColor = "text-gray";
+                let sectionFound = false;
+                sections.forEach((section) => {
+                  if (sectionFound) return;
+                  const sectionRect = section.getBoundingClientRect();
+                  if (
+                    sectionRect.top < logoRect.bottom &&
+                    sectionRect.bottom > logoRect.top
+                  ) {
+                    if (section.classList.contains("bg-light")) {
+                      determinedColor = "text-darkgray";
+                    }
+                    sectionFound = true;
+                  }
+                });
+                targetLogoColor = determinedColor;
+              }
+
+              if (logoColor() !== targetLogoColor) {
+                setLogoColor(targetLogoColor);
+              }
+            }
+          },
         },
         ">-0.4"
       );
     }
-
-    // Call dynamic nav color setup and signal that the preloader is finished
-    tl.add(() => {
-      // First, signal that the preloader is done.
-      setIsPreloaderFinished(true);
-      // Now, call the setup function, which is now safe to run.
-      const setupFunc = setupNavTriggers();
-      if (setupFunc) {
-        setupFunc();
-      }
-    }, ">-0.3");
   });
 
   return (

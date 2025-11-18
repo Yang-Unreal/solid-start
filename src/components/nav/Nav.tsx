@@ -15,9 +15,9 @@ export default function Nav() {
   const isRouting = useIsRouting();
   const {
     triggerTransition,
-    navLinkColors: contextNavLinkColors,
+    navLinkColors,
     setNavLinkColors: setContextNavLinkColors,
-    logoColor: contextLogoColor,
+    logoColor,
     setLogoColor: setContextLogoColor,
     setSetupNavTriggers,
     setKillScrollTriggers,
@@ -36,26 +36,9 @@ export default function Nav() {
   let contactLinkRef: HTMLAnchorElement | undefined;
   let logoRef: HTMLAnchorElement | undefined;
 
-  // Re-introduce local state. This acts as a safe, visible default
-  // ONLY while the preloader is running.
-  const [initialNavClasses] = createSignal([
-    { originalClass: "text-gray", duplicateClass: "text-light" },
-    { originalClass: "text-gray", duplicateClass: "text-light" },
-    { originalClass: "text-gray", duplicateClass: "text-light" },
-    { originalClass: "text-gray", duplicateClass: "text-light" },
-  ]);
-  const [initialLogoColor] = createSignal("text-gray");
-
-  // This is the derived signal that intelligently chooses the correct color source.
-  const finalNavColors = () =>
-    isPreloaderFinished() ? contextNavLinkColors() : initialNavClasses();
-  const finalLogoColor = () =>
-    isPreloaderFinished() ? contextLogoColor() : initialLogoColor();
-
   let scrollTriggers: ScrollTrigger[] = [];
 
   const setupNavTriggers = () => {
-    // This function remains the same.
     if (isServer || !isPreloaderFinished()) {
       return;
     }
@@ -63,45 +46,99 @@ export default function Nav() {
     const sections = document.querySelectorAll("main section");
     if (sections.length === 0) return;
 
-    let initialSectionFound = false;
-    sections.forEach((section) => {
-      if (initialSectionFound) return;
-      const rect = section.getBoundingClientRect();
-      if (rect.top <= 0 && rect.bottom > 0) {
-        const newColors = section.classList.contains("bg-light")
-          ? { originalClass: "text-darkgray", duplicateClass: "text-dark" }
-          : { originalClass: "text-gray", duplicateClass: "text-light" };
-        const newLogoColor = section.classList.contains("bg-light")
-          ? "text-darkgray"
-          : "text-gray";
+    const navElements = {
+      links: [productLinkRef, servicesLinkRef, aboutLinkRef, contactLinkRef],
+      logo: logoRef,
+    };
 
-        setContextNavLinkColors(Array(4).fill(newColors));
-        setContextLogoColor(newLogoColor);
-        initialSectionFound = true;
-      }
-    });
+    const trigger = ScrollTrigger.create({
+      start: "top top",
+      end: "bottom bottom",
+      onUpdate: (self) => {
+        // Prevent this from running until the preloader is finished and the
+        // user has scrolled past the top of the page.
+        if (!isPreloaderFinished() || self.scroll() < 10) {
+          return;
+        }
 
-    sections.forEach((section) => {
-      const trigger = ScrollTrigger.create({
-        trigger: section,
-        start: "top 60px",
-        end: "bottom 60px",
-        onToggle: (self) => {
-          if (self.isActive) {
-            const newColors = section.classList.contains("bg-light")
-              ? { originalClass: "text-darkgray", duplicateClass: "text-dark" }
-              : { originalClass: "text-gray", duplicateClass: "text-light" };
-            const newLogoColor = section.classList.contains("bg-light")
-              ? "text-darkgray"
-              : "text-gray";
+        const currentLinkColors = navLinkColors();
+        const newLinkColors = [...currentLinkColors];
+        let linkColorsChanged = false;
 
-            setContextNavLinkColors(Array(4).fill(newColors));
-            setContextLogoColor(newLogoColor);
+        // Handle Nav Links
+        navElements.links.forEach((link, index) => {
+          if (!link) return;
+          const linkRect = link.getBoundingClientRect();
+          const currentColor = newLinkColors[index];
+          if (!currentColor) return;
+
+          let targetLinkColors = currentColor;
+          let determinedColors = {
+            originalClass: "text-gray",
+            duplicateClass: "text-light",
+          };
+          let sectionFound = false;
+
+          sections.forEach((section) => {
+            if (sectionFound) return;
+            const sectionRect = section.getBoundingClientRect();
+            if (
+              sectionRect.top < linkRect.bottom &&
+              sectionRect.bottom > linkRect.top
+            ) {
+              if (section.classList.contains("bg-light")) {
+                determinedColors = {
+                  originalClass: "text-darkgray",
+                  duplicateClass: "text-dark",
+                };
+              }
+              sectionFound = true;
+            }
+          });
+          targetLinkColors = determinedColors;
+
+          if (
+            JSON.stringify(newLinkColors[index]) !==
+            JSON.stringify(targetLinkColors)
+          ) {
+            newLinkColors[index] = targetLinkColors;
+            linkColorsChanged = true;
           }
-        },
-      });
-      scrollTriggers.push(trigger);
+        });
+
+        if (linkColorsChanged) {
+          setContextNavLinkColors(newLinkColors);
+        }
+
+        // Handle Logo
+        if (navElements.logo) {
+          const logoRect = navElements.logo.getBoundingClientRect();
+          let targetLogoColor = logoColor();
+          let determinedColor = "text-gray";
+          let sectionFound = false;
+
+          sections.forEach((section) => {
+            if (sectionFound) return;
+            const sectionRect = section.getBoundingClientRect();
+            if (
+              sectionRect.top < logoRect.bottom &&
+              sectionRect.bottom > logoRect.top
+            ) {
+              if (section.classList.contains("bg-light")) {
+                determinedColor = "text-darkgray";
+              }
+              sectionFound = true;
+            }
+          });
+          targetLogoColor = determinedColor;
+
+          if (logoColor() !== targetLogoColor) {
+            setContextLogoColor(targetLogoColor);
+          }
+        }
+      },
     });
+    scrollTriggers.push(trigger);
   };
 
   // The rest of the file remains largely the same, but we will update the JSX.
@@ -124,21 +161,10 @@ export default function Nav() {
         scrollTriggers = [];
       });
       setMenuClosedCallback(() => {
-        const sections = document.querySelectorAll("main section");
-        sections.forEach((section) => {
-          const rect = section.getBoundingClientRect();
-          if (rect.top <= 0 && rect.bottom > 0) {
-            const newColors = section.classList.contains("bg-light")
-              ? { originalClass: "text-darkgray", duplicateClass: "text-dark" }
-              : { originalClass: "text-gray", duplicateClass: "text-light" };
-            const newLogoColor = section.classList.contains("bg-light")
-              ? "text-darkgray"
-              : "text-gray";
-
-            setContextNavLinkColors(Array(4).fill(newColors));
-            setContextLogoColor(newLogoColor);
-          }
-        });
+        // The color setting logic here was causing a race condition
+        // with the preloader animation. The unified scroll trigger
+        // now handles this correctly. We just need to refresh.
+        ScrollTrigger.refresh();
       });
     }
   });
@@ -218,10 +244,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    finalNavColors()[0]?.originalClass ?? "text-gray"
+                    navLinkColors()[0]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    finalNavColors()[0]?.duplicateClass ?? "text-light"
+                    navLinkColors()[0]?.duplicateClass ?? "text-light"
                   }
                   text="PRODUCT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -229,7 +255,7 @@ export default function Nav() {
                 <div
                   ref={workUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    finalNavColors()[0]?.duplicateClass ?? "text-light"
+                    navLinkColors()[0]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
@@ -263,10 +289,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    finalNavColors()[1]?.originalClass ?? "text-gray"
+                    navLinkColors()[1]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    finalNavColors()[1]?.duplicateClass ?? "text-light"
+                    navLinkColors()[1]?.duplicateClass ?? "text-light"
                   }
                   text="SERVICES"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -274,7 +300,7 @@ export default function Nav() {
                 <div
                   ref={servicesUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    finalNavColors()[1]?.duplicateClass ?? "text-light"
+                    navLinkColors()[1]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
@@ -301,7 +327,7 @@ export default function Nav() {
                   }
                 }}
               >
-                <YourLogo class={`h-auto w-[11em] ${finalLogoColor()}`} />
+                <YourLogo class={`h-auto w-[11em] ${logoColor()}`} />
               </A>
             </li>
             {/* ABOUT LINK - USE THE DERIVED SIGNAL */}
@@ -333,10 +359,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    finalNavColors()[2]?.originalClass ?? "text-gray"
+                    navLinkColors()[2]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    finalNavColors()[2]?.duplicateClass ?? "text-light"
+                    navLinkColors()[2]?.duplicateClass ?? "text-light"
                   }
                   text="ABOUT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -344,7 +370,7 @@ export default function Nav() {
                 <div
                   ref={aboutUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    finalNavColors()[2]?.duplicateClass ?? "text-light"
+                    navLinkColors()[2]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
@@ -378,10 +404,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    finalNavColors()[3]?.originalClass ?? "text-gray"
+                    navLinkColors()[3]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    finalNavColors()[3]?.duplicateClass ?? "text-light"
+                    navLinkColors()[3]?.duplicateClass ?? "text-light"
                   }
                   text="CONTACT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -389,7 +415,7 @@ export default function Nav() {
                 <div
                   ref={contactUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    finalNavColors()[3]?.duplicateClass ?? "text-light"
+                    navLinkColors()[3]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
