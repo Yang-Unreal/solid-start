@@ -123,7 +123,7 @@ export default function Preloader() {
       if (setupFunc) {
         setupFunc();
       }
-    }, ">-0.2");
+    }, ">-0.3");
   });
 
   return (
