@@ -1,5 +1,5 @@
 import { A, useIsRouting } from "@solidjs/router";
-import { createEffect, createSignal, onMount } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js"; // Re-import createSignal
 import YourLogo from "~/components/logo/YourLogo";
 import TextAnimation from "~/components/TextAnimation";
 import gsap from "gsap";
@@ -22,7 +22,7 @@ export default function Nav() {
     setSetupNavTriggers,
     setKillScrollTriggers,
     setMenuClosedCallback,
-    isPreloaderFinished, // Import the preloader state
+    isPreloaderFinished,
   } = usePageTransition();
 
   // Refs for animations
@@ -36,36 +36,33 @@ export default function Nav() {
   let contactLinkRef: HTMLAnchorElement | undefined;
   let logoRef: HTMLAnchorElement | undefined;
 
-  // Local signals for classes that default to a safe, visible value.
-  const [currentNavClasses, setCurrentNavClasses] = createSignal([
+  // Re-introduce local state. This acts as a safe, visible default
+  // ONLY while the preloader is running.
+  const [initialNavClasses] = createSignal([
     { originalClass: "text-gray", duplicateClass: "text-light" },
     { originalClass: "text-gray", duplicateClass: "text-light" },
     { originalClass: "text-gray", duplicateClass: "text-light" },
     { originalClass: "text-gray", duplicateClass: "text-light" },
   ]);
-  const [currentLogoColor, setCurrentLogoColor] = createSignal("text-gray");
+  const [initialLogoColor] = createSignal("text-gray");
 
-  // Sync the context state to our local state ONLY when the preloader is finished.
-  createEffect(() => {
-    if (isPreloaderFinished()) {
-      setCurrentNavClasses(contextNavLinkColors());
-      setCurrentLogoColor(contextLogoColor());
-    }
-  });
+  // This is the derived signal that intelligently chooses the correct color source.
+  const finalNavColors = () =>
+    isPreloaderFinished() ? contextNavLinkColors() : initialNavClasses();
+  const finalLogoColor = () =>
+    isPreloaderFinished() ? contextLogoColor() : initialLogoColor();
 
   let scrollTriggers: ScrollTrigger[] = [];
 
   const setupNavTriggers = () => {
-    // GUARD CLAUSE: The entire function does nothing until the preloader is finished.
+    // This function remains the same.
     if (isServer || !isPreloaderFinished()) {
       return;
     }
 
-    // This logic now runs only after the preloader is done.
     const sections = document.querySelectorAll("main section");
     if (sections.length === 0) return;
 
-    // Set initial colors based on the first section in view
     let initialSectionFound = false;
     sections.forEach((section) => {
       if (initialSectionFound) return;
@@ -84,7 +81,6 @@ export default function Nav() {
       }
     });
 
-    // Create new triggers
     sections.forEach((section) => {
       const trigger = ScrollTrigger.create({
         trigger: section,
@@ -108,7 +104,7 @@ export default function Nav() {
     });
   };
 
-  // Master effect to control navigation lifecycle
+  // The rest of the file remains largely the same, but we will update the JSX.
   createEffect(() => {
     if (isRouting()) {
       lenisControls?.stop();
@@ -147,7 +143,6 @@ export default function Nav() {
     }
   });
 
-  // Effect for menu drawer to prevent conflicts
   createEffect(() => {
     if (isMenuOpen()) {
       lenisControls?.stop();
@@ -194,6 +189,7 @@ export default function Nav() {
       <div class="w-full relative flex items-center justify-between">
         <nav class="w-full flex" aria-label="Navigation Desktop">
           <ul class="w-full font-formula-bold flex flex-row justify-between items-center overflow-hidden pointer-events-auto p-0 m-0  ">
+            {/* PRODUCT LINK - USE THE DERIVED SIGNAL */}
             <li class="relative">
               <A
                 ref={productLinkRef}
@@ -222,10 +218,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    currentNavClasses()[0]?.originalClass ?? "text-gray"
+                    finalNavColors()[0]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    currentNavClasses()[0]?.duplicateClass ?? "text-light"
+                    finalNavColors()[0]?.duplicateClass ?? "text-light"
                   }
                   text="PRODUCT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -233,11 +229,12 @@ export default function Nav() {
                 <div
                   ref={workUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    currentNavClasses()[0]?.duplicateClass ?? "text-light"
+                    finalNavColors()[0]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
             </li>
+            {/* SERVICES LINK - USE THE DERIVED SIGNAL */}
             <li class="relative">
               <A
                 ref={servicesLinkRef}
@@ -266,10 +263,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    currentNavClasses()[1]?.originalClass ?? "text-gray"
+                    finalNavColors()[1]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    currentNavClasses()[1]?.duplicateClass ?? "text-light"
+                    finalNavColors()[1]?.duplicateClass ?? "text-light"
                   }
                   text="SERVICES"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -277,11 +274,12 @@ export default function Nav() {
                 <div
                   ref={servicesUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    currentNavClasses()[1]?.duplicateClass ?? "text-light"
+                    finalNavColors()[1]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
             </li>
+            {/* LOGO - USE THE DERIVED SIGNAL */}
             <li class="relative flex items-center justify-center">
               <A
                 ref={logoRef}
@@ -295,9 +293,7 @@ export default function Nav() {
                       const menuContainer = document.querySelector(
                         ".navigation-full"
                       ) as HTMLElement;
-                      if (menuContainer) {
-                        menuContainer.style.display = "none";
-                      }
+                      if (menuContainer) menuContainer.style.display = "none";
                       setIsMenuOpen(false);
                     });
                   } else {
@@ -305,9 +301,10 @@ export default function Nav() {
                   }
                 }}
               >
-                <YourLogo class={`h-auto w-[11em] ${currentLogoColor()}`} />
+                <YourLogo class={`h-auto w-[11em] ${finalLogoColor()}`} />
               </A>
             </li>
+            {/* ABOUT LINK - USE THE DERIVED SIGNAL */}
             <li class="relative">
               <A
                 ref={aboutLinkRef}
@@ -336,10 +333,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    currentNavClasses()[2]?.originalClass ?? "text-gray"
+                    finalNavColors()[2]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    currentNavClasses()[2]?.duplicateClass ?? "text-light"
+                    finalNavColors()[2]?.duplicateClass ?? "text-light"
                   }
                   text="ABOUT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -347,11 +344,12 @@ export default function Nav() {
                 <div
                   ref={aboutUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    currentNavClasses()[2]?.duplicateClass ?? "text-light"
+                    finalNavColors()[2]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
             </li>
+            {/* CONTACT LINK - USE THE DERIVED SIGNAL */}
             <li class="relative">
               <A
                 ref={contactLinkRef}
@@ -380,10 +378,10 @@ export default function Nav() {
               >
                 <TextAnimation
                   originalClass={
-                    currentNavClasses()[3]?.originalClass ?? "text-gray"
+                    finalNavColors()[3]?.originalClass ?? "text-gray"
                   }
                   duplicateClass={
-                    currentNavClasses()[3]?.duplicateClass ?? "text-light"
+                    finalNavColors()[3]?.duplicateClass ?? "text-light"
                   }
                   text="CONTACT"
                   textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
@@ -391,7 +389,7 @@ export default function Nav() {
                 <div
                   ref={contactUnderlineRef!}
                   class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-                    currentNavClasses()[3]?.duplicateClass ?? "text-light"
+                    finalNavColors()[3]?.duplicateClass ?? "text-light"
                   ).replace("text-", "bg-")}`}
                 ></div>
               </A>
