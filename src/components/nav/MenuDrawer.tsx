@@ -58,7 +58,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
 
   onMount(() => {
     if (menuContainer) {
-      gsap.set(menuContainer, { display: "none" });
+      gsap.set(menuContainer, { visibility: "hidden" });
       gsap.set(linkRefs, { y: "100%" });
       gsap.set([addressRef, contactRef], { y: "100%" });
       if (currentImageRef) {
@@ -86,7 +86,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       if (currentIndex !== -1 && underlineRefs[currentIndex]) {
         gsap.to(underlineRefs[currentIndex]!, { scaleX: 1, duration: 0 });
       }
-      gsap.set(menuContainer, { display: "flex" });
+      gsap.set(menuContainer, { visibility: "visible" });
 
       lenis?.stop();
       gsap.set(columns, {
@@ -156,6 +156,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         currentTl = gsap.timeline({
           onComplete: () => {
             lenis?.start();
+            if (menuContainer) gsap.set(menuContainer, { visibility: "hidden" });
           },
         });
 
@@ -273,7 +274,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     triggerTransition(item.href, undefined, undefined, () => {
                       // Hide menu immediately when columns reach 0%
                       if (menuContainer) {
-                        menuContainer.style.display = "none";
+                        menuContainer.style.visibility = "hidden";
                       }
                       setIsMenuOpen(false);
                     });

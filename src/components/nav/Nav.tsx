@@ -354,7 +354,7 @@ export default function Nav() {
                       const menuContainer = document.querySelector(
                         ".navigation-full"
                       ) as HTMLElement;
-                      if (menuContainer) menuContainer.style.display = "none";
+                      if (menuContainer) menuContainer.style.visibility = "hidden";
                       setIsMenuOpen(false);
                     });
                   } else {
