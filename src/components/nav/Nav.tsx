@@ -137,6 +137,22 @@ export default function Nav() {
         });
         targetLogoColor = determinedColor;
 
+        // Check for transition column overlap
+        const columns = document.querySelectorAll(".column2");
+        columns.forEach((column) => {
+          const colRect = column.getBoundingClientRect();
+          // Check if column overlaps logo horizontally
+          if (
+            logoRect.x < colRect.right &&
+            logoRect.x + logoRect.width > colRect.left
+          ) {
+            // Check if column bottom overlaps logo (is still covering or passing through)
+            if (colRect.bottom > logoRect.top) {
+              targetLogoColor = "text-gray";
+            }
+          }
+        });
+
         if (logoColor() !== targetLogoColor) {
           setContextLogoColor(targetLogoColor);
         }

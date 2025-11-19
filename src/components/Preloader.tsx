@@ -204,22 +204,24 @@ export default function Preloader() {
             if (navElements.logo) {
               const logoRect = navElements.logo.getBoundingClientRect();
               let targetLogoColor = logoColor();
-              let isCrossed = false;
+              let isCovered = false;
 
               columns2.forEach((column) => {
                 const colRect = column.getBoundingClientRect();
                 const isOverlappingHorizontally =
                   logoRect.left < colRect.right &&
                   logoRect.right > colRect.left;
+                
+                // Check if column is overlapping horizontally AND still covering vertically (bottom is below logo top)
                 if (
                   isOverlappingHorizontally &&
-                  colRect.bottom <= logoRect.top + logoRect.height / 2 // Check against vertical center
+                  colRect.bottom > logoRect.top+logoRect.height
                 ) {
-                  isCrossed = true;
+                  isCovered = true;
                 }
               });
 
-              if (isCrossed) {
+              if (!isCovered) {
                 let determinedColor = "text-gray";
                 let sectionFound = false;
                 sections.forEach((section) => {
@@ -236,6 +238,8 @@ export default function Preloader() {
                   }
                 });
                 targetLogoColor = determinedColor;
+              } else {
+                targetLogoColor = "text-gray";
               }
 
               if (logoColor() !== targetLogoColor) {
