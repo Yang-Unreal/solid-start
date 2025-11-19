@@ -3,20 +3,62 @@ import gsap from "gsap";
 import { useNavigate } from "@solidjs/router";
 import { useLenis } from "~/context/LenisContext";
 
+// --- Constants & Configuration ---
+const SELECTORS = {
+  COLUMNS: ".column2",
+  NAV_BAR: ".main-nav-bar",
+  SECTIONS: "main section",
+  LINKS: {
+    PRODUCT: 'a[href="/product"]',
+    SERVICES: 'a[href="/services"]',
+    ABOUT: 'a[href="/about"]',
+    CONTACT: 'a[href="/contact"]',
+    LOGO: 'a[href="/"]',
+  },
+};
+
+const COLORS = {
+  GRAY: "text-gray",
+  LIGHT: "text-light",
+  DARK: "text-dark",
+  DARKGRAY: "text-darkgray",
+};
+
+const DEFAULT_LINK_COLORS = {
+  originalClass: COLORS.GRAY,
+  duplicateClass: COLORS.LIGHT,
+};
+
+const DARK_LINK_COLORS = {
+  originalClass: COLORS.DARKGRAY,
+  duplicateClass: COLORS.DARK,
+};
+
+// --- Types ---
+interface NavElements {
+  links: (HTMLElement | undefined)[];
+  logo: HTMLElement | undefined;
+}
+
+interface LinkPosition {
+  x: number;
+  width: number;
+}
+
+interface ColorState {
+  originalClass: string;
+  duplicateClass: string;
+}
+
 interface PageTransitionContextType {
   triggerTransition: (
     href: string,
-    navElements?: {
-      links: (HTMLElement | undefined)[];
-      logo: HTMLElement | undefined;
-    },
-    linkPositions?: { x: number; width: number }[],
+    navElements?: NavElements,
+    linkPositions?: LinkPosition[],
     onMenuHide?: () => void
   ) => void;
-  setNavLinkColors: (
-    colors: { originalClass: string; duplicateClass: string }[]
-  ) => void;
-  navLinkColors: () => { originalClass: string; duplicateClass: string }[];
+  setNavLinkColors: (colors: ColorState[]) => void;
+  navLinkColors: () => ColorState[];
   logoColor: () => string;
   setLogoColor: (color: string) => void;
   setupNavTriggers: () => () => void;
@@ -31,92 +73,92 @@ interface PageTransitionContextType {
 
 const PageTransitionContext = createContext<PageTransitionContextType>();
 
+// --- Helper Functions ---
+const getNavElements = (): NavElements => {
+  if (typeof document === "undefined")
+    return { links: [], logo: undefined };
+
+  const productLink = document.querySelector<HTMLElement>(SELECTORS.LINKS.PRODUCT);
+  const servicesLink = document.querySelector<HTMLElement>(SELECTORS.LINKS.SERVICES);
+  const aboutLink = document.querySelector<HTMLElement>(SELECTORS.LINKS.ABOUT);
+  const contactLink = document.querySelector<HTMLElement>(SELECTORS.LINKS.CONTACT);
+  const logoEl = document.querySelector<HTMLElement>(SELECTORS.LINKS.LOGO);
+
+  return {
+    links: [productLink, servicesLink, aboutLink, contactLink].map(
+      (el) => el || undefined
+    ),
+    logo: logoEl || undefined,
+  };
+};
+
+const getLinkPositions = (elements: NavElements): LinkPosition[] => {
+  return elements.links.map((el) => {
+    if (!el) return { x: 0, width: 0 };
+    const rect = el.getBoundingClientRect();
+    return { x: rect.x, width: rect.width };
+  });
+};
+
 export function PageTransitionProvider(props: { children: any }) {
   const navigate = useNavigate();
   const lenis = useLenis();
+  
+  // State
   const [isVisible, setIsVisible] = createSignal(false);
-  const [pendingNavigation, setPendingNavigation] = createSignal<string | null>(
-    null
+  const [pendingNavigation, setPendingNavigation] = createSignal<string | null>(null);
+  const [navLinkColors, setNavLinkColors] = createSignal<ColorState[]>(
+    Array(4).fill(DEFAULT_LINK_COLORS)
   );
-  const [navLinkColors, setNavLinkColors] = createSignal(
-    Array(4).fill({
-      originalClass: "text-gray",
-      duplicateClass: "text-light",
-    })
-  );
-  const [logoColor, setLogoColor] = createSignal("text-gray");
-  const [setupNavTriggers, setSetupNavTriggers] = createSignal<() => void>(
-    () => {}
-  );
-  const [killScrollTriggers, setKillScrollTriggers] = createSignal<() => void>(
-    () => {}
-  );
-  const [menuClosedCallback, setMenuClosedCallback] = createSignal<() => void>(
-    () => {}
-  );
-  const [menuVisibility, setMenuVisibility] = createSignal<() => void>(
-    () => {}
-  );
+  const [logoColor, setLogoColor] = createSignal(COLORS.GRAY);
   const [isPreloaderFinished, setIsPreloaderFinished] = createSignal(false);
+
+  // Callbacks
+  const [setupNavTriggers, setSetupNavTriggers] = createSignal<() => void>(() => {});
+  const [killScrollTriggers, setKillScrollTriggers] = createSignal<() => void>(() => {});
+  const [menuClosedCallback, setMenuClosedCallback] = createSignal<() => void>(() => {});
+  const [menuVisibility, setMenuVisibility] = createSignal<() => void>(() => {});
 
   const triggerTransition = (
     href: string,
-    navElements?: {
-      links: (HTMLElement | undefined)[];
-      logo: HTMLElement | undefined;
-    },
-    linkPositions?: { x: number; width: number }[],
+    providedNavElements?: NavElements,
+    providedLinkPositions?: LinkPosition[],
     onMenuHide?: () => void
   ) => {
-    if (isVisible()) return; // Prevent multiple transitions
+    if (isVisible()) return;
 
-    // Fallback to query DOM if elements are not provided
-    if (!navElements || !linkPositions) {
-      const productLink =
-        document.querySelector<HTMLElement>('a[href="/product"]');
-      const servicesLink = document.querySelector<HTMLElement>(
-        'a[href="/services"]'
-      );
-      const aboutLink = document.querySelector<HTMLElement>('a[href="/about"]');
-      const contactLink =
-        document.querySelector<HTMLElement>('a[href="/contact"]');
-      const logoEl = document.querySelector<HTMLElement>('a[href="/"]');
+    // 1. Prepare Elements & Data
+    const navElements = providedNavElements || getNavElements();
+    const linkPositions = providedLinkPositions || getLinkPositions(navElements);
+    const columns = document.querySelectorAll(SELECTORS.COLUMNS);
+    const navBar = document.querySelector(SELECTORS.NAV_BAR);
 
-      const queriedLinks = [productLink, servicesLink, aboutLink, contactLink];
-
-      navElements = {
-        links: queriedLinks.map((el) => el || undefined),
-        logo: logoEl || undefined,
-      };
-
-      linkPositions = queriedLinks.map((el) => {
-        if (!el) return { x: 0, width: 0 };
-        const rect = el.getBoundingClientRect();
-        return { x: rect.x, width: rect.width };
-      });
+    if (!columns.length) {
+      console.warn("Transition columns not found");
+      navigate(href);
+      return;
     }
 
     setPendingNavigation(href);
     setIsVisible(true);
-
-    // Kill old scroll triggers before transition
     killScrollTriggers()();
 
-    // Use the preloader columns for transition
-    const columns = document.querySelectorAll(".column2");
+    // 2. Pre-calculate static values for the animation loop
+    const navBarRect = navBar?.getBoundingClientRect();
+    const navBarTop = navBarRect?.top ?? 0;
+    const navBarBottom = navBarRect?.bottom ?? 0;
 
+    // 3. GSAP Timeline
     const tl = gsap.timeline({
       onComplete: () => {
         setIsVisible(false);
-        // Set up new triggers after transition completes
         setupNavTriggers()();
-        // Call menu closed callback if set
         const callback = menuClosedCallback();
         if (callback) callback();
       },
     });
 
-    // Set initial state
+    // --- ENTER ANIMATION (Slide Up) ---
     tl.set(columns, {
       y: "100vh",
       scaleX: 1.1,
@@ -125,7 +167,6 @@ export function PageTransitionProvider(props: { children: any }) {
       transformOrigin: "100% 0%",
     });
 
-    // Start transition: columns slide from bottom (100vh) to cover (0%)
     tl.to(columns, {
       y: "0%",
       rotate: 0,
@@ -133,65 +174,65 @@ export function PageTransitionProvider(props: { children: any }) {
       ease: "circ.inOut",
       stagger: 0.02,
       onComplete: () => {
-        // Call menu hide callback when columns reach 0%
         if (onMenuHide) onMenuHide();
       },
-      onUpdate: function () {
-        const navBar = document.querySelector(".main-nav-bar");
-        if (!navBar || !navElements || !linkPositions) return;
+      onUpdate: () => {
+        // Optimization: Skip if essential elements are missing
+        if (!navBar) return;
 
-        const navBarTop = navBar.getBoundingClientRect().top;
-        const resetColors = {
-          originalClass: "text-gray",
-          duplicateClass: "text-light",
-        };
-        const resetLogoColor = "text-gray";
-
-        const currentLinkColors = navLinkColors();
-        const newLinkColors = [...currentLinkColors];
+        const currentColors = navLinkColors();
+        const newColors = [...currentColors];
         let colorsChanged = false;
+        let currentLogoColor = logoColor();
+        let logoChanged = false;
 
+        // Check collisions
         columns.forEach((column) => {
           const colRect = column.getBoundingClientRect();
+          
+          // Only check if column is high enough to touch navbar
           if (colRect.top <= navBarTop) {
-            // Check against nav links
+            
+            // Check Links
             linkPositions.forEach((linkPos, index) => {
               if (
                 linkPos.x < colRect.right &&
-                linkPos.x + linkPos.width > colRect.left &&
-                JSON.stringify(newLinkColors[index]) !==
-                  JSON.stringify(resetColors)
+                linkPos.x + linkPos.width > colRect.left
               ) {
-                newLinkColors[index] = resetColors;
-                colorsChanged = true;
+                // Collision detected -> Reset to default colors
+                if (JSON.stringify(newColors[index]) !== JSON.stringify(DEFAULT_LINK_COLORS)) {
+                  newColors[index] = DEFAULT_LINK_COLORS;
+                  colorsChanged = true;
+                }
               }
             });
 
-            // Check against logo
-            if (navElements.logo && logoColor() !== resetLogoColor) {
+            // Check Logo
+            if (navElements.logo) {
               const logoRect = navElements.logo.getBoundingClientRect();
               if (
                 logoRect.x < colRect.right &&
                 logoRect.x + logoRect.width > colRect.left
               ) {
-                setLogoColor(resetLogoColor);
+                 if (currentLogoColor !== COLORS.GRAY) {
+                   currentLogoColor = COLORS.GRAY;
+                   logoChanged = true;
+                 }
               }
             }
           }
         });
 
-        if (colorsChanged) {
-          setNavLinkColors(newLinkColors);
-        }
+        if (colorsChanged) setNavLinkColors(newColors);
+        if (logoChanged) setLogoColor(currentLogoColor);
       },
     });
 
-    // Scroll to top using Lenis
+    // --- NAVIGATION & SCROLL RESET ---
     tl.add(() => {
       lenis?.lenis.scrollTo(0, { immediate: true });
     });
 
-    // Navigate to the new page
     tl.add(() => {
       if (pendingNavigation()) {
         navigate(pendingNavigation()!);
@@ -199,7 +240,7 @@ export function PageTransitionProvider(props: { children: any }) {
       }
     });
 
-    // Slide columns up to reveal the new page
+    // --- EXIT ANIMATION (Slide Away) ---
     tl.to(columns, {
       y: "-100vh",
       rotate: 6,
@@ -207,71 +248,71 @@ export function PageTransitionProvider(props: { children: any }) {
       duration: 0.5,
       ease: "circ.inOut",
       stagger: 0.02,
-      onUpdate: function () {
-        const navBar = document.querySelector(".main-nav-bar");
-        if (!navBar || !navElements) return;
+      onUpdate: () => {
+        if (!navBar) return;
 
-        const navBarBottom = navBar.getBoundingClientRect().bottom;
-
-        // Determine target colors from the new page's section
-        const sections = document.querySelectorAll("main section");
-        let targetLinkColors = {
-          originalClass: "text-gray",
-          duplicateClass: "text-light",
-        };
-        let targetLogoColor = "text-gray";
-        let sectionFound = false;
-        sections.forEach((section) => {
-          if (sectionFound) return;
+        // Determine target colors based on the new page's first section
+        const sections = document.querySelectorAll(SELECTORS.SECTIONS);
+        let targetLinkColors = DEFAULT_LINK_COLORS;
+        let targetLogoColor = COLORS.GRAY;
+        
+        // Find the first visible section at the top
+        for (const section of sections) {
           const rect = section.getBoundingClientRect();
+          // We check if the section is at the top of the viewport
           if (rect.top <= 1 && rect.bottom > 0) {
             if (section.classList.contains("bg-light")) {
-              targetLinkColors = {
-                originalClass: "text-darkgray",
-                duplicateClass: "text-dark",
-              };
-              targetLogoColor = "text-darkgray";
+              targetLinkColors = DARK_LINK_COLORS;
+              targetLogoColor = COLORS.DARKGRAY;
             }
-            sectionFound = true;
+            break; // Found the top section
           }
-        });
+        }
 
-        const currentLinkColors = navLinkColors();
-        const newLinkColors = [...currentLinkColors];
+        const currentColors = navLinkColors();
+        const newColors = [...currentColors];
         let colorsChanged = false;
+        let currentLogoColor = logoColor();
+        let logoChanged = false;
 
         columns.forEach((column) => {
           const colRect = column.getBoundingClientRect();
+          
+          // Only check if column is still covering the navbar
           if (colRect.bottom <= navBarBottom) {
-            // Check against nav links
+            
+            // Check Links
             linkPositions.forEach((linkPos, index) => {
               if (
                 linkPos.x < colRect.right &&
-                linkPos.x + linkPos.width > colRect.left &&
-                JSON.stringify(newLinkColors[index]) !==
-                  JSON.stringify(targetLinkColors)
+                linkPos.x + linkPos.width > colRect.left
               ) {
-                newLinkColors[index] = targetLinkColors;
-                colorsChanged = true;
+                // Collision detected (column passing *up* past link) -> Change to target color
+                if (JSON.stringify(newColors[index]) !== JSON.stringify(targetLinkColors)) {
+                  newColors[index] = targetLinkColors;
+                  colorsChanged = true;
+                }
               }
             });
 
-            // Check against logo
-            if (navElements.logo && logoColor() !== targetLogoColor) {
+            // Check Logo
+            if (navElements.logo) {
               const logoRect = navElements.logo.getBoundingClientRect();
               if (
                 logoRect.x < colRect.right &&
                 logoRect.x + logoRect.width > colRect.left
               ) {
-                setLogoColor(targetLogoColor);
+                if (currentLogoColor !== targetLogoColor) {
+                  currentLogoColor = targetLogoColor;
+                  logoChanged = true;
+                }
               }
             }
           }
         });
 
-        if (colorsChanged) {
-          setNavLinkColors(newLinkColors);
-        }
+        if (colorsChanged) setNavLinkColors(newColors);
+        if (logoChanged) setLogoColor(currentLogoColor);
       },
     });
   };
