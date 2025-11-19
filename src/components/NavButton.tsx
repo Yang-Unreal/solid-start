@@ -1,5 +1,5 @@
 import { createSignal, type Component, type JSX, splitProps } from "solid-js";
-import MagneticLink from "~/components/unused/MagneticLink";
+import MagneticLink from "~/components/MagneticLink";
 
 interface NavButtonProps
   extends Omit<JSX.HTMLAttributes<HTMLDivElement>, "children"> {
