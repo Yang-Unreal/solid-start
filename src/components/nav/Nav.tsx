@@ -1,5 +1,7 @@
+// --- START OF FILE Nav.tsx ---
+
 import { A, useIsRouting } from "@solidjs/router";
-import { createEffect, createSignal, onMount } from "solid-js"; // Re-import createSignal
+import { createEffect, createSignal, onMount } from "solid-js";
 import YourLogo from "~/components/logo/YourLogo";
 import TextAnimation from "~/components/TextAnimation";
 import gsap from "gsap";
@@ -51,97 +53,117 @@ export default function Nav() {
       logo: logoRef,
     };
 
+    /**
+     * Extracted logic to detect colors.
+     * This allows us to call it on scroll AND on window resize.
+     */
+    const detectColors = () => {
+      const currentLinkColors = navLinkColors();
+      const newLinkColors = [...currentLinkColors];
+      let linkColorsChanged = false;
+
+      // Handle Nav Links
+      navElements.links.forEach((link, index) => {
+        if (!link) return;
+        
+        // On mobile -> desktop resize, this rect changes from 0x0 to valid dimensions
+        const linkRect = link.getBoundingClientRect();
+        
+        // If element is hidden (width/height 0), skip logic to preserve state or default
+        if (linkRect.width === 0 && linkRect.height === 0) return;
+
+        const currentColor = newLinkColors[index];
+        if (!currentColor) return;
+
+        let targetLinkColors = currentColor;
+        let determinedColors = {
+          originalClass: "text-gray",
+          duplicateClass: "text-light",
+        };
+        let sectionFound = false;
+
+        sections.forEach((section) => {
+          if (sectionFound) return;
+          const sectionRect = section.getBoundingClientRect();
+          
+          // Check intersection
+          if (
+            sectionRect.top < linkRect.bottom &&
+            sectionRect.bottom > linkRect.top
+          ) {
+            if (section.classList.contains("bg-light")) {
+              determinedColors = {
+                originalClass: "text-darkgray",
+                duplicateClass: "text-dark",
+              };
+            }
+            sectionFound = true;
+          }
+        });
+        targetLinkColors = determinedColors;
+
+        if (
+          JSON.stringify(newLinkColors[index]) !==
+          JSON.stringify(targetLinkColors)
+        ) {
+          newLinkColors[index] = targetLinkColors;
+          linkColorsChanged = true;
+        }
+      });
+
+      if (linkColorsChanged) {
+        setContextNavLinkColors(newLinkColors);
+      }
+
+      // Handle Logo
+      if (navElements.logo) {
+        const logoRect = navElements.logo.getBoundingClientRect();
+        let targetLogoColor = logoColor();
+        let determinedColor = "text-gray";
+        let sectionFound = false;
+
+        sections.forEach((section) => {
+          if (sectionFound) return;
+          const sectionRect = section.getBoundingClientRect();
+          if (
+            sectionRect.top < logoRect.bottom &&
+            sectionRect.bottom > logoRect.top
+          ) {
+            if (section.classList.contains("bg-light")) {
+              determinedColor = "text-darkgray";
+            }
+            sectionFound = true;
+          }
+        });
+        targetLogoColor = determinedColor;
+
+        if (logoColor() !== targetLogoColor) {
+          setContextLogoColor(targetLogoColor);
+        }
+      }
+    };
+
     const trigger = ScrollTrigger.create({
       start: "top top",
       end: "bottom bottom",
+      // 1. Runs when you scroll
       onUpdate: (self) => {
-        // Prevent this from running until the preloader is finished and the
-        // user has scrolled past the top of the page.
         if (!isPreloaderFinished() || self.scroll() < 10) {
           return;
         }
-
-        const currentLinkColors = navLinkColors();
-        const newLinkColors = [...currentLinkColors];
-        let linkColorsChanged = false;
-
-        // Handle Nav Links
-        navElements.links.forEach((link, index) => {
-          if (!link) return;
-          const linkRect = link.getBoundingClientRect();
-          const currentColor = newLinkColors[index];
-          if (!currentColor) return;
-
-          let targetLinkColors = currentColor;
-          let determinedColors = {
-            originalClass: "text-gray",
-            duplicateClass: "text-light",
-          };
-          let sectionFound = false;
-
-          sections.forEach((section) => {
-            if (sectionFound) return;
-            const sectionRect = section.getBoundingClientRect();
-            if (
-              sectionRect.top < linkRect.bottom &&
-              sectionRect.bottom > linkRect.top
-            ) {
-              if (section.classList.contains("bg-light")) {
-                determinedColors = {
-                  originalClass: "text-darkgray",
-                  duplicateClass: "text-dark",
-                };
-              }
-              sectionFound = true;
-            }
-          });
-          targetLinkColors = determinedColors;
-
-          if (
-            JSON.stringify(newLinkColors[index]) !==
-            JSON.stringify(targetLinkColors)
-          ) {
-            newLinkColors[index] = targetLinkColors;
-            linkColorsChanged = true;
-          }
-        });
-
-        if (linkColorsChanged) {
-          setContextNavLinkColors(newLinkColors);
-        }
-
-        // Handle Logo
-        if (navElements.logo) {
-          const logoRect = navElements.logo.getBoundingClientRect();
-          let targetLogoColor = logoColor();
-          let determinedColor = "text-gray";
-          let sectionFound = false;
-
-          sections.forEach((section) => {
-            if (sectionFound) return;
-            const sectionRect = section.getBoundingClientRect();
-            if (
-              sectionRect.top < logoRect.bottom &&
-              sectionRect.bottom > logoRect.top
-            ) {
-              if (section.classList.contains("bg-light")) {
-                determinedColor = "text-darkgray";
-              }
-              sectionFound = true;
-            }
-          });
-          targetLogoColor = determinedColor;
-
-          if (logoColor() !== targetLogoColor) {
-            setContextLogoColor(targetLogoColor);
-          }
-        }
+        detectColors();
       },
+      // 2. Runs when you resize the window (Mobile -> Desktop)
+      onRefresh: () => {
+        if (!isPreloaderFinished()) {
+            return;
+        }
+        detectColors();
+      }
     });
     scrollTriggers.push(trigger);
   };
 
-  // The rest of the file remains largely the same, but we will update the JSX.
   createEffect(() => {
     if (isRouting()) {
       lenisControls?.stop();
@@ -161,9 +183,6 @@ export default function Nav() {
         scrollTriggers = [];
       });
       setMenuClosedCallback(() => {
-        // The color setting logic here was causing a race condition
-        // with the preloader animation. The unified scroll trigger
-        // now handles this correctly. We just need to refresh.
         ScrollTrigger.refresh();
       });
     }
@@ -215,7 +234,7 @@ export default function Nav() {
       <div class="w-full relative flex items-center justify-between">
         <nav class="w-full flex" aria-label="Navigation Desktop">
           <ul class="w-full font-formula-bold flex flex-row justify-between items-center overflow-hidden pointer-events-auto p-0 m-0  ">
-            {/* PRODUCT LINK - USE THE DERIVED SIGNAL */}
+            {/* PRODUCT LINK */}
             <li class="relative">
               <A
                 ref={productLinkRef}
@@ -260,7 +279,7 @@ export default function Nav() {
                 ></div>
               </A>
             </li>
-            {/* SERVICES LINK - USE THE DERIVED SIGNAL */}
+            {/* SERVICES LINK */}
             <li class="relative">
               <A
                 ref={servicesLinkRef}
@@ -305,7 +324,7 @@ export default function Nav() {
                 ></div>
               </A>
             </li>
-            {/* LOGO - USE THE DERIVED SIGNAL */}
+            {/* LOGO */}
             <li class="relative flex items-center justify-center">
               <A
                 ref={logoRef}
@@ -330,7 +349,7 @@ export default function Nav() {
                 <YourLogo class={`h-auto w-[11em] ${logoColor()}`} />
               </A>
             </li>
-            {/* ABOUT LINK - USE THE DERIVED SIGNAL */}
+            {/* ABOUT LINK */}
             <li class="relative">
               <A
                 ref={aboutLinkRef}
@@ -375,7 +394,7 @@ export default function Nav() {
                 ></div>
               </A>
             </li>
-            {/* CONTACT LINK - USE THE DERIVED SIGNAL */}
+            {/* CONTACT LINK */}
             <li class="relative">
               <A
                 ref={contactLinkRef}
