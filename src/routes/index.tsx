@@ -1,6 +1,5 @@
 // src/routes/index.tsx
 
-import { Meta, Title } from "@solidjs/meta";
 import { onMount } from "solid-js";
 import gsap from "gsap/all";
 
