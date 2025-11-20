@@ -89,6 +89,7 @@ const Preloader: Component = () => {
 
       const tl = gsap.timeline({
         onComplete: () => {
+          gsap.set([...columns, ...columns2], { display: "none" });
           lenis?.start();
           setIsPreloaderFinished(true);
           // Initialize nav triggers after preloader finishes
