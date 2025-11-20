@@ -1,3 +1,5 @@
+// --- START OF FILE Nav.tsx ---
+
 import { A, useIsRouting } from "@solidjs/router";
 import { createEffect, onMount, For } from "solid-js";
 import YourLogo from "~/components/logo/YourLogo";
@@ -8,10 +10,19 @@ import { useLenis } from "~/context/LenisContext";
 import { usePageTransition } from "~/context/PageTransitionContext";
 import { useMenu } from "~/context/MenuContext";
 import NavLink from "./NavLink";
-import { NAV_LINKS } from "~/config/navigation";
 
-// Use NAV_LINKS from config
-const LINKS = NAV_LINKS;
+interface LinkConfig {
+  href: string;
+  label: string;
+  hiddenOnMobile: boolean;
+}
+
+const LINKS: LinkConfig[] = [
+  { href: "/product", label: "PRODUCT", hiddenOnMobile: false },
+  { href: "/services", label: "SERVICES", hiddenOnMobile: true },
+  { href: "/about", label: "ABOUT", hiddenOnMobile: true },
+  { href: "/contact", label: "CONTACT", hiddenOnMobile: false },
+];
 
 export default function Nav() {
   const { isMenuOpen, setIsMenuOpen } = useMenu();
