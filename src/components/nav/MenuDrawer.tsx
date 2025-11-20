@@ -155,7 +155,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       if (!isVisible()) {
         currentTl = gsap.timeline({
           onComplete: () => {
-            if (isPreloaderFinished()) {
+            if (isPreloaderFinished() && !isVisible()) {
               lenis?.start();
             }
             if (menuContainer) gsap.set(menuContainer, { visibility: "hidden" });

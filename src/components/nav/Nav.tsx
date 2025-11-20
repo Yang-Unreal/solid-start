@@ -38,6 +38,7 @@ export default function Nav() {
     setKillScrollTriggers,
     setMenuClosedCallback,
     isPreloaderFinished,
+    isVisible,
   } = usePageTransition();
 
   // Refs
@@ -170,10 +171,10 @@ export default function Nav() {
   };
 
   createEffect(() => {
-    if (isRouting()) {
+    if (isRouting() || isVisible()) {
       lenisControls?.stop();
     } else {
-      if (isPreloaderFinished()) {
+      if (isPreloaderFinished() && !isVisible()) {
         lenisControls?.lenis.scrollTo(0, { immediate: true });
         ScrollTrigger.refresh();
         lenisControls?.start();
@@ -201,7 +202,7 @@ export default function Nav() {
     if (isMenuOpen()) {
       lenisControls?.stop();
     } else {
-      if (!isRouting() && isPreloaderFinished()) {
+      if (!isRouting() && isPreloaderFinished() && !isVisible()) {
         lenisControls?.start();
       }
     }

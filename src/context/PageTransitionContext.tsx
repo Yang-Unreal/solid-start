@@ -141,6 +141,7 @@ export function PageTransitionProvider(props: { children: any }) {
 
     setPendingNavigation(href);
     setIsVisible(true);
+    lenis?.stop();
     killScrollTriggers()();
 
     // 2. Pre-calculate static values for the animation loop
