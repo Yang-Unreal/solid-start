@@ -162,7 +162,7 @@ export function PageTransitionProvider(props: { children: any }) {
 
     // --- ENTER ANIMATION (Slide Up) ---
     tl.set(columns, {
-      display: "block",
+      clearProps: "display",
       y: "100vh",
       scaleX: 1.1,
       scaleY: 1.05,

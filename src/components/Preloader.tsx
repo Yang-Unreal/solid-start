@@ -313,8 +313,8 @@ const Preloader: Component = () => {
         <For each={COLUMNS_CONFIG}>
           {(config) => (
             <div
-              class={`column flex h-full w-full bg-dark rounded ${
-                config.visibleMobile ? "" : "hidden sm:block"
+              class={`column loading-screen ${
+                config.visibleMobile ? "" : "last"
               }`}
             />
           )}
@@ -358,8 +358,8 @@ const Preloader: Component = () => {
         <For each={COLUMNS_CONFIG}>
           {(config) => (
             <div
-              class={`column2 flex h-full w-full bg-darkgray rounded ${
-                config.visibleMobile ? "" : "hidden sm:block"
+              class={`column2 transition-screen ${
+                config.visibleMobile ? "" : "last"
               }`}
             />
           )}
