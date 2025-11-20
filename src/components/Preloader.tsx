@@ -1,11 +1,11 @@
-import { onMount, type Component } from "solid-js";
+import { onMount, onCleanup, type Component, For } from "solid-js";
 import gsap from "gsap";
 import { useLenis } from "~/context/LenisContext";
 import YourLogo from "./logo/YourLogo";
 import MobileLogo from "./logo/MobileLogo";
 import { usePageTransition } from "~/context/PageTransitionContext";
 
-// Constants for animation timings and eases for better maintainability
+// Animation constants
 const DURATION = {
   LOGO_REVEAL: 1,
   LOGO_SLIDE: 0.4,
@@ -20,13 +20,20 @@ const EASE = {
   COLUMN_SLIDE: "circ.inOut",
 };
 
+const COLUMNS_CONFIG = [
+  { visibleMobile: true },
+  { visibleMobile: true },
+  { visibleMobile: false },
+  { visibleMobile: false },
+];
+
 /**
  * A modern, production-ready preloader component for SolidJS applications.
  * It uses GSAP for a sophisticated animation sequence and ensures smooth
  * page transitions by coordinating with Lenis and PageTransition contexts.
  */
 const Preloader: Component = () => {
-  let preloaderRef: HTMLDivElement | undefined;
+  let containerRef: HTMLDivElement | undefined;
   let logoContainerRef: HTMLDivElement | undefined;
   let copyrightRef: HTMLDivElement | undefined;
 
@@ -39,75 +46,86 @@ const Preloader: Component = () => {
     logoColor,
     setLogoColor,
   } = usePageTransition();
-  /**
-   * Initializes and runs the entire preloader animation sequence.
-   */
-  const runEnterAnimation = () => {
-    // Ensure all required DOM elements are available before starting the animation
-    if (!preloaderRef || !logoContainerRef || !copyrightRef) {
-      console.error("Preloader refs not found, aborting animation.");
-      // Fallback to ensure the site is usable if refs are missing
-      setIsPreloaderFinished(true);
-      return;
-    }
 
-    const columns = preloaderRef.querySelectorAll<HTMLDivElement>(".column");
-    const columns2 = preloaderRef.querySelectorAll<HTMLDivElement>(".column2");
-    const grayLogo =
-      logoContainerRef.querySelector<SVGSVGElement>("svg:first-child");
-    const whiteLogo =
-      logoContainerRef.querySelector<SVGSVGElement>("svg:last-child");
+  // GSAP Context for proper cleanup
+  let ctx: gsap.Context;
 
-    if (
-      !whiteLogo ||
-      !grayLogo ||
-      columns.length === 0 ||
-      columns2.length === 0
-    ) {
-      console.error("Preloader animation targets not found, aborting.");
-      // Fallback to ensure the site is usable if elements are missing
-      setIsPreloaderFinished(true);
-      return;
-    }
+  onMount(() => {
+    if (typeof window === "undefined") return;
 
-    const tl = gsap.timeline({
-      onComplete: () => {
-        lenis?.start();
+    ctx = gsap.context(() => {
+      // Select elements within the context of containerRef
+      const columns = gsap.utils.toArray<HTMLDivElement>(".column");
+      const columns2 = gsap.utils.toArray<HTMLDivElement>(".column2");
+      const grayLogo = logoContainerRef?.querySelector<SVGSVGElement>("svg:first-child");
+      const whiteLogo = logoContainerRef?.querySelector<SVGSVGElement>("svg:last-child");
+
+      if (
+        !whiteLogo ||
+        !grayLogo ||
+        columns.length === 0 ||
+        columns2.length === 0 ||
+        !copyrightRef
+      ) {
+        console.warn("Preloader: Animation targets not found, skipping.");
         setIsPreloaderFinished(true);
-        // setupNavTriggers returns the actual setup function, which we then call.
-        const setup = setupNavTriggers();
-        if (setup) {
-          setup();
-        }
-      },
-    });
+        return;
+      }
 
-    // Stop user scrolling during the preloader animation
-    lenis?.stop();
-    lenis?.lenis.scrollTo(0, { immediate: true });
+      // Cache navigation elements for performance optimization during animation loop
+      const navLinks = [
+        document.querySelector('a[href="/product"]'),
+        document.querySelector('a[href="/services"]'),
+        document.querySelector('a[href="/about"]'),
+        document.querySelector('a[href="/contact"]'),
+      ].filter((el): el is HTMLAnchorElement => !!el);
 
-    // Build the animation timeline in a readable, chained manner
-    tl.add(animateLogoReveal(whiteLogo))
-      .add(animateLogoSlide(grayLogo, whiteLogo), "-=0.2")
-      .add(animateCopyright(copyrightRef), "<")
-      .add(
-        animateColumns(columns, { y: "-100vh", rotate: -6, stagger: 0.03 }),
-        "<0.2"
-      )
-      .add(
-        animateColumns(columns2, {
-          y: "-100vh",
-          rotate: 6,
-          stagger: 0.03,
-          onUpdate: handleNavColorUpdate,
-        }),
-        ">-0.4"
-      );
-  };
+      const navLogo = document.querySelector('a[href="/"]');
+      const sections = document.querySelectorAll("main section");
 
-  /**
-   * Creates a GSAP animation for the logo reveal effect using clip-path.
-   */
+      // Stop user scrolling during the preloader animation
+      lenis?.stop();
+      lenis?.lenis.scrollTo(0, { immediate: true });
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          lenis?.start();
+          setIsPreloaderFinished(true);
+          // Initialize nav triggers after preloader finishes
+          const setup = setupNavTriggers();
+          setup?.();
+        },
+      });
+
+      // Animation Sequence
+      tl.add(animateLogoReveal(whiteLogo))
+        .add(animateLogoSlide(grayLogo, whiteLogo), "-=0.2")
+        .add(animateCopyright(copyrightRef), "<")
+        .add(
+          animateColumns(columns, { y: "-100vh", rotate: -6, stagger: 0.03 }),
+          "<0.2"
+        )
+        .add(
+          animateColumns(columns2, {
+            y: "-100vh",
+            rotate: 6,
+            stagger: 0.03,
+            onUpdate: () => {
+              // Run color update logic on every frame of the column reveal
+              handleNavColorUpdate(navLinks, navLogo, sections, columns2);
+            },
+          }),
+          ">-0.4"
+        );
+    }, containerRef);
+  });
+
+  onCleanup(() => {
+    ctx?.revert();
+  });
+
+  // --- Animation Helpers ---
+
   const animateLogoReveal = (target: SVGSVGElement) => {
     gsap.set(target, { clipPath: "inset(0 100% 0 0)", visibility: "visible" });
     return gsap.to(target, {
@@ -117,9 +135,6 @@ const Preloader: Component = () => {
     });
   };
 
-  /**
-   * Creates a GSAP animation for the logo slide-up and rotate effect.
-   */
   const animateLogoSlide = (target1: SVGSVGElement, target2: SVGSVGElement) => {
     return gsap.to([target1, target2], {
       rotation: 2,
@@ -130,9 +145,6 @@ const Preloader: Component = () => {
     });
   };
 
-  /**
-   * Creates a GSAP animation for the copyright section fade-out and scale effect.
-   */
   const animateCopyright = (target: HTMLDivElement) => {
     return gsap.to(target, {
       scale: 0.9,
@@ -142,141 +154,8 @@ const Preloader: Component = () => {
     });
   };
 
-  const handleNavColorUpdate = () => {
-    const navElements = {
-      links: [
-        document.querySelector('a[href="/product"]'),
-        document.querySelector('a[href="/services"]'),
-        document.querySelector('a[href="/about"]'),
-        document.querySelector('a[href="/contact"]'),
-      ],
-      logo: document.querySelector('a[href="/"]'),
-    };
-
-    const sections = document.querySelectorAll("main section");
-    if (sections.length === 0) return;
-
-    const columns2 = preloaderRef?.querySelectorAll(".column2");
-    if (!columns2) return;
-
-    const currentLinkColors = navLinkColors();
-    const newLinkColors = [...currentLinkColors];
-    let linkColorsChanged = false;
-
-    // Handle Nav Links
-    navElements.links.forEach((link, index) => {
-      if (!link) return;
-      const linkRect = link.getBoundingClientRect();
-
-      const currentColor = newLinkColors[index];
-      if (!currentColor) return; // Fix for potential undefined
-      let targetLinkColors = currentColor;
-
-      let isCrossed = false;
-      columns2.forEach((column) => {
-        const colRect = column.getBoundingClientRect();
-        const isOverlappingHorizontally =
-          linkRect.left < colRect.right && linkRect.right > colRect.left;
-        if (
-          isOverlappingHorizontally &&
-          colRect.bottom <= linkRect.top + linkRect.height / 2 // Check against vertical center
-        ) {
-          isCrossed = true;
-        }
-      });
-
-      if (isCrossed) {
-        let determinedColors = {
-          originalClass: "text-gray",
-          duplicateClass: "text-light",
-        };
-        let sectionFound = false;
-        sections.forEach((section) => {
-          if (sectionFound) return;
-          const sectionRect = section.getBoundingClientRect();
-          if (
-            sectionRect.top < linkRect.bottom &&
-            sectionRect.bottom > linkRect.top
-          ) {
-            if (section.classList.contains("bg-light")) {
-              determinedColors = {
-                originalClass: "text-darkgray",
-                duplicateClass: "text-dark",
-              };
-            }
-            sectionFound = true;
-          }
-        });
-        targetLinkColors = determinedColors;
-      }
-
-      if (
-        JSON.stringify(newLinkColors[index]) !==
-        JSON.stringify(targetLinkColors)
-      ) {
-        newLinkColors[index] = targetLinkColors;
-        linkColorsChanged = true;
-      }
-    });
-
-    if (linkColorsChanged) {
-      setNavLinkColors(newLinkColors);
-    }
-
-    // Handle Logo
-    if (navElements.logo) {
-      const logoRect = navElements.logo.getBoundingClientRect();
-      let targetLogoColor = logoColor();
-      let isCovered = false;
-
-      columns2.forEach((column) => {
-        const colRect = column.getBoundingClientRect();
-        const isOverlappingHorizontally =
-          logoRect.left < colRect.right && logoRect.right > colRect.left;
-
-        // Check if column is overlapping horizontally AND still covering vertically (bottom is below logo top)
-        if (
-          isOverlappingHorizontally &&
-          colRect.bottom > logoRect.top + logoRect.height
-        ) {
-          isCovered = true;
-        }
-      });
-
-      if (!isCovered) {
-        let determinedColor = "text-gray";
-        let sectionFound = false;
-        sections.forEach((section) => {
-          if (sectionFound) return;
-          const sectionRect = section.getBoundingClientRect();
-          if (
-            sectionRect.top < logoRect.bottom &&
-            sectionRect.bottom > logoRect.top
-          ) {
-            if (section.classList.contains("bg-light")) {
-              determinedColor = "text-darkgray";
-            }
-            sectionFound = true;
-          }
-        });
-        targetLogoColor = determinedColor;
-      } else {
-        targetLogoColor = "text-gray";
-      }
-
-      if (logoColor() !== targetLogoColor) {
-        setLogoColor(targetLogoColor);
-      }
-    }
-  };
-
-  /**
-   * Creates a GSAP animation for the columns sliding up to reveal the page.
-   * @param targets - The column elements to animate.
-   * @param vars - GSAP tween variables (y, rotate, stagger).
-   */
   const animateColumns = (
-    targets: NodeListOf<HTMLDivElement>,
+    targets: HTMLDivElement[],
     vars: gsap.TweenVars
   ) => {
     const { y, rotate, stagger, onUpdate } = vars;
@@ -298,27 +177,147 @@ const Preloader: Component = () => {
     });
   };
 
-  onMount(() => {
-    // Ensure animation runs only on the client-side
-    if (typeof window !== "undefined") {
-      // Use requestAnimationFrame to ensure the DOM is painted before starting
-      requestAnimationFrame(runEnterAnimation);
+  // --- Logic Helpers ---
+
+  const handleNavColorUpdate = (
+    navLinks: HTMLAnchorElement[],
+    navLogo: Element | null,
+    sections: NodeListOf<Element>,
+    columns: HTMLDivElement[]
+  ) => {
+    if (sections.length === 0) return;
+
+    const currentLinkColors = navLinkColors();
+    const newLinkColors = [...currentLinkColors];
+    let linkColorsChanged = false;
+
+    // 1. Update Nav Links
+    navLinks.forEach((link, index) => {
+      const linkRect = link.getBoundingClientRect();
+      const currentColor = newLinkColors[index];
+      if (!currentColor) return;
+
+      let targetLinkColors = currentColor;
+      let isCrossed = false;
+
+      // Check if any column has revealed this link
+      // "Revealed" means the column (moving up) has passed the link's vertical center
+      for (const column of columns) {
+        const colRect = column.getBoundingClientRect();
+        const isOverlappingHorizontally =
+          linkRect.left < colRect.right && linkRect.right > colRect.left;
+        
+        if (
+          isOverlappingHorizontally &&
+          colRect.bottom <= linkRect.top + linkRect.height / 2
+        ) {
+          isCrossed = true;
+          break; // Optimized: once crossed by one column, it's revealed
+        }
+      }
+
+      if (isCrossed) {
+        let determinedColors = {
+          originalClass: "text-gray",
+          duplicateClass: "text-light",
+        };
+        
+        // Find which section is underneath the link
+        for (const section of sections) {
+          const sectionRect = section.getBoundingClientRect();
+          if (
+            sectionRect.top < linkRect.bottom &&
+            sectionRect.bottom > linkRect.top
+          ) {
+            if (section.classList.contains("bg-light")) {
+              determinedColors = {
+                originalClass: "text-darkgray",
+                duplicateClass: "text-dark",
+              };
+            }
+            break; // Found the section
+          }
+        }
+        targetLinkColors = determinedColors;
+      }
+
+      if (
+        JSON.stringify(newLinkColors[index]) !==
+        JSON.stringify(targetLinkColors)
+      ) {
+        newLinkColors[index] = targetLinkColors;
+        linkColorsChanged = true;
+      }
+    });
+
+    if (linkColorsChanged) {
+      setNavLinkColors(newLinkColors);
     }
-  });
+
+    // 2. Update Logo
+    if (navLogo) {
+      const logoRect = navLogo.getBoundingClientRect();
+      let targetLogoColor = logoColor();
+      let isCovered = false;
+
+      for (const column of columns) {
+        const colRect = column.getBoundingClientRect();
+        const isOverlappingHorizontally =
+          logoRect.left < colRect.right && logoRect.right > colRect.left;
+
+        // Check if column is still covering the logo
+        if (
+          isOverlappingHorizontally &&
+          colRect.bottom > logoRect.top + logoRect.height
+        ) {
+          isCovered = true;
+          break;
+        }
+      }
+
+      if (!isCovered) {
+        let determinedColor = "text-gray";
+        for (const section of sections) {
+          const sectionRect = section.getBoundingClientRect();
+          if (
+            sectionRect.top < logoRect.bottom &&
+            sectionRect.bottom > logoRect.top
+          ) {
+            if (section.classList.contains("bg-light")) {
+              determinedColor = "text-darkgray";
+            }
+            break;
+          }
+        }
+        targetLogoColor = determinedColor;
+      } else {
+        targetLogoColor = "text-gray";
+      }
+
+      if (logoColor() !== targetLogoColor) {
+        setLogoColor(targetLogoColor);
+      }
+    }
+  };
 
   return (
     <div
-      ref={preloaderRef}
+      ref={containerRef}
       class="preloader-root"
       aria-live="polite"
       aria-busy="true"
     >
       {/* Background columns - First layer */}
       <div class="loading-container">
-        <div class="column flex h-full w-full bg-dark rounded"></div>
-        <div class="column flex h-full w-full bg-dark rounded"></div>
-        <div class="column h-full w-full bg-dark rounded hidden sm:block"></div>
-        <div class="column h-full w-full bg-dark rounded hidden sm:block"></div>
+        <For each={COLUMNS_CONFIG}>
+          {(config) => (
+            <div
+              class={`column flex h-full w-full bg-dark rounded ${
+                config.visibleMobile ? "" : "hidden sm:block"
+              }`}
+            />
+          )}
+        </For>
 
         <div ref={logoContainerRef} class="logo">
           <YourLogo class="h-auto w-full text-gray" />
@@ -355,10 +354,15 @@ const Preloader: Component = () => {
 
       {/* Transition columns - Second layer that reveals the page */}
       <div class="transition-container">
-        <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
-        <div class="column2 flex h-full w-full bg-darkgray rounded"></div>
-        <div class="column2 h-full w-full bg-darkgray rounded hidden sm:block"></div>
-        <div class="column2 h-full w-full bg-darkgray rounded hidden sm:block"></div>
+        <For each={COLUMNS_CONFIG}>
+          {(config) => (
+            <div
+              class={`column2 flex h-full w-full bg-darkgray rounded ${
+                config.visibleMobile ? "" : "hidden sm:block"
+              }`}
+            />
+          )}
+        </For>
       </div>
     </div>
   );
