@@ -53,6 +53,10 @@ const Preloader: Component = () => {
   onMount(() => {
     if (typeof window === "undefined") return;
 
+    // Disable scrolling immediately when preloader mounts
+    lenis?.stop();
+    lenis?.lenis.scrollTo(0, { immediate: true });
+
     ctx = gsap.context(() => {
       // Select elements within the context of containerRef
       const columns = gsap.utils.toArray<HTMLDivElement>(".column");
@@ -82,10 +86,6 @@ const Preloader: Component = () => {
 
       const navLogo = document.querySelector('a[href="/"]');
       const sections = document.querySelectorAll("main section");
-
-      // Stop user scrolling during the preloader animation
-      lenis?.stop();
-      lenis?.lenis.scrollTo(0, { immediate: true });
 
       const tl = gsap.timeline({
         onComplete: () => {

@@ -13,7 +13,7 @@ type MenuDrawerProps = {
 const MenuDrawer = (props: MenuDrawerProps) => {
   const lenis = useLenis();
   // Destructure isVisible to check for active transitions
-  const { triggerTransition, setLogoColor, isVisible } = usePageTransition();
+  const { triggerTransition, setLogoColor, isVisible, isPreloaderFinished } = usePageTransition();
   const { isMenuOpen, setIsMenuOpen, menuButtonRef } = useMenu();
   const location = useLocation();
 
@@ -155,7 +155,9 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       if (!isVisible()) {
         currentTl = gsap.timeline({
           onComplete: () => {
-            lenis?.start();
+            if (isPreloaderFinished()) {
+              lenis?.start();
+            }
             if (menuContainer) gsap.set(menuContainer, { visibility: "hidden" });
           },
         });
@@ -224,9 +226,6 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           },
           0
         );
-      } else {
-        // When closing due to page transition, just re-enable scroll
-        lenis?.start();
       }
     }
   });

@@ -173,9 +173,11 @@ export default function Nav() {
     if (isRouting()) {
       lenisControls?.stop();
     } else {
-      lenisControls?.lenis.scrollTo(0, { immediate: true });
-      ScrollTrigger.refresh();
-      lenisControls?.start();
+      if (isPreloaderFinished()) {
+        lenisControls?.lenis.scrollTo(0, { immediate: true });
+        ScrollTrigger.refresh();
+        lenisControls?.start();
+      }
     }
   });
 
@@ -199,7 +201,7 @@ export default function Nav() {
     if (isMenuOpen()) {
       lenisControls?.stop();
     } else {
-      if (!isRouting()) {
+      if (!isRouting() && isPreloaderFinished()) {
         lenisControls?.start();
       }
     }
