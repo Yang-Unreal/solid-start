@@ -27,6 +27,7 @@ const MenuDrawer = () => {
 
   const [hoveredIndex, setHoveredIndex] = createSignal<number | null>(null);
   const [activeIndex, setActiveIndex] = createSignal<number>(-1);
+  const [hasHoveredOther, setHasHoveredOther] = createSignal(false);
 
   // Refs for animations
   let underlineRefs: (HTMLDivElement | undefined)[] = new Array(navLinks.length).fill(undefined);
@@ -61,6 +62,7 @@ const MenuDrawer = () => {
 
     if (isMenuOpen()) {
       // OPEN ANIMATION
+      setHasHoveredOther(false);
       gsap.set(menuContainer, { visibility: "visible" });
       lenis?.stop();
 
@@ -215,6 +217,10 @@ const MenuDrawer = () => {
   const handleMouseEnter = (index: number) => {
     setHoveredIndex(index);
     
+    if (index !== activeIndex()) {
+      setHasHoveredOther(true);
+    }
+
     // Animate underlines
     underlineRefs.forEach((ref, i) => {
       if (ref) {
@@ -232,6 +238,11 @@ const MenuDrawer = () => {
     
     const ref = underlineRefs[index];
     if (!ref) return;
+
+    // If it's the active link and we haven't hovered other links yet, keep it visible
+    if (index === activeIndex() && !hasHoveredOther()) {
+      return;
+    }
 
     gsap.to(ref, {
       scaleX: 0,
