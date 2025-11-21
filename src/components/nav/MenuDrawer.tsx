@@ -1,74 +1,58 @@
-import { For, createEffect, onMount, createSignal } from "solid-js";
+import { For, createEffect, onMount, createSignal, onCleanup } from "solid-js";
 import { useLocation } from "@solidjs/router";
 import gsap from "gsap";
 import TextAnimation from "../TextAnimation";
 import { useLenis } from "~/context/LenisContext";
 import { usePageTransition } from "~/context/PageTransitionContext";
 import { useMenu } from "~/context/MenuContext";
+import MenuImages from "./MenuImages";
 
-type MenuDrawerProps = {
-  onClose?: () => void;
-};
-
-const MenuDrawer = (props: MenuDrawerProps) => {
+const MenuDrawer = () => {
   const lenis = useLenis();
-  // Destructure isVisible to check for active transitions
   const { triggerTransition, setLogoColor, isVisible, isPreloaderFinished } = usePageTransition();
-  const { isMenuOpen, setIsMenuOpen, menuButtonRef } = useMenu();
+  const { isMenuOpen, setIsMenuOpen } = useMenu();
   const location = useLocation();
 
   let menuContainer: HTMLDivElement | undefined;
+  let addressRef: HTMLDivElement | undefined;
+  let contactRef: HTMLDivElement | undefined;
+  let currentTl: gsap.core.Timeline | undefined;
 
   const navLinks = [
     { href: "/product", label: "PRODUCT", image: "/images/menu/PRODUCT.webp" },
-    {
-      href: "/services",
-      label: "SERVICES",
-      image: "/images/menu/SERVICES.webp",
-    },
+    { href: "/services", label: "SERVICES", image: "/images/menu/SERVICES.webp" },
     { href: "/about", label: "ABOUT", image: "/images/menu/ABOUT.webp" },
     { href: "/contact", label: "CONTACT", image: "/images/menu/CONTACT.webp" },
   ] as const;
 
-  const hoverSignals = navLinks.map(() =>
-    createSignal<"enter" | "leave" | null>(null)
-  );
+  const [hoveredIndex, setHoveredIndex] = createSignal<number | null>(null);
+  const [activeIndex, setActiveIndex] = createSignal<number>(-1);
 
-  let underlineRefs: (HTMLDivElement | undefined)[] = new Array(
-    navLinks.length
-  ).fill(undefined);
-  let linkRefs: (HTMLLIElement | undefined)[] = new Array(navLinks.length).fill(
-    undefined
-  );
+  // Refs for animations
+  let underlineRefs: (HTMLDivElement | undefined)[] = new Array(navLinks.length).fill(undefined);
+  let linkRefs: (HTMLLIElement | undefined)[] = new Array(navLinks.length).fill(undefined);
 
-  let currentTl: gsap.core.Timeline | undefined;
-  let addressRef: HTMLDivElement | undefined;
-  let contactRef: HTMLDivElement | undefined;
-  let imageContainerRef: HTMLDivElement | undefined;
-  let currentImageRef: HTMLImageElement | undefined;
-  let nextImageRef: HTMLImageElement | undefined;
-  let imageTl: gsap.core.Timeline | undefined;
-  let currentIndex = -1;
-
+  // Update active index based on route
   createEffect(() => {
-    currentIndex = navLinks.findIndex(
-      (link) => link.href === location.pathname
-    );
+    const index = navLinks.findIndex((link) => link.href === location.pathname);
+    setActiveIndex(index);
   });
 
+  // Initial setup
   onMount(() => {
     if (menuContainer) {
       gsap.set(menuContainer, { visibility: "hidden" });
       gsap.set(linkRefs, { y: "100%" });
       gsap.set([addressRef, contactRef], { y: "100%" });
-      if (currentImageRef) {
-        currentImageRef.src = navLinks[0].image;
-        currentImageRef.alt = navLinks[0].label;
-        gsap.set(currentImageRef, { y: "100%", opacity: 1 });
-      }
     }
   });
 
+  // Cleanup
+  onCleanup(() => {
+    if (currentTl) currentTl.kill();
+  });
+
+  // Main Open/Close Animation Logic
   createEffect(() => {
     const columns = menuContainer?.querySelectorAll(".column");
     if (!columns || !menuContainer) return;
@@ -76,19 +60,11 @@ const MenuDrawer = (props: MenuDrawerProps) => {
     if (currentTl) currentTl.kill();
 
     if (isMenuOpen()) {
-      // Update default image based on current route when opening
-      const currentLink = navLinks[currentIndex] || navLinks[0];
-      if (currentImageRef && currentLink) {
-        currentImageRef.src = currentLink.image;
-        currentImageRef.alt = currentLink.label;
-      }
-      // Set current underline
-      if (currentIndex !== -1 && underlineRefs[currentIndex]) {
-        gsap.to(underlineRefs[currentIndex]!, { scaleX: 1, duration: 0 });
-      }
+      // OPEN ANIMATION
       gsap.set(menuContainer, { visibility: "visible" });
-
       lenis?.stop();
+
+      // Reset elements for animation
       gsap.set(columns, {
         scaleX: 1.1,
         scaleY: 1.05,
@@ -96,7 +72,17 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         y: "100%",
         transformOrigin: "100% 0%",
       });
+
+      // Set initial underline state
+      underlineRefs.forEach((ref, i) => {
+        if (ref) {
+             gsap.set(ref, { scaleX: i === activeIndex() ? 1 : 0 });
+        }
+      });
+
       currentTl = gsap.timeline();
+      
+      // 1. Columns
       currentTl.to(columns, {
         y: "0%",
         rotate: 0,
@@ -104,9 +90,13 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         stagger: 0.02,
         ease: "circ.inOut",
       });
+
+      // 2. Logo Color
       currentTl.add(() => {
         setLogoColor("text-gray");
       }, ">-0.1");
+
+      // 3. Links
       currentTl.to(
         linkRefs,
         {
@@ -119,19 +109,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         },
         "-=0.2"
       );
-      if (currentImageRef) {
-        currentTl.to(
-          currentImageRef,
-          {
-            y: "0%",
-            rotation: 0,
-            transformOrigin: "100% 0%",
-            duration: 0.3,
-            ease: "slideUp",
-          },
-          "<-0.05"
-        );
-      }
+
+      // 4. Footer Info
       currentTl.to(
         [addressRef, contactRef],
         {
@@ -144,14 +123,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
         },
         "-=0.4"
       );
+
     } else {
-      // Reset underlines
-      gsap.to(
-        underlineRefs.filter((ref) => ref),
-        { scaleX: 0, duration: 0 }
-      );
-      // --- MODIFICATION ---
-      // Only run the closing animation if a page transition is NOT active.
+      // CLOSE ANIMATION
+      // Only animate if not transitioning to a new page (page transition handles its own exit)
       if (!isVisible()) {
         currentTl = gsap.timeline({
           onComplete: () => {
@@ -162,9 +137,10 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           },
         });
 
-        // Set logo color based on current section when closing menu
-        const setColorCallback = () => {
+        // Reset Logo Color Logic
+        const setLogoColorCallback = () => {
           const sections = document.querySelectorAll("main section");
+          let found = false;
           sections.forEach((section) => {
             const rect = section.getBoundingClientRect();
             if (rect.top <= 0 && rect.bottom > 0) {
@@ -173,11 +149,14 @@ const MenuDrawer = (props: MenuDrawerProps) => {
               } else {
                 setLogoColor("text-gray");
               }
+              found = true;
             }
           });
+           if (!found) setLogoColor("text-gray"); // Default fallback
         };
-        currentTl.add(setColorCallback, 0.1);
+        currentTl.add(setLogoColorCallback, 0.1);
 
+        // 1. Links & Footer (Simultaneous)
         currentTl.to(
           linkRefs,
           {
@@ -202,19 +181,8 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           },
           0
         );
-        if (currentImageRef) {
-          currentTl.to(
-            currentImageRef,
-            {
-              y: "100%",
-              rotation: -12,
-              transformOrigin: "100% 0%",
-              duration: 0.3,
-              ease: "slideUp",
-            },
-            0
-          );
-        }
+
+        // 2. Columns
         currentTl.to(
           columns,
           {
@@ -226,9 +194,62 @@ const MenuDrawer = (props: MenuDrawerProps) => {
           },
           0
         );
+      } else {
+          // If page transition is active, just hide immediately/reset
+           if (menuContainer) gsap.set(menuContainer, { visibility: "hidden" });
+           lenis?.start(); // Ensure scroll is back if we just closed without animation (rare case)
       }
     }
   });
+
+  const handleLinkClick = (e: MouseEvent, href: string) => {
+    e.preventDefault();
+    triggerTransition(href, undefined, undefined, () => {
+      if (menuContainer) {
+        menuContainer.style.visibility = "hidden";
+      }
+      setIsMenuOpen(false);
+    });
+  };
+
+  const handleMouseEnter = (index: number) => {
+    setHoveredIndex(index);
+    
+    // Animate underlines
+    underlineRefs.forEach((ref, i) => {
+      if (ref) {
+        gsap.to(ref, {
+          scaleX: i === index ? 1 : 0,
+          transformOrigin: i === index ? "0% 50%" : "100% 50%",
+          duration: 0.3,
+        });
+      }
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+    
+    // Reset underlines to active state
+    const current = activeIndex();
+    underlineRefs.forEach((ref, i) => {
+        if (ref) {
+             if (i === current) {
+                 gsap.to(ref, {
+                    scaleX: 1,
+                    transformOrigin: "0% 50%",
+                    duration: 0.3,
+                  });
+             } else {
+                 gsap.to(ref, {
+                    scaleX: 0,
+                    transformOrigin: "100% 50%",
+                    duration: 0.3,
+                  });
+             }
+        }
+    });
+  };
 
   return (
     <nav
@@ -243,23 +264,14 @@ const MenuDrawer = (props: MenuDrawerProps) => {
       <div class="column navigation-tile last"></div>
 
       {/* Image Container */}
-      <div ref={imageContainerRef} class="navigation-images">
-        <img
-          ref={currentImageRef}
-          src={navLinks[0].image}
-          alt={navLinks[0].label}
-          class="absolute w-full h-full object-cover"
-        />
-        <img
-          ref={nextImageRef}
-          src=""
-          alt=""
-          class="absolute w-full h-full object-cover translate-y-full"
-        />
-      </div>
+      <MenuImages 
+        links={navLinks} 
+        activeLinkIndex={activeIndex()} 
+        hoveredLinkIndex={hoveredIndex()} 
+        isOpen={isMenuOpen()} 
+      />
 
       {/* Foreground Text */}
-
       <ul class="navigation-center">
         <For each={navLinks}>
           {(item, index) => (
@@ -268,99 +280,9 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                 <a
                   href={item.href}
                   class="link-click"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    triggerTransition(item.href, undefined, undefined, () => {
-                      // Hide menu immediately when columns reach 0%
-                      if (menuContainer) {
-                        menuContainer.style.visibility = "hidden";
-                      }
-                      setIsMenuOpen(false);
-                    });
-                  }}
-                  onMouseEnter={() => {
-                    hoverSignals[index()]![1]("enter");
-
-                    // Set hovered underline to 1, others to 0
-                    underlineRefs.forEach((ref, i) => {
-                      if (ref) {
-                        gsap.to(ref, {
-                          scaleX: i === index() ? 1 : 0,
-                          transformOrigin:
-                            i === index() ? "0% 50%" : "100% 50%",
-                          duration: 0.3,
-                        });
-                      }
-                    });
-
-                    if (!currentImageRef || !nextImageRef) return;
-
-                    if (imageTl && imageTl.isActive()) {
-                      imageTl.progress(1);
-                    }
-
-                    const targetItem = { image: item.image, alt: item.label };
-
-                    if (
-                      new URL(currentImageRef.src).pathname === targetItem.image
-                    ) {
-                      return;
-                    }
-
-                    nextImageRef.src = targetItem.image;
-                    nextImageRef.alt = targetItem.alt;
-                    gsap.set(nextImageRef, { y: "100%" });
-
-                    const duration = 0.6;
-
-                    imageTl = gsap.timeline({
-                      onComplete: () => {
-                        currentImageRef!.src = nextImageRef!.src;
-                        currentImageRef!.alt = nextImageRef!.alt;
-
-                        gsap.set(currentImageRef, { y: "0%" });
-                        gsap.set(nextImageRef, {
-                          y: "100%",
-                          src: "",
-                          alt: "",
-                        });
-                      },
-                    });
-
-                    imageTl
-                      .to(nextImageRef, {
-                        y: "0%",
-                        duration,
-                        ease: "slideUp",
-                      })
-                      .to(
-                        currentImageRef,
-                        {
-                          y: "-100%",
-                          duration,
-                          ease: "slideUp",
-                        },
-                        "<"
-                      );
-                  }}
-                  onMouseLeave={() => {
-                    hoverSignals[index()]![1]("leave");
-
-                    // If leaving the current page link, set it back to 1, else set to 0
-                    if (index() === currentIndex && underlineRefs[index()]) {
-                      gsap.to(underlineRefs[index()]!, {
-                        scaleX: 1,
-                        transformOrigin: "0% 50%",
-                        duration: 0.3,
-                      });
-                    } else if (underlineRefs[index()]) {
-                      gsap.to(underlineRefs[index()]!, {
-                        scaleX: 0,
-                        transformOrigin: "100% 50%",
-                        duration: 0.3,
-                      });
-                    }
-                  }}
+                  onClick={(e) => handleLinkClick(e, item.href)}
+                  onMouseEnter={() => handleMouseEnter(index())}
+                  onMouseLeave={handleMouseLeave}
                 >
                   <TextAnimation
                     originalClass="text-light"
@@ -368,7 +290,7 @@ const MenuDrawer = (props: MenuDrawerProps) => {
                     text={item.label}
                     class="overflow-hidden"
                     textStyle="pt-[0.1em] text-[1.25em] leading-[0.86] tracking-wide uppercase font-formula-bold"
-                    externalTrigger={hoverSignals[index()]![0]()}
+                    externalTrigger={hoveredIndex() === index() ? "enter" : "leave"}
                   />
                   <div
                     ref={(el) => (underlineRefs[index()] = el)}
