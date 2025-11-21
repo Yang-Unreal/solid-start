@@ -227,27 +227,16 @@ const MenuDrawer = () => {
     });
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (index: number) => {
     setHoveredIndex(null);
     
-    // Reset underlines to active state
-    const current = activeIndex();
-    underlineRefs.forEach((ref, i) => {
-        if (ref) {
-             if (i === current) {
-                 gsap.to(ref, {
-                    scaleX: 1,
-                    transformOrigin: "0% 50%",
-                    duration: 0.3,
-                  });
-             } else {
-                 gsap.to(ref, {
-                    scaleX: 0,
-                    transformOrigin: "100% 50%",
-                    duration: 0.3,
-                  });
-             }
-        }
+    const ref = underlineRefs[index];
+    if (!ref) return;
+
+    gsap.to(ref, {
+      scaleX: 0,
+      transformOrigin: "100% 50%",
+      duration: 0.3,
     });
   };
 
@@ -282,7 +271,7 @@ const MenuDrawer = () => {
                   class="link-click"
                   onClick={(e) => handleLinkClick(e, item.href)}
                   onMouseEnter={() => handleMouseEnter(index())}
-                  onMouseLeave={handleMouseLeave}
+                  onMouseLeave={() => handleMouseLeave(index())}
                 >
                   <TextAnimation
                     originalClass="text-light"
