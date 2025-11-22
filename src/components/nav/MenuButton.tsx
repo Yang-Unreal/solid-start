@@ -244,7 +244,7 @@ const MenuButton: Component = () => {
 	// ============================================================================
 
 	return (
-		<div class="btn-hamburger">
+		<div class="btn btn-hamburger">
 			<button
 				type="button"
 				ref={handleButtonRef}
@@ -265,8 +265,8 @@ const MenuButton: Component = () => {
 				</div>
 
 				{/* Text Label */}
-				<div class="btn-content font-formula-bold">
-					<div class="btn-text text-[1em]">
+				<div class="btn-content">
+					<div class="btn-text">
 						<Show when={!isMenuOpen()}>
 							<TextAnimation
 								originalClass="text-dark"

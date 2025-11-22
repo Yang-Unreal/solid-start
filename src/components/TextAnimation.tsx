@@ -136,23 +136,20 @@ export default function TextAnimation(props: TextAnimationProps) {
 		>
 			<button
 				type="button"
-				class={`relative overflow-hidden cursor-pointer ${props.class || ""}`}
+				class={`link-text ${props.class || ""}`}
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 				onClick={handleClick}
 			>
 				<span
 					ref={originalRef}
-					class={`block ${props.textStyle} ${props.originalClass || ""}`}
+					class={`${props.textStyle} ${props.originalClass || ""}`}
 				>
 					{displayText()}
 				</span>
 				<span
 					ref={duplicateRef}
-					class={`absolute top-0 left-0 block ${props.textStyle} ${
-						props.duplicateClass || ""
-					}`}
-					style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%;`}
+					class={`duplicate ${props.textStyle} ${props.duplicateClass || ""}`}
 				>
 					{displayText()}
 				</span>

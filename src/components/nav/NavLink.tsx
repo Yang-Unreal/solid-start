@@ -75,16 +75,14 @@ export default function NavLink(props: NavLinkProps) {
 	});
 
 	return (
-		<li class="link">
+		<li class={`link ${props.hiddenOnMobile ? "fold" : ""}`}>
 			<A
 				ref={(el) => {
 					linkRef = el;
 					props.ref(el);
 				}}
 				href={props.href}
-				class={`relative text-[1.25em] bg-transparent overflow-hidden ${
-					props.hiddenOnMobile ? "hidden md:block" : "block"
-				}`}
+				class="link-click"
 				onClick={(e) => {
 					e.preventDefault();
 					props.onClick(e, props.href);
@@ -92,18 +90,19 @@ export default function NavLink(props: NavLinkProps) {
 				onMouseEnter={handleMouseEnter}
 				onMouseLeave={handleMouseLeave}
 			>
-				<TextAnimation
-					originalClass={props.colorState?.originalClass ?? "text-gray"}
-					duplicateClass={props.colorState?.duplicateClass ?? "text-light"}
-					text={props.label}
-					textStyle="pt-[0.1em] leading-[0.86] text-nowrap"
-				/>
-				<div
-					ref={underlineRef}
-					class={`absolute bottom-0 left-0 w-full h-px scale-x-0 ${(
-						props.colorState?.duplicateClass ?? "text-light"
-					).replace("text-", "bg-")}`}
-				></div>
+				<div class="link-content">
+					<TextAnimation
+						originalClass={props.colorState?.originalClass ?? "text-gray"}
+						duplicateClass={props.colorState?.duplicateClass ?? "text-light"}
+						text={props.label}
+					/>
+					<div
+						ref={underlineRef}
+						class={`underline ${(
+							props.colorState?.duplicateClass ?? "text-light"
+						).replace("text-", "bg-")}`}
+					></div>
+				</div>
 			</A>
 		</li>
 	);
