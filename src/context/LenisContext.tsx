@@ -1,21 +1,26 @@
 // src/context/LenisContext.tsx
 
-import {
-	createContext,
-	onMount,
-	onCleanup,
-	useContext,
-	type ParentComponent,
-} from "solid-js";
-import Lenis from "lenis";
-import { isServer } from "solid-js/web";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
+import {
+	createContext,
+	onCleanup,
+	onMount,
+	type ParentComponent,
+	useContext,
+} from "solid-js";
+import { isServer } from "solid-js/web";
 
 interface LenisContextValue {
 	lenis: Lenis;
 	start: () => void;
 	stop: () => void;
+}
+
+// Extend Lenis type to include the isStopped property
+interface LenisWithState extends Lenis {
+	isStopped: boolean;
 }
 
 // Create the context with the new type
@@ -62,7 +67,7 @@ export const LenisProvider: ParentComponent = (props) => {
 			// Start the ticker only if not already stopped (e.g. by a child component like Preloader)
 			// We check the internal state of the Lenis instance.
 			// Note: isStopped is a public property on the Lenis instance.
-			if (!(instance as any).isStopped) {
+			if (!(instance as LenisWithState).isStopped) {
 				gsap.ticker.add(raf);
 			}
 			gsap.ticker.lagSmoothing(0);

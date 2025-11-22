@@ -279,6 +279,32 @@ header {
   left: 0;
   width: 100%;
   padding: calc(var(--row-gap) - 0.2em) var(--container-padding);
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+nav {
+    width: 100%;
+    display: flex;
+}
+
+ul {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-between;
+    overflow: hidden;
+  .link{
+      position: relative;
+      pointer-events: all;
+    }
+}
+
+
 }
 
 /* ==========================================================================

@@ -75,7 +75,7 @@ export default function NavLink(props: NavLinkProps) {
 	});
 
 	return (
-		<li class="relative">
+		<li class="link">
 			<A
 				ref={(el) => {
 					linkRef = el;

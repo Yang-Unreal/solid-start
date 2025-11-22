@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 
 interface TextAnimationProps {
 	text: string;
@@ -10,6 +10,7 @@ interface TextAnimationProps {
 	navSlideTrigger?: "up" | "down" | null;
 	isCopyable?: boolean;
 	textStyle?: string;
+	asButton?: boolean;
 }
 
 export default function TextAnimation(props: TextAnimationProps) {
@@ -108,31 +109,54 @@ export default function TextAnimation(props: TextAnimationProps) {
 		}
 	});
 
+	const isInteractive = props.isCopyable || props.asButton !== false;
+
 	return (
-		<button
-			type="button"
-			class={`relative overflow-hidden ${
-				props.isCopyable ? "cursor-pointer" : "cursor-pointer"
-			} ${props.class || ""}`}
-			onMouseEnter={handleMouseEnter}
-			onMouseLeave={handleMouseLeave}
-			onClick={handleClick}
+		<Show
+			when={isInteractive}
+			fallback={
+				<div class={`relative overflow-hidden ${props.class || ""}`}>
+					<span
+						ref={originalRef}
+						class={`block ${props.textStyle} ${props.originalClass || ""}`}
+					>
+						{displayText()}
+					</span>
+					<span
+						ref={duplicateRef}
+						class={`absolute top-0 left-0 block ${props.textStyle} ${
+							props.duplicateClass || ""
+						}`}
+						style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%;`}
+					>
+						{displayText()}
+					</span>
+				</div>
+			}
 		>
-			<span
-				ref={originalRef}
-				class={`block ${props.textStyle} ${props.originalClass || ""}`}
+			<button
+				type="button"
+				class={`relative overflow-hidden cursor-pointer ${props.class || ""}`}
+				onMouseEnter={handleMouseEnter}
+				onMouseLeave={handleMouseLeave}
+				onClick={handleClick}
 			>
-				{displayText()}
-			</span>
-			<span
-				ref={duplicateRef}
-				class={`absolute top-0 left-0 block ${props.textStyle} ${
-					props.duplicateClass || ""
-				}`}
-				style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%;`}
-			>
-				{displayText()}
-			</span>
-		</button>
+				<span
+					ref={originalRef}
+					class={`block ${props.textStyle} ${props.originalClass || ""}`}
+				>
+					{displayText()}
+				</span>
+				<span
+					ref={duplicateRef}
+					class={`absolute top-0 left-0 block ${props.textStyle} ${
+						props.duplicateClass || ""
+					}`}
+					style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%;`}
+				>
+					{displayText()}
+				</span>
+			</button>
+		</Show>
 	);
 }

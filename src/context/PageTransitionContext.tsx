@@ -1,6 +1,6 @@
-import { createContext, createSignal, useContext } from "solid-js";
-import gsap from "gsap";
 import { useNavigate } from "@solidjs/router";
+import gsap from "gsap";
+import { createContext, createSignal, type JSX, useContext } from "solid-js";
 import { useLenis } from "~/context/LenisContext";
 
 // --- Constants & Configuration ---
@@ -65,7 +65,6 @@ interface PageTransitionContextType {
 	setSetupNavTriggers: (callback: () => void) => void;
 	setKillScrollTriggers: (callback: () => void) => void;
 	setMenuClosedCallback: (callback: () => void) => void;
-	setMenuVisibility: (callback: () => void) => void;
 	isVisible: () => boolean;
 	isPreloaderFinished: () => boolean;
 	setIsPreloaderFinished: (value: boolean) => void;
@@ -105,7 +104,7 @@ const getLinkPositions = (elements: NavElements): LinkPosition[] => {
 	});
 };
 
-export function PageTransitionProvider(props: { children: any }) {
+export function PageTransitionProvider(props: { children: JSX.Element }) {
 	const navigate = useNavigate();
 	const lenis = useLenis();
 
@@ -128,9 +127,6 @@ export function PageTransitionProvider(props: { children: any }) {
 		() => {},
 	);
 	const [menuClosedCallback, setMenuClosedCallback] = createSignal<() => void>(
-		() => {},
-	);
-	const [menuVisibility, setMenuVisibility] = createSignal<() => void>(
 		() => {},
 	);
 
@@ -352,7 +348,6 @@ export function PageTransitionProvider(props: { children: any }) {
 				setSetupNavTriggers,
 				setKillScrollTriggers,
 				setMenuClosedCallback,
-				setMenuVisibility,
 				isVisible,
 				isPreloaderFinished,
 				setIsPreloaderFinished,

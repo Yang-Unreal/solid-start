@@ -1,3 +1,4 @@
+import type { JSX } from "solid-js";
 import { createContext, createSignal, useContext } from "solid-js";
 
 interface MenuContextType {
@@ -9,7 +10,7 @@ interface MenuContextType {
 
 const MenuContext = createContext<MenuContextType>();
 
-export function MenuProvider(props: { children: any }) {
+export function MenuProvider(props: { children: JSX.Element }) {
 	const [isMenuOpen, setIsMenuOpen] = createSignal(false);
 	const [menuButtonRef, setMenuButtonRef] = createSignal<HTMLElement>();
 

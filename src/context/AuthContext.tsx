@@ -1,5 +1,11 @@
 import { useLocation, useNavigate } from "@solidjs/router";
-import { createContext, createEffect, createMemo, useContext } from "solid-js";
+import {
+	createContext,
+	createEffect,
+	createMemo,
+	type JSX,
+	useContext,
+} from "solid-js";
 import { authClient } from "~/lib/auth-client";
 
 // Define the shape of the context
@@ -10,7 +16,7 @@ export type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>();
 
-export function AuthProvider(props: { children: any }) {
+export function AuthProvider(props: { children: JSX.Element }) {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const session = authClient.useSession();

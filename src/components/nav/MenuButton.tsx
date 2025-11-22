@@ -274,6 +274,7 @@ const MenuButton: Component = () => {
 								text="MENU"
 								externalTrigger={externalTrigger()}
 								textStyle="pt-[0.2em] leading-[0.86em] tracking-wide"
+								asButton={false}
 							/>
 						</Show>
 						<Show when={isMenuOpen()}>
@@ -283,6 +284,7 @@ const MenuButton: Component = () => {
 								text="CLOSE"
 								externalTrigger={externalTrigger()}
 								textStyle="pt-[0.2em] leading-[0.86em] tracking-wide"
+								asButton={false}
 							/>
 						</Show>
 					</div>

@@ -75,7 +75,7 @@ const MenuImages = (props: MenuImagesProps) => {
 
 		if (!targetItem) return;
 
-		if (imageTl && imageTl.isActive()) {
+		if (imageTl?.isActive()) {
 			imageTl.progress(1);
 		}
 

@@ -242,9 +242,9 @@ export default function Nav() {
 
 	return (
 		<div class="main-nav-bar">
-			<div class="w-full relative flex items-center justify-between">
-				<nav class="w-full flex" aria-label="Navigation Desktop">
-					<ul class="w-full font-formula-bold flex flex-row justify-between items-center overflow-hidden pointer-events-auto p-0 m-0">
+			<div class="row">
+				<nav aria-label="Navigation Desktop">
+					<ul>
 						<For each={LINKS.slice(0, 2)}>
 							{(link, i) => (
 								<NavLink
