@@ -1,5 +1,5 @@
 import gsap from "gsap/all";
-import { createEffect, createSignal, Show } from "solid-js";
+import { createEffect, createSignal, onMount, Show } from "solid-js";
 
 interface TextAnimationProps {
 	text: string;
@@ -18,6 +18,16 @@ export default function TextAnimation(props: TextAnimationProps) {
 	let duplicateRef: HTMLSpanElement | undefined;
 	const [displayText, setDisplayText] = createSignal(props.text);
 	const duration = 0.2;
+
+	onMount(() => {
+		if (duplicateRef) {
+			gsap.set(duplicateRef, {
+				y: "100%",
+				rotation: -12,
+				transformOrigin: "100% 0%",
+			});
+		}
+	});
 	const animateEnter = () => {
 		if (!originalRef || !duplicateRef) return;
 
