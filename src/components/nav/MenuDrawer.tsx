@@ -298,22 +298,22 @@ const MenuDrawer = () => {
 									onMouseEnter={() => handleMouseEnter(index())}
 									onMouseLeave={() => handleMouseLeave(index())}
 								>
-									<TextAnimation
-										originalClass="text-light"
-										duplicateClass="text-light"
-										text={item.label}
-										class="overflow-hidden"
-										textStyle="pt-[0.1em] text-[1.25em] leading-[0.86] tracking-wide uppercase font-formula-bold"
-										externalTrigger={
-											hoveredIndex() === index() ? "enter" : "leave"
-										}
-									/>
-									<div
-										ref={(el) => {
-											underlineRefs[index()] = el;
-										}}
-										class="absolute bottom-0 left-0 w-full h-0.5 bg-light scale-x-0"
-									></div>
+									<div class="link-content">
+										<TextAnimation
+											originalClass="text-light"
+											duplicateClass="text-light"
+											text={item.label}
+											externalTrigger={
+												hoveredIndex() === index() ? "enter" : "leave"
+											}
+										/>
+										<div
+											ref={(el) => {
+												underlineRefs[index()] = el;
+											}}
+											class="underline bg-light"
+										></div>
+									</div>
 								</a>
 							</li>
 						</div>
@@ -324,26 +324,20 @@ const MenuDrawer = () => {
 			<div class="navigation-bottom-usps">
 				<div class="container large">
 					<div class="col-row" ref={addressRef}>
-						<span class="font-formula-bold text-[1em] text-gray opacity-50 tracking-wide leading-[0.86] uppercase">
-							Address
-						</span>
-						<h4 class="font-formula-bold text-[1.25em] py-[0.1em] text-gray leading-[1.1] tracking-wide uppercase">
-							Taizhou, Zhejiang, China
-						</h4>
+						<span class="eyebrow inactive">Address</span>
+						<h4 class="xxs">Taizhou, Zhejiang, China</h4>
 					</div>
 					<div class="col-row" ref={contactRef}>
-						<span class="font-formula-bold text-[1em] text-gray opacity-50 tracking-wide leading-[0.86] uppercase">
-							CONTACT
-						</span>
-						<div class="flex items-center justify-center py-[0.2em] relative">
-							<TextAnimation
-								originalClass="text-gray"
-								duplicateClass="text-light"
-								text="yang@limingcn.com"
-								class="overflow-hidden"
-								textStyle="leading-[0.86] font-formula-bold text-[1.25em] pt-[0.1em] text-gray tracking-wide uppercase"
-								isCopyable={true}
-							/>
+						<span class="eyebrow inactive">CONTACT</span>
+						<div class="link">
+							<div class="link-content">
+								<TextAnimation
+									originalClass="text-gray"
+									duplicateClass="text-light"
+									text="yang@limingcn.com"
+									isCopyable={true}
+								/>
+							</div>
 						</div>
 					</div>
 				</div>
