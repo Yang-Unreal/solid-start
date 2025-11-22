@@ -671,7 +671,6 @@ header {
 			padding: 0.3em 0.35em;
 			h4 {
 				font-size: 1em;
-				color: var(--color-gray);
 				transform: translateY(0.05em);
 				white-space: nowrap;
 				text-align: center;
@@ -685,7 +684,6 @@ header {
 
 			p {
 				font-size: 0.425em;
-				color: var(--color-gray);
 				text-align: center;
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -702,7 +700,7 @@ header {
 /* Override styles when copyright-visual is inside loading container */
 .loading-container .copyright-row .copyright-visual * {
 	border-color: rgba(var(--color-gray-rgb), 0.25);
-	color: rgba(var(--color-gray-rgb), 0.25) !important;
+	color: rgba(var(--color-gray-rgb), 0.25);
 }
 
 .transition-container {
