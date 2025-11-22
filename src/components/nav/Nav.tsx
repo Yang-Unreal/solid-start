@@ -261,7 +261,7 @@ export default function Nav() {
 						</For>
 
 						{/* LOGO */}
-						<li class="relative flex items-center justify-center">
+						<li class="relative flex items-center justify-center pointer-events-auto">
 							<A
 								ref={logoRef}
 								href="/"

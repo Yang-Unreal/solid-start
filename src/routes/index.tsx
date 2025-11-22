@@ -1,7 +1,7 @@
 // src/routes/index.tsx
 
-import { onMount } from "solid-js";
 import gsap from "gsap/all";
+import { onMount } from "solid-js";
 
 import Footer from "~/components/Footer";
 
@@ -59,35 +59,29 @@ export default function Home() {
 						<div class="row">
 							<div class="col">
 								<div class="col-row-title">
-									<h1 class="h-1 text-light">
-										<span class="block sm:inline">YOUR </span>
-										<span class="relative overflow-hidden inline-block align-top">
-											<span ref={gatewayRef} class="inline-block">
-												GATEWAY
-											</span>
-											<span ref={partnerRef} class="absolute hidden left-0">
-												PARTNER
-											</span>
+									<h1 class="h1 text-light">
+										<span>
+											<div>
+												<div>YOUR</div>
+											</div>
 										</span>
-										<br />
-										<span class="block sm:inline">FOR CHINA </span>
-										<span class="block sm:inline">SOURCING</span>
+										<span>
+											<div>
+												<div>YOUR</div>
+											</div>
+										</span>
 									</h1>
 								</div>
-								{/* <div class="absolute flex justify-between w-full bottom-[10%] px-3 lg:px-25 text-center font-formula-bold z-2">
-          <div>
-            <span class="text-sm xl:text-xl text-gray">LIMING AGENCY</span>
-            <h4 class="text-xl xl:text-3xl text-light-white">
-              ELIMINATE THE RISK
-            </h4>
-          </div>
-          <div>
-            <span class="text-sm xl:text-xl text-gray">SINCE 2015</span>
-            <h4 class="text-xl xl:text-3xl text-light-white">
-              WORKING GLOBALLY
-            </h4>
-          </div>
-        </div> */}
+								<div class="col-row-usps">
+									<div class="col-row-col">
+										<span class="eyebrow text-gray">LIMING AGENCY</span>
+										<h4 class="xxs text-light">ELIMINATE THE RISK</h4>
+									</div>
+									<div class="col-row-col">
+										<span class="eyebrow text-gray">SINCE 2015</span>
+										<h4 class="xxs text-light">WORKING GLOBALLY</h4>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>

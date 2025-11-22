@@ -1,5 +1,6 @@
 import { Router } from "@solidjs/router";
 import { FileRoutes } from "@solidjs/start/router";
+import "lenis/dist/lenis.css";
 import "./app.css";
 import { QueryClientProvider } from "@tanstack/solid-query";
 import { AppContent } from "~/components/AppContent";

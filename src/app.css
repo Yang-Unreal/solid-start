@@ -1,9 +1,8 @@
 /* ==========================================================================
    1. Imports
    ========================================================================== */
-/** biome-ignore-all lint/style/noDescendingSpecificity: <explanation> */
+
 @import "tailwindcss";
-@import "lenis/dist/lenis.css";
 
 /* ==========================================================================
    2. Fonts
@@ -72,8 +71,11 @@
 	--col-gap: var(--gap);
 	--container-padding: var(--col-gap);
 	--section-padding: calc(var(--title-size) * 1.2);
-	--vh-in-px: 9.15px;
+	--vh-in-px: 7.97px;
 	--vh: var(--vh-in-px);
+	@media screen and (max-width: 1024px) {
+		--container-padding: var(--col-gap);
+	}
 
 	/* Components */
 	--border-radius: 2px;
@@ -169,7 +171,18 @@ h4 {
 		font-size: 1.5em;
 		line-height: 1.1;
 		letter-spacing: 0.02em;
+		@media screen and (max-width: 540px) {
+			font-size: 1.25em;
+		}
 	}
+}
+
+h1.h1,
+h2.h1,
+h3.h1,
+h4.h1 {
+	font-size: calc(var(--title-size) * 1.2);
+	line-height: 0.86;
 }
 
 a {
@@ -397,7 +410,6 @@ header {
 		overflow: hidden;
 		display: flex;
 		position: relative;
-		padding: 0.2em 0;
 	}
 
 	.link-content {
@@ -534,6 +546,12 @@ header {
 	left: 0;
 	width: 100%;
 
+	h4 {
+		color: var(--color-gray);
+		font-size: 1.25em;
+		padding: 0.1em 0;
+	}
+
 	@media screen and (max-width: 720px) {
 		display: none;
 	}
@@ -562,7 +580,6 @@ header {
 	font-weight: 700;
 	font-size: 1em;
 	line-height: 0.86;
-	color: rgba(var(--color-dark-rgb), 0.4);
 	text-transform: uppercase;
 	letter-spacing: 0.025em;
 	&.inactive {
@@ -732,12 +749,6 @@ header {
 		padding-top: 0;
 		padding-bottom: 0;
 
-		@media screen and (min-width: 1025px) {
-			.container {
-				padding-bottom: calc(var(--vh) * 15);
-			}
-		}
-
 		.container > .row {
 			min-height: calc(var(--vh) * 100);
 			padding-top: var(--section-padding);
@@ -763,6 +774,12 @@ header {
 		}
 	}
 
+	&.full-height .container {
+		@media screen and (min-width: 1025px) {
+			padding-bottom: calc(var(--vh) * 15);
+		}
+	}
+
 	.col {
 		width: 100%;
 		justify-content: flex-end;
@@ -778,6 +795,17 @@ header {
 
 		& > * {
 			z-index: 2;
+		}
+	}
+
+	.col-row-usps {
+		display: flex;
+		justify-content: space-between;
+		padding-top: calc(var(--gap) * 2);
+		z-index: 2;
+		width: 100%;
+		.col-row-col {
+			text-align: center;
 		}
 	}
 
