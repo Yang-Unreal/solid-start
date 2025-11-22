@@ -68,6 +68,9 @@
   --row-gap: var(--gap);
   --col-gap: var(--gap);
   --container-padding: var(--col-gap);
+  --section-padding: calc(var(--title-size) * 1.2);
+  --vh-in-px: 9.15px;
+  --vh: var(--vh-in-px);
   
   /* Components */
   --border-radius: 2px;
@@ -464,7 +467,99 @@ header {
     .last {
       display: none;
     }
+  }
 }
+
+.main{
+  display:block;
+  box-sizing:border-box;
+
+}
+.main-wrap{
+    will-change: transform;
+    box-sizing: border-box;
+}
+
+.section {
+    padding-top: var(--section-padding);
+    padding-bottom: var(--section-padding);
+    position: relative;
+    &.full-height {
+    padding-top: 0;
+    padding-bottom: 0;
+    @media screen and (min-width: 1025px) {
+      .container {
+        padding-bottom: calc(var(--vh) * 15);
+    }
+}
+.container > .row {
+    min-height: calc(var(--vh) * 100);
+    padding-top: var(--section-padding);
+    padding-bottom: var(--section-padding);
+}
+}
+}
+
+.default-header {
+    padding-top: calc(var(--vh) * 25);
+}
+
+.section-home-header {
+    overflow: hidden;
+    &.full-height .container > .row {
+        padding-bottom: calc(var(--row-gap) + var(--btn-height));
+        @media screen and (max-width: 720px) {
+            padding-bottom: calc(var(--row-gap) + var(--btn-height) + (var(--row-gap) * 2));
+        }
+    }
+}
+
+.single-video-background {
+    --aspect-ratio-w: 16;
+    --aspect-ratio-h: 9;
+    --parent-height: 100;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: calc(var(--parent-height) * 1vh);
+    overflow: hidden;
+    background: var(--color-dark);
+    transform: translateZ(0);
+    isolation: isolate;
+    pointer-events: none;
+    
+    @media screen and (max-width: 1024px) {
+    --parent-height: 100;
+    }
+    @media screen and (min-width: 1025px) {
+    --parent-height: 115;
+    }
+
+   video {
+    width: 100vw;
+    height: calc(var(--aspect-ratio-h) / var(--aspect-ratio-w) * (var(--parent-height) * 1vw));
+    min-height: calc(var(--parent-height) * 1vh);
+    min-width: calc(var(--aspect-ratio-w) / var(--aspect-ratio-h) * (var(--parent-height) * 1vh));
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    }
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.row {
+    display: flex;
+    width: 100%;
+    position: relative;
 }
 
 /* ==========================================================================

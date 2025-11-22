@@ -43,17 +43,21 @@ export default function Home() {
   });
 
   return (
-    <main>
-      <section class="hero h-svh flex items-center justify-center relative text-light-white bg-dark">
+    <main class="main">
+      <div class="main-wrap">
+      <section class="section default-header full-height section-home-header bg-dark">
+        <div class="single-video-background">
         <video
           autoplay
           muted
           loop
-          class="absolute inset-0 w-full h-full object-cover "
           src="https://minio.limingcn.com/solid-start/byd-3.webm"
           poster="https://minio.limingcn.com/solid-start/poster-1.webp"
         ></video>
-        <div class="absolute inset-0 bg-gray-800 opacity-30 mix-blend-multiply z-1"></div>
+        <div class="overlay bg-dark opacity-25"></div>
+        </div>
+   <div class="container large">
+    <div class="row">
         <h1
           class="font-formula-bold leading-none absolute bottom-[25%] md:landscape:bottom-[25%] xl:landscape:bottom-[20%] text-[clamp(1.5rem,17vw,5rem)] sm:landscape:text-[clamp(2rem,8vw,4rem)] md:landscape:text-[clamp(2rem,10vw,6rem)] lg:landscape:text-[clamp(2rem,9vw,10rem)] 2xl:text-[10rem] text-center z-2"
           style="word-spacing: -0.12em;"
@@ -85,10 +89,13 @@ export default function Home() {
             </h4>
           </div>
         </div>
+        </div>
+        </div>
       </section>
       <section class="h-screen bg-dark w-full"></section>
       <section class="h-screen bg-light w-full"></section>
       <Footer />
+      </div>
     </main>
   );
 }
