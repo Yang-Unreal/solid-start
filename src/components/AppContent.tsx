@@ -1,12 +1,12 @@
-import { Suspense, onMount } from "solid-js";
+import gsap from "gsap/all";
+import { CustomEase } from "gsap/CustomEase";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { type JSX, onMount, Suspense } from "solid-js";
 import Header from "./Header";
 import MenuDrawer from "./nav/MenuDrawer";
 import Preloader from "./Preloader";
-import gsap from "gsap/all";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { CustomEase } from "gsap/CustomEase";
 
-export function AppContent(props: { children: any }) {
+export function AppContent(props: { children: JSX.Element }) {
 	onMount(() => {
 		gsap.registerPlugin(ScrollTrigger);
 		gsap.registerPlugin(CustomEase);

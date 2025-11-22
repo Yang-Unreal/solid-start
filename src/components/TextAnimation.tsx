@@ -1,5 +1,5 @@
-import { createEffect, onMount, createSignal } from "solid-js";
-import gsap, { CustomEase } from "gsap/all";
+import gsap from "gsap/all";
+import { createEffect, createSignal } from "solid-js";
 
 interface TextAnimationProps {
 	text: string;
@@ -18,14 +18,16 @@ export default function TextAnimation(props: TextAnimationProps) {
 	const [displayText, setDisplayText] = createSignal(props.text);
 	const duration = 0.2;
 	const animateEnter = () => {
-		gsap.to(originalRef!, {
+		if (!originalRef || !duplicateRef) return;
+
+		gsap.to(originalRef, {
 			y: "-100%",
 			rotation: -12,
 			transformOrigin: "0% 100%",
 			duration: duration,
 			ease: "custom",
 		});
-		gsap.to(duplicateRef!, {
+		gsap.to(duplicateRef, {
 			y: "0%",
 			rotation: 0,
 			transformOrigin: "100% 0%",
@@ -35,14 +37,16 @@ export default function TextAnimation(props: TextAnimationProps) {
 	};
 
 	const animateLeave = () => {
-		gsap.to(originalRef!, {
+		if (!originalRef || !duplicateRef) return;
+
+		gsap.to(originalRef, {
 			y: "0%",
 			rotation: 0,
 			transformOrigin: "0% 100%",
 			duration: duration,
 			ease: "custom",
 		});
-		gsap.to(duplicateRef!, {
+		gsap.to(duplicateRef, {
 			y: "100%",
 			rotation: -12,
 			transformOrigin: "100% 0%",
@@ -82,8 +86,10 @@ export default function TextAnimation(props: TextAnimationProps) {
 	});
 
 	createEffect(() => {
+		if (!originalRef) return;
+
 		if (props.navSlideTrigger === "up") {
-			gsap.to(originalRef!, {
+			gsap.to(originalRef, {
 				y: "-100%",
 				rotation: -12,
 				transformOrigin: "0% 0%",
@@ -92,7 +98,7 @@ export default function TextAnimation(props: TextAnimationProps) {
 				delay: 0.1,
 			});
 		} else if (props.navSlideTrigger === "down") {
-			gsap.to(originalRef!, {
+			gsap.to(originalRef, {
 				y: "0%",
 				rotation: 0,
 				transformOrigin: "0% 0%",
@@ -103,7 +109,8 @@ export default function TextAnimation(props: TextAnimationProps) {
 	});
 
 	return (
-		<div
+		<button
+			type="button"
 			class={`relative overflow-hidden ${
 				props.isCopyable ? "cursor-pointer" : "cursor-pointer"
 			} ${props.class || ""}`}
@@ -112,13 +119,13 @@ export default function TextAnimation(props: TextAnimationProps) {
 			onClick={handleClick}
 		>
 			<span
-				ref={originalRef!}
+				ref={originalRef}
 				class={`block ${props.textStyle} ${props.originalClass || ""}`}
 			>
 				{displayText()}
 			</span>
 			<span
-				ref={duplicateRef!}
+				ref={duplicateRef}
 				class={`absolute top-0 left-0 block ${props.textStyle} ${
 					props.duplicateClass || ""
 				}`}
@@ -126,6 +133,6 @@ export default function TextAnimation(props: TextAnimationProps) {
 			>
 				{displayText()}
 			</span>
-		</div>
+		</button>
 	);
 }

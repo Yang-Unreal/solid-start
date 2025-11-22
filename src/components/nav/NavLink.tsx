@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
-import { createEffect, onCleanup } from "solid-js";
 import gsap from "gsap";
+import { createEffect, onCleanup } from "solid-js";
 import TextAnimation from "~/components/TextAnimation";
 
 interface ColorState {

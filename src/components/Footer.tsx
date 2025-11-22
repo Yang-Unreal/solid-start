@@ -1,13 +1,10 @@
+import { A } from "@solidjs/router";
 import type { Component } from "solid-js";
 
 const Footer: Component = () => {
 	return (
 		<footer class="relative bg-dark text-gray  p-0">
 			<div class="container-padding">
-				<div class="flex">
-					<div></div>
-					<div></div>
-				</div>
 				<div class=" grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
 					{/* Company Info */}
 					<div>
@@ -20,24 +17,24 @@ const Footer: Component = () => {
 						<h2 class="text-lg font-bold mb-4">Quick Links</h2>
 						<ul class="space-y-2 text-sm">
 							<li>
-								<a href="#" class="hover:underline">
+								<A href="/about" class="hover:underline">
 									About
-								</a>
+								</A>
 							</li>
 							<li>
-								<a href="#" class="hover:underline">
+								<A href="/services" class="hover:underline">
 									Services
-								</a>
+								</A>
 							</li>
 							<li>
-								<a href="#" class="hover:underline">
+								<A href="/products" class="hover:underline">
 									Products
-								</a>
+								</A>
 							</li>
 							<li>
-								<a href="#" class="hover:underline">
+								<A href="/contact" class="hover:underline">
 									Contact
-								</a>
+								</A>
 							</li>
 						</ul>
 					</div>
@@ -46,16 +43,36 @@ const Footer: Component = () => {
 					<div>
 						<h2 class="text-lg font-bold mb-4">Follow Us</h2>
 						<div class="flex justify-center md:justify-start space-x-4">
-							<a href="#" class="hover:text-gray-400">
+							<a
+								href="https://facebook.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-gray-400"
+							>
 								Facebook
 							</a>
-							<a href="#" class="hover:text-gray-400">
+							<a
+								href="https://twitter.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-gray-400"
+							>
 								Twitter
 							</a>
-							<a href="#" class="hover:text-gray-400">
+							<a
+								href="https://instagram.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-gray-400"
+							>
 								Instagram
 							</a>
-							<a href="#" class="hover:text-gray-400">
+							<a
+								href="https://linkedin.com"
+								target="_blank"
+								rel="noopener noreferrer"
+								class="hover:text-gray-400"
+							>
 								LinkedIn
 							</a>
 						</div>

@@ -1,14 +1,14 @@
+import gsap from "gsap";
 import {
-	createSignal,
-	Show,
-	createEffect,
-	onCleanup,
 	batch,
 	type Component,
+	createEffect,
+	createSignal,
+	onCleanup,
+	Show,
 } from "solid-js";
-import gsap from "gsap";
-import TextAnimation from "../TextAnimation";
 import { useMenu } from "~/context/MenuContext";
+import TextAnimation from "../TextAnimation";
 
 // ============================================================================
 // Types
@@ -246,6 +246,7 @@ const MenuButton: Component = () => {
 	return (
 		<div class="btn-hamburger">
 			<button
+				type="button"
 				ref={handleButtonRef}
 				onClick={handleClick}
 				onMouseEnter={handleMouseEnter}

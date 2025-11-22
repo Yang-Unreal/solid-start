@@ -1,5 +1,5 @@
-import { createEffect, onMount, onCleanup } from "solid-js";
 import gsap from "gsap";
+import { createEffect, onCleanup, onMount } from "solid-js";
 
 type MenuImagesProps = {
 	links: readonly { href: string; label: string; image: string }[];

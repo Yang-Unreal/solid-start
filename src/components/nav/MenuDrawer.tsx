@@ -1,10 +1,10 @@
-import { For, createEffect, onMount, createSignal, onCleanup } from "solid-js";
 import { useLocation } from "@solidjs/router";
 import gsap from "gsap";
-import TextAnimation from "../TextAnimation";
+import { createEffect, createSignal, For, onCleanup, onMount } from "solid-js";
 import { useLenis } from "~/context/LenisContext";
-import { usePageTransition } from "~/context/PageTransitionContext";
 import { useMenu } from "~/context/MenuContext";
+import { usePageTransition } from "~/context/PageTransitionContext";
+import TextAnimation from "../TextAnimation";
 import MenuImages from "./MenuImages";
 
 const MenuDrawer = () => {
@@ -35,12 +35,12 @@ const MenuDrawer = () => {
 	const [hasHoveredOther, setHasHoveredOther] = createSignal(false);
 
 	// Refs for animations
-	let underlineRefs: (HTMLDivElement | undefined)[] = new Array(
+	const underlineRefs: (HTMLDivElement | undefined)[] = new Array(
 		navLinks.length,
 	).fill(undefined);
-	let linkRefs: (HTMLLIElement | undefined)[] = new Array(navLinks.length).fill(
-		undefined,
-	);
+	const linkRefs: (HTMLLIElement | undefined)[] = new Array(
+		navLinks.length,
+	).fill(undefined);
 
 	// Update active index based on route
 	createEffect(() => {
@@ -285,7 +285,12 @@ const MenuDrawer = () => {
 				<For each={navLinks}>
 					{(item, index) => (
 						<div class="link-wrap">
-							<li class="link" ref={(el) => (linkRefs[index()] = el)}>
+							<li
+								class="link"
+								ref={(el) => {
+									linkRefs[index()] = el;
+								}}
+							>
 								<a
 									href={item.href}
 									class="link-click"
@@ -304,7 +309,9 @@ const MenuDrawer = () => {
 										}
 									/>
 									<div
-										ref={(el) => (underlineRefs[index()] = el)}
+										ref={(el) => {
+											underlineRefs[index()] = el;
+										}}
 										class="absolute bottom-0 left-0 w-full h-0.5 bg-light scale-x-0"
 									></div>
 								</a>

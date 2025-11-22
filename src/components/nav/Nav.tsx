@@ -187,7 +187,9 @@ export default function Nav() {
 			gsap.registerPlugin(ScrollTrigger);
 			setSetupNavTriggers(() => setupNavTriggers);
 			setKillScrollTriggers(() => () => {
-				scrollTriggers.forEach((trigger) => trigger.kill());
+				scrollTriggers.forEach((trigger) => {
+					trigger.kill();
+				});
 				scrollTriggers = [];
 			});
 			setMenuClosedCallback(() => {
@@ -250,8 +252,10 @@ export default function Nav() {
 									index={i()}
 									colorState={navLinkColors()[i()]}
 									isMenuOpen={isMenuOpen()}
-									onClick={(e, href) => handleTransition(href)}
-									ref={(el) => (linkRefs[i()] = el)}
+									onClick={(_e, href) => handleTransition(href)}
+									ref={(el) => {
+										linkRefs[i()] = el;
+									}}
 								/>
 							)}
 						</For>
@@ -276,8 +280,10 @@ export default function Nav() {
 									index={i() + 2}
 									colorState={navLinkColors()[i() + 2]}
 									isMenuOpen={isMenuOpen()}
-									onClick={(e, href) => handleTransition(href)}
-									ref={(el) => (linkRefs[i() + 2] = el)}
+									onClick={(_e, href) => handleTransition(href)}
+									ref={(el) => {
+										linkRefs[i() + 2] = el;
+									}}
 								/>
 							)}
 						</For>

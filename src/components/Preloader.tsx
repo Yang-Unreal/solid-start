@@ -1,9 +1,9 @@
-import { onMount, onCleanup, type Component, For } from "solid-js";
 import gsap from "gsap";
+import { type Component, For, onCleanup, onMount } from "solid-js";
 import { useLenis } from "~/context/LenisContext";
-import YourLogo from "./logo/YourLogo";
-import MobileLogo from "./logo/MobileLogo";
 import { usePageTransition } from "~/context/PageTransitionContext";
+import MobileLogo from "./logo/MobileLogo";
+import YourLogo from "./logo/YourLogo";
 
 // Animation constants
 const DURATION = {
@@ -332,7 +332,7 @@ const Preloader: Component = () => {
 						<div class="text">
 							<div class="top">
 								<h4 class="xxs">2025 © All rights reserved</h4>
-							      </div>
+							</div>
 							<div class="bottom">
 								<p>
 									LIMING is a Export Company specializing in Used Car Parallel
