@@ -3,110 +3,110 @@ import { createSignal, createEffect, createResource } from "solid-js";
 import type { Photo } from "~/db/schema";
 
 interface VehicleImageProps {
-  vehicleId: string;
-  index: number;
-  size: "thumbnail" | "card" | "detail";
-  alt: string;
-  class?: string;
-  onTouchStart?: (e: TouchEvent) => void;
-  onTouchMove?: (e: TouchEvent) => void;
-  onTouchEnd?: () => void;
-  onClick?: () => void;
-  classList?: Record<string, boolean>;
-  isBlob?: boolean;
+	vehicleId: string;
+	index: number;
+	size: "thumbnail" | "card" | "detail";
+	alt: string;
+	class?: string;
+	onTouchStart?: (e: TouchEvent) => void;
+	onTouchMove?: (e: TouchEvent) => void;
+	onTouchEnd?: () => void;
+	onClick?: () => void;
+	classList?: Record<string, boolean>;
+	isBlob?: boolean;
 }
 
 async function fetchVehiclePhotos(vehicleId: string): Promise<Photo[]> {
-  const baseUrl =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/vehicles/${vehicleId}/photos`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch vehicle photos");
-  }
-  return res.json();
+	const baseUrl =
+		typeof window !== "undefined"
+			? window.location.origin
+			: "http://localhost:3000";
+	const res = await fetch(`${baseUrl}/api/vehicles/${vehicleId}/photos`);
+	if (!res.ok) {
+		throw new Error("Failed to fetch vehicle photos");
+	}
+	return res.json();
 }
 
 export default function VehicleImage(props: VehicleImageProps) {
-  const photosQuery = useQuery(() => ({
-    queryKey: ["vehiclePhotos", props.vehicleId],
-    queryFn: () => fetchVehiclePhotos(props.vehicleId),
-    enabled: !props.isBlob,
-  }));
+	const photosQuery = useQuery(() => ({
+		queryKey: ["vehiclePhotos", props.vehicleId],
+		queryFn: () => fetchVehiclePhotos(props.vehicleId),
+		enabled: !props.isBlob,
+	}));
 
-  if (props.isBlob) {
-    return (
-      <img
-        src={props.alt} // Blobs are passed in alt for now
-        alt={props.alt}
-        class={props.class}
-        classList={props.classList}
-        onClick={props.onClick}
-        decoding="async"
-      />
-    );
-  }
+	if (props.isBlob) {
+		return (
+			<img
+				src={props.alt} // Blobs are passed in alt for now
+				alt={props.alt}
+				class={props.class}
+				classList={props.classList}
+				onClick={props.onClick}
+				decoding="async"
+			/>
+		);
+	}
 
-  const getImageUrl = (photo: Photo | undefined) => {
-    if (!photo || !photo.photo_url) return undefined;
-    // Assuming photo_url is the full URL
-    // Or you can construct it here based on your storage solution
-    return photo.photo_url;
-  };
+	const getImageUrl = (photo: Photo | undefined) => {
+		if (!photo || !photo.photo_url) return undefined;
+		// Assuming photo_url is the full URL
+		// Or you can construct it here based on your storage solution
+		return photo.photo_url;
+	};
 
-  const [imageSrc, setImageSrc] = createSignal<string | undefined>(
-    getImageUrl(photosQuery.data?.[props.index])
-  );
+	const [imageSrc, setImageSrc] = createSignal<string | undefined>(
+		getImageUrl(photosQuery.data?.[props.index]),
+	);
 
-  const [fallbackSrc, setFallbackSrc] = createSignal<string | undefined>();
+	const [fallbackSrc, setFallbackSrc] = createSignal<string | undefined>();
 
-  createEffect(() => {
-    const photo = photosQuery.data?.[props.index];
-    if (photo && photo.photo_url) {
-      setImageSrc(photo.photo_url);
-      // Generate fallback URL by replacing .avif with .webp
-      const fallbackUrl = photo.photo_url.replace(/\.avif$/, ".webp");
-      setFallbackSrc(fallbackUrl);
-    }
-  });
+	createEffect(() => {
+		const photo = photosQuery.data?.[props.index];
+		if (photo && photo.photo_url) {
+			setImageSrc(photo.photo_url);
+			// Generate fallback URL by replacing .avif with .webp
+			const fallbackUrl = photo.photo_url.replace(/\.avif$/, ".webp");
+			setFallbackSrc(fallbackUrl);
+		}
+	});
 
-  const handleImageError = (e: Event) => {
-    const img = e.target as HTMLImageElement;
-    const currentSrc = img.src;
+	const handleImageError = (e: Event) => {
+		const img = e.target as HTMLImageElement;
+		const currentSrc = img.src;
 
-    // If AVIF failed and we have a fallback, try WebP
-    if (currentSrc.includes(".avif") && fallbackSrc()) {
-      console.log("AVIF not supported, trying WebP fallback");
-      img.src = fallbackSrc()!;
-      return;
-    }
+		// If AVIF failed and we have a fallback, try WebP
+		if (currentSrc.includes(".avif") && fallbackSrc()) {
+			console.log("AVIF not supported, trying WebP fallback");
+			img.src = fallbackSrc()!;
+			return;
+		}
 
-    // If WebP also failed or no fallback, show placeholder
-    const placeholderSvg = `data:image/svg+xml;base64,${btoa(`
+		// If WebP also failed or no fallback, show placeholder
+		const placeholderSvg = `data:image/svg+xml;base64,${btoa(`
       <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#f3f4f6"/>
         <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="16" fill="#6b7280" text-anchor="middle" dy=".3em">Image not available</text>
       </svg>
     `)}`;
-    setImageSrc(placeholderSvg);
-  };
+		setImageSrc(placeholderSvg);
+	};
 
-  return (
-    <picture>
-      {/* This component will need to be updated to handle different formats if required */}
-      <img
-        src={imageSrc()}
-        alt={props.alt}
-        class={props.class}
-        classList={props.classList}
-        onTouchStart={props.onTouchStart}
-        onTouchMove={props.onTouchMove}
-        onTouchEnd={props.onTouchEnd}
-        onClick={props.onClick}
-        onError={handleImageError}
-        decoding="async"
-      />
-    </picture>
-  );
+	return (
+		<picture>
+			{/* This component will need to be updated to handle different formats if required */}
+			<img
+				src={imageSrc()}
+				alt={props.alt}
+				class={props.class}
+				classList={props.classList}
+				onTouchStart={props.onTouchStart}
+				onTouchMove={props.onTouchMove}
+				onTouchEnd={props.onTouchEnd}
+				onClick={props.onClick}
+				onError={handleImageError}
+				decoding="async"
+			/>
+		</picture>
+	);
 }

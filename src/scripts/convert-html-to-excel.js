@@ -14,10 +14,10 @@ const table = $("table");
 // Extract headers
 const headers = [];
 table.find("thead tr td").each((i, el) => {
-  const text = $(el).text().trim();
-  // Extract model name, e.g., "2023 Model 1.5L Manual Trend CNY 115,900" -> "1.5L Manual Trend"
-  const match = text.match(/(\d{4} Model )?(.+?) CNY/);
-  headers.push(match ? match[2] : text);
+	const text = $(el).text().trim();
+	// Extract model name, e.g., "2023 Model 1.5L Manual Trend CNY 115,900" -> "1.5L Manual Trend"
+	const match = text.match(/(\d{4} Model )?(.+?) CNY/);
+	headers.push(match ? match[2] : text);
 });
 
 // Add empty first column for features
@@ -28,30 +28,30 @@ const data = [headers];
 
 // Process tbody
 table.find("tbody").each((tbodyIndex, tbody) => {
-  $(tbody)
-    .find("tr")
-    .each((trIndex, tr) => {
-      const row = [];
-      $(tr)
-        .find("th, td")
-        .each((cellIndex, cell) => {
-          const colspan = $(cell).attr("colspan");
-          const text = $(cell).text().trim();
-          if (colspan && parseInt(colspan) > 1) {
-            // Section header
-            row.push(text);
-            // Fill the rest with empty
-            for (let i = 1; i < parseInt(colspan); i++) {
-              row.push("");
-            }
-          } else {
-            row.push(text);
-          }
-        });
-      if (row.length > 0) {
-        data.push(row);
-      }
-    });
+	$(tbody)
+		.find("tr")
+		.each((trIndex, tr) => {
+			const row = [];
+			$(tr)
+				.find("th, td")
+				.each((cellIndex, cell) => {
+					const colspan = $(cell).attr("colspan");
+					const text = $(cell).text().trim();
+					if (colspan && parseInt(colspan) > 1) {
+						// Section header
+						row.push(text);
+						// Fill the rest with empty
+						for (let i = 1; i < parseInt(colspan); i++) {
+							row.push("");
+						}
+					} else {
+						row.push(text);
+					}
+				});
+			if (row.length > 0) {
+				data.push(row);
+			}
+		});
 });
 
 // Create workbook

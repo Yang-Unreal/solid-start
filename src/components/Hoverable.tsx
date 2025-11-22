@@ -1,181 +1,181 @@
 import {
-  createSignal,
-  onMount,
-  onCleanup,
-  type JSX,
-  createEffect,
-  type Accessor,
-  type Setter,
-  type Component,
-  splitProps,
+	createSignal,
+	onMount,
+	onCleanup,
+	type JSX,
+	createEffect,
+	type Accessor,
+	type Setter,
+	type Component,
+	splitProps,
 } from "solid-js";
 import { gsap } from "gsap";
 import { Dynamic } from "solid-js/web";
 
 interface HoverableProps<E extends HTMLElement = HTMLElement>
-  extends Omit<JSX.HTMLAttributes<E>, "children"> {
-  as?: string | Component<any>;
-  enableHoverCircle?: boolean;
-  hoverCircleColor?: string;
-  applyOverflowHidden?: boolean;
-  triggerLeaveAnimation?: Accessor<boolean>;
-  setTriggerLeaveAnimation?: Setter<boolean>;
-  children: JSX.Element;
-  isLocked?: Accessor<boolean>;
-  [key: string]: any;
+	extends Omit<JSX.HTMLAttributes<E>, "children"> {
+	as?: string | Component<any>;
+	enableHoverCircle?: boolean;
+	hoverCircleColor?: string;
+	applyOverflowHidden?: boolean;
+	triggerLeaveAnimation?: Accessor<boolean>;
+	setTriggerLeaveAnimation?: Setter<boolean>;
+	children: JSX.Element;
+	isLocked?: Accessor<boolean>;
+	[key: string]: any;
 }
 
 const Hoverable = <E extends HTMLElement = HTMLElement>(
-  props: HoverableProps<E>
+	props: HoverableProps<E>,
 ) => {
-  const [local, rest] = splitProps(props, [
-    "as",
-    "enableHoverCircle",
-    "hoverCircleColor",
-    "applyOverflowHidden",
-    "triggerLeaveAnimation",
-    "setTriggerLeaveAnimation",
-    "children",
-    "class",
-    "ref",
-    "isLocked",
-  ]);
+	const [local, rest] = splitProps(props, [
+		"as",
+		"enableHoverCircle",
+		"hoverCircleColor",
+		"applyOverflowHidden",
+		"triggerLeaveAnimation",
+		"setTriggerLeaveAnimation",
+		"children",
+		"class",
+		"ref",
+		"isLocked",
+	]);
 
-  let containerRef: E | undefined;
-  let circleRef: SVGSVGElement | undefined;
-  let circleAnimation: gsap.core.Tween | undefined;
+	let containerRef: E | undefined;
+	let circleRef: SVGSVGElement | undefined;
+	let circleAnimation: gsap.core.Tween | undefined;
 
-  const [isMobile, setIsMobile] = createSignal(false);
-  const [isReady, setIsReady] = createSignal(false);
+	const [isMobile, setIsMobile] = createSignal(false);
+	const [isReady, setIsReady] = createSignal(false);
 
-  const handleMouseEnter = () => {
-    if (
-      isMobile() ||
-      (local.triggerLeaveAnimation && local.triggerLeaveAnimation())
-    )
-      return;
-    if (local.enableHoverCircle && circleRef) {
-      if (circleAnimation) circleAnimation.kill();
-      circleAnimation = gsap.fromTo(
-        circleRef,
-        { y: "101%" },
-        {
-          y: "0%",
-          duration: 0.5,
-          ease: "power2.out",
-        }
-      );
-    }
-  };
+	const handleMouseEnter = () => {
+		if (
+			isMobile() ||
+			(local.triggerLeaveAnimation && local.triggerLeaveAnimation())
+		)
+			return;
+		if (local.enableHoverCircle && circleRef) {
+			if (circleAnimation) circleAnimation.kill();
+			circleAnimation = gsap.fromTo(
+				circleRef,
+				{ y: "101%" },
+				{
+					y: "0%",
+					duration: 0.5,
+					ease: "power2.out",
+				},
+			);
+		}
+	};
 
-  const triggerCircleExitAnimation = () => {
-    if (isMobile() || (local.isLocked && local.isLocked())) return;
-    if (local.enableHoverCircle && circleRef) {
-      if (circleAnimation) circleAnimation.kill();
-      circleAnimation = gsap.to(circleRef, {
-        y: "-101%",
-        duration: 0.5,
-        ease: "power2.out",
-      });
-    }
-  };
+	const triggerCircleExitAnimation = () => {
+		if (isMobile() || (local.isLocked && local.isLocked())) return;
+		if (local.enableHoverCircle && circleRef) {
+			if (circleAnimation) circleAnimation.kill();
+			circleAnimation = gsap.to(circleRef, {
+				y: "-101%",
+				duration: 0.5,
+				ease: "power2.out",
+			});
+		}
+	};
 
-  const setRefs = (el: E) => {
-    containerRef = el;
-    const ref = local.ref;
-    if (typeof ref === "function") {
-      ref(el);
-    }
-  };
+	const setRefs = (el: E) => {
+		containerRef = el;
+		const ref = local.ref;
+		if (typeof ref === "function") {
+			ref(el);
+		}
+	};
 
-  onMount(() => {
-    if (!import.meta.env.SSR) {
-      const mediaQuery = window.matchMedia("(max-width: 767px)");
-      setIsMobile(mediaQuery.matches);
-      const handleMediaQueryChange = (e: MediaQueryListEvent) =>
-        setIsMobile(e.matches);
-      mediaQuery.addEventListener("change", handleMediaQueryChange);
-      onCleanup(() =>
-        mediaQuery.removeEventListener("change", handleMediaQueryChange)
-      );
-    }
-    setIsReady(true);
-  });
+	onMount(() => {
+		if (!import.meta.env.SSR) {
+			const mediaQuery = window.matchMedia("(max-width: 767px)");
+			setIsMobile(mediaQuery.matches);
+			const handleMediaQueryChange = (e: MediaQueryListEvent) =>
+				setIsMobile(e.matches);
+			mediaQuery.addEventListener("change", handleMediaQueryChange);
+			onCleanup(() =>
+				mediaQuery.removeEventListener("change", handleMediaQueryChange),
+			);
+		}
+		setIsReady(true);
+	});
 
-  createEffect(() => {
-    if (local.enableHoverCircle && !isMobile() && circleRef) {
-      gsap.set(circleRef, { y: "101%" });
-    }
-  });
+	createEffect(() => {
+		if (local.enableHoverCircle && !isMobile() && circleRef) {
+			gsap.set(circleRef, { y: "101%" });
+		}
+	});
 
-  createEffect(() => {
-    if (local.triggerLeaveAnimation && local.triggerLeaveAnimation()) {
-      triggerCircleExitAnimation();
-      if (local.setTriggerLeaveAnimation) {
-        local.setTriggerLeaveAnimation(false);
-      }
-    }
-  });
+	createEffect(() => {
+		if (local.triggerLeaveAnimation && local.triggerLeaveAnimation()) {
+			triggerCircleExitAnimation();
+			if (local.setTriggerLeaveAnimation) {
+				local.setTriggerLeaveAnimation(false);
+			}
+		}
+	});
 
-  createEffect(() => {
-    if (containerRef) {
-      if (!isMobile()) {
-        containerRef.addEventListener("mouseenter", handleMouseEnter);
-        containerRef.addEventListener("mouseleave", triggerCircleExitAnimation);
-      } else {
-        containerRef.removeEventListener("mouseenter", handleMouseEnter);
-        containerRef.removeEventListener(
-          "mouseleave",
-          triggerCircleExitAnimation
-        );
-      }
-    }
-  });
+	createEffect(() => {
+		if (containerRef) {
+			if (!isMobile()) {
+				containerRef.addEventListener("mouseenter", handleMouseEnter);
+				containerRef.addEventListener("mouseleave", triggerCircleExitAnimation);
+			} else {
+				containerRef.removeEventListener("mouseenter", handleMouseEnter);
+				containerRef.removeEventListener(
+					"mouseleave",
+					triggerCircleExitAnimation,
+				);
+			}
+		}
+	});
 
-  onCleanup(() => {
-    if (containerRef) {
-      containerRef.removeEventListener("mouseenter", handleMouseEnter);
-      containerRef.removeEventListener(
-        "mouseleave",
-        triggerCircleExitAnimation
-      );
-    }
-  });
+	onCleanup(() => {
+		if (containerRef) {
+			containerRef.removeEventListener("mouseenter", handleMouseEnter);
+			containerRef.removeEventListener(
+				"mouseleave",
+				triggerCircleExitAnimation,
+			);
+		}
+	});
 
-  const Tag = local.as || "div";
+	const Tag = local.as || "div";
 
-  return (
-    <Dynamic
-      component={Tag}
-      ref={setRefs}
-      class={`relative ${local.applyOverflowHidden ? "overflow-hidden" : ""} ${
-        local.class || ""
-      }`}
-      {...rest}
-    >
-      <div class="relative z-10">{local.children}</div>
-      {local.enableHoverCircle && !isMobile() && (
-        <svg
-          ref={(el) => (circleRef = el)}
-          class={`absolute w-[150%] h-[200%] top-[-50%] left-[-25%] z-0 ${
-            isReady() ? "visible" : "invisible"
-          }`}
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <ellipse
-            cx="50"
-            cy="50"
-            rx="50"
-            ry="50"
-            style={{
-              fill: local.hoverCircleColor || "#455CE9",
-            }}
-          />
-        </svg>
-      )}
-    </Dynamic>
-  );
+	return (
+		<Dynamic
+			component={Tag}
+			ref={setRefs}
+			class={`relative ${local.applyOverflowHidden ? "overflow-hidden" : ""} ${
+				local.class || ""
+			}`}
+			{...rest}
+		>
+			<div class="relative z-10">{local.children}</div>
+			{local.enableHoverCircle && !isMobile() && (
+				<svg
+					ref={(el) => (circleRef = el)}
+					class={`absolute w-[150%] h-[200%] top-[-50%] left-[-25%] z-0 ${
+						isReady() ? "visible" : "invisible"
+					}`}
+					viewBox="0 0 100 100"
+					preserveAspectRatio="none"
+				>
+					<ellipse
+						cx="50"
+						cy="50"
+						rx="50"
+						ry="50"
+						style={{
+							fill: local.hoverCircleColor || "#455CE9",
+						}}
+					/>
+				</svg>
+			)}
+		</Dynamic>
+	);
 };
 
 export default Hoverable;

@@ -2,9 +2,9 @@
 import { mount, StartClient } from "@solidjs/start/client";
 
 if (history.scrollRestoration) {
-  history.scrollRestoration = "manual";
+	history.scrollRestoration = "manual";
 }
 
 mount(() => {
-  return <StartClient />;
+	return <StartClient />;
 }, document.getElementById("app")!);

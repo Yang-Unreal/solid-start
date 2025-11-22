@@ -3,6 +3,6 @@ import { adminClient } from "better-auth/client/plugins";
 
 const baseURL = process.env.VITE_BASE_URL;
 export const authClient = createAuthClient({
-  baseURL: baseURL,
-  plugins: [adminClient()],
+	baseURL: baseURL,
+	plugins: [adminClient()],
 });

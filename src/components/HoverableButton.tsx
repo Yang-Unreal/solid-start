@@ -2,18 +2,18 @@ import type { Component, ComponentProps } from "solid-js";
 import Hoverable from "./Hoverable";
 
 const HoverableButton: Component<ComponentProps<typeof Hoverable>> = (
-  props
+	props,
 ) => {
-  return (
-    <div class="block">
-      <Hoverable
-        {...props}
-        class={`flex items-center justify-center ${props.class || ""}`}
-      >
-        {props.children}
-      </Hoverable>
-    </div>
-  );
+	return (
+		<div class="block">
+			<Hoverable
+				{...props}
+				class={`flex items-center justify-center ${props.class || ""}`}
+			>
+				{props.children}
+			</Hoverable>
+		</div>
+	);
 };
 
 export default HoverableButton;
