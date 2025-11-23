@@ -10,6 +10,8 @@ export default function Home() {
 	let partnerRef: HTMLSpanElement | undefined;
 
 	onMount(() => {
+		if (!gatewayRef || !partnerRef) return;
+
 		const commonScrollTrigger = {
 			trigger: ".hero",
 			start: "top -1%",
@@ -17,7 +19,7 @@ export default function Home() {
 			invalidateOnRefresh: true,
 		};
 
-		gsap.to(gatewayRef!, {
+		gsap.to(gatewayRef, {
 			y: "-100%",
 			rotation: 12,
 			transformOrigin: "100% 100%",
@@ -27,7 +29,7 @@ export default function Home() {
 		});
 
 		gsap.fromTo(
-			partnerRef!,
+			partnerRef,
 			{ y: "100%", rotation: 12, transformOrigin: "0% 0%" },
 			{
 				y: "0%",
@@ -60,15 +62,8 @@ export default function Home() {
 							<div class="col">
 								<div class="col-row-title">
 									<h1 class="h1 text-light">
-										<span>
-											<div>
-												<div>YOUR</div>
-											</div>
-										</span>
-										<span>
-											<div>
-												<div>YOUR</div>
-											</div>
+										<span class="split-words" ref={gatewayRef}>
+											Top Chinese Cars Deserve Global Access
 										</span>
 									</h1>
 								</div>

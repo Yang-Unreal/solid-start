@@ -163,7 +163,7 @@ h4 {
 		line-height: 0.86;
 
 		@media screen and (max-width: 540px) {
-			font-size: 18vw;
+			font-size: 13vw;
 		}
 	}
 
@@ -183,6 +183,9 @@ h3.h1,
 h4.h1 {
 	font-size: calc(var(--title-size) * 1.2);
 	line-height: 0.86;
+	@media screen and (max-width: 540px) {
+		font-size: 18vw;
+	}
 }
 
 a {
@@ -788,7 +791,7 @@ header {
 		position: relative;
 		max-width: calc(var(--title-size) * 9);
 		@media screen and (max-width: 720px) {
-			max-width: 76vw;
+			max-width: 82vw;
 		}
 
 		& > :nth-child(n) {
@@ -860,6 +863,23 @@ header {
 	left: 0;
 	height: 100%;
 	width: 100%;
+}
+
+.split-words {
+	position: relative;
+
+	.single-word {
+		position: relative;
+		overflow: hidden;
+		transform: translateY(10%) rotate(0.001deg);
+		margin: -0.17em 0 -0.08em 0;
+		padding: 0.08em 0;
+		.single-word-inner {
+			position: relative;
+			transform: translateY(6%) rotate(0.001deg);
+			transform-origin: left top;
+		}
+	}
 }
 
 /* ==========================================================================
