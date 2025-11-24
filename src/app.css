@@ -71,8 +71,6 @@
 	--col-gap: var(--gap);
 	--container-padding: var(--col-gap);
 	--section-padding: calc(var(--title-size) * 1.2);
-	--vh-in-px: 7.97px;
-	--vh: var(--vh-in-px);
 	@media screen and (max-width: 1024px) {
 		--container-padding: var(--col-gap);
 	}
