@@ -303,6 +303,10 @@ body::-webkit-scrollbar {
 		justify-content: center;
 		padding: 0.2em 0;
 
+		@media screen and (max-width: 720px) {
+			padding: 0.025em 0;
+		}
+
 		.underline {
 			pointer-events: none;
 			position: absolute;
@@ -515,10 +519,6 @@ header {
 
 			@media screen and (max-width: 720px) {
 				font-size: 12vw;
-
-				.link-click {
-					padding: 0.025em 0;
-				}
 			}
 		}
 	}
