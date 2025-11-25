@@ -873,11 +873,11 @@ header {
 		position: relative;
 		overflow: hidden;
 		transform: translateY(10%) rotate(0.001deg);
-		margin: -0.17em 0 -0.08em 0;
-		padding: 0.08em 0;
+		margin: -0.17em 0.12em -0.08em 0;
+		padding: 0.12em 0;
 		.single-word-inner {
 			position: relative;
-			transform: translateY(6%) rotate(0.001deg);
+			transform: translateY(6%);
 			transform-origin: left top;
 		}
 	}

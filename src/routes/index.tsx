@@ -1,46 +1,29 @@
 // src/routes/index.tsx
 
 import gsap from "gsap/all";
-import { onMount } from "solid-js";
-
+import { createEffect } from "solid-js";
 import Footer from "~/components/Footer";
+import { usePageTransition } from "~/context/PageTransitionContext";
 
 export default function Home() {
-	let gatewayRef: HTMLSpanElement | undefined;
-	let partnerRef: HTMLSpanElement | undefined;
+	const { isPreloaderFinished } = usePageTransition();
 
-	onMount(() => {
-		if (!gatewayRef || !partnerRef) return;
-
-		const commonScrollTrigger = {
-			trigger: ".hero",
-			start: "top -1%",
-			toggleActions: "play reverse play reverse",
-			invalidateOnRefresh: true,
-		};
-
-		gsap.to(gatewayRef, {
-			y: "-100%",
-			rotation: 12,
-			transformOrigin: "100% 100%",
-			duration: 0.6,
-			ease: "circ.inOut",
-			scrollTrigger: commonScrollTrigger,
-		});
-
-		gsap.fromTo(
-			partnerRef,
-			{ y: "100%", rotation: 12, transformOrigin: "0% 0%" },
-			{
-				y: "0%",
-				display: "inline",
-				rotation: 0,
-				transformOrigin: "0% 0%",
-				duration: 0.6,
-				ease: "circ.inOut",
-				scrollTrigger: commonScrollTrigger,
-			},
-		);
+	createEffect(() => {
+		if (isPreloaderFinished()) {
+			gsap.fromTo(
+				".word-anim",
+				{ y: "115%", rotation: 12, transformOrigin: "0% 0%" },
+				{
+					y: "0%",
+					rotation: 0,
+					transformOrigin: "0% 0%",
+					duration: 1,
+					stagger: 0.05,
+					ease: "elastic.out(1,1)",
+					delay: 0.2,
+				},
+			);
+		}
 	});
 
 	return (
@@ -62,8 +45,16 @@ export default function Home() {
 							<div class="col">
 								<div class="col-row-title">
 									<h1 class="h1 text-light">
-										<span class="split-words" ref={gatewayRef}>
-											Top Chinese Cars Deserve Global Access
+										<span class="split-words">
+											{"Top Chinese Cars Deserve Global Access"
+												.split(" ")
+												.map((word) => (
+													<div class="single-word inline-block">
+														<div class="word-anim single-word-inner">
+															{word}
+														</div>
+													</div>
+												))}
 										</span>
 									</h1>
 								</div>
