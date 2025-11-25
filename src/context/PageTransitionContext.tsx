@@ -68,6 +68,8 @@ interface PageTransitionContextType {
 	isVisible: () => boolean;
 	isPreloaderFinished: () => boolean;
 	setIsPreloaderFinished: (value: boolean) => void;
+	setHeroRevealCallback: (el: HTMLElement, callback: () => void) => void;
+	heroRevealConfig: () => { el: HTMLElement; callback: () => void } | null;
 }
 
 const PageTransitionContext = createContext<PageTransitionContextType>();
@@ -129,6 +131,14 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 	const [menuClosedCallback, setMenuClosedCallback] = createSignal<() => void>(
 		() => {},
 	);
+	const [heroRevealConfig, setHeroRevealConfig] = createSignal<{
+		el: HTMLElement;
+		callback: () => void;
+	} | null>(null);
+
+	const setHeroRevealCallback = (el: HTMLElement, callback: () => void) => {
+		setHeroRevealConfig({ el, callback });
+	};
 
 	const triggerTransition = (
 		href: string,
@@ -251,13 +261,17 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 		});
 
 		tl.add(() => {
-			if (pendingNavigation()) {
-				navigate(pendingNavigation()!);
+			const href = pendingNavigation();
+			if (href) {
+				navigate(href);
 				setPendingNavigation(null);
 			}
 		});
 
 		// --- EXIT ANIMATION (Slide Away) ---
+		// Track hero reveal trigger state across frames
+		let hasTriggeredReveal = false;
+
 		tl.to(columns, {
 			y: "-100vh",
 			rotate: 6,
@@ -265,6 +279,19 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 			duration: 0.5,
 			ease: "circ.inOut",
 			stagger: 0.02,
+			onStart: () => {
+				// Reset hero text animation state when starting exit animation
+				const heroConfig = heroRevealConfig();
+				if (heroConfig) {
+					const { el } = heroConfig;
+					const wordAnims = el.querySelectorAll(".word-anim");
+					gsap.set(wordAnims, {
+						y: "115%",
+						rotation: 12,
+						transformOrigin: "0% 0%",
+					});
+				}
+			},
 			onUpdate: () => {
 				if (!navBar) return;
 
@@ -332,6 +359,23 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 
 				if (colorsChanged) setNavLinkColors(newColors);
 				if (logoChanged) setLogoColor(currentLogoColor);
+
+				// Check Hero Reveal
+				const heroConfig = heroRevealConfig();
+				if (heroConfig && !hasTriggeredReveal) {
+					const { el, callback } = heroConfig;
+					const elRect = el.getBoundingClientRect();
+					let maxBottom = 0;
+					columns.forEach((col) => {
+						const rect = col.getBoundingClientRect();
+						if (rect.bottom > maxBottom) maxBottom = rect.bottom;
+					});
+
+					if (maxBottom < elRect.top) {
+						callback();
+						hasTriggeredReveal = true;
+					}
+				}
 			},
 		});
 	};
@@ -351,6 +395,8 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 				isVisible,
 				isPreloaderFinished,
 				setIsPreloaderFinished,
+				setHeroRevealCallback,
+				heroRevealConfig,
 			}}
 		>
 			{props.children}

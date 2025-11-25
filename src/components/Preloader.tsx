@@ -45,6 +45,7 @@ const Preloader: Component = () => {
 		setNavLinkColors,
 		logoColor,
 		setLogoColor,
+		heroRevealConfig,
 	} = usePageTransition();
 
 	// GSAP Context for proper cleanup
@@ -89,6 +90,8 @@ const Preloader: Component = () => {
 			const navLogo = document.querySelector('a[href="/"]');
 			const sections = document.querySelectorAll("main section");
 
+			let hasTriggeredReveal = false;
+
 			const tl = gsap.timeline({
 				onComplete: () => {
 					gsap.set([...columns, ...columns2], { display: "none" });
@@ -113,9 +116,39 @@ const Preloader: Component = () => {
 						y: "-100vh",
 						rotate: 6,
 						stagger: 0.03,
+						onStart: () => {
+							// Reset hero text animation state when starting preloader exit animation
+							const heroConfig = heroRevealConfig();
+							if (heroConfig) {
+								const { el } = heroConfig;
+								const wordAnims = el.querySelectorAll(".word-anim");
+								gsap.set(wordAnims, {
+									y: "115%",
+									rotation: 12,
+									transformOrigin: "0% 0%",
+								});
+							}
+						},
 						onUpdate: () => {
 							// Run color update logic on every frame of the column reveal
 							handleNavColorUpdate(navLinks, navLogo, sections, columns2);
+
+							// Check Hero Reveal
+							const heroConfig = heroRevealConfig();
+							if (heroConfig && !hasTriggeredReveal) {
+								const { el, callback } = heroConfig;
+								const elRect = el.getBoundingClientRect();
+								let maxBottom = 0;
+								columns2.forEach((col) => {
+									const rect = col.getBoundingClientRect();
+									if (rect.bottom > maxBottom) maxBottom = rect.bottom;
+								});
+
+								if (maxBottom < elRect.top) {
+									callback();
+									hasTriggeredReveal = true;
+								}
+							}
 						},
 					}),
 					">-0.4",

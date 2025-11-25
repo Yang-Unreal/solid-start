@@ -1,17 +1,30 @@
 // src/routes/index.tsx
 
 import gsap from "gsap/all";
-import { createEffect } from "solid-js";
+import { onMount } from "solid-js";
 import Footer from "~/components/Footer";
 import { usePageTransition } from "~/context/PageTransitionContext";
 
 export default function Home() {
-	const { isPreloaderFinished } = usePageTransition();
+	let gatewayRef: HTMLSpanElement | undefined;
+	const { setHeroRevealCallback } = usePageTransition();
 
-	createEffect(() => {
-		if (isPreloaderFinished()) {
+	onMount(() => {
+		if (!gatewayRef) return;
+
+		const q = gsap.utils.selector(gatewayRef);
+
+		// Set initial state immediately on mount (fallback for initial load timing)
+		gsap.set(q(".word-anim"), {
+			y: "115%",
+			rotation: 12,
+			transformOrigin: "0% 0%",
+		});
+
+		// Register the reveal animation callback
+		setHeroRevealCallback(gatewayRef, () => {
 			gsap.fromTo(
-				".word-anim",
+				q(".word-anim"),
 				{ y: "115%", rotation: 12, transformOrigin: "0% 0%" },
 				{
 					y: "0%",
@@ -20,10 +33,10 @@ export default function Home() {
 					duration: 1,
 					stagger: 0.05,
 					ease: "elastic.out(1,1)",
-					delay: 0.2,
+					overwrite: true, // Ensure we don't conflict with previous calls
 				},
 			);
-		}
+		});
 	});
 
 	return (
@@ -45,7 +58,7 @@ export default function Home() {
 							<div class="col">
 								<div class="col-row-title">
 									<h1 class="h1 text-light">
-										<span class="split-words">
+										<span class="split-words" ref={gatewayRef}>
 											{"Top Chinese Cars Deserve Global Access"
 												.split(" ")
 												.map((word) => (
