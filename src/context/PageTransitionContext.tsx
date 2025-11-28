@@ -1,4 +1,4 @@
-import { useNavigate } from "@solidjs/router";
+import { useBeforeLeave, useNavigate } from "@solidjs/router";
 import gsap from "gsap";
 import { createContext, createSignal, type JSX, useContext } from "solid-js";
 import { useLenis } from "~/context/LenisContext";
@@ -52,7 +52,7 @@ interface ColorState {
 
 interface PageTransitionContextType {
 	triggerTransition: (
-		href: string,
+		href: string | number,
 		navElements?: NavElements,
 		linkPositions?: LinkPosition[],
 		onMenuHide?: () => void,
@@ -112,9 +112,9 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 
 	// State
 	const [isVisible, setIsVisible] = createSignal(false);
-	const [pendingNavigation, setPendingNavigation] = createSignal<string | null>(
-		null,
-	);
+	const [pendingNavigation, setPendingNavigation] = createSignal<
+		string | number | null
+	>(null);
 	const [navLinkColors, setNavLinkColors] = createSignal<ColorState[]>(
 		Array(4).fill(DEFAULT_LINK_COLORS),
 	);
@@ -141,7 +141,7 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 	};
 
 	const triggerTransition = (
-		href: string,
+		href: string | number,
 		providedNavElements?: NavElements,
 		providedLinkPositions?: LinkPosition[],
 		onMenuHide?: () => void,
@@ -157,7 +157,7 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 
 		if (!columns.length) {
 			console.warn("Transition columns not found");
-			navigate(href);
+			navigate(href as string); // Cast to string if needed, or handle number
 			return;
 		}
 
@@ -262,8 +262,13 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 
 		tl.add(() => {
 			const href = pendingNavigation();
-			if (href) {
-				navigate(href);
+			if (href !== null) {
+				// Handle both string paths and number deltas
+				if (typeof href === "number") {
+					navigate(href);
+				} else {
+					navigate(href);
+				}
 				setPendingNavigation(null);
 			}
 		});
@@ -380,6 +385,22 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 			},
 		});
 	};
+
+	// Intercept navigations
+	useBeforeLeave((e) => {
+		if (isVisible()) {
+			// If transition is already running, let the navigation happen
+			// This happens when we call navigate() inside triggerTransition
+			return;
+		}
+
+		// Prevent immediate navigation
+		e.preventDefault();
+
+		// Trigger transition with the target
+		// e.to can be string or number (for history delta)
+		triggerTransition(e.to as string | number);
+	});
 
 	return (
 		<PageTransitionContext.Provider
