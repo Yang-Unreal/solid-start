@@ -117,7 +117,7 @@ const Preloader: Component = () => {
 						rotate: 6,
 						stagger: 0.03,
 						onStart: () => {
-							// Reset hero text animation state when starting preloader exit animation
+		
 							const heroConfig = heroRevealConfig();
 							if (heroConfig) {
 								const { el } = heroConfig;
@@ -191,7 +191,7 @@ const Preloader: Component = () => {
 	};
 
 	const animateColumns = (targets: HTMLDivElement[], vars: gsap.TweenVars) => {
-		const { y, rotate, stagger, onUpdate } = vars;
+		const { y, rotate, stagger, onUpdate, onStart } = vars;
 		const isFirstSet = rotate === -6;
 
 		gsap.set(targets, {
@@ -207,6 +207,7 @@ const Preloader: Component = () => {
 			ease: EASE.COLUMN_SLIDE,
 			stagger,
 			onUpdate,
+			onStart,
 		});
 	};
 

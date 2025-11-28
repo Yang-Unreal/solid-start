@@ -292,6 +292,7 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 					});
 				}
 			},
+
 			onUpdate: () => {
 				if (!navBar) return;
 

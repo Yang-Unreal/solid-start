@@ -7,19 +7,23 @@ import { usePageTransition } from "~/context/PageTransitionContext";
 
 export default function Home() {
 	let gatewayRef: HTMLSpanElement | undefined;
-	const { setHeroRevealCallback } = usePageTransition();
+	const { setHeroRevealCallback, isVisible } = usePageTransition();
 
 	onMount(() => {
 		if (!gatewayRef) return;
 
 		const q = gsap.utils.selector(gatewayRef);
 
-		// Set initial state immediately on mount (fallback for initial load timing)
-		gsap.set(q(".word-anim"), {
-			y: "115%",
-			rotation: 12,
-			transformOrigin: "0% 0%",
-		});
+		// Reset state only if we are in a page transition (SPA navigation)
+		// This prevents double-reset on initial load (handled by Preloader)
+		// and ensures visibility on back-button navigation (where isVisible is false)
+		if (isVisible()) {
+			gsap.set(q(".word-anim"), {
+				y: "115%",
+				rotation: 12,
+				transformOrigin: "0% 0%",
+			});
+		}
 
 		// Register the reveal animation callback
 		setHeroRevealCallback(gatewayRef, () => {
