@@ -13,6 +13,14 @@ export default function Home() {
 		if (!gatewayRef) return;
 
 		const q = gsap.utils.selector(gatewayRef);
+
+		// Set initial state immediately on mount (fallback for initial load timing)
+		gsap.set(q(".word-anim"), {
+			y: "115%",
+			rotation: 12,
+			transformOrigin: "0% 0%",
+		});
+
 		// Register the reveal animation callback
 		setHeroRevealCallback(gatewayRef, () => {
 			gsap.fromTo(
