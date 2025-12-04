@@ -13,10 +13,10 @@ export default createHandler((event) => {
 							name="viewport"
 							content="width=device-width, initial-scale=1"
 						/>
-						<title>LIMING© - YOUR GATEWAY FOR CHINA SOURCING</title>
+						<title>LIMING© - MOST TRUSTED CHINESE CAR SUPPLIER</title>
 						<meta
 							name="description"
-							content="We are an export company based in China, specializing in parallel exports of used cars, as well as new motorcycles and prefabricated modular homes."
+							content="LIMING connects global dealers with China’s top vehicles—backed by live inspections, guaranteed parts, and rapid support. We don't just ship cars; we secure your supply chain."
 						/>
 						<link
 							rel="icon"
