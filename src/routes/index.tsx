@@ -14,20 +14,23 @@ export default function Home() {
 
 		const q = gsap.utils.selector(gatewayRef);
 
-		// Reset state only if we are in a page transition (SPA navigation)
-		// This prevents double-reset on initial load (handled by Preloader)
-		// and ensures visibility on back-button navigation (where isVisible is false)
 		if (isVisible()) {
 			gsap.set(q(".word-anim"), {
 				y: "115%",
 				rotation: 12,
 				transformOrigin: "0% 0%",
 			});
+			gsap.set(".usps-anim", {
+				y: "100%",
+			});
 		}
 
-		// Register the reveal animation callback
+		const uspsAnims = document.querySelectorAll(".usps-anim");
+
 		setHeroRevealCallback(gatewayRef, () => {
-			gsap.fromTo(
+			const tl = gsap.timeline();
+
+			tl.fromTo(
 				q(".word-anim"),
 				{ y: "115%", rotation: 12, transformOrigin: "0% 0%" },
 				{
@@ -37,9 +40,23 @@ export default function Home() {
 					duration: 1,
 					stagger: 0.05,
 					ease: "elastic.out(1,1)",
-					overwrite: true, // Ensure we don't conflict with previous calls
+					overwrite: true,
 				},
 			);
+
+			if (uspsAnims.length > 0) {
+				tl.fromTo(
+					uspsAnims,
+					{ y: "100%" },
+					{
+						y: "0%",
+						duration: 1,
+						ease: "elastic.out(1,1)",
+						overwrite: true,
+					},
+					"<",
+				);
+			}
 		});
 	});
 
@@ -63,24 +80,26 @@ export default function Home() {
 								<div class="col-row-title">
 									<h1 class="h1 text-light">
 										<span class="split-words" ref={gatewayRef}>
-											{"Top Chinese Cars Deserve Global Access"
-												.split(" ")
-												.map((word) => (
-													<div class="single-word inline-block">
-														<div class="word-anim single-word-inner">
-															{word}
-														</div>
-													</div>
-												))}
+											{"Most Trusted".split(" ").map((word) => (
+												<div class="single-word inline-block">
+													<div class="word-anim single-word-inner">{word}</div>
+												</div>
+											))}
+											<br />
+											{"Chinese Car Supplier".split(" ").map((word) => (
+												<div class="single-word inline-block">
+													<div class="word-anim single-word-inner">{word}</div>
+												</div>
+											))}
 										</span>
 									</h1>
 								</div>
 								<div class="col-row-usps">
-									<div class="col-row-col">
+									<div class="col-row-col usps-anim">
 										<span class="eyebrow text-gray">LIMING AGENCY</span>
 										<h4 class="xxs text-light">ELIMINATE THE RISK</h4>
 									</div>
-									<div class="col-row-col">
+									<div class="col-row-col usps-anim">
 										<span class="eyebrow text-gray">SINCE 2015</span>
 										<h4 class="xxs text-light">WORKING GLOBALLY</h4>
 									</div>

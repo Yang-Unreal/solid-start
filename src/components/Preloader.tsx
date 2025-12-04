@@ -117,7 +117,6 @@ const Preloader: Component = () => {
 						rotate: 6,
 						stagger: 0.03,
 						onStart: () => {
-		
 							const heroConfig = heroRevealConfig();
 							if (heroConfig) {
 								const { el } = heroConfig;
@@ -127,6 +126,13 @@ const Preloader: Component = () => {
 									rotation: 12,
 									transformOrigin: "0% 0%",
 								});
+
+								const uspsAnims = document.querySelectorAll(".usps-anim");
+								if (uspsAnims.length > 0) {
+									gsap.set(uspsAnims, {
+										y: "100%",
+									});
+								}
 							}
 						},
 						onUpdate: () => {

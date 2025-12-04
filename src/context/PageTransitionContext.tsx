@@ -295,6 +295,10 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 						rotation: 12,
 						transformOrigin: "0% 0%",
 					});
+					// Reset USPS animation state
+					gsap.set(".usps-anim", {
+						y: "100%",
+					});
 				}
 			},
 

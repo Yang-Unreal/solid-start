@@ -806,6 +806,7 @@ header {
 		padding-top: calc(var(--gap) * 2);
 		z-index: 2;
 		width: 100%;
+		overflow: hidden;
 		.col-row-col {
 			text-align: center;
 		}
