@@ -96,8 +96,8 @@ export default function Home() {
 								</div>
 								<div class="col-row-usps">
 									<div class="col-row-col usps-anim">
-										<span class="eyebrow text-gray">LIMING AGENCY</span>
-										<h4 class="xxs text-light">ELIMINATE THE RISK</h4>
+										<span class="eyebrow text-gray">LICENSED EXPORTER</span>
+										<h4 class="xxs text-light">ELIMINATE IMPORT RISKS</h4>
 									</div>
 									<div class="col-row-col usps-anim">
 										<span class="eyebrow text-gray">SINCE 2015</span>
