@@ -85,7 +85,7 @@ export default function Nav() {
 						sectionRect.top < linkRect.bottom &&
 						sectionRect.bottom > linkRect.top
 					) {
-						if (section.classList.contains("bg-light")) {
+						if (section.getAttribute("data-theme-section") === "light") {
 							determinedColors = {
 								originalClass: "text-darkgray",
 								duplicateClass: "text-dark",
@@ -123,7 +123,7 @@ export default function Nav() {
 						sectionRect.top < logoRect.bottom &&
 						sectionRect.bottom > logoRect.top
 					) {
-						if (section.classList.contains("bg-light")) {
+						if (section.getAttribute("data-theme-section") === "light") {
 							determinedColor = "text-darkgray";
 						}
 						sectionFound = true;

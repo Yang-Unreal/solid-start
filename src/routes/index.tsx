@@ -63,7 +63,10 @@ export default function Home() {
 	return (
 		<main class="main">
 			<div class="main-wrap">
-				<section class="section default-header full-height section-home-header bg-dark">
+				<section
+					class="section default-header full-height section-home-header bg-dark"
+					data-theme-section="dark"
+				>
 					<div class="single-video-background">
 						<video
 							autoplay
@@ -108,8 +111,14 @@ export default function Home() {
 						</div>
 					</div>
 				</section>
-				<section class="h-screen bg-dark w-full"></section>
-				<section class="h-screen bg-light w-full"></section>
+				<section
+					class="h-screen bg-dark w-full"
+					data-theme-section="dark"
+				></section>
+				<section
+					class="h-screen bg-light w-full"
+					data-theme-section="light"
+				></section>
 				<Footer />
 			</div>
 		</main>
