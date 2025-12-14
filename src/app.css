@@ -455,9 +455,49 @@ body::-webkit-scrollbar {
 	}
 }
 
+.social-link {
+	position: relative;
+	border: 0;
+	outline: 0;
+	.social-link-click {
+		cursor: pointer;
+		background-color: transparent;
+		display: flex;
+		position: relative;
+		padding: 0.2em 0;
+		overflow: hidden;
+	}
+}
+
+.social-link .social-link-click::before {
+	content: "";
+	pointer-events: none;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	background-color: currentColor;
+	transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+	z-index: 2;
+	transform: scaleX(0);
+	transform-origin: 100% 50%;
+}
+
+[data-theme-section="dark"] .social-link .social-link-click::before {
+	background-color: var(
+		--color-light
+	); /* Keep explicit for dark section if needed, or rely on currentColor */
+}
+
+.social-link:hover .social-link-click::before {
+	transform: scaleX(1);
+	transform-origin: 0% 50%;
+}
+
 /* ==========================================================================
-   6. Layout Components
-   ========================================================================== */
+    6. Layout Components
+    ========================================================================== */
 header {
 	position: fixed;
 	inset: 0; /* top: 0; left: 0; right: 0; bottom: 0; */
@@ -909,6 +949,17 @@ header {
 			display: flex;
 			flex-direction: row;
 			gap: var(--gap);
+		}
+		.col-socials {
+			display: flex;
+			flex-direction: row;
+			gap: 1em;
+
+			.link {
+				display: block;
+				height: auto;
+				width: auto;
+			}
 		}
 	}
 	.row-logo {

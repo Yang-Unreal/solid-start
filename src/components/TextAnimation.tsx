@@ -11,6 +11,7 @@ interface TextAnimationProps {
 	isCopyable?: boolean;
 	textStyle?: string;
 	asButton?: boolean;
+	children?: any;
 }
 
 export default function TextAnimation(props: TextAnimationProps) {
@@ -120,6 +121,7 @@ export default function TextAnimation(props: TextAnimationProps) {
 	});
 
 	const isInteractive = props.isCopyable || props.asButton !== false;
+	const content = () => props.children || displayText();
 
 	return (
 		<Show
@@ -130,7 +132,7 @@ export default function TextAnimation(props: TextAnimationProps) {
 						ref={originalRef}
 						class={`block ${props.textStyle} ${props.originalClass || ""}`}
 					>
-						{displayText()}
+						{content()}
 					</span>
 					<span
 						ref={duplicateRef}
@@ -139,7 +141,7 @@ export default function TextAnimation(props: TextAnimationProps) {
 						}`}
 						style={`transform: translateY(100%) rotate(-12deg); transform-origin: 100% 0%;`}
 					>
-						{displayText()}
+						{content()}
 					</span>
 				</div>
 			}
@@ -155,13 +157,13 @@ export default function TextAnimation(props: TextAnimationProps) {
 					ref={originalRef}
 					class={`${props.textStyle} ${props.originalClass || ""}`}
 				>
-					{displayText()}
+					{content()}
 				</span>
 				<span
 					ref={duplicateRef}
 					class={`duplicate ${props.textStyle} ${props.duplicateClass || ""}`}
 				>
-					{displayText()}
+					{content()}
 				</span>
 			</button>
 		</Show>

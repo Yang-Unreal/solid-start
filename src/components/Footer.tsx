@@ -1,6 +1,12 @@
 import { A } from "@solidjs/router";
 import gsap from "gsap";
 import { type Component, createSignal, For } from "solid-js";
+import {
+	IconInstagram,
+	IconLinkedin,
+	IconTiktok,
+	IconVimeo,
+} from "./footer/SocialIcons";
 import YourLogo from "./logo/YourLogo";
 import TextAnimation from "./TextAnimation";
 
@@ -41,6 +47,29 @@ const Footer: Component = () => {
 		{ href: "/contact", label: "CONTACT" },
 	];
 
+	const socialLinks = [
+		{
+			href: "https://www.instagram.com/twicemediahouse/",
+			icon: IconInstagram,
+			label: "Instagram",
+		},
+		{
+			href: "https://www.tiktok.com/@twicemediahouse",
+			icon: IconTiktok,
+			label: "TikTok",
+		},
+		{
+			href: "https://vimeo.com/twicemediahouse",
+			icon: IconVimeo,
+			label: "Vimeo",
+		},
+		{
+			href: "https://www.linkedin.com/company/twice-media-house/about/",
+			icon: IconLinkedin,
+			label: "LinkedIn",
+		},
+	];
+
 	const [hoveredSitemapIndex, setHoveredSitemapIndex] = createSignal<
 		number | null
 	>(null);
@@ -51,6 +80,18 @@ const Footer: Component = () => {
 
 	const handleSitemapMouseLeave = () => {
 		setHoveredSitemapIndex(null);
+	};
+
+	const [hoveredSocialIndex, setHoveredSocialIndex] = createSignal<
+		number | null
+	>(null);
+
+	const handleSocialMouseEnter = (index: number) => {
+		setHoveredSocialIndex(index);
+	};
+
+	const handleSocialMouseLeave = () => {
+		setHoveredSocialIndex(null);
 	};
 
 	return (
@@ -151,7 +192,7 @@ const Footer: Component = () => {
 									>
 										<div class="link-content text-light">
 											<TextAnimation
-												originalClass="text-light"
+												originalClass="text-gray"
 												duplicateClass="text-light"
 												text={item.label}
 												externalTrigger={
@@ -160,6 +201,38 @@ const Footer: Component = () => {
 											/>
 										</div>
 									</A>
+								</li>
+							)}
+						</For>
+					</ul>
+					<ul class="col col-socials">
+						<For each={socialLinks}>
+							{(item, index) => (
+								<li class="social-link">
+									<a
+										href={item.href}
+										target="_blank"
+										rel="noreferrer"
+										class="social-link-click"
+										onMouseEnter={() => handleSocialMouseEnter(index())}
+										onMouseLeave={() => handleSocialMouseLeave()}
+									>
+										<div class="icon-wrap">
+											<TextAnimation
+												class="w-full h-full"
+												originalClass="text-gray"
+												duplicateClass="text-light"
+												text=""
+												textStyle="w-full h-full"
+												externalTrigger={
+													hoveredSocialIndex() === index() ? "enter" : "leave"
+												}
+												asButton={false}
+											>
+												<item.icon class="icon" />
+											</TextAnimation>
+										</div>
+									</a>
 								</li>
 							)}
 						</For>
