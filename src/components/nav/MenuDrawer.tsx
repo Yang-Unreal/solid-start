@@ -32,12 +32,8 @@ const MenuDrawer = () => {
 
 	const [hoveredIndex, setHoveredIndex] = createSignal<number | null>(null);
 	const [activeIndex, setActiveIndex] = createSignal<number>(-1);
-	const [hasHoveredOther, setHasHoveredOther] = createSignal(false);
 
 	// Refs for animations
-	const underlineRefs: (HTMLDivElement | undefined)[] = new Array(
-		navLinks.length,
-	).fill(undefined);
 	const linkRefs: (HTMLLIElement | undefined)[] = new Array(
 		navLinks.length,
 	).fill(undefined);
@@ -71,7 +67,6 @@ const MenuDrawer = () => {
 
 		if (isMenuOpen()) {
 			// OPEN ANIMATION
-			setHasHoveredOther(false);
 			gsap.set(menuContainer, { visibility: "visible" });
 			lenis?.stop();
 
@@ -82,13 +77,6 @@ const MenuDrawer = () => {
 				rotate: -6,
 				y: "100%",
 				transformOrigin: "100% 0%",
-			});
-
-			// Set initial underline state
-			underlineRefs.forEach((ref, i) => {
-				if (ref) {
-					gsap.set(ref, { scaleX: i === activeIndex() ? 1 : 0 });
-				}
 			});
 
 			currentTl = gsap.timeline();
@@ -225,39 +213,10 @@ const MenuDrawer = () => {
 
 	const handleMouseEnter = (index: number) => {
 		setHoveredIndex(index);
-
-		if (index !== activeIndex()) {
-			setHasHoveredOther(true);
-		}
-
-		// Animate underlines
-		underlineRefs.forEach((ref, i) => {
-			if (ref) {
-				gsap.to(ref, {
-					scaleX: i === index ? 1 : 0,
-					transformOrigin: i === index ? "0% 50%" : "100% 50%",
-					duration: 0.3,
-				});
-			}
-		});
 	};
 
-	const handleMouseLeave = (index: number) => {
+	const handleMouseLeave = () => {
 		setHoveredIndex(null);
-
-		const ref = underlineRefs[index];
-		if (!ref) return;
-
-		// If it's the active link and we haven't hovered other links yet, keep it visible
-		if (index === activeIndex() && !hasHoveredOther()) {
-			return;
-		}
-
-		gsap.to(ref, {
-			scaleX: 0,
-			transformOrigin: "100% 50%",
-			duration: 0.3,
-		});
 	};
 
 	return (
@@ -294,11 +253,12 @@ const MenuDrawer = () => {
 								<a
 									href={item.href}
 									class="link-click"
+									classList={{ active: activeIndex() === index() }}
 									onClick={(e) => handleLinkClick(e, item.href)}
 									onMouseEnter={() => handleMouseEnter(index())}
-									onMouseLeave={() => handleMouseLeave(index())}
+									onMouseLeave={() => handleMouseLeave()}
 								>
-									<div class="link-content">
+									<div class="link-content text-light">
 										<TextAnimation
 											originalClass="text-light"
 											duplicateClass="text-light"
@@ -307,12 +267,6 @@ const MenuDrawer = () => {
 												hoveredIndex() === index() ? "enter" : "leave"
 											}
 										/>
-										<div
-											ref={(el) => {
-												underlineRefs[index()] = el;
-											}}
-											class="underline bg-light"
-										></div>
 									</div>
 								</a>
 							</li>

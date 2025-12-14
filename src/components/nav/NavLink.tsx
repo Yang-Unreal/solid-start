@@ -20,29 +20,7 @@ interface NavLinkProps {
 }
 
 export default function NavLink(props: NavLinkProps) {
-	let underlineRef: HTMLDivElement | undefined;
 	let linkRef: HTMLAnchorElement | undefined;
-
-	// Handle hover animations
-	const handleMouseEnter = () => {
-		if (!props.isMenuOpen && underlineRef) {
-			gsap.to(underlineRef, {
-				scaleX: 1,
-				transformOrigin: "0% 50%",
-				duration: 0.3,
-			});
-		}
-	};
-
-	const handleMouseLeave = () => {
-		if (!props.isMenuOpen && underlineRef) {
-			gsap.to(underlineRef, {
-				scaleX: 0,
-				transformOrigin: "100% 50%",
-				duration: 0.3,
-			});
-		}
-	};
 
 	// Handle menu open/close animations
 	createEffect(() => {
@@ -71,7 +49,6 @@ export default function NavLink(props: NavLinkProps) {
 
 	onCleanup(() => {
 		if (linkRef) gsap.killTweensOf(linkRef);
-		if (underlineRef) gsap.killTweensOf(underlineRef);
 	});
 
 	return (
@@ -87,21 +64,15 @@ export default function NavLink(props: NavLinkProps) {
 					e.preventDefault();
 					props.onClick(e, props.href);
 				}}
-				onMouseEnter={handleMouseEnter}
-				onMouseLeave={handleMouseLeave}
 			>
-				<div class="link-content">
+				<div
+					class={`link-content ${props.colorState?.duplicateClass ?? "text-light"}`}
+				>
 					<TextAnimation
 						originalClass={props.colorState?.originalClass ?? "text-gray"}
 						duplicateClass={props.colorState?.duplicateClass ?? "text-light"}
 						text={props.label}
 					/>
-					<div
-						ref={underlineRef}
-						class={`underline ${(
-							props.colorState?.duplicateClass ?? "text-light"
-						).replace("text-", "bg-")}`}
-					></div>
 				</div>
 			</A>
 		</li>
