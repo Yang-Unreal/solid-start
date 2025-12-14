@@ -2,7 +2,6 @@
 
 import gsap from "gsap/all";
 import { onMount } from "solid-js";
-import Footer from "~/components/Footer";
 import { usePageTransition } from "~/context/PageTransitionContext";
 
 export default function Home() {
@@ -119,7 +118,6 @@ export default function Home() {
 					class="h-screen bg-dark w-full"
 					data-theme-section="dark"
 				></section>
-				<Footer />
 			</div>
 		</main>
 	);

@@ -1,4 +1,3 @@
-import Footer from "~/components/Footer";
 export default function Contact() {
 	return (
 		<main>
@@ -14,7 +13,6 @@ export default function Contact() {
 				class=" bg-light min-h-screen"
 				data-theme-section="light"
 			></section>
-			<Footer />
 		</main>
 	);
 }

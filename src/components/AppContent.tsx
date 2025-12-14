@@ -2,6 +2,7 @@ import gsap from "gsap/all";
 import { CustomEase } from "gsap/CustomEase";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { type JSX, onCleanup, onMount, Suspense } from "solid-js";
+import Footer from "./Footer";
 import Header from "./Header";
 import MenuDrawer from "./nav/MenuDrawer";
 import Preloader from "./Preloader";
@@ -37,6 +38,7 @@ export function AppContent(props: { children: JSX.Element }) {
 			<main class="grow">
 				<Suspense fallback={null}>{props.children}</Suspense>
 			</main>
+			<Footer />
 		</>
 	);
 }

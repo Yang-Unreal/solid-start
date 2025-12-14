@@ -1,6 +1,6 @@
 import { A } from "@solidjs/router";
 import gsap from "gsap";
-import { type Component, createSignal } from "solid-js";
+import { type Component, createSignal, For } from "solid-js";
 import YourLogo from "./logo/YourLogo";
 import TextAnimation from "./TextAnimation";
 
@@ -32,6 +32,25 @@ const Footer: Component = () => {
 				overwrite: true,
 			});
 		}
+	};
+
+	const sitemapLinks = [
+		{ href: "/product", label: "PRODUCT" },
+		{ href: "/services", label: "SERVICES" },
+		{ href: "/about", label: "ABOUT" },
+		{ href: "/contact", label: "CONTACT" },
+	];
+
+	const [hoveredSitemapIndex, setHoveredSitemapIndex] = createSignal<
+		number | null
+	>(null);
+
+	const handleSitemapMouseEnter = (index: number) => {
+		setHoveredSitemapIndex(index);
+	};
+
+	const handleSitemapMouseLeave = () => {
+		setHoveredSitemapIndex(null);
 	};
 
 	return (
@@ -120,7 +139,31 @@ const Footer: Component = () => {
 					</div>
 				</div>
 				<div class="row row-links">
-					<ul class="col col-sitemap"></ul> <ul class="col col-sitemap"></ul>
+					<ul class="col col-sitemap">
+						<For each={sitemapLinks}>
+							{(item, index) => (
+								<li class="link">
+									<A
+										href={item.href}
+										class="link-click"
+										onMouseEnter={() => handleSitemapMouseEnter(index())}
+										onMouseLeave={() => handleSitemapMouseLeave()}
+									>
+										<div class="link-content text-light">
+											<TextAnimation
+												originalClass="text-light"
+												duplicateClass="text-light"
+												text={item.label}
+												externalTrigger={
+													hoveredSitemapIndex() === index() ? "enter" : "leave"
+												}
+											/>
+										</div>
+									</A>
+								</li>
+							)}
+						</For>
+					</ul>
 				</div>
 				<div class="row"></div>
 			</div>
