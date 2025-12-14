@@ -238,7 +238,10 @@ const Footer: Component = () => {
 						</For>
 					</ul>
 				</div>
-				<div class="row"></div>
+				<div class="row row-credentials">
+					<div class="col col-copyright"></div>
+					<div class="col col-legal"></div> <div class="col col-credits"></div>
+				</div>
 			</div>
 		</footer>
 	);

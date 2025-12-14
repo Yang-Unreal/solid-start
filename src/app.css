@@ -998,6 +998,18 @@ header {
 		flex-shrink: 0;
 		justify-content: center;
 	}
+	.row-credentials {
+		padding-top: 0;
+		padding-bottom: var(--gap);
+		gap: calc(var(--gap) * 2);
+	}
+	.col-copyright {
+		align-items: flex-start;
+	}
+	.col-credits {
+		margin-left: auto;
+		align-items: flex-end;
+	}
 }
 
 .default-header {
