@@ -105,6 +105,11 @@
 	--color-text: rgba(var(--color-gray-rgb), 0.8);
 }
 
+[data-theme-section="dark"] {
+	--color-border: rgba(var(--color-gray-rgb), 0.2);
+	--color-text: rgba(var(--color-gray-rgb), 0.8);
+}
+
 /* ==========================================================================
    4. Base Styles
    ========================================================================== */
@@ -887,6 +892,15 @@ header {
 		padding: calc(var(--gap) * 3) 0;
 		justify-content: space-between;
 	}
+	.row-links {
+		border-top: 1px solid var(--color-border);
+		align-items: center;
+		.col-sitemap {
+			display: flex;
+			flex-direction: row;
+			gap: var(--gap);
+		}
+	}
 	.row-logo {
 		--columns: 2;
 		.col-logo {
@@ -1140,4 +1154,15 @@ header {
 	.section-padding-small {
 		padding: calc(var(--title-size) * 0.8);
 	}
+}
+
+[data-theme-section="dark"] .btn .btn-icon::before,
+.btn.dark .btn-icon::before,
+[data-theme-section="dark"] .btn .btn-content::before,
+.btn.dark .btn-content::before {
+	border: 1px solid var(--color-light);
+}
+
+[data-theme-section="dark"] + .section-footer .row-logo {
+	border-top: 1px solid var(--color-border);
 }

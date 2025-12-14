@@ -35,7 +35,7 @@ const Footer: Component = () => {
 	};
 
 	return (
-		<footer class="section section-footer" data-theme-section="light">
+		<footer class="section section-footer" data-theme-section="dark">
 			<div class="container wide">
 				<div class="row row-logo grid">
 					<div class="col-logo">
@@ -49,9 +49,9 @@ const Footer: Component = () => {
 					<div class="col col-text styled-col">
 						<div class="col-row col-row-text">
 							<p>
-								"Were a marketing agency and audiovisual production company
+								We're a marketing agency and audiovisual production company
 								dedicated to offering all-encompassing services to help you
-								stand out in the digital world."
+								stand out in the digital world.
 							</p>
 						</div>
 						<div class="col-row col-row-btn">
@@ -105,8 +105,8 @@ const Footer: Component = () => {
 									<div class="btn-content">
 										<div class="btn-text">
 											<TextAnimation
-												originalClass="text-dark"
-												duplicateClass="text-dark"
+												originalClass="text-light"
+												duplicateClass="text-light"
 												text="CONTACT US"
 												externalTrigger={externalTrigger()}
 												textStyle="pt-[0.2em] leading-[0.86em] tracking-wide"
@@ -119,7 +119,9 @@ const Footer: Component = () => {
 						</div>
 					</div>
 				</div>
-				<div class="row"></div>
+				<div class="row row-links">
+					<ul class="col col-sitemap"></ul> <ul class="col col-sitemap"></ul>
+				</div>
 				<div class="row"></div>
 			</div>
 		</footer>

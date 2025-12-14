@@ -116,8 +116,8 @@ export default function Home() {
 					data-theme-section="dark"
 				></section>
 				<section
-					class="h-screen bg-light w-full"
-					data-theme-section="light"
+					class="h-screen bg-dark w-full"
+					data-theme-section="dark"
 				></section>
 				<Footer />
 			</div>
