@@ -360,8 +360,8 @@ const Preloader: Component = () => {
 				</For>
 
 				<div ref={logoContainerRef} class="logo">
-					<YourLogo class="h-auto w-full text-gray" />
-					<YourLogo class="h-auto w-full text-light absolute invisible" />
+					<YourLogo class="h-auto w-full text-gray/25" />
+					<YourLogo class="h-auto w-full text-gray absolute invisible" />
 				</div>
 
 				<div ref={copyrightRef} class="copyright-row">
