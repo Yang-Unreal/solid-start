@@ -20,7 +20,7 @@ async function fetchVehiclePhotos(vehicleId: string): Promise<Photo[]> {
 	const baseUrl =
 		typeof window !== "undefined"
 			? window.location.origin
-			: "http://localhost:3000";
+			: import.meta.env.VITE_INTERNAL_API_ORIGIN || import.meta.env.VITE_BASE_URL || "http://localhost:3000";
 	const res = await fetch(`${baseUrl}/api/vehicles/${vehicleId}/photos`);
 	if (!res.ok) {
 		throw new Error("Failed to fetch vehicle photos");
