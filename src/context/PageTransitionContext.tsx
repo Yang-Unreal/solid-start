@@ -296,9 +296,12 @@ export function PageTransitionProvider(props: { children: JSX.Element }) {
 						transformOrigin: "0% 0%",
 					});
 					// Reset USPS animation state
-					gsap.set(".usps-anim", {
-						y: "100%",
-					});
+					const uspsAnims = document.querySelectorAll(".usps-anim");
+					if (uspsAnims.length > 0) {
+						gsap.set(uspsAnims, {
+							y: "100%",
+						});
+					}
 				}
 			},
 
