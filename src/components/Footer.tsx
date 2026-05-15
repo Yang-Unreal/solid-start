@@ -49,7 +49,7 @@ const Footer: Component = () => {
 
 	const socialLinks = [
 		{
-			href: "https://www.instagram.com/twicemediahouse/",
+			href: "https://www.instagram.com/liming_chinasourcing/",
 			icon: IconInstagram,
 			label: "Instagram",
 		},
