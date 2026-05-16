@@ -7,11 +7,6 @@ export default defineConfig(() => {
 	return {
 		server: {
 			port: 3000,
-			host: true,
-		},
-		preview: {
-			port: 3000,
-			host: true,
 		},
 		plugins: [solidStart(), nitroV2Plugin(), tailwindcss()],
 	};
