@@ -25,7 +25,7 @@
 		"jsx": "preserve",
 		"jsxImportSource": "solid-js",
 
-		"types": ["@solidjs/start/env"],
+		"types": ["vinxi/types/client"],
 		"isolatedModules": true,
 		"paths": {
 			"~/*": ["./src/*"]
