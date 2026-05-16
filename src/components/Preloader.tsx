@@ -53,12 +53,14 @@ const Preloader: Component = () => {
 
 	onMount(() => {
 		if (typeof window === "undefined") return;
+		console.log("Preloader onMount started");
 
 		// Disable scrolling immediately when preloader mounts
 		lenis?.stop();
 		lenis?.lenis.scrollTo(0, { immediate: true });
 
 		ctx = gsap.context(() => {
+			console.log("GSAP context executed");
 			// Select elements within the context of containerRef
 			const columns = gsap.utils.toArray<HTMLDivElement>(".column");
 			const columns2 = gsap.utils.toArray<HTMLDivElement>(".column2");
@@ -94,6 +96,7 @@ const Preloader: Component = () => {
 
 			const tl = gsap.timeline({
 				onComplete: () => {
+					console.log("GSAP timeline completed");
 					gsap.set([...columns, ...columns2], { display: "none" });
 					lenis?.start();
 					setIsPreloaderFinished(true);
